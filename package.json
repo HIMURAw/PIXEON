@@ -1,0 +1,21 @@
+{
+  "name": "px-fivemweb",
+  "version": "1.0.0",
+  "description": "Fivem server webiste",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HIMURAw/PX-FiveMWeb.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/HIMURAw/PX-FiveMWeb/issues"
+  },
+  "homepage": "https://github.com/HIMURAw/PX-FiveMWeb#readme"
+}
