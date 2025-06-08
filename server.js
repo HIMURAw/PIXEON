@@ -1,6 +1,11 @@
 const express = require('express');
+const fs = require('fs');
+
 const app = express();
+
+
 const Config = require('./config.json');
+
 const port = Config.PORT || 3000;
 
 app.get('/', (req, res) => {
