@@ -17,5 +17,8 @@
   "bugs": {
     "url": "https://github.com/HIMURAw/PX-FiveMWeb/issues"
   },
-  "homepage": "https://github.com/HIMURAw/PX-FiveMWeb#readme"
+  "homepage": "https://github.com/HIMURAw/PX-FiveMWeb#readme",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
 }
