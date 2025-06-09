@@ -1,12 +1,13 @@
 /* Navbar Styles */
 .navbar {
-    background: rgba(0, 0, 0, 0.9);
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
     padding: 1rem 0;
     position: fixed;
     width: 100%;
     top: 0;
     z-index: 1000;
     transition: all 0.3s ease;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .navbar.scrolled {
@@ -15,25 +16,26 @@
 }
 
 .navbar-brand {
-    color: #fff !important;
-    font-size: 1.8rem;
+    font-size: 1.5rem;
     font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    transition: all 0.3s ease;
+    color: #fff !important;
+    transition: transform 0.3s ease;
 }
 
 .navbar-brand:hover {
-    color: #ff3e3e !important;
-    text-shadow: 0 0 10px rgba(255, 62, 62, 0.5);
+    transform: scale(1.05);
 }
 
 .nav-link {
-    color: #fff !important;
-    font-size: 1.1rem;
-    margin: 0 10px;
+    color: rgba(255, 255, 255, 0.8) !important;
+    margin: 0 0.5rem;
     position: relative;
     transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+    color: #fff !important;
+    transform: translateY(-2px);
 }
 
 .nav-link::after {
@@ -43,78 +45,89 @@
     height: 2px;
     bottom: 0;
     left: 0;
-    background-color: #ff3e3e;
+    background-color: #fff;
     transition: width 0.3s ease;
-}
-
-.nav-link:hover {
-    color: #ff3e3e !important;
 }
 
 .nav-link:hover::after {
     width: 100%;
 }
 
-.navbar-toggler {
-    border: none;
-    padding: 0.5rem;
-}
-
-.navbar-toggler:focus {
-    box-shadow: none;
-}
-
-.navbar-toggler-icon {
-    background-image: none;
-    position: relative;
-    width: 30px;
-    height: 2px;
-    background-color: #fff;
-    transition: all 0.3s ease;
-}
-
-.navbar-toggler-icon::before,
-.navbar-toggler-icon::after {
-    content: '';
-    position: absolute;
-    width: 30px;
-    height: 2px;
-    background-color: #fff;
-    transition: all 0.3s ease;
-}
-
-.navbar-toggler-icon::before {
-    transform: translateY(-8px);
-}
-
-.navbar-toggler-icon::after {
-    transform: translateY(8px);
-}
-
-.navbar-toggler[aria-expanded="true"] .navbar-toggler-icon {
-    background-color: transparent;
-}
-
-.navbar-toggler[aria-expanded="true"] .navbar-toggler-icon::before {
-    transform: rotate(45deg);
-}
-
-.navbar-toggler[aria-expanded="true"] .navbar-toggler-icon::after {
-    transform: rotate(-45deg);
-}
-
 /* Responsive Styles */
-@media (max-width: 991px) {
+@media (max-width: 991.98px) {
     .navbar-collapse {
-        background: rgba(0, 0, 0, 0.95);
+        background: rgba(26, 26, 26, 0.95);
         padding: 1rem;
-        border-radius: 10px;
+        border-radius: 8px;
         margin-top: 1rem;
     }
 
     .nav-link {
-        margin: 0.5rem 0;
+        padding: 0.8rem 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
+
+    .nav-link:last-child {
+        border-bottom: none;
+    }
+
+    .nav-link::after {
+        display: none;
+    }
+}
+
+/* Animation for navbar collapse */
+.navbar-collapse {
+    transition: all 0.3s ease-in-out;
+}
+
+.navbar-collapse.collapsing {
+    transition: all 0.3s ease-in-out;
+}
+
+/* Active state for current page */
+.nav-link.active {
+    color: #fff !important;
+    font-weight: bold;
+}
+
+.nav-link.active::after {
+    width: 100%;
+}
+
+/* Hover effect for navbar items */
+.nav-item {
+    position: relative;
+}
+
+.nav-item:hover .nav-link {
+    color: #fff !important;
+}
+
+/* Burger Menu Styles */
+.navbar-toggler {
+    border: none;
+    padding: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.navbar-toggler:focus {
+    box-shadow: none;
+    outline: none;
+}
+
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+    transition: transform 0.3s ease;
+}
+
+/* Burger menu rotation */
+.navbar-toggler[aria-expanded="true"] .navbar-toggler-icon {
+    transform: rotate(90deg);
+}
+
+.navbar-toggler[aria-expanded="false"] .navbar-toggler-icon {
+    transform: rotate(0deg);
 }
 
 /* Animation for navbar items */
