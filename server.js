@@ -6,7 +6,7 @@ const app = express();
 
 // EJS ayarları
 app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', path.join(__dirname, 'public/views'));
 app.set('layout', 'layouts/main');
 app.use(expressLayouts);
 
