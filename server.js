@@ -1,71 +1,30 @@
 const express = require('express');
-const expressLayouts = require('express-ejs-layouts');
 const path = require('path');
 const Config = require('./config.json');
 
 const app = express();
 
-// EJS ayarları
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'public/views'));
-app.set('layout', 'layouts/main');
-app.use(expressLayouts);
+// Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Statik dosyalar
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Routes
+// Ana sayfa route'u
 app.get('/', (req, res) => {
-    res.render('home', {
-        currentPage: 'home',
-        title: 'Ana Sayfa'
-    });
-});
-
-app.get('/stats', (req, res) => {
-    res.render('stats', {
-        currentPage: 'stats',
-        title: 'İstatistikler'
-    });
-});
-
-app.get('/shop', (req, res) => {
-    res.render('shop', {
-        currentPage: 'shop',
-        title: 'Mağaza'
-    });
-});
-
-app.get('/donate', (req, res) => {
-    res.render('donate', {
-        currentPage: 'donate',
-        title: 'Bağış'
-    });
-});
-
-app.get('/promo', (req, res) => {
-    res.render('promo', {
-        currentPage: 'promo',
-        title: 'Tanıtım'
-    });
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // 404 hata sayfası
 app.use((req, res) => {
-    res.status(404).render('404', {
-        title: 'Sayfa Bulunamadı',
-        currentPage: '404'
-    });
+    res.status(404).sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Hata yönetimi
 app.use((err, req, res, next) => {
     console.error(err.stack);
-    res.status(500).render('error', {
-        title: 'Sunucu Hatası',
-        currentPage: 'error',
-        error: err
-    });
+    res.status(500).sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 const port = Config.PORT || 3000;
