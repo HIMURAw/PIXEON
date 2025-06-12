@@ -1,6 +1,7 @@
 const express = require('express');
 const expressLayouts = require('express-ejs-layouts');
 const path = require('path');
+const Config = require('./config.json');
 
 const app = express();
 
@@ -11,7 +12,7 @@ app.set('layout', 'layouts/main');
 app.use(expressLayouts);
 
 // Statik dosyalar
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Routes
 app.get('/', (req, res) => {
@@ -49,7 +50,25 @@ app.get('/promo', (req, res) => {
     });
 });
 
-const port = process.env.PORT || 3000;
+// 404 hata sayfası
+app.use((req, res) => {
+    res.status(404).render('404', {
+        title: 'Sayfa Bulunamadı',
+        currentPage: '404'
+    });
+});
+
+// Hata yönetimi
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).render('error', {
+        title: 'Sunucu Hatası',
+        currentPage: 'error',
+        error: err
+    });
+});
+
+const port = Config.PORT || 3000;
 app.listen(port, () => {
     console.log(`Sunucu http://localhost:${port} adresinde çalışıyor`);
 });
