@@ -28,6 +28,45 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // Sidebar menü işlemleri
+    const menuItems = document.querySelectorAll('.sidebar-nav li');
+    const contentSections = {
+        'dashboard': document.querySelector('.dashboard-content'),
+        'players': document.querySelector('.players-content'),
+        'servers': document.querySelector('.servers-content'),
+        'bans': document.querySelector('.bans-content'),
+        'settings': document.querySelector('.settings-content')
+    };
+
+    // İlk yüklemede dashboard içeriğini göster
+    showContent('dashboard');
+
+    menuItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            // Aktif menü öğesini güncelle
+            menuItems.forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+
+            // İlgili içeriği göster
+            const section = item.querySelector('a').getAttribute('href').substring(1);
+            showContent(section);
+        });
+    });
+
+    function showContent(section) {
+        // Tüm içerikleri gizle
+        Object.values(contentSections).forEach(content => {
+            if (content) content.style.display = 'none';
+        });
+
+        // Seçilen içeriği göster
+        if (contentSections[section]) {
+            contentSections[section].style.display = 'block';
+        }
+    }
+
     // Logout işlemi
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
