@@ -27,7 +27,7 @@ app.use((err, req, res, next) => {
     res.status(500).sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-const port = Config.PORT || 3000;
+const port = Config.dev.port || 3000;
 app.listen(port, () => {
     console.log(`Sunucu http://localhost:${port} adresinde çalışıyor`);
 });
