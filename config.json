@@ -2,6 +2,9 @@
     "dev": {
         "port": "3000"
     },
+    "discord": {
+        "token": "MTI0NzMyNTY3OTMyNjk4NjI1MA.GUB21K.fk3XSiLfM5f6uiMaev7Nw_2ijDYa-b77_iaD30"
+    },
     "db": {
         "host": "localhost",
         "user": "root",
