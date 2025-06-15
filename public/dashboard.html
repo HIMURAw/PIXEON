@@ -298,6 +298,48 @@
         </main>
     </div>
 
+    <!-- Member Details Modal -->
+    <div id="memberModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Üye Detayları</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="member-details">
+                    <div class="member-header">
+                        <div class="member-avatar-large">
+                            <img src="" alt="Member Avatar" id="modalAvatar">
+                            <span class="status-indicator" id="modalStatus"></span>
+                        </div>
+                        <div class="member-title">
+                            <h3 id="modalName"></h3>
+                            <span id="modalUsername"></span>
+                        </div>
+                    </div>
+                    <div class="member-info-grid">
+                        <div class="info-item">
+                            <label>Sunucuya Katılma</label>
+                            <span id="modalJoinedAt"></span>
+                        </div>
+                        <div class="info-item">
+                            <label>Hesap Oluşturma</label>
+                            <span id="modalCreatedAt"></span>
+                        </div>
+                        <div class="info-item">
+                            <label>Durum</label>
+                            <span id="modalActivity"></span>
+                        </div>
+                    </div>
+                    <div class="member-roles">
+                        <h4>Roller</h4>
+                        <div class="roles-list" id="modalRoles"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="/js/dashboard.js"></script>
     <script src="/js/dashboard/discord.js"></script>
