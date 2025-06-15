@@ -69,9 +69,10 @@ router.get('/channels', async (req, res) => {
             return res.status(404).json({ error: 'Server not found' });
         }
 
-        await guild.channels.fetch();
-
-        const channels = guild.channels.cache.map(channel => ({
+        // Tüm kanalları yükle
+        const channels = await guild.channels.fetch();
+        
+        const channelList = channels.map(channel => ({
             id: channel.id,
             name: channel.name,
             type: channel.type,
@@ -93,9 +94,19 @@ router.get('/channels', async (req, res) => {
             }))
         }));
 
+        // Kanalları tipe göre sırala
+        const sortedChannels = channelList.sort((a, b) => {
+            // Önce kategoriler
+            if (a.type === 4 && b.type !== 4) return -1;
+            if (a.type !== 4 && b.type === 4) return 1;
+            
+            // Sonra pozisyon
+            return a.position - b.position;
+        });
+
         res.status(200).json({
-            total: channels.length,
-            channels: channels
+            total: channelList.length,
+            channels: sortedChannels
         });
     } catch (error) {
         console.error('Error fetching channels:', error);
