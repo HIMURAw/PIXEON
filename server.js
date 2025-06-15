@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const Config = require('./config.json');
+const { createAdminsTable } = require('./private/DB/models/userModel');
 
 const app = express();
 
@@ -26,6 +27,9 @@ const loginRouter = require('./private/DB/loginRouter');
 
 // Login routes
 app.use('/api/auth', loginRouter);
+
+// Admins tablosunu oluştur
+createAdminsTable().catch(console.error);
 
 /*
 
