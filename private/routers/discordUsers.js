@@ -1,8 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Config = require('../../config.json');
-const client = require('../../server.js')
-
+const client = require('../../server.js');
 
 router.get('/serverMembers', async (req, res) => {
     try {
@@ -11,12 +10,37 @@ router.get('/serverMembers', async (req, res) => {
             return res.status(404).json({ error: 'Server not found' });
         }
 
+        // Tüm üyeleri yükle
+        await guild.members.fetch();
+
         const memberCount = guild.memberCount;
+        const members = guild.members.cache.map(member => ({
+            username: member.user.username,
+            discriminator: member.user.discriminator,
+            id: member.id,
+            status: member.presence?.status || 'offline',
+            activities: member.presence?.activities?.map(activity => ({
+                name: activity.name,
+                type: activity.type,
+                details: activity.details
+            })) || [],
+            avatar: member.user.displayAvatarURL({ dynamic: true }),
+            joinedAt: member.joinedAt,
+            roles: member.roles.cache.map(role => ({
+                id: role.id,
+                name: role.name,
+                color: role.color,
+                position: role.position
+            })).sort((a, b) => b.position - a.position),
+            isBot: member.user.bot,
+            nickname: member.nickname
+        }));
 
         res.status(200).json({
             serverName: guild.name,
             memberCount: memberCount,
             onlineMembers: guild.members.cache.filter(member => member.presence?.status === 'online').size,
+            members: members,
             lastUpdated: new Date()
         });
     } catch (error) {
