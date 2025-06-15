@@ -83,42 +83,40 @@ document.addEventListener('DOMContentLoaded', () => {
         document.cookie = name + '=; Max-Age=-99999999; path=/';
     }
 
-    // Sayfa yüklendiğinde cookie kontrolü
+    // Sayfa yüklendiğinde token kontrolü
     document.addEventListener('DOMContentLoaded', function() {
-        const savedUsername = getCookie('username');
-        const savedPassword = getCookie('password');
+        const token = getCookie('auth_token');
         
-        if (savedUsername && savedPassword) {
-            // Otomatik giriş yap
-            autoLogin(savedUsername, savedPassword);
+        if (token) {
+            // Token'ı doğrula
+            verifyToken(token);
         }
     });
 
-    // Otomatik giriş fonksiyonu
-    async function autoLogin(username, password) {
+    // Token doğrulama fonksiyonu
+    async function verifyToken(token) {
         try {
-            const response = await fetch('/api/auth/login', {
-                method: 'POST',
+            const response = await fetch('/api/auth/verify', {
+                method: 'GET',
                 headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ username, password })
+                    'Authorization': `Bearer ${token}`
+                }
             });
             
             const data = await response.json();
             
             if (data.status === 'success') {
-                // Başarılı giriş
+                // Token geçerli, otomatik giriş yap
                 loginModal.style.display = 'none';
                 // Burada kullanıcıyı yönlendirebilir veya UI'ı güncelleyebilirsiniz
                 console.log('Auto login successful');
             } else {
-                // Cookie'leri temizle
-                deleteCookie('username');
-                deleteCookie('password');
+                // Token geçersiz, cookie'yi temizle
+                deleteCookie('auth_token');
             }
         } catch (error) {
-            console.error('Auto login error:', error);
+            console.error('Token verification error:', error);
+            deleteCookie('auth_token');
         }
     }
 
@@ -142,14 +140,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
             
             if (data.status === 'success') {
-                // Remember me seçili ise cookie'ye kaydet
+                // Remember me seçili ise token'ı cookie'ye kaydet
                 if (rememberMe) {
-                    setCookie('username', username, 30); // 30 gün
-                    setCookie('password', password, 30);
+                    setCookie('auth_token', data.token, 30); // 30 gün
                 } else {
-                    // Remember me seçili değilse cookie'leri temizle
-                    deleteCookie('username');
-                    deleteCookie('password');
+                    // Remember me seçili değilse cookie'yi temizle
+                    deleteCookie('auth_token');
                 }
                 
                 // Başarılı giriş
