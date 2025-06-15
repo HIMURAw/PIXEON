@@ -9,6 +9,79 @@ async function updateServerStats() {
         const serverResponse = await fetch('/api/discordServer/serverInfo');
         const serverData = await serverResponse.json();
 
+        // Kanalları al
+        const channelsResponse = await fetch('/api/discordServer/channels');
+        const channelsData = await channelsResponse.json();
+
+        // Kanalları listele
+        const channelsList = document.querySelector('.channels-list');
+        if (channelsList && channelsData && channelsData.channels) {
+            channelsList.innerHTML = ''; // Mevcut içeriği temizle
+            
+            // Kategorileri grupla
+            const categories = {};
+            channelsData.channels.forEach(channel => {
+                if (channel.type === 4) { // Kategori
+                    categories[channel.id] = {
+                        name: channel.name,
+                        channels: []
+                    };
+                }
+            });
+
+            // Kanalları kategorilere ekle
+            channelsData.channels.forEach(channel => {
+                if (channel.type !== 4) { // Kategori değilse
+                    if (channel.parent) {
+                        if (!categories[channel.parent.id]) {
+                            categories[channel.parent.id] = {
+                                name: channel.parent.name,
+                                channels: []
+                            };
+                        }
+                        categories[channel.parent.id].channels.push(channel);
+                    } else {
+                        if (!categories['uncategorized']) {
+                            categories['uncategorized'] = {
+                                name: 'Diğer',
+                                channels: []
+                            };
+                        }
+                        categories['uncategorized'].channels.push(channel);
+                    }
+                }
+            });
+
+            // Kategorileri ve kanalları göster
+            Object.values(categories).forEach(category => {
+                if (category.channels.length > 0) {
+                    const categoryDiv = document.createElement('div');
+                    categoryDiv.className = 'channel-category';
+                    categoryDiv.innerHTML = `
+                        <div class="category-header">
+                            <i class="fas fa-folder"></i>
+                            <span>${category.name}</span>
+                        </div>
+                        <div class="category-channels">
+                            ${category.channels.map(channel => `
+                                <div class="channel-item">
+                                    <i class="fas ${channel.type === 2 ? 'fa-volume-up' : 'fa-hashtag'}"></i>
+                                    <span>${channel.name}</span>
+                                    ${channel.type === 2 ? `<span class="voice-users">0</span>` : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                    channelsList.appendChild(categoryDiv);
+                }
+            });
+        } else {
+            console.error('Channels data is not available');
+            if (channelsList) {
+                channelsList.innerHTML = '<div class="loading-spinner">Loading channels...</div>';
+            }
+        }
+
         // Sunucu ikonunu güncelle
         const logoElement = document.querySelector('.logo');
         if (logoElement && serverData.icon) {
@@ -91,6 +164,11 @@ async function updateServerStats() {
 
     } catch (error) {
         console.error('Error fetching server stats:', error);
+        // Hata durumunda loading mesajını göster
+        const channelsList = document.querySelector('.channels-list');
+        if (channelsList) {
+            channelsList.innerHTML = '<div class="loading-spinner">Error loading channels. Please try again.</div>';
+        }
     }
 }
 

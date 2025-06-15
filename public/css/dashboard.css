@@ -471,43 +471,80 @@ body {
 
 /* Channels List */
 .channels-list {
+    padding: 10px;
+}
+
+.channel-category {
+    margin-bottom: 15px;
+}
+
+.category-header {
     display: flex;
-    flex-direction: column;
-    gap: 10px;
+    align-items: center;
+    padding: 5px 10px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    margin-bottom: 5px;
+}
+
+.category-header i {
+    margin-right: 8px;
+    color: #8e9297;
+}
+
+.category-header span {
+    color: #8e9297;
+    font-size: 0.9em;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.category-channels {
+    padding-left: 10px;
 }
 
 .channel-item {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 10px;
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.05);
-    transition: background 0.2s;
+    padding: 5px 10px;
+    margin: 2px 0;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
 }
 
 .channel-item:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
-.channel-icon {
-    color: var(--text-secondary);
-    font-size: 1.2rem;
+.channel-item i {
+    margin-right: 8px;
+    color: #8e9297;
+    width: 16px;
+    text-align: center;
 }
 
-.channel-info {
-    flex: 1;
+.channel-item span {
+    color: #8e9297;
+    font-size: 0.9em;
 }
 
-.channel-name {
-    color: var(--text-primary);
-    font-weight: 500;
+.channel-item .voice-users {
+    margin-left: auto;
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 0.8em;
 }
 
-.channel-topic {
-    color: var(--text-secondary);
-    font-size: 0.9rem;
-    margin-top: 2px;
+/* Ses kanalı ikonları için özel renkler */
+.channel-item i.fa-volume-up {
+    color: #43b581;
+}
+
+/* Kategori ikonları için özel renkler */
+.category-header i.fa-folder {
+    color: #8e9297;
 }
 
 /* Members List */
