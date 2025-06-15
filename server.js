@@ -149,9 +149,11 @@ ROUTERS
 
 const loginRouter = require('./private/DB/loginRouter');
 const discordUsersRouter = require('./private/routers/discordUsers.js');
+const discordServerRouter = require('./private/routers/discordServer.js');
 
 app.use('/api/auth', loginRouter);
 app.use('/api/discordUsers', discordUsersRouter);
+app.use('/api/discordServer', discordServerRouter);
 
 
 
