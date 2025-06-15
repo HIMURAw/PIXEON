@@ -13,6 +13,50 @@ async function updateServerStats() {
         const channelsResponse = await fetch('/api/discordServer/channels');
         const channelsData = await channelsResponse.json();
 
+        // Üyeleri listele
+        const membersList = document.querySelector('.members-list');
+        if (membersList && membersData && membersData.members) {
+            membersList.innerHTML = ''; // Mevcut içeriği temizle
+
+            // Üyeleri rollerine göre sırala
+            const sortedMembers = membersData.members.sort((a, b) => {
+                // En yüksek rolü bul
+                const aHighestRole = a.roles.length > 0 ? a.roles[0].position : 0;
+                const bHighestRole = b.roles.length > 0 ? b.roles[0].position : 0;
+                return bHighestRole - aHighestRole;
+            });
+
+            // Üyeleri göster
+            sortedMembers.forEach(member => {
+                const memberDiv = document.createElement('div');
+                memberDiv.className = 'member-item';
+                
+                // En yüksek rolü bul
+                const highestRole = member.roles.length > 0 ? member.roles[0] : null;
+                const roleColor = highestRole ? highestRole.color : '#99aab5';
+
+                memberDiv.innerHTML = `
+                    <div class="member-avatar">
+                        <img src="${member.avatar}" alt="${member.username}" onerror="this.src='assets/default-avatar.png'">
+                        <span class="status-indicator ${member.status}"></span>
+                    </div>
+                    <div class="member-info">
+                        <span class="member-name">${member.nickname || member.username}</span>
+                        <span class="member-username">${member.username}</span>
+                    </div>
+                    <div class="member-role" style="color: ${roleColor}">
+                        ${highestRole ? highestRole.name : 'No Role'}
+                    </div>
+                `;
+                membersList.appendChild(memberDiv);
+            });
+        } else {
+            console.error('Members data is not available');
+            if (membersList) {
+                membersList.innerHTML = '<div class="loading-spinner">Loading members...</div>';
+            }
+        }
+
         // Kanalları listele
         const channelsList = document.querySelector('.channels-list');
         if (channelsList && channelsData && channelsData.channels) {
@@ -164,10 +208,9 @@ async function updateServerStats() {
 
     } catch (error) {
         console.error('Error fetching server stats:', error);
-        // Hata durumunda loading mesajını göster
-        const channelsList = document.querySelector('.channels-list');
-        if (channelsList) {
-            channelsList.innerHTML = '<div class="loading-spinner">Error loading channels. Please try again.</div>';
+        const membersList = document.querySelector('.members-list');
+        if (membersList) {
+            membersList.innerHTML = '<div class="loading-spinner">Error loading members. Please try again.</div>';
         }
     }
 }
@@ -177,3 +220,101 @@ document.addEventListener('DOMContentLoaded', () => {
     updateServerStats();
     setInterval(updateServerStats, 30000); // Her 30 saniyede bir güncelle
 });
+
+// Modal functionality
+const modal = document.getElementById('memberModal');
+const closeModal = document.querySelector('.close-modal');
+
+function openMemberModal(member) {
+    // Set member details
+    document.getElementById('modalAvatar').src = member.avatarURL || 'https://cdn.discordapp.com/embed/avatars/0.png';
+    document.getElementById('modalName').textContent = member.nickname || member.username;
+    document.getElementById('modalUsername').textContent = `@${member.username}`;
+    
+    // Set status
+    const statusIndicator = document.getElementById('modalStatus');
+    statusIndicator.className = 'status-indicator';
+    statusIndicator.classList.add(member.presence?.status || 'offline');
+    
+    // Set dates
+    document.getElementById('modalJoinedAt').textContent = new Date(member.joinedAt).toLocaleDateString('tr-TR', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+    
+    document.getElementById('modalCreatedAt').textContent = new Date(member.user.createdAt).toLocaleDateString('tr-TR', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+    
+    // Set activity
+    const activity = member.presence?.activities?.[0];
+    document.getElementById('modalActivity').textContent = activity ? 
+        `${activity.type} ${activity.name}` : 
+        'Aktif değil';
+    
+    // Set roles
+    const rolesList = document.getElementById('modalRoles');
+    rolesList.innerHTML = '';
+    
+    member.roles.cache
+        .sort((a, b) => b.position - a.position)
+        .forEach(role => {
+            if (role.name !== '@everyone') {
+                const roleElement = document.createElement('span');
+                roleElement.className = 'role-tag';
+                roleElement.style.backgroundColor = role.hexColor === '#000000' ? 
+                    'rgba(255, 255, 255, 0.1)' : 
+                    role.hexColor;
+                roleElement.style.color = role.hexColor === '#000000' ? 
+                    '#fff' : 
+                    '#000';
+                roleElement.textContent = role.name;
+                rolesList.appendChild(roleElement);
+            }
+        });
+    
+    // Show modal
+    modal.style.display = 'block';
+}
+
+function closeMemberModal() {
+    modal.style.display = 'none';
+}
+
+// Event listeners
+closeModal.addEventListener('click', closeMemberModal);
+window.addEventListener('click', (e) => {
+    if (e.target === modal) {
+        closeMemberModal();
+    }
+});
+
+// Update member list click handlers
+function updateMembersList(members) {
+    const membersList = document.querySelector('.members-list');
+    membersList.innerHTML = '';
+    
+    members.forEach(member => {
+        const memberElement = document.createElement('div');
+        memberElement.className = 'member-item';
+        memberElement.innerHTML = `
+            <div class="member-avatar">
+                <img src="${member.avatarURL || 'https://cdn.discordapp.com/embed/avatars/0.png'}" alt="${member.username}">
+                <span class="status-indicator ${member.presence?.status || 'offline'}"></span>
+            </div>
+            <div class="member-info">
+                <div class="member-name">${member.nickname || member.username}</div>
+                <div class="member-username">@${member.username}</div>
+            </div>
+            <div class="member-role">${member.roles.highest.name}</div>
+        `;
+        
+        // Add click handler
+        memberElement.addEventListener('click', () => openMemberModal(member));
+        
+        membersList.appendChild(memberElement);
+    });
+}
