@@ -22,6 +22,8 @@ const client = new Client({
     ]
 });
 
+module.exports = client;
+
 // Discord bot token
 const token = Config.discord.token;
 
@@ -149,6 +151,7 @@ const loginRouter = require('./private/DB/loginRouter');
 const discordUsersRouter = require('./private/routers/discordUsers.js');
 
 app.use('/api/auth', loginRouter);
+app.use('/api/discordUsers', discordUsersRouter);
 
 
 

@@ -1,29 +1,28 @@
 const express = require('express');
 const router = express.Router();
+const Config = require('../../config.json');
+const client = require('../../server.js')
 
-router.post('/discordUsers', async (req, res) => {
+
+router.get('/serverMembers', async (req, res) => {
     try {
-        const { discordId, username, discriminator } = req.body;
-
-        if (!discordId || !username || !discriminator) {
-            return res.status(400).json({ error: 'Missing required fields' });
+        const guild = await client.guilds.fetch(Config.discord.guidid);
+        if (!guild) {
+            return res.status(404).json({ error: 'Server not found' });
         }
 
+        const memberCount = guild.memberCount;
 
-        const newUser = {
-            discordId,
-            username,
-            discriminator,
-            createdAt: new Date(),
-        };
-
-        res.status(201).json(newUser);
+        res.status(200).json({
+            serverName: guild.name,
+            memberCount: memberCount,
+            onlineMembers: guild.members.cache.filter(member => member.presence?.status === 'online').size,
+            lastUpdated: new Date()
+        });
     } catch (error) {
-        console.error('Error creating Discord user:', error);
+        console.error('Error fetching server members:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
-
-
 
 module.exports = router;
