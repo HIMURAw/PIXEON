@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const token = getCookie('auth_token');
         if (token) {
             // Token varsa dashboard'a yönlendir
-            window.location.href = '/dashboard.html';
+            window.location.href = '/dashboard';
         } else {
             // Token yoksa login modalını göster
             loginModal.style.display = 'flex';
@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function getCookie(name) {
         const nameEQ = name + "=";
         const ca = document.cookie.split(';');
-        for(let i = 0; i < ca.length; i++) {
+        for (let i = 0; i < ca.length; i++) {
             let c = ca[i];
             while (c.charAt(0) === ' ') c = c.substring(1, c.length);
             if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Sayfa yüklendiğinde token kontrolü
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const token = getCookie('auth_token');
         if (token) {
             // Token varsa ve dashboard'da değilsek yönlendir
@@ -107,9 +107,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     'Authorization': `Bearer ${token}`
                 }
             });
-            
+
             const data = await response.json();
-            
+
             if (data.status === 'success') {
                 // Token geçerli, otomatik giriş yap
                 loginModal.style.display = 'none';
@@ -124,11 +124,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Login form submit
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        
+
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
         const rememberMe = document.querySelector('input[name="remember"]').checked;
-        
+
         try {
             const response = await fetch('/api/auth/login', {
                 method: 'POST',
@@ -137,15 +137,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
                 body: JSON.stringify({ username, password })
             });
-            
+
             const data = await response.json();
-            
+
             if (data.status === 'success') {
                 // Token'ı cookie'ye kaydet
                 setCookie('auth_token', data.token, rememberMe ? 30 : 1);
-                
+
                 // Başarılı giriş
-                window.location.href = '/dashboard.html';
+                window.location.href = '/dashboard';
             } else {
                 // Başarısız giriş
                 alert(data.message || 'Login failed. Please check your credentials.');
@@ -182,11 +182,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const togglePassword = document.getElementById('togglePassword');
     const passwordInput = document.getElementById('password');
 
-    togglePassword.addEventListener('click', function() {
+    togglePassword.addEventListener('click', function () {
         // Şifre tipini değiştir
         const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
         passwordInput.setAttribute('type', type);
-        
+
         // İkonu değiştir
         this.querySelector('i').classList.toggle('fa-eye');
         this.querySelector('i').classList.toggle('fa-eye-slash');
