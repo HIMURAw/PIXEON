@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Sidebar toggle
     const sidebarToggle = document.getElementById('sidebarToggle');
     const sidebar = document.querySelector('.sidebar');
@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Refresh buttons
     const refreshButtons = document.querySelectorAll('.btn-refresh');
     refreshButtons.forEach(button => {
-        button.addEventListener('click', function() {
+        button.addEventListener('click', function () {
             const icon = this.querySelector('i');
             icon.style.animation = 'spin 1s linear';
             setTimeout(() => {
@@ -33,21 +33,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Search functionality
     const searchInput = document.querySelector('.search-bar input');
-    searchInput.addEventListener('input', function(e) {
+    searchInput.addEventListener('input', function (e) {
         const searchTerm = e.target.value.toLowerCase();
         // Burada arama işlemi yapılabilir
     });
 
     // Notifications
     const notifications = document.querySelector('.notifications');
-    notifications.addEventListener('click', function() {
+    notifications.addEventListener('click', function () {
         // Burada bildirimler modalı açılabilir
         alert('Notifications feature coming soon!');
     });
 
     // Admin profile
     const adminProfile = document.querySelector('.admin-profile');
-    adminProfile.addEventListener('click', function() {
+    adminProfile.addEventListener('click', function () {
         // Burada profil menüsü açılabilir
         alert('Profile menu coming soon!');
     });

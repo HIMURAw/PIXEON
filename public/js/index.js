@@ -44,7 +44,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Login Modal
     loginBtn.addEventListener('click', () => {
-        loginModal.style.display = 'flex';
+        const token = getCookie('auth_token');
+        if (token) {
+            // Token varsa dashboard'a yönlendir
+            window.location.href = '/dashboard.html';
+        } else {
+            // Token yoksa login modalını göster
+            loginModal.style.display = 'flex';
+        }
     });
 
     closeModal.addEventListener('click', () => {
@@ -59,13 +66,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Cookie işlemleri için yardımcı fonksiyonlar
     function setCookie(name, value, days) {
-        let expires = "";
-        if (days) {
-            const date = new Date();
-            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-            expires = "; expires=" + date.toUTCString();
-        }
-        document.cookie = name + "=" + (value || "") + expires + "; path=/";
+        const date = new Date();
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+        const expires = "expires=" + date.toUTCString();
+        document.cookie = name + "=" + value + ";" + expires + ";path=/;SameSite=Lax;Secure";
     }
 
     function getCookie(name) {
@@ -86,10 +90,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Sayfa yüklendiğinde token kontrolü
     document.addEventListener('DOMContentLoaded', function() {
         const token = getCookie('auth_token');
-        
         if (token) {
-            // Token'ı doğrula
-            verifyToken(token);
+            // Token varsa ve dashboard'da değilsek yönlendir
+            if (!window.location.pathname.includes('dashboard')) {
+                window.location.href = '/dashboard';
+            }
         }
     });
 
@@ -110,13 +115,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 loginModal.style.display = 'none';
                 // Burada kullanıcıyı yönlendirebilir veya UI'ı güncelleyebilirsiniz
                 console.log('Auto login successful');
-            } else {
-                // Token geçersiz, cookie'yi temizle
-                deleteCookie('auth_token');
             }
         } catch (error) {
             console.error('Token verification error:', error);
-            deleteCookie('auth_token');
         }
     }
 
@@ -140,18 +141,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
             
             if (data.status === 'success') {
-                // Remember me seçili ise token'ı cookie'ye kaydet
-                if (rememberMe) {
-                    setCookie('auth_token', data.token, 30); // 30 gün
-                } else {
-                    // Remember me seçili değilse cookie'yi temizle
-                    deleteCookie('auth_token');
-                }
+                // Token'ı cookie'ye kaydet
+                setCookie('auth_token', data.token, rememberMe ? 30 : 1);
                 
                 // Başarılı giriş
-                alert('Login successful!');
-                loginModal.style.display = 'none';
-                // Burada kullanıcıyı yönlendirebilir veya UI'ı güncelleyebilirsiniz
+                window.location.href = '/dashboard.html';
             } else {
                 // Başarısız giriş
                 alert(data.message || 'Login failed. Please check your credentials.');
