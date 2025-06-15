@@ -44,36 +44,50 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Login Modal
     loginBtn.addEventListener('click', () => {
-        loginModal.classList.add('active');
-        document.body.style.overflow = 'hidden';
+        loginModal.style.display = 'flex';
     });
 
     closeModal.addEventListener('click', () => {
-        loginModal.classList.remove('active');
-        document.body.style.overflow = '';
+        loginModal.style.display = 'none';
     });
 
-    // Close modal when clicking outside
-    loginModal.addEventListener('click', (e) => {
+    window.addEventListener('click', (e) => {
         if (e.target === loginModal) {
-            loginModal.classList.remove('active');
-            document.body.style.overflow = '';
+            loginModal.style.display = 'none';
         }
     });
 
-    // Handle form submission
-    loginForm.addEventListener('submit', (e) => {
+    // Login form submit
+    loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+        
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
-        const remember = document.querySelector('input[name="remember"]').checked;
-
-        // Here you would typically send the login data to your server
-        console.log('Login attempt:', { username, password, remember });
         
-        // For demo purposes, just close the modal
-        loginModal.classList.remove('active');
-        document.body.style.overflow = '';
+        try {
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, password })
+            });
+            
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+                // Başarılı giriş
+                alert('Login successful!');
+                loginModal.style.display = 'none';
+                // Burada kullanıcıyı yönlendirebilir veya UI'ı güncelleyebilirsiniz
+            } else {
+                // Başarısız giriş
+                alert(data.message || 'Login failed. Please check your credentials.');
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            alert('An error occurred during login. Please try again.');
+        }
     });
 
     // Add active class to current page link
