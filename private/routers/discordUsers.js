@@ -10,8 +10,8 @@ router.get('/serverMembers', async (req, res) => {
             return res.status(404).json({ error: 'Server not found' });
         }
 
-        // Tüm üyeleri yükle
-        await guild.members.fetch();
+        // Tüm üyeleri yükle ve presence bilgilerini güncelle
+        await guild.members.fetch({ withPresences: true });
 
         const memberCount = guild.memberCount;
         const members = guild.members.cache.map(member => ({
@@ -36,10 +36,16 @@ router.get('/serverMembers', async (req, res) => {
             nickname: member.nickname
         }));
 
+        // Online üye sayısını hesapla (online, idle ve dnd durumlarını dahil et)
+        const onlineMembers = guild.members.cache.filter(member => 
+            member.presence && 
+            ['online', 'idle', 'dnd'].includes(member.presence.status)
+        ).size;
+
         res.status(200).json({
             serverName: guild.name,
             memberCount: memberCount,
-            onlineMembers: guild.members.cache.filter(member => member.presence?.status === 'online').size,
+            onlineMembers: onlineMembers,
             members: members,
             lastUpdated: new Date()
         });
