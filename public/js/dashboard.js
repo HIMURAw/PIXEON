@@ -1,22 +1,44 @@
 document.addEventListener('DOMContentLoaded', function () {
+    // Token kontrolü
+    function getCookie(name) {
+        const nameEQ = name + "=";
+        const ca = document.cookie.split(';');
+        for (let i = 0; i < ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+            if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+        }
+        return null;
+    }
+
+    const token = getCookie('auth_token');
+    if (!token) {
+        // Token yoksa anasayfaya yönlendir
+        window.location.href = '/';
+    }
+
     // Sidebar toggle
     const sidebarToggle = document.getElementById('sidebarToggle');
     const sidebar = document.querySelector('.sidebar');
     const mainContent = document.querySelector('.main-content');
 
-    sidebarToggle.addEventListener('click', () => {
-        sidebar.classList.toggle('active');
-    });
+    if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+        });
+    }
 
-    // Logout functionality
+    // Logout işlemi
     const logoutBtn = document.getElementById('logoutBtn');
-    logoutBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        // Token'ı sil
-        document.cookie = 'auth_token=; Max-Age=-99999999; path=/';
-        // Ana sayfaya yönlendir
-        window.location.href = '/';
-    });
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            // Cookie'yi sil
+            document.cookie = 'auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            // Anasayfaya yönlendir
+            window.location.href = '/';
+        });
+    }
 
     // Refresh buttons
     const refreshButtons = document.querySelectorAll('.btn-refresh');
