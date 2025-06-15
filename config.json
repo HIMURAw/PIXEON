@@ -3,7 +3,9 @@
         "port": "3000"
     },
     "discord": {
-        "token": "MTI0NzMyNTY3OTMyNjk4NjI1MA.GUB21K.fk3XSiLfM5f6uiMaev7Nw_2ijDYa-b77_iaD30"
+        "token": "MTI0NzMyNTY3OTMyNjk4NjI1MA.GUB21K.fk3XSiLfM5f6uiMaev7Nw_2ijDYa-b77_iaD30",
+        "guidid": "1269430268402335867",
+        "voicechannel": "1271919365368840212"
     },
     "db": {
         "host": "localhost",

@@ -3,6 +3,7 @@ const path = require('path');
 const { Client, GatewayIntentBits, Events } = require('discord.js');
 const Config = require('./config.json');
 const { createAdminsTable } = require('./private/DB/models/userModel');
+const { joinVoiceChannel } = require('@discordjs/voice')
 
 const app = express();
 
@@ -48,6 +49,7 @@ ROUTERS
 */
 
 const loginRouter = require('./private/DB/loginRouter');
+const { config } = require('process');
 
 // Login routes
 app.use('/api/auth', loginRouter);
@@ -61,10 +63,20 @@ ROUTERS END
 
 */
 
+client.on('ready', () => {
+    let channel = client.channels.cache.get(Config.discord.voicechannel)
+
+    const VoiceConnection = joinVoiceChannel({
+        channelId: channel.id,
+        guildId: channel.guild.id,
+        adapterCreator: channel.guild.voiceAdapterCreator
+    });
+})
+
 const port = Config.port || 3000;
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
-    // Discord bot'u başlat
+
     client.login(Config.discord.token).catch(error => {
         console.error('Discord bot login error:', error);
     });
