@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { checkLogin } = require('./connect');
+const { checkLogin } = require('./models/userModel');
 
 // Login endpoint
 router.post('/login', async (req, res) => {
