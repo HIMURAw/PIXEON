@@ -39,7 +39,7 @@ const commands = [];
 for (const file of commandFiles) {
     const filePath = path.join(commandsPath, file);
     console.log(`\nYükleniyor: ${file}`);
-    
+
     try {
         const command = require(filePath);
         if ('data' in command && 'execute' in command) {
@@ -146,11 +146,13 @@ ROUTERS
 */
 
 const loginRouter = require('./private/DB/loginRouter');
+const discordUsersRouter = require('./private/routers/discordUsers.js');
 
-// Login routes
 app.use('/api/auth', loginRouter);
 
-// Admins tablosunu oluştur
+
+
+
 createAdminsTable().catch(console.error);
 
 /*
