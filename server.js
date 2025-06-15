@@ -7,6 +7,8 @@ const { joinVoiceChannel } = require('@discordjs/voice')
 
 const app = express();
 
+const port = Config.port || 3000;
+
 // Discord Client oluştur
 const client = new Client({
     intents: [
@@ -63,6 +65,7 @@ ROUTERS END
 
 */
 
+// Discord botu başlat ve ses kanalına bağlan
 client.on('ready', () => {
     let channel = client.channels.cache.get(Config.discord.voicechannel)
 
@@ -73,7 +76,6 @@ client.on('ready', () => {
     });
 })
 
-const port = Config.port || 3000;
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
 
