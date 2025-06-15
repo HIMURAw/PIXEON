@@ -111,4 +111,18 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+
+    // Şifre göster/gizle fonksiyonu
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('password');
+
+    togglePassword.addEventListener('click', function() {
+        // Şifre tipini değiştir
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        
+        // İkonu değiştir
+        this.querySelector('i').classList.toggle('fa-eye');
+        this.querySelector('i').classList.toggle('fa-eye-slash');
+    });
 });
