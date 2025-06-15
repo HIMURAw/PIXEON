@@ -3,6 +3,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const navbarToggle = document.getElementById('navbarToggle');
     const navbarMenu = document.querySelector('.navbar-menu');
     const menuItems = document.querySelectorAll('.navbar-menu a');
+    const loginBtn = document.getElementById('loginBtn');
+    const loginModal = document.getElementById('loginModal');
+    const closeModal = document.getElementById('closeModal');
+    const loginForm = document.getElementById('loginForm');
 
     // Scroll effect
     window.addEventListener('scroll', () => {
@@ -36,6 +40,40 @@ document.addEventListener('DOMContentLoaded', () => {
             navbarToggle.classList.remove('active');
             document.body.style.overflow = '';
         });
+    });
+
+    // Login Modal
+    loginBtn.addEventListener('click', () => {
+        loginModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    });
+
+    closeModal.addEventListener('click', () => {
+        loginModal.classList.remove('active');
+        document.body.style.overflow = '';
+    });
+
+    // Close modal when clicking outside
+    loginModal.addEventListener('click', (e) => {
+        if (e.target === loginModal) {
+            loginModal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    });
+
+    // Handle form submission
+    loginForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const remember = document.querySelector('input[name="remember"]').checked;
+
+        // Here you would typically send the login data to your server
+        console.log('Login attempt:', { username, password, remember });
+        
+        // For demo purposes, just close the modal
+        loginModal.classList.remove('active');
+        document.body.style.overflow = '';
     });
 
     // Add active class to current page link
