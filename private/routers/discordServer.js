@@ -6,6 +6,7 @@ const client = require('../../server.js');
 // Sunucu genel bilgilerini getir
 router.get('/serverInfo', async (req, res) => {
     try {
+
         const guild = await client.guilds.fetch(Config.discord.guidid);
         if (!guild) {
             return res.status(404).json({ error: 'Server not found' });
@@ -64,6 +65,8 @@ router.get('/serverInfo', async (req, res) => {
 // Sunucu kanallarını getir
 router.get('/channels', async (req, res) => {
     try {
+
+
         const guild = await client.guilds.fetch(Config.discord.guidid);
         if (!guild) {
             return res.status(404).json({ error: 'Server not found' });
@@ -71,7 +74,7 @@ router.get('/channels', async (req, res) => {
 
         // Tüm kanalları yükle
         const channels = await guild.channels.fetch();
-        
+
         const channelList = channels.map(channel => ({
             id: channel.id,
             name: channel.name,
@@ -99,7 +102,7 @@ router.get('/channels', async (req, res) => {
             // Önce kategoriler
             if (a.type === 4 && b.type !== 4) return -1;
             if (a.type !== 4 && b.type === 4) return 1;
-            
+
             // Sonra pozisyon
             return a.position - b.position;
         });

@@ -10,7 +10,7 @@ async function updateServerStats() {
         const serverData = await serverResponse.json();
 
         // Kanalları al
-        const channelsResponse = await fetch('/api/discordServer/channels');
+        const channelsResponse = await fetch('api/discordChannel/channels');
         const channelsData = await channelsResponse.json();
 
         // Üyeleri listele
@@ -31,7 +31,7 @@ async function updateServerStats() {
                 const memberDiv = document.createElement('div');
                 memberDiv.className = 'member-item';
                 memberDiv.style.cursor = 'pointer';
-                
+
                 // En yüksek rolü bul
                 const highestRole = member.roles.length > 0 ? member.roles[0] : null;
                 const roleColor = highestRole ? highestRole.color : '#99aab5';
@@ -54,17 +54,17 @@ async function updateServerStats() {
                 memberDiv.addEventListener('click', () => {
                     const modal = document.getElementById('memberModal');
                     modal.style.display = 'block';
-                    
+
                     // Modal içeriğini doldur
                     document.getElementById('modalAvatar').src = member.avatar || 'assets/default-avatar.png';
                     document.getElementById('modalStatus').className = `status-indicator ${member.status}`;
                     document.getElementById('modalName').textContent = member.nickname || member.username;
                     document.getElementById('modalUsername').textContent = `@${member.username}`;
-                    
+
                     // Tarihleri formatla
                     const joinedDate = new Date(member.joinedAt);
                     const createdDate = new Date(member.user?.createdAt || member.joinedAt);
-                    
+
                     document.getElementById('modalJoinedAt').textContent = joinedDate.toLocaleDateString('tr-TR', {
                         year: 'numeric',
                         month: 'long',
@@ -72,7 +72,7 @@ async function updateServerStats() {
                         hour: '2-digit',
                         minute: '2-digit'
                     });
-                    
+
                     document.getElementById('modalCreatedAt').textContent = createdDate.toLocaleDateString('tr-TR', {
                         year: 'numeric',
                         month: 'long',
@@ -83,7 +83,7 @@ async function updateServerStats() {
 
                     // Aktiviteleri göster
                     const activities = member.activities || [];
-                    const activityText = activities.length > 0 
+                    const activityText = activities.length > 0
                         ? activities.map(activity => activity.name).join(', ')
                         : 'Aktif değil';
                     document.getElementById('modalActivity').textContent = activityText;
@@ -113,7 +113,7 @@ async function updateServerStats() {
         const channelsList = document.querySelector('.channels-list');
         if (channelsList && channelsData && channelsData.channels) {
             channelsList.innerHTML = ''; // Mevcut içeriği temizle
-            
+
             // Kategorileri grupla
             const categories = {};
             channelsData.channels.forEach(channel => {
@@ -280,12 +280,12 @@ const closeModal = document.querySelector('.close-modal');
 function updateMembersList(members) {
     const membersList = document.querySelector('.members-list');
     membersList.innerHTML = '';
-    
+
     members.forEach(member => {
         const memberElement = document.createElement('div');
         memberElement.className = 'member-item';
         memberElement.style.cursor = 'pointer';
-        
+
         memberElement.innerHTML = `
             <div class="member-avatar">
                 <img src="${member.avatarURL || 'https://cdn.discordapp.com/embed/avatars/0.png'}" alt="${member.username}">
@@ -297,12 +297,12 @@ function updateMembersList(members) {
             </div>
             <div class="member-role">${member.roles.highest?.name || 'Üye'}</div>
         `;
-        
+
         // En basit tıklama olayı
-        memberElement.addEventListener('click', function() {
+        memberElement.addEventListener('click', function () {
             const modal = document.getElementById('memberModal');
             modal.style.display = 'block';
-            
+
             // Modal içeriğini doldur
             document.getElementById('modalAvatar').src = member.avatarURL || 'https://cdn.discordapp.com/embed/avatars/0.png';
             document.getElementById('modalName').textContent = member.nickname || member.username;
@@ -311,18 +311,18 @@ function updateMembersList(members) {
             document.getElementById('modalCreatedAt').textContent = new Date(member.user.createdAt).toLocaleDateString('tr-TR');
             document.getElementById('modalActivity').textContent = member.presence?.activities?.[0]?.name || 'Aktif değil';
         });
-        
+
         membersList.appendChild(memberElement);
     });
 }
 
 // Modal kapatma butonu
-document.querySelector('.close-modal').addEventListener('click', function() {
+document.querySelector('.close-modal').addEventListener('click', function () {
     document.getElementById('memberModal').style.display = 'none';
 });
 
 // Modal dışına tıklayınca kapatma
-window.addEventListener('click', function(e) {
+window.addEventListener('click', function (e) {
     const modal = document.getElementById('memberModal');
     if (e.target === modal) {
         modal.style.display = 'none';
