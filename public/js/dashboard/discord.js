@@ -30,6 +30,7 @@ async function updateServerStats() {
             sortedMembers.forEach(member => {
                 const memberDiv = document.createElement('div');
                 memberDiv.className = 'member-item';
+                memberDiv.style.cursor = 'pointer';
                 
                 // En yüksek rolü bul
                 const highestRole = member.roles.length > 0 ? member.roles[0] : null;
@@ -48,6 +49,57 @@ async function updateServerStats() {
                         ${highestRole ? highestRole.name : 'No Role'}
                     </div>
                 `;
+
+                // Üye detayları modalını aç
+                memberDiv.addEventListener('click', () => {
+                    const modal = document.getElementById('memberModal');
+                    modal.style.display = 'block';
+                    
+                    // Modal içeriğini doldur
+                    document.getElementById('modalAvatar').src = member.avatar || 'assets/default-avatar.png';
+                    document.getElementById('modalStatus').className = `status-indicator ${member.status}`;
+                    document.getElementById('modalName').textContent = member.nickname || member.username;
+                    document.getElementById('modalUsername').textContent = `@${member.username}`;
+                    
+                    // Tarihleri formatla
+                    const joinedDate = new Date(member.joinedAt);
+                    const createdDate = new Date(member.user?.createdAt || member.joinedAt);
+                    
+                    document.getElementById('modalJoinedAt').textContent = joinedDate.toLocaleDateString('tr-TR', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    
+                    document.getElementById('modalCreatedAt').textContent = createdDate.toLocaleDateString('tr-TR', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+
+                    // Aktiviteleri göster
+                    const activities = member.activities || [];
+                    const activityText = activities.length > 0 
+                        ? activities.map(activity => activity.name).join(', ')
+                        : 'Aktif değil';
+                    document.getElementById('modalActivity').textContent = activityText;
+
+                    // Rolleri göster
+                    const rolesList = document.getElementById('modalRoles');
+                    rolesList.innerHTML = '';
+                    member.roles.forEach(role => {
+                        const roleTag = document.createElement('span');
+                        roleTag.className = 'role-tag';
+                        roleTag.style.backgroundColor = `#${role.color.toString(16).padStart(6, '0')}`;
+                        roleTag.textContent = role.name;
+                        rolesList.appendChild(roleTag);
+                    });
+                });
+
                 membersList.appendChild(memberDiv);
             });
         } else {
@@ -225,74 +277,6 @@ document.addEventListener('DOMContentLoaded', () => {
 const modal = document.getElementById('memberModal');
 const closeModal = document.querySelector('.close-modal');
 
-function openMemberModal(member) {
-    // Set member details
-    document.getElementById('modalAvatar').src = member.avatarURL || 'https://cdn.discordapp.com/embed/avatars/0.png';
-    document.getElementById('modalName').textContent = member.nickname || member.username;
-    document.getElementById('modalUsername').textContent = `@${member.username}`;
-    
-    // Set status
-    const statusIndicator = document.getElementById('modalStatus');
-    statusIndicator.className = 'status-indicator';
-    statusIndicator.classList.add(member.presence?.status || 'offline');
-    
-    // Set dates
-    document.getElementById('modalJoinedAt').textContent = new Date(member.joinedAt).toLocaleDateString('tr-TR', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
-    
-    document.getElementById('modalCreatedAt').textContent = new Date(member.user.createdAt).toLocaleDateString('tr-TR', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
-    
-    // Set activity
-    const activity = member.presence?.activities?.[0];
-    document.getElementById('modalActivity').textContent = activity ? 
-        `${activity.type} ${activity.name}` : 
-        'Aktif değil';
-    
-    // Set roles
-    const rolesList = document.getElementById('modalRoles');
-    rolesList.innerHTML = '';
-    
-    member.roles.cache
-        .sort((a, b) => b.position - a.position)
-        .forEach(role => {
-            if (role.name !== '@everyone') {
-                const roleElement = document.createElement('span');
-                roleElement.className = 'role-tag';
-                roleElement.style.backgroundColor = role.hexColor === '#000000' ? 
-                    'rgba(255, 255, 255, 0.1)' : 
-                    role.hexColor;
-                roleElement.style.color = role.hexColor === '#000000' ? 
-                    '#fff' : 
-                    '#000';
-                roleElement.textContent = role.name;
-                rolesList.appendChild(roleElement);
-            }
-        });
-    
-    // Show modal
-    modal.style.display = 'block';
-}
-
-function closeMemberModal() {
-    modal.style.display = 'none';
-}
-
-// Event listeners
-closeModal.addEventListener('click', closeMemberModal);
-window.addEventListener('click', (e) => {
-    if (e.target === modal) {
-        closeMemberModal();
-    }
-});
-
-// Update member list click handlers
 function updateMembersList(members) {
     const membersList = document.querySelector('.members-list');
     membersList.innerHTML = '';
@@ -300,6 +284,8 @@ function updateMembersList(members) {
     members.forEach(member => {
         const memberElement = document.createElement('div');
         memberElement.className = 'member-item';
+        memberElement.style.cursor = 'pointer';
+        
         memberElement.innerHTML = `
             <div class="member-avatar">
                 <img src="${member.avatarURL || 'https://cdn.discordapp.com/embed/avatars/0.png'}" alt="${member.username}">
@@ -309,12 +295,37 @@ function updateMembersList(members) {
                 <div class="member-name">${member.nickname || member.username}</div>
                 <div class="member-username">@${member.username}</div>
             </div>
-            <div class="member-role">${member.roles.highest.name}</div>
+            <div class="member-role">${member.roles.highest?.name || 'Üye'}</div>
         `;
         
-        // Add click handler
-        memberElement.addEventListener('click', () => openMemberModal(member));
+        // En basit tıklama olayı
+        memberElement.addEventListener('click', function() {
+            const modal = document.getElementById('memberModal');
+            modal.style.display = 'block';
+            
+            // Modal içeriğini doldur
+            document.getElementById('modalAvatar').src = member.avatarURL || 'https://cdn.discordapp.com/embed/avatars/0.png';
+            document.getElementById('modalName').textContent = member.nickname || member.username;
+            document.getElementById('modalUsername').textContent = `@${member.username}`;
+            document.getElementById('modalJoinedAt').textContent = new Date(member.joinedAt).toLocaleDateString('tr-TR');
+            document.getElementById('modalCreatedAt').textContent = new Date(member.user.createdAt).toLocaleDateString('tr-TR');
+            document.getElementById('modalActivity').textContent = member.presence?.activities?.[0]?.name || 'Aktif değil';
+        });
         
         membersList.appendChild(memberElement);
     });
 }
+
+// Modal kapatma butonu
+document.querySelector('.close-modal').addEventListener('click', function() {
+    document.getElementById('memberModal').style.display = 'none';
+});
+
+// Modal dışına tıklayınca kapatma
+window.addEventListener('click', function(e) {
+    const modal = document.getElementById('memberModal');
+    if (e.target === modal) {
+        modal.style.display = 'none';
+    }
+});
+
