@@ -322,6 +322,23 @@ async function updateServerStats() {
 document.addEventListener('DOMContentLoaded', () => {
     updateServerStats();
     setInterval(updateServerStats, 30000); // Her 30 saniyede bir güncelle
+
+    // Kick butonu
+    const kickButton = document.getElementById('kickButton');
+    if (kickButton) {
+        kickButton.addEventListener('click', async () => {
+            const userId = document.getElementById('userSearch').value;
+            if (!userId) {
+                showNotification('error', 'Lütfen bir kullanıcı seçin');
+                return;
+            }
+
+            const reason = prompt('Kick sebebini girin:');
+            if (reason === null) return; // Kullanıcı iptal etti
+
+            await kickUser(userId, reason);
+        });
+    }
 });
 
 // Modal functionality
@@ -432,33 +449,35 @@ async function warnUser() {
     }
 }
 
-async function kickUser() {
-    const userId = document.getElementById('userSearch').value;
-    if (!userId) {
-        showNotification('Lütfen bir kullanıcı seçin', 'error');
-        return;
-    }
-
+// Kullanıcıyı kickle
+async function kickUser(userId, reason) {
     try {
-        const response = await fetch('/api/discordUsers/kick', {
+        console.log('Kick request initiated:', { userId, reason });
+        const response = await fetch('/api/discord/users/kick', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ userId })
+            body: JSON.stringify({
+                userId,
+                reason,
+                guildId: Config.discord.guidid
+            })
         });
-        const data = await response.json();
 
-        if (data.error) {
-            showNotification(data.error, 'error');
-            return;
+        console.log('Kick response status:', response.status);
+        const data = await response.json();
+        console.log('Kick response data:', data);
+
+        if (!response.ok) {
+            throw new Error(data.error || 'Kick işlemi başarısız oldu');
         }
 
-        showNotification('Kullanıcı sunucudan atıldı', 'success');
+        showNotification('success', 'Kullanıcı başarıyla sunucudan atıldı');
         refreshUserHistory();
     } catch (error) {
-        console.error('Error kicking user:', error);
-        showNotification('İşlem sırasında bir hata oluştu', 'error');
+        console.error('Kick error:', error);
+        showNotification('error', error.message);
     }
 }
 
