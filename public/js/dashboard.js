@@ -88,30 +88,33 @@ document.addEventListener('DOMContentLoaded', function () {
             setTimeout(() => {
                 icon.style.animation = '';
             }, 1000);
-            // Burada verileri yenileme işlemi yapılabilir
         });
     });
 
     // Search functionality
     const searchInput = document.querySelector('.search-bar input');
-    searchInput.addEventListener('input', function (e) {
-        const searchTerm = e.target.value.toLowerCase();
-        // Burada arama işlemi yapılabilir
-    });
+    if (searchInput) {
+        searchInput.addEventListener('input', function (e) {
+            const searchTerm = e.target.value.toLowerCase();
+            // Arama işlemi
+        });
+    }
 
     // Notifications
     const notifications = document.querySelector('.notifications');
-    notifications.addEventListener('click', function () {
-        // Burada bildirimler modalı açılabilir
-        alert('Notifications feature coming soon!');
-    });
+    if (notifications) {
+        notifications.addEventListener('click', function () {
+            // Bildirimler modalı
+        });
+    }
 
     // Admin profile
     const adminProfile = document.querySelector('.admin-profile');
-    adminProfile.addEventListener('click', function () {
-        // Burada profil menüsü açılabilir
-        alert('Profile menu coming soon!');
-    });
+    if (adminProfile) {
+        adminProfile.addEventListener('click', function () {
+            // Profil menüsü
+        });
+    }
 
     // Responsive sidebar
     function checkScreenSize() {
@@ -124,6 +127,67 @@ document.addEventListener('DOMContentLoaded', function () {
 
     window.addEventListener('resize', checkScreenSize);
     checkScreenSize();
+
+    // Utility Functions
+    function showNotification(message, type = 'info') {
+        // Bildirim container'ını oluştur veya bul
+        let container = document.querySelector('.notification-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.className = 'notification-container';
+            document.body.appendChild(container);
+        }
+
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        
+        // Bildirim tipine göre ikon seç
+        let icon;
+        switch(type) {
+            case 'success':
+                icon = 'fa-check-circle';
+                break;
+            case 'error':
+                icon = 'fa-exclamation-circle';
+                break;
+            case 'warning':
+                icon = 'fa-exclamation-triangle';
+                break;
+            case 'info':
+            default:
+                icon = 'fa-info-circle';
+                break;
+        }
+        
+        notification.innerHTML = `
+            <i class="fas ${icon}"></i>
+            <span>${message}</span>
+            <div class="progress-bar"></div>
+        `;
+        
+        // Bildirimi container'a ekle
+        container.appendChild(notification);
+        
+        // Animasyon için setTimeout kullan
+        setTimeout(() => {
+            notification.classList.add('show');
+        }, 100);
+        
+        // 3 saniye sonra bildirimi kaldır
+        setTimeout(() => {
+            notification.classList.add('hide');
+            setTimeout(() => {
+                notification.remove();
+                // Eğer container boşsa, onu da kaldır
+                if (container.children.length === 0) {
+                    container.remove();
+                }
+            }, 300);
+        }, 3000);
+    }
+
+    // Global olarak erişilebilir yap
+    window.showNotification = showNotification;
 
     // Add spin animation for refresh icon
     const style = document.createElement('style');
