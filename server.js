@@ -23,6 +23,7 @@ const client = new Client({
     ]
 });
 
+// Client'ı hemen export et
 module.exports = client;
 
 // Discord bot token
@@ -35,7 +36,6 @@ const commandsPath = path.join(__dirname, 'private', 'commands');
 const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
 
 console.log('🔄 Starting command registration process...');
-console.log(`📁 Found ${commandFiles.length} command files: ${commandFiles.join(', ')}`);
 
 const commands = [];
 
@@ -183,7 +183,9 @@ client.on('ready', () => {
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
 
-    client.login(Config.discord.token).catch(error => {
+    client.login(Config.discord.token).then(() => {
+        console.log('Discord bot başarıyla bağlandı');
+    }).catch(error => {
         console.error('Discord bot login error:', error);
     });
 });

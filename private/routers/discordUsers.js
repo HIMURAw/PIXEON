@@ -37,8 +37,8 @@ router.get('/serverMembers', async (req, res) => {
         }));
 
         // Online üye sayısını hesapla (online, idle ve dnd durumlarını dahil et)
-        const onlineMembers = guild.members.cache.filter(member => 
-            member.presence && 
+        const onlineMembers = guild.members.cache.filter(member =>
+            member.presence &&
             ['online', 'idle', 'dnd'].includes(member.presence.status)
         ).size;
 

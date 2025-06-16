@@ -1,11 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const { client } = require('../discord');
-const Config = require('../config');
+const client = require('../../server.js');
+const Config = require('../../config.json');
 
 // Duyuru kanalı mesajlarını getir
 router.get('/announcements', async (req, res) => {
     try {
+
         const channel = await client.channels.fetch(Config.discord.AnnoncementChannel);
 
         if (!channel) {
@@ -59,6 +60,8 @@ router.get('/announcements', async (req, res) => {
 // Tüm kanalları getir
 router.get('/channels', async (req, res) => {
     try {
+
+
         const guild = await client.guilds.fetch(Config.discord.guidid);
         if (!guild) {
             return res.status(404).json({ error: 'Sunucu bulunamadı' });
