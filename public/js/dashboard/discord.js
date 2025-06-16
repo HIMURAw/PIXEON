@@ -692,3 +692,84 @@ document.addEventListener('DOMContentLoaded', () => {
     setInterval(refreshServerActivity, 60000);
 });
 
+// Banlı kullanıcıları yükle
+async function loadBannedUsers() {
+    const bannedUsersList = document.getElementById('bannedUsersList');
+    bannedUsersList.innerHTML = `
+        <div class="loading-spinner">
+            <i class="fas fa-spinner fa-spin"></i>
+            <span>Banlı kullanıcılar yükleniyor...</span>
+        </div>
+    `;
+
+    try {
+        const response = await fetch('/api/discordUsers/bannedUsers');
+        let data;
+        
+        // Response'un text olarak alıp JSON'a çevirelim
+        const text = await response.text();
+        try {
+            data = JSON.parse(text);
+        } catch (e) {
+            console.error('API yanıtı JSON formatında değil:', text);
+            throw new Error('API yanıtı geçersiz format');
+        }
+
+        if (!response.ok) {
+            throw new Error(data.error || 'Bilinmeyen bir hata oluştu');
+        }
+
+        if (!data.bannedUsers || data.bannedUsers.length === 0) {
+            bannedUsersList.innerHTML = `
+                <div class="no-banned-users">
+                    <i class="fas fa-check-circle"></i>
+                    <p>Banlı kullanıcı bulunmuyor</p>
+                </div>
+            `;
+            return;
+        }
+
+        bannedUsersList.innerHTML = data.bannedUsers.map(ban => `
+            <div class="banned-user-item">
+                <img src="${ban.user.avatar}" alt="${ban.user.username}" class="banned-user-avatar">
+                <div class="banned-user-info">
+                    <div class="banned-user-name">${ban.user.username}</div>
+                    <div class="banned-user-reason">${ban.reason}</div>
+                    <div class="banned-user-date">
+                        Ban Tarihi: ${new Date(ban.bannedAt).toLocaleString('tr-TR')}
+                        ${ban.bannedBy ? ` • Banlayan: ${ban.bannedBy.username}` : ''}
+                    </div>
+                </div>
+                <div class="banned-user-actions">
+                    <button class="unban-btn" onclick="unbanUser('${ban.user.id}')" title="Banı Kaldır">
+                        <i class="fas fa-unlock"></i>
+                    </button>
+                </div>
+            </div>
+        `).join('');
+
+    } catch (error) {
+        console.error('Banlı kullanıcılar yüklenirken hata:', error);
+        bannedUsersList.innerHTML = `
+            <div class="error-message">
+                <i class="fas fa-exclamation-circle"></i>
+                <p>${error.message}</p>
+                <button onclick="refreshBannedUsers()" class="retry-btn">
+                    <i class="fas fa-sync-alt"></i> Tekrar Dene
+                </button>
+            </div>
+        `;
+    }
+}
+
+// Banlı kullanıcıları yenile
+function refreshBannedUsers() {
+    loadBannedUsers();
+}
+
+// Sayfa yüklendiğinde banlı kullanıcıları yükle
+document.addEventListener('DOMContentLoaded', () => {
+    loadBannedUsers();
+    // ... existing code ...
+});
+
