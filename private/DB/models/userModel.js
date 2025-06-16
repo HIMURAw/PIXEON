@@ -31,7 +31,10 @@ async function createUserHistoryTable() {
                 reason TEXT,
                 timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
                 moderator_id VARCHAR(255) NOT NULL,
-                moderator_username VARCHAR(255) NOT NULL
+                moderator_username VARCHAR(255) NOT NULL,
+                ban_duration INT DEFAULT NULL,
+                ban_expires_at DATETIME DEFAULT NULL,
+                is_expired BOOLEAN DEFAULT FALSE
             )
         `);
         console.log('User History table created or already exists');
@@ -58,15 +61,35 @@ async function checkLogin(username, password) {
 // Kullanıcı geçmişi ekle
 async function addUserHistory(data) {
     try {
-        console.log('Adding user history:', data);
         const [result] = await pool.execute(
-            'INSERT INTO user_history (user_id, username, action, reason, moderator_id, moderator_username) VALUES (?, ?, ?, ?, ?, ?)',
-            [data.userId, data.username, data.action, data.reason, data.moderatorId, data.moderatorUsername]
+            'INSERT INTO user_history (user_id, username, action, reason, moderator_id, moderator_username, ban_duration, ban_expires_at, is_expired) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [
+                data.userId, 
+                data.username, 
+                data.action, 
+                data.reason, 
+                data.moderatorId, 
+                data.moderatorUsername,
+                data.banDuration || null,
+                data.banExpiresAt || null,
+                data.isExpired || false
+            ]
         );
-        console.log('User history added successfully:', result);
         return result;
     } catch (error) {
         console.error('Error adding user history:', error);
+        throw error;
+    }
+}
+
+// Ban süresi dolan kullanıcıları güncelle
+async function updateExpiredBans() {
+    try {
+        await pool.execute(
+            'UPDATE user_history SET is_expired = TRUE WHERE action = "ban" AND ban_expires_at < NOW() AND is_expired = FALSE'
+        );
+    } catch (error) {
+        console.error('Error updating expired bans:', error);
         throw error;
     }
 }
@@ -113,5 +136,6 @@ module.exports = {
     createUserHistoryTable,
     checkLogin,
     addUserHistory,
+    updateExpiredBans,
     getUserHistory
 }; 
