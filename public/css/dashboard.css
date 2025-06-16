@@ -331,11 +331,15 @@ body {
 }
 
 .card-content {
-    padding: 15px;
-    flex: 1;
+    padding: 20px;
+    height: calc(100% - 60px); /* Header yüksekliğini çıkar */
+    overflow: hidden; /* Dış scroll'u engelle */
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    max-height: 400px;
     overflow-y: auto;
 }
-
 /* Table Styles */
 .data-table {
     width: 100%;
@@ -454,12 +458,6 @@ body {
 .btn-refresh:hover {
     color: var(--primary-color);
     background: rgba(255, 255, 255, 0.1);
-}
-
-.card-content {
-    padding: 20px;
-    max-height: 400px;
-    overflow-y: auto;
 }
 
 /* Channels List */
@@ -1472,4 +1470,51 @@ body {
 
 .notification.info .progress-bar {
     background: #2196F3;
+}
+
+/* Scroll gerektiren içerikler için */
+.members-list,
+.channels-list,
+.messages-list,
+.history-list,
+.banned-users-list {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 10px;
+    margin-right: -10px; /* Scroll çubuğu için boşluk */
+}
+
+/* Scroll çubuğu stilleri */
+.members-list::-webkit-scrollbar,
+.channels-list::-webkit-scrollbar,
+.messages-list::-webkit-scrollbar,
+.history-list::-webkit-scrollbar,
+.banned-users-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.members-list::-webkit-scrollbar-track,
+.channels-list::-webkit-scrollbar-track,
+.messages-list::-webkit-scrollbar-track,
+.history-list::-webkit-scrollbar-track,
+.banned-users-list::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+.members-list::-webkit-scrollbar-thumb,
+.channels-list::-webkit-scrollbar-thumb,
+.messages-list::-webkit-scrollbar-thumb,
+.history-list::-webkit-scrollbar-thumb,
+.banned-users-list::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+}
+
+.members-list::-webkit-scrollbar-thumb:hover,
+.channels-list::-webkit-scrollbar-thumb:hover,
+.messages-list::-webkit-scrollbar-thumb:hover,
+.history-list::-webkit-scrollbar-thumb:hover,
+.banned-users-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.4);
 }
