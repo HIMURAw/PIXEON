@@ -10,8 +10,12 @@ async function updateServerStats() {
         const serverData = await serverResponse.json();
 
         // Kanalları al
-        const channelsResponse = await fetch('api/discordChannel/channels');
+        const channelsResponse = await fetch('/api/discordChannel/channels');
         const channelsData = await channelsResponse.json();
+
+        // Duyuru mesajlarını al
+        const announcementsResponse = await fetch('/api/discordChannel/announcements');
+        const announcementsData = await announcementsResponse.json();
 
         // Üyeleri listele
         const membersList = document.querySelector('.members-list');
@@ -175,6 +179,53 @@ async function updateServerStats() {
             console.error('Channels data is not available');
             if (channelsList) {
                 channelsList.innerHTML = '<div class="loading-spinner">Loading channels...</div>';
+            }
+        }
+
+        // Mesajları listele
+        const messagesList = document.querySelector('.messages-list');
+        if (messagesList && announcementsData && announcementsData.messages) {
+            messagesList.innerHTML = ''; // Mevcut içeriği temizle
+
+            announcementsData.messages.forEach(message => {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message-item';
+
+                // Mesaj içeriğini formatla
+                let messageContent = message.content;
+                if (message.embeds && message.embeds.length > 0) {
+                    message.embeds.forEach(embed => {
+                        if (embed.title) messageContent += `\n**${embed.title}**`;
+                        if (embed.description) messageContent += `\n${embed.description}`;
+                    });
+                }
+
+                messageDiv.innerHTML = `
+                    <div class="message-header">
+                        <img src="${message.author.avatar}" alt="${message.author.username}" class="message-avatar">
+                        <div class="message-info">
+                            <span class="message-author">${message.author.username}</span>
+                            <span class="message-timestamp">${new Date(message.timestamp).toLocaleString('tr-TR')}</span>
+                        </div>
+                    </div>
+                    <div class="message-content">${messageContent}</div>
+                    ${message.attachments.length > 0 ? `
+                        <div class="message-attachments">
+                            ${message.attachments.map(attachment => `
+                                <a href="${attachment.url}" target="_blank" class="attachment-link">
+                                    <i class="fas fa-paperclip"></i> ${attachment.name}
+                                </a>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                `;
+
+                messagesList.appendChild(messageDiv);
+            });
+        } else {
+            console.error('Announcements data is not available');
+            if (messagesList) {
+                messagesList.innerHTML = '<div class="loading-spinner">Loading messages...</div>';
             }
         }
 
