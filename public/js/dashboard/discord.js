@@ -526,36 +526,109 @@ async function unbanUser() {
 async function refreshUserHistory() {
     const historyType = document.getElementById('historyType').value;
     const historyDate = document.getElementById('historyDate').value;
+    const historyList = document.querySelector('.history-list');
 
     try {
+        historyList.innerHTML = `
+            <div class="loading-spinner">
+                <i class="fas fa-spinner fa-spin"></i>
+                <span>Geçmiş yükleniyor...</span>
+            </div>
+        `;
+
         const response = await fetch(`/api/discordUsers/history?type=${historyType}&date=${historyDate}`);
         const data = await response.json();
-
+        
         if (data.error) {
-            showNotification(data.error, 'error');
+            throw new Error(data.error);
+        }
+
+        if (!data.history || data.history.length === 0) {
+            historyList.innerHTML = `
+                <div class="no-history">
+                    <i class="fas fa-history"></i>
+                    <p>Bu kriterlere uygun geçmiş bulunamadı</p>
+                </div>
+            `;
             return;
         }
 
-        const historyList = document.querySelector('.history-list');
-        historyList.innerHTML = '';
-
-        data.history.forEach(item => {
-            const historyItem = document.createElement('div');
-            historyItem.className = 'history-item';
-            historyItem.innerHTML = `
+        historyList.innerHTML = data.history.map(item => `
+            <div class="history-item ${item.action}">
                 <div class="history-info">
-                    <span class="history-user">${item.user.username}</span>
-                    <span class="history-action">${item.action}</span>
+                    <div class="history-user">
+                        <img src="https://cdn.discordapp.com/avatars/${item.userId}/${item.avatar}.png" 
+                             alt="${item.username}" 
+                             onerror="this.src='assets/default-avatar.png'">
+                        <span>${item.username}</span>
+                    </div>
+                    <div class="history-action">
+                        <i class="fas ${getActionIcon(item.action)}"></i>
+                        <span>${getActionText(item.action)}</span>
+                    </div>
+                    <div class="history-reason">${item.reason}</div>
                 </div>
-                <span class="history-timestamp">${new Date(item.timestamp).toLocaleString('tr-TR')}</span>
-            `;
-            historyList.appendChild(historyItem);
-        });
+                <div class="history-meta">
+                    <div class="history-moderator">
+                        <i class="fas fa-user-shield"></i>
+                        <span>${item.moderatorUsername}</span>
+                    </div>
+                    <div class="history-timestamp">
+                        <i class="fas fa-clock"></i>
+                        <span>${new Date(item.timestamp).toLocaleString('tr-TR')}</span>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
     } catch (error) {
-        console.error('Error fetching history:', error);
-        showNotification('Geçmiş yüklenirken bir hata oluştu', 'error');
+        console.error('Geçmiş yüklenirken hata:', error);
+        historyList.innerHTML = `
+            <div class="error-message">
+                <i class="fas fa-exclamation-circle"></i>
+                <p>${error.message}</p>
+                <button onclick="refreshUserHistory()" class="retry-btn">
+                    <i class="fas fa-sync-alt"></i> Tekrar Dene
+                </button>
+            </div>
+        `;
     }
 }
+
+// Yardımcı fonksiyonlar
+function getActionIcon(action) {
+    switch(action) {
+        case 'warn': return 'fa-exclamation-triangle';
+        case 'kick': return 'fa-user-slash';
+        case 'ban': return 'fa-ban';
+        case 'unban': return 'fa-unlock';
+        default: return 'fa-info-circle';
+    }
+}
+
+function getActionText(action) {
+    switch(action) {
+        case 'warn': return 'Uyarıldı';
+        case 'kick': return 'Sunucudan Atıldı';
+        case 'ban': return 'Yasaklandı';
+        case 'unban': return 'Yasağı Kaldırıldı';
+        default: return action;
+    }
+}
+
+// Event Listeners
+document.addEventListener('DOMContentLoaded', () => {
+    // Tarih filtresi için bugünün tarihini varsayılan olarak ayarla
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('historyDate').value = today;
+
+    // Filtre değişikliklerini dinle
+    document.getElementById('historyType').addEventListener('change', refreshUserHistory);
+    document.getElementById('historyDate').addEventListener('change', refreshUserHistory);
+
+    // İlk yükleme
+    refreshUserHistory();
+});
 
 // Server Activity Functions
 let activityChart;

@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Config = require('../../config.json');
 const client = require('../../server.js');
+const { pool } = require('../DB/connect');
 
 router.get('/serverMembers', async (req, res) => {
     try {
@@ -150,6 +151,155 @@ router.get('/searchBanned', async (req, res) => {
     } catch (error) {
         console.error('Banlı kullanıcı araması sırasında hata oluştu:', error);
         res.status(500).json({ error: 'Sunucu hatası' });
+    }
+});
+
+// Kullanıcı geçmişi için veritabanı şeması (örnek)
+const userHistorySchema = {
+    userId: String,
+    username: String,
+    action: String, // 'warn', 'kick', 'ban', 'unban'
+    reason: String,
+    timestamp: Date,
+    moderatorId: String,
+    moderatorUsername: String
+};
+
+// Kullanıcı geçmişini getir
+router.get('/history', async (req, res) => {
+    try {
+        const { type, date } = req.query;
+        let query = 'SELECT * FROM user_history';
+        const params = [];
+
+        // Tarihe göre filtrele
+        if (date) {
+            query += ' WHERE DATE(timestamp) = ?';
+            params.push(date);
+        }
+
+        // İşlem tipine göre filtrele
+        if (type && type !== 'all') {
+            query += params.length ? ' AND' : ' WHERE';
+            query += ' action = ?';
+            params.push(type);
+        }
+
+        // Geçmişi tarihe göre sırala (en yeniden en eskiye)
+        query += ' ORDER BY timestamp DESC';
+
+        const [rows] = await pool.execute(query, params);
+        res.json({ history: rows });
+    } catch (error) {
+        console.error('Kullanıcı geçmişi alınırken hata:', error);
+        res.status(500).json({ error: 'Kullanıcı geçmişi alınırken bir hata oluştu' });
+    }
+});
+
+// Uyarı ekle
+router.post('/warn', async (req, res) => {
+    try {
+        const { userId, reason } = req.body;
+        const guild = await client.guilds.fetch(Config.discord.guidid);
+        const member = await guild.members.fetch(userId);
+        const moderator = req.user;
+
+        // MySQL'e kaydet
+        await pool.execute(
+            'INSERT INTO user_history (user_id, username, action, reason, moderator_id, moderator_username) VALUES (?, ?, ?, ?, ?, ?)',
+            [member.id, member.user.username, 'warn', reason || 'Sebep belirtilmedi', moderator.id, moderator.username]
+        );
+
+        // Kullanıcıya DM gönder
+        try {
+            await member.send(`Sunucuda uyarıldınız.\nSebep: ${reason || 'Sebep belirtilmedi'}`);
+        } catch (error) {
+            console.log('DM gönderilemedi:', error);
+        }
+
+        res.json({ success: true, message: 'Kullanıcı uyarıldı' });
+    } catch (error) {
+        console.error('Uyarı verilirken hata:', error);
+        res.status(500).json({ error: 'Uyarı verilirken bir hata oluştu' });
+    }
+});
+
+// Kick işlemi
+router.post('/kick', async (req, res) => {
+    try {
+        const { userId, reason } = req.body;
+        const guild = await client.guilds.fetch(Config.discord.guidid);
+        const member = await guild.members.fetch(userId);
+        const moderator = req.user;
+
+        // MySQL'e kaydet
+        await pool.execute(
+            'INSERT INTO user_history (user_id, username, action, reason, moderator_id, moderator_username) VALUES (?, ?, ?, ?, ?, ?)',
+            [member.id, member.user.username, 'kick', reason || 'Sebep belirtilmedi', moderator.id, moderator.username]
+        );
+
+        // Kullanıcıyı kickle
+        await member.kick(reason || 'Sebep belirtilmedi');
+
+        res.json({ success: true, message: 'Kullanıcı sunucudan atıldı' });
+    } catch (error) {
+        console.error('Kick işlemi sırasında hata:', error);
+        res.status(500).json({ error: 'Kick işlemi sırasında bir hata oluştu' });
+    }
+});
+
+// Ban işlemi
+router.post('/ban', async (req, res) => {
+    try {
+        const { userId, reason } = req.body;
+        const guild = await client.guilds.fetch(Config.discord.guidid);
+        const member = await guild.members.fetch(userId);
+        const moderator = req.user;
+
+        // MySQL'e kaydet
+        await pool.execute(
+            'INSERT INTO user_history (user_id, username, action, reason, moderator_id, moderator_username) VALUES (?, ?, ?, ?, ?, ?)',
+            [member.id, member.user.username, 'ban', reason || 'Sebep belirtilmedi', moderator.id, moderator.username]
+        );
+
+        // Kullanıcıyı banla
+        await member.ban({ reason: reason || 'Sebep belirtilmedi' });
+
+        res.json({ success: true, message: 'Kullanıcı yasaklandı' });
+    } catch (error) {
+        console.error('Ban işlemi sırasında hata:', error);
+        res.status(500).json({ error: 'Ban işlemi sırasında bir hata oluştu' });
+    }
+});
+
+// Ban kaldırma
+router.post('/unban', async (req, res) => {
+    try {
+        const { userId, reason } = req.body;
+        const guild = await client.guilds.fetch(Config.discord.guidid);
+        const moderator = req.user;
+
+        // Banlı kullanıcıyı bul
+        const bans = await guild.bans.fetch();
+        const bannedUser = bans.find(ban => ban.user.id === userId);
+
+        if (!bannedUser) {
+            return res.status(404).json({ error: 'Kullanıcı banlı değil' });
+        }
+
+        // MySQL'e kaydet
+        await pool.execute(
+            'INSERT INTO user_history (user_id, username, action, reason, moderator_id, moderator_username) VALUES (?, ?, ?, ?, ?, ?)',
+            [bannedUser.user.id, bannedUser.user.username, 'unban', reason || 'Sebep belirtilmedi', moderator.id, moderator.username]
+        );
+
+        // Banı kaldır
+        await guild.members.unban(userId, reason || 'Sebep belirtilmedi');
+
+        res.json({ success: true, message: 'Kullanıcının yasağı kaldırıldı' });
+    } catch (error) {
+        console.error('Ban kaldırma işlemi sırasında hata:', error);
+        res.status(500).json({ error: 'Ban kaldırma işlemi sırasında bir hata oluştu' });
     }
 });
 
