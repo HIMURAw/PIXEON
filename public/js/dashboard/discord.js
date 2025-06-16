@@ -380,3 +380,315 @@ window.addEventListener('click', function (e) {
     }
 });
 
+// Moderation Panel Functions
+async function searchUser() {
+    const searchInput = document.getElementById('userSearch').value;
+    if (!searchInput) return;
+
+    try {
+        const response = await fetch(`/api/discordUsers/search?query=${encodeURIComponent(searchInput)}`);
+        const data = await response.json();
+        
+        if (data.error) {
+            showNotification(data.error, 'error');
+            return;
+        }
+
+        // Kullanıcı bilgilerini göster
+        showUserDetails(data);
+    } catch (error) {
+        console.error('Error searching user:', error);
+        showNotification('Kullanıcı aranırken bir hata oluştu', 'error');
+    }
+}
+
+async function warnUser() {
+    const userId = document.getElementById('userSearch').value;
+    if (!userId) {
+        showNotification('Lütfen bir kullanıcı seçin', 'error');
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/discordUsers/warn', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ userId })
+        });
+        const data = await response.json();
+        
+        if (data.error) {
+            showNotification(data.error, 'error');
+            return;
+        }
+
+        showNotification('Kullanıcı uyarıldı', 'success');
+        refreshUserHistory();
+    } catch (error) {
+        console.error('Error warning user:', error);
+        showNotification('İşlem sırasında bir hata oluştu', 'error');
+    }
+}
+
+async function kickUser() {
+    const userId = document.getElementById('userSearch').value;
+    if (!userId) {
+        showNotification('Lütfen bir kullanıcı seçin', 'error');
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/discordUsers/kick', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ userId })
+        });
+        const data = await response.json();
+        
+        if (data.error) {
+            showNotification(data.error, 'error');
+            return;
+        }
+
+        showNotification('Kullanıcı sunucudan atıldı', 'success');
+        refreshUserHistory();
+    } catch (error) {
+        console.error('Error kicking user:', error);
+        showNotification('İşlem sırasında bir hata oluştu', 'error');
+    }
+}
+
+async function banUser() {
+    const userId = document.getElementById('userSearch').value;
+    if (!userId) {
+        showNotification('Lütfen bir kullanıcı seçin', 'error');
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/discordUsers/ban', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ userId })
+        });
+        const data = await response.json();
+        
+        if (data.error) {
+            showNotification(data.error, 'error');
+            return;
+        }
+
+        showNotification('Kullanıcı yasaklandı', 'success');
+        refreshUserHistory();
+    } catch (error) {
+        console.error('Error banning user:', error);
+        showNotification('İşlem sırasında bir hata oluştu', 'error');
+    }
+}
+
+async function unbanUser() {
+    const userId = document.getElementById('userSearch').value;
+    if (!userId) {
+        showNotification('Lütfen bir kullanıcı seçin', 'error');
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/discordUsers/unban', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ userId })
+        });
+        const data = await response.json();
+        
+        if (data.error) {
+            showNotification(data.error, 'error');
+            return;
+        }
+
+        showNotification('Kullanıcının yasağı kaldırıldı', 'success');
+        refreshUserHistory();
+    } catch (error) {
+        console.error('Error unbanning user:', error);
+        showNotification('İşlem sırasında bir hata oluştu', 'error');
+    }
+}
+
+// User History Functions
+async function refreshUserHistory() {
+    const historyType = document.getElementById('historyType').value;
+    const historyDate = document.getElementById('historyDate').value;
+
+    try {
+        const response = await fetch(`/api/discordUsers/history?type=${historyType}&date=${historyDate}`);
+        const data = await response.json();
+        
+        if (data.error) {
+            showNotification(data.error, 'error');
+            return;
+        }
+
+        const historyList = document.querySelector('.history-list');
+        historyList.innerHTML = '';
+
+        data.history.forEach(item => {
+            const historyItem = document.createElement('div');
+            historyItem.className = 'history-item';
+            historyItem.innerHTML = `
+                <div class="history-info">
+                    <span class="history-user">${item.user.username}</span>
+                    <span class="history-action">${item.action}</span>
+                </div>
+                <span class="history-timestamp">${new Date(item.timestamp).toLocaleString('tr-TR')}</span>
+            `;
+            historyList.appendChild(historyItem);
+        });
+    } catch (error) {
+        console.error('Error fetching history:', error);
+        showNotification('Geçmiş yüklenirken bir hata oluştu', 'error');
+    }
+}
+
+// Server Activity Functions
+let activityChart;
+
+async function refreshServerActivity() {
+    try {
+        const response = await fetch('/api/discordServer/activity');
+        const data = await response.json();
+        
+        if (data.error) {
+            showNotification(data.error, 'error');
+            return;
+        }
+
+        // Metrikleri güncelle
+        document.getElementById('activeUsers').textContent = data.activeUsers;
+        document.getElementById('voiceChannelUsage').textContent = `${data.voiceChannelUsage}%`;
+        document.getElementById('messageActivity').textContent = data.messageActivity;
+
+        // Grafiği güncelle
+        updateActivityChart(data.activityData);
+    } catch (error) {
+        console.error('Error fetching server activity:', error);
+        showNotification('Sunucu aktivitesi yüklenirken bir hata oluştu', 'error');
+    }
+}
+
+function updateActivityChart(data) {
+    const ctx = document.getElementById('activityChart').getContext('2d');
+    
+    if (activityChart) {
+        activityChart.destroy();
+    }
+
+    activityChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: data.labels,
+            datasets: [{
+                label: 'Aktif Kullanıcılar',
+                data: data.activeUsers,
+                borderColor: '#7289da',
+                tension: 0.4
+            }, {
+                label: 'Ses Kanalı Kullanımı',
+                data: data.voiceChannelUsage,
+                borderColor: '#43b581',
+                tension: 0.4
+            }, {
+                label: 'Mesaj Aktivitesi',
+                data: data.messageActivity,
+                borderColor: '#faa61a',
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        color: '#fff'
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    },
+                    ticks: {
+                        color: '#fff'
+                    }
+                },
+                x: {
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    },
+                    ticks: {
+                        color: '#fff'
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Utility Functions
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+
+function showUserDetails(user) {
+    // Kullanıcı detaylarını göster
+    const modal = document.getElementById('memberModal');
+    modal.style.display = 'block';
+
+    document.getElementById('modalAvatar').src = user.avatar || 'assets/default-avatar.png';
+    document.getElementById('modalName').textContent = user.nickname || user.username;
+    document.getElementById('modalUsername').textContent = `@${user.username}`;
+    document.getElementById('modalJoinedAt').textContent = new Date(user.joinedAt).toLocaleString('tr-TR');
+    document.getElementById('modalCreatedAt').textContent = new Date(user.user?.createdAt || user.joinedAt).toLocaleString('tr-TR');
+    document.getElementById('modalActivity').textContent = user.activities?.length > 0 ? user.activities[0].name : 'Aktif değil';
+
+    const rolesList = document.getElementById('modalRoles');
+    rolesList.innerHTML = '';
+    user.roles.forEach(role => {
+        const roleTag = document.createElement('span');
+        roleTag.className = 'role-tag';
+        roleTag.style.backgroundColor = `#${role.color.toString(16).padStart(6, '0')}`;
+        roleTag.textContent = role.name;
+        rolesList.appendChild(roleTag);
+    });
+}
+
+// Event Listeners
+document.addEventListener('DOMContentLoaded', () => {
+    updateServerStats();
+    refreshUserHistory();
+    refreshServerActivity();
+    
+    setInterval(updateServerStats, 30000);
+    setInterval(refreshUserHistory, 60000);
+    setInterval(refreshServerActivity, 60000);
+});
+
