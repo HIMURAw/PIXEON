@@ -19,7 +19,29 @@ async function createAdminsTable() {
     }
 }
 
-// Admin girişi kontrolü
+// User History tablosunu oluştur
+async function createUserHistoryTable() {
+    try {
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS user_history (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id VARCHAR(255) NOT NULL,
+                username VARCHAR(255) NOT NULL,
+                action ENUM('warn', 'kick', 'ban', 'unban') NOT NULL,
+                reason TEXT,
+                timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+                moderator_id VARCHAR(255) NOT NULL,
+                moderator_username VARCHAR(255) NOT NULL
+            )
+        `);
+        console.log('User History table created or already exists');
+    } catch (error) {
+        console.error('Error creating user history table:', error);
+        throw error;
+    }
+}
+
+// Admin girişi kontrolü.
 async function checkLogin(username, password) {
     try {
         const [rows] = await pool.query(
@@ -33,7 +55,63 @@ async function checkLogin(username, password) {
     }
 }
 
+// Kullanıcı geçmişi ekle
+async function addUserHistory(data) {
+    try {
+        console.log('Adding user history:', data);
+        const [result] = await pool.execute(
+            'INSERT INTO user_history (user_id, username, action, reason, moderator_id, moderator_username) VALUES (?, ?, ?, ?, ?, ?)',
+            [data.userId, data.username, data.action, data.reason, data.moderatorId, data.moderatorUsername]
+        );
+        console.log('User history added successfully:', result);
+        return result;
+    } catch (error) {
+        console.error('Error adding user history:', error);
+        throw error;
+    }
+}
+
+// Kullanıcı geçmişini getir
+async function getUserHistory(filters = {}) {
+    try {
+        let query = 'SELECT * FROM user_history';
+        const params = [];
+
+        if (filters.date) {
+            query += ' WHERE DATE(timestamp) = ?';
+            params.push(filters.date);
+        }
+
+        if (filters.type && filters.type !== 'all') {
+            query += params.length ? ' AND' : ' WHERE';
+            query += ' action = ?';
+            params.push(filters.type);
+        }
+
+        query += ' ORDER BY timestamp DESC';
+
+        const [rows] = await pool.execute(query, params);
+        return rows;
+    } catch (error) {
+        console.error('Error getting user history:', error);
+        throw error;
+    }
+}
+
+// Tabloları oluştur
+(async () => {
+    try {
+        await createAdminsTable();
+        await createUserHistoryTable();
+    } catch (error) {
+        console.error('Error creating tables:', error);
+    }
+})();
+
 module.exports = {
     createAdminsTable,
-    checkLogin
+    createUserHistoryTable,
+    checkLogin,
+    addUserHistory,
+    getUserHistory
 }; 
