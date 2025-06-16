@@ -58,6 +58,8 @@ router.get('/serverMembers', async (req, res) => {
 // Banlı kullanıcıları getir
 router.get('/bannedUsers', async (req, res) => {
     try {
+
+
         const guild = await client.guilds.fetch(Config.discord.guidid);
         if (!guild) {
             return res.status(404).json({ error: 'Sunucu bulunamadı' });
@@ -65,7 +67,7 @@ router.get('/bannedUsers', async (req, res) => {
 
         // Banlı kullanıcıları getir
         const bans = await guild.bans.fetch();
-        
+
         // Banlı kullanıcıları formatla
         const bannedUsers = bans.map(ban => ({
             user: {
@@ -93,7 +95,7 @@ router.get('/bannedUsers', async (req, res) => {
 
     } catch (error) {
         console.error('Banlı kullanıcılar alınırken hata oluştu:', error);
-        res.status(500).json({ error: 'Sunucu hatası' });
+        res.status(500).json({ error: 'Sunucu hatası: ' + error.message });
     }
 });
 
@@ -112,7 +114,7 @@ router.get('/searchBanned', async (req, res) => {
 
         // Banlı kullanıcıları getir
         const bans = await guild.bans.fetch();
-        
+
         // Arama yap
         const searchResults = bans.filter(ban => {
             const searchTerm = query.toLowerCase();
