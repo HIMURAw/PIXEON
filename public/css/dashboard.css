@@ -1120,43 +1120,121 @@ body {
 }
 
 /* Notifications */
-.notification {
+.notification-container {
     position: fixed;
-    top: 20px;
+    bottom: 20px;
     right: 20px;
-    padding: 12px 20px;
-    border-radius: 4px;
-    color: #fff;
-    font-weight: 500;
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 10px;
     z-index: 1000;
-    animation: slideIn 0.3s ease-out;
+    max-height: 80vh;
+    overflow-y: auto;
+    padding-right: 10px;
+    pointer-events: none;
 }
 
-.notification.info {
-    background: #7289da;
+.notification {
+    position: relative;
+    padding: 15px 20px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 300px;
+    max-width: 400px;
+    border-left: 4px solid #4CAF50;
+    backdrop-filter: blur(8px);
+    pointer-events: auto;
+    transform: translateX(120%);
+    transition: transform 0.3s ease-in-out;
+    overflow: hidden;
 }
 
-.notification.success {
-    background: #43b581;
+.notification.show {
+    transform: translateX(0);
 }
 
-.notification.error {
-    background: #ed4245;
-}
-
-.notification.warning {
-    background: #faa61a;
+.notification.hide {
+    transform: translateX(120%);
 }
 
 @keyframes slideIn {
     from {
-        transform: translateX(100%);
-        opacity: 0;
+        transform: translateX(120%);
     }
     to {
         transform: translateX(0);
-        opacity: 1;
     }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(120%);
+    }
+}
+
+.notification.success.show {
+    animation: slideIn 0.3s ease-out;
+}
+
+.notification.error.show {
+    animation: slideIn 0.3s ease-out;
+}
+
+.notification.warning.show,
+.notification.info.show {
+    animation: slideIn 0.3s ease-out;
+}
+
+.notification.hide {
+    animation: slideOut 0.3s ease-in-out forwards;
+}
+
+.notification i {
+    font-size: 20px;
+    color: #4CAF50;
+}
+
+.notification.success {
+    background: rgba(76, 175, 80, 0.1);
+    border-left-color: #4CAF50;
+}
+
+.notification.success i {
+    color: #4CAF50;
+}
+
+.notification.error {
+    background: rgba(244, 67, 54, 0.1);
+    border-left-color: #F44336;
+}
+
+.notification.error i {
+    color: #F44336;
+}
+
+.notification.warning {
+    background: rgba(255, 152, 0, 0.1);
+    border-left-color: #FF9800;
+}
+
+.notification.warning i {
+    color: #FF9800;
+}
+
+.notification.info {
+    background: rgba(33, 150, 243, 0.1);
+    border-left-color: #2196F3;
+}
+
+.notification.info i {
+    color: #2196F3;
 }
 
 .banned-users-section {
@@ -1328,4 +1406,70 @@ body {
 
 .retry-btn i {
     font-size: 1em;
+}
+
+/* Scroll çubuğu stilleri */
+.notification-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.notification-container::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+.notification-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+}
+
+.notification-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+/* Progress bar */
+.notification::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.notification .progress-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: currentColor;
+    width: 100%;
+    transform-origin: left;
+    animation: progress 3s linear forwards;
+}
+
+@keyframes progress {
+    from {
+        transform: scaleX(1);
+    }
+    to {
+        transform: scaleX(0);
+    }
+}
+
+.notification.success .progress-bar {
+    background: #4CAF50;
+}
+
+.notification.error .progress-bar {
+    background: #F44336;
+}
+
+.notification.warning .progress-bar {
+    background: #FF9800;
+}
+
+.notification.info .progress-bar {
+    background: #2196F3;
 }

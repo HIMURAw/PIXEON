@@ -388,7 +388,7 @@ async function searchUser() {
     try {
         const response = await fetch(`/api/discordUsers/search?query=${encodeURIComponent(searchInput)}`);
         const data = await response.json();
-        
+
         if (data.error) {
             showNotification(data.error, 'error');
             return;
@@ -418,7 +418,7 @@ async function warnUser() {
             body: JSON.stringify({ userId })
         });
         const data = await response.json();
-        
+
         if (data.error) {
             showNotification(data.error, 'error');
             return;
@@ -448,7 +448,7 @@ async function kickUser() {
             body: JSON.stringify({ userId })
         });
         const data = await response.json();
-        
+
         if (data.error) {
             showNotification(data.error, 'error');
             return;
@@ -478,7 +478,7 @@ async function banUser() {
             body: JSON.stringify({ userId })
         });
         const data = await response.json();
-        
+
         if (data.error) {
             showNotification(data.error, 'error');
             return;
@@ -508,7 +508,7 @@ async function unbanUser() {
             body: JSON.stringify({ userId })
         });
         const data = await response.json();
-        
+
         if (data.error) {
             showNotification(data.error, 'error');
             return;
@@ -530,7 +530,7 @@ async function refreshUserHistory() {
     try {
         const response = await fetch(`/api/discordUsers/history?type=${historyType}&date=${historyDate}`);
         const data = await response.json();
-        
+
         if (data.error) {
             showNotification(data.error, 'error');
             return;
@@ -564,7 +564,7 @@ async function refreshServerActivity() {
     try {
         const response = await fetch('/api/discordServer/activity');
         const data = await response.json();
-        
+
         if (data.error) {
             showNotification(data.error, 'error');
             return;
@@ -579,13 +579,13 @@ async function refreshServerActivity() {
         updateActivityChart(data.activityData);
     } catch (error) {
         console.error('Error fetching server activity:', error);
-        showNotification('Sunucu aktivitesi yüklenirken bir hata oluştu', 'error');
+        showNotification('Sunucu aktivitesi yüklenirken bir hata oluştu', 'success');
     }
 }
 
 function updateActivityChart(data) {
     const ctx = document.getElementById('activityChart').getContext('2d');
-    
+
     if (activityChart) {
         activityChart.destroy();
     }
@@ -646,22 +646,13 @@ function updateActivityChart(data) {
 }
 
 // Utility Functions
-function showNotification(message, type = 'info') {
-    const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
-    notification.textContent = message;
-    
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-        notification.remove();
-    }, 3000);
-}
-
 function showUserDetails(user) {
     // Kullanıcı detaylarını göster
     const modal = document.getElementById('memberModal');
     modal.style.display = 'block';
+
+    // Test bildirimi
+    window.showNotification('Kullanıcı detayları açıldı', 'success');
 
     document.getElementById('modalAvatar').src = user.avatar || 'assets/default-avatar.png';
     document.getElementById('modalName').textContent = user.nickname || user.username;
@@ -686,7 +677,7 @@ document.addEventListener('DOMContentLoaded', () => {
     updateServerStats();
     refreshUserHistory();
     refreshServerActivity();
-    
+
     setInterval(updateServerStats, 30000);
     setInterval(refreshUserHistory, 60000);
     setInterval(refreshServerActivity, 60000);
@@ -705,7 +696,7 @@ async function loadBannedUsers() {
     try {
         const response = await fetch('/api/discordUsers/bannedUsers');
         let data;
-        
+
         // Response'un text olarak alıp JSON'a çevirelim
         const text = await response.text();
         try {
