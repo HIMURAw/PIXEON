@@ -62,61 +62,6 @@ router.get('/serverInfo', async (req, res) => {
     }
 });
 
-// Sunucu kanallarını getir
-router.get('/channels', async (req, res) => {
-    try {
-
-
-        const guild = await client.guilds.fetch(Config.discord.guidid);
-        if (!guild) {
-            return res.status(404).json({ error: 'Server not found' });
-        }
-
-        // Tüm kanalları yükle
-        const channels = await guild.channels.fetch();
-
-        const channelList = channels.map(channel => ({
-            id: channel.id,
-            name: channel.name,
-            type: channel.type,
-            position: channel.position,
-            parent: channel.parent ? {
-                id: channel.parent.id,
-                name: channel.parent.name
-            } : null,
-            topic: channel.topic,
-            nsfw: channel.nsfw,
-            bitrate: channel.bitrate,
-            userLimit: channel.userLimit,
-            rateLimitPerUser: channel.rateLimitPerUser,
-            permissions: channel.permissionOverwrites.cache.map(perm => ({
-                id: perm.id,
-                type: perm.type,
-                allow: perm.allow.toArray(),
-                deny: perm.deny.toArray()
-            }))
-        }));
-
-        // Kanalları tipe göre sırala
-        const sortedChannels = channelList.sort((a, b) => {
-            // Önce kategoriler
-            if (a.type === 4 && b.type !== 4) return -1;
-            if (a.type !== 4 && b.type === 4) return 1;
-
-            // Sonra pozisyon
-            return a.position - b.position;
-        });
-
-        res.status(200).json({
-            total: channelList.length,
-            channels: sortedChannels
-        });
-    } catch (error) {
-        console.error('Error fetching channels:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-});
-
 // Sunucu rollerini getir
 router.get('/roles', async (req, res) => {
     try {
