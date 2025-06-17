@@ -1261,6 +1261,7 @@ body {
     border-radius: 3px;
 }
 
+/* Banlı kullanıcı öğesi */
 .banned-user-item {
     display: flex;
     align-items: center;
