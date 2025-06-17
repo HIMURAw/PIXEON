@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Config = require('../../config.json');
 const client = require('../../server.js');
-const { pool } = require('../DB/connect');
+const db = require('../DB/connect.js');
 const { addUserHistory, getUserHistory } = require('../DB/models/userModel');
 const { AuditLogEvent, Events } = require('discord.js');
 
@@ -445,6 +445,53 @@ client.on(Events.GuildBanRemove, async (ban) => {
         }
     } catch (error) {
         console.error('Error in guildBanRemove event:', error);
+    }
+});
+
+const moment = require('moment');
+
+router.get('/historyList', async (req, res) => {
+    try {
+        const { type, date } = req.query;
+        let sql = 'SELECT * FROM user_history WHERE 1=1';
+        const params = [];
+
+        if (type && type !== 'all') {
+            sql += ' AND action_type = ?';
+            params.push(type);
+        }
+        if (date) {
+            sql += ' AND DATE(timestamp) = ?';
+            params.push(date);
+        }
+
+        sql += ' ORDER BY timestamp DESC';
+
+        const [rows] = await db.pool.query(sql, params);
+
+        // Düzenli ve sade veri
+        const history = rows.map(row => ({
+            id: row.id,
+            user: {
+                id: row.userId,
+                username: row.username
+            },
+            action: row.action_type,
+            reason: row.reason,
+            moderator: {
+                id: row.moderatorId,
+                username: row.moderatorUsername
+            },
+            timestamp: row.timestamp,
+            formattedDate: row.timestamp
+                ? new Date(row.timestamp).toLocaleString('tr-TR')
+                : null
+        }));
+
+        res.json({ history });
+    } catch (error) {
+        console.error('Kullanıcı geçmişi alınırken hata:', error);
+        res.status(500).json({ error: 'Kullanıcı geçmişi alınırken bir hata oluştu' });
     }
 });
 
