@@ -4,7 +4,7 @@ const Config = require('../../config.json');
 const client = require('../../server.js');
 const { pool } = require('../DB/connect');
 const { addUserHistory, getUserHistory } = require('../DB/models/userModel');
-const { AuditLogEvent } = require('discord.js');
+const { AuditLogEvent, Events } = require('discord.js');
 
 router.get('/serverMembers', async (req, res) => {
     try {
@@ -423,36 +423,9 @@ client.on('guildMemberRemove', async (member) => {
     }
 });
 
-client.on('guildBanAdd', async (ban) => {
+client.on(Events.GuildBanRemove, async (ban) => {
+    console.log('Guild ban remove event triggered:', ban.user.username);
     try {
-        console.log('Ban event triggered:', ban.user.username);
-
-        const auditLogs = await ban.guild.fetchAuditLogs({
-            type: AuditLogEvent.MemberBanAdd,
-            limit: 1
-        });
-
-        const banLog = auditLogs.entries.first();
-        if (banLog && banLog.target.id === ban.user.id) {
-            console.log('Ban detected, adding to history');
-            await addUserHistory({
-                userId: ban.user.id,
-                username: ban.user.username,
-                action: 'ban',
-                reason: banLog.reason || 'Sebep belirtilmedi',
-                moderatorId: banLog.executor.id,
-                moderatorUsername: banLog.executor.username
-            });
-        }
-    } catch (error) {
-        console.error('Error in guildBanAdd event:', error);
-    }
-});
-
-client.on('guildBanRemove', async (ban) => {
-    try {
-        console.log('Unban event triggered:', ban.user.username);
-
         const auditLogs = await ban.guild.fetchAuditLogs({
             type: AuditLogEvent.MemberBanRemove,
             limit: 1
