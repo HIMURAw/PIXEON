@@ -58,7 +58,6 @@ async function checkLogin(username, password) {
 // Kullanıcı geçmişi ekle
 async function addUserHistory(data) {
     try {
-        console.log('Adding user history:', data);
         const [result] = await pool.execute(
             'INSERT INTO user_history (user_id, username, action, reason, moderator_id, moderator_username) VALUES (?, ?, ?, ?, ?, ?)',
             [data.userId, data.username, data.action, data.reason, data.moderatorId, data.moderatorUsername]

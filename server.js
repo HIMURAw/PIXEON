@@ -19,7 +19,8 @@ const client = new Client({
         GatewayIntentBits.MessageContent,
         GatewayIntentBits.GuildMembers,
         GatewayIntentBits.GuildVoiceStates,
-        GatewayIntentBits.GuildPresences
+        GatewayIntentBits.GuildPresences,
+        GatewayIntentBits.GuildBans,
     ]
 });
 
@@ -168,6 +169,7 @@ createAdminsTable().catch(console.error);
 ROUTERS END
 
 */
+
 
 // Discord botu başlat ve ses kanalına bağlan
 client.on('ready', () => {
