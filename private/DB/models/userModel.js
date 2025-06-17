@@ -63,7 +63,6 @@ async function addUserHistory(data) {
             'INSERT INTO user_history (user_id, username, action, reason, moderator_id, moderator_username) VALUES (?, ?, ?, ?, ?, ?)',
             [data.userId, data.username, data.action, data.reason, data.moderatorId, data.moderatorUsername]
         );
-        console.log('User history added successfully:', result);
         return result;
     } catch (error) {
         console.error('Error adding user history:', error);

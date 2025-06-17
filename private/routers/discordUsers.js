@@ -173,14 +173,14 @@ router.post('/warn', async (req, res) => {
     try {
         console.log('Uyarı isteği alındı:', req.body);
         const { userId, reason } = req.body;
-        
+
         console.log('Guild ID:', Config.discord.guidid);
         const guild = await client.guilds.fetch(Config.discord.guidid);
         console.log('Guild bulundu:', guild.name);
-        
+
         const member = await guild.members.fetch(userId);
         console.log('Kullanıcı bulundu:', member.user.username);
-        
+
         const moderator = req.user;
         console.log('Moderatör:', moderator.username);
 
@@ -274,8 +274,8 @@ router.post('/kick', async (req, res) => {
             code: error.code,
             name: error.name
         });
-        res.status(500).json({ 
-            success: false, 
+        res.status(500).json({
+            success: false,
             error: error.message,
             details: {
                 code: error.code,
@@ -290,14 +290,14 @@ router.post('/ban', async (req, res) => {
     try {
         console.log('Ban isteği alındı:', req.body);
         const { userId, reason } = req.body;
-        
+
         console.log('Guild ID:', Config.discord.guidid);
         const guild = await client.guilds.fetch(Config.discord.guidid);
         console.log('Guild bulundu:', guild.name);
-        
+
         const member = await guild.members.fetch(userId);
         console.log('Kullanıcı bulundu:', member.user.username);
-        
+
         const moderator = req.user;
         console.log('Moderatör:', moderator.username);
 
@@ -333,11 +333,11 @@ router.post('/unban', async (req, res) => {
     try {
         console.log('Unban isteği alındı:', req.body);
         const { userId, reason } = req.body;
-        
+
         console.log('Guild ID:', Config.discord.guidid);
         const guild = await client.guilds.fetch(Config.discord.guidid);
         console.log('Guild bulundu:', guild.name);
-        
+
         const moderator = req.user;
         console.log('Moderatör:', moderator.username);
 
@@ -380,14 +380,19 @@ router.post('/unban', async (req, res) => {
 client.on('guildMemberRemove', async (member) => {
     try {
         console.log('Member removed event triggered:', member.user.username);
-        
+
         // Check if the member was kicked
-        const auditLogs = await member.guild.fetchAuditLogs({
+        const auditLogsKick = await member.guild.fetchAuditLogs({
             type: AuditLogEvent.MemberKick,
             limit: 1
         });
-        
-        const kickLog = auditLogs.entries.first();
+
+        const auditLogsBan = await member.guild.fetchAuditLogs({
+            type: AuditLogEvent.MemberBanAdd,
+            limit: 1
+        });
+
+        const kickLog = auditLogsKick.entries.first();
         if (kickLog && kickLog.target.id === member.id) {
             console.log('Kick detected, adding to history');
             await addUserHistory({
@@ -399,6 +404,20 @@ client.on('guildMemberRemove', async (member) => {
                 moderatorUsername: kickLog.executor.username
             });
         }
+
+        const kickLogBan = auditLogsBan.entries.first();
+        if (kickLogBan && kickLogBan.target.id === member.id) {
+            console.log('Ban detected, adding to history');
+            await addUserHistory({
+                userId: member.id,
+                username: member.user.username,
+                action: 'ban',
+                reason: kickLogBan.reason || 'Sebep belirtilmedi',
+                moderatorId: kickLogBan.executor.id,
+                moderatorUsername: kickLogBan.executor.username
+            });
+        }
+
     } catch (error) {
         console.error('Error in guildMemberRemove event:', error);
     }
@@ -407,12 +426,12 @@ client.on('guildMemberRemove', async (member) => {
 client.on('guildBanAdd', async (ban) => {
     try {
         console.log('Ban event triggered:', ban.user.username);
-        
+
         const auditLogs = await ban.guild.fetchAuditLogs({
             type: AuditLogEvent.MemberBanAdd,
             limit: 1
         });
-        
+
         const banLog = auditLogs.entries.first();
         if (banLog && banLog.target.id === ban.user.id) {
             console.log('Ban detected, adding to history');
@@ -433,12 +452,12 @@ client.on('guildBanAdd', async (ban) => {
 client.on('guildBanRemove', async (ban) => {
     try {
         console.log('Unban event triggered:', ban.user.username);
-        
+
         const auditLogs = await ban.guild.fetchAuditLogs({
             type: AuditLogEvent.MemberBanRemove,
             limit: 1
         });
-        
+
         const unbanLog = auditLogs.entries.first();
         if (unbanLog && unbanLog.target.id === ban.user.id) {
             console.log('Unban detected, adding to history');
