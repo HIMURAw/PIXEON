@@ -153,11 +153,13 @@ const loginRouter = require('./private/DB/loginRouter');
 const discordUsersRouter = require('./private/routers/discordUsers.js');
 const discordServerRouter = require('./private/routers/discordServer.js');
 const discordChannelRouter = require('./private/routers/discordChannel.js');
+const fivemPlayersRouter = require('./private/routers/fivemplayer.js');
 
 app.use('/api/auth', loginRouter);
 app.use('/api/discordUsers', discordUsersRouter);
 app.use('/api/discordServer', discordServerRouter);
 app.use('/api/discordChannel', discordChannelRouter);
+app.use('/api/fivem/players', fivemPlayersRouter);
 
 
 
