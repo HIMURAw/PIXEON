@@ -321,7 +321,28 @@ async function updateServerStats() {
 // Sayfa yüklendiğinde ve her 30 saniyede bir güncelle
 document.addEventListener('DOMContentLoaded', () => {
     updateServerStats();
-    setInterval(updateServerStats, 30000); // Her 30 saniyede bir güncelle
+    refreshUserHistory();
+    refreshServerActivity();
+
+    // History filters event listeners
+    const historyType = document.getElementById('historyType');
+    const historyDate = document.getElementById('historyDate');
+
+    if (historyType) {
+        historyType.addEventListener('change', () => {
+            refreshUserHistory();
+        });
+    }
+
+    if (historyDate) {
+        historyDate.addEventListener('change', () => {
+            refreshUserHistory();
+        });
+    }
+
+    setInterval(updateServerStats, 30000);
+    setInterval(refreshUserHistory, 60000);
+    setInterval(refreshServerActivity, 60000);
 });
 
 // Modal functionality
@@ -554,34 +575,39 @@ async function refreshUserHistory() {
             historyItem.className = 'history-item';
             
             // Action type'a göre icon ve renk belirle
-            let actionIcon, actionColor;
+            let actionIcon, actionColor, actionText;
             switch(item.action) {
                 case 'warn':
                     actionIcon = 'fa-exclamation-triangle';
                     actionColor = '#faa61a';
+                    actionText = 'UYARI';
                     break;
                 case 'kick':
                     actionIcon = 'fa-user-slash';
                     actionColor = '#f04747';
+                    actionText = 'KICK';
                     break;
                 case 'ban':
                     actionIcon = 'fa-ban';
                     actionColor = '#ed4245';
+                    actionText = 'BAN';
                     break;
                 case 'unban':
                     actionIcon = 'fa-unlock';
                     actionColor = '#43b581';
+                    actionText = 'BAN KALDIRMA';
                     break;
                 default:
                     actionIcon = 'fa-info-circle';
                     actionColor = '#7289da';
+                    actionText = item.action.toUpperCase();
             }
 
             historyItem.innerHTML = `
                 <div class="history-info">
                     <div class="history-action" style="color: ${actionColor}">
                         <i class="fas ${actionIcon}"></i>
-                        <span>${item.action.toUpperCase()}</span>
+                        <span>${actionText}</span>
                     </div>
                     <div class="history-details">
                         <div class="history-user">
@@ -722,17 +748,6 @@ function showUserDetails(user) {
         rolesList.appendChild(roleTag);
     });
 }
-
-// Event Listeners
-document.addEventListener('DOMContentLoaded', () => {
-    updateServerStats();
-    refreshUserHistory();
-    refreshServerActivity();
-
-    setInterval(updateServerStats, 30000);
-    setInterval(refreshUserHistory, 60000);
-    setInterval(refreshServerActivity, 60000);
-});
 
 // Banlı kullanıcıları yükle
 async function loadBannedUsers() {
