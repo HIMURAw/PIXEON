@@ -21,11 +21,16 @@
             </div>
             <nav class="sidebar-nav">
                 <ul>
-                    <li class="active">
-                        <a href="#dashboard">
+                    <li class="sidebar-parent" id="dashboardMenu">
+                        <a href="#" class="sidebar-parent-toggle">
                             <i class="fas fa-home"></i>
                             <span>Dashboard</span>
+                            <i class="fas fa-chevron-down sidebar-arrow"></i>
                         </a>
+                        <ul class="sidebar-submenu" style="display: none;">
+                            <li><a href="#fivem-dashboard" class="dashboard-subitem"><i class="fab fa-steam-symbol"></i> Fivem Dashboard</a></li>
+                            <li><a href="#discord-dashboard" class="dashboard-subitem"><i class="fab fa-discord"></i> Discord Dashboard</a></li>
+                        </ul>
                     </li>
                     <li>
                         <a href="#players">
