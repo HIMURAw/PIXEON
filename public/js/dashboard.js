@@ -91,13 +91,11 @@ document.addEventListener('DOMContentLoaded', function () {
         });
         // Fivem ve Discord dashboard için özel içerik gösterimi
         if (section === 'fivem-dashboard') {
-            document.querySelector('.dashboard-content').style.display = 'block';
+            // Burada Fivem dashboard içeriği gösterilecek (eklenirse)
         } else if (section === 'discord-dashboard') {
-            document.querySelector('.dashboard-content').style.display = 'block';
-            // Burada isterseniz sadece Discord ile ilgili alanları gösterecek şekilde özelleştirebilirsiniz
+            document.getElementById('discord-dashboard-content').style.display = 'block';
         } else if (contentSections[section]) {
             contentSections[section].style.display = 'block';
-            
             // Dashboard içeriği gösterildiğinde verileri yükle
             if (section === 'dashboard') {
                 console.log('Loading dashboard data...');
