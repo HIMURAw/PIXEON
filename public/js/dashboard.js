@@ -44,26 +44,58 @@ document.addEventListener('DOMContentLoaded', function () {
 
     menuItems.forEach(item => {
         item.addEventListener('click', (e) => {
+            // Eğer sidebar-parent (dashboard) ise, bu event çalışmasın
+            if (item.classList.contains('sidebar-parent')) return;
             e.preventDefault();
-            
             // Aktif menü öğesini güncelle
             menuItems.forEach(i => i.classList.remove('active'));
             item.classList.add('active');
-
             // İlgili içeriği göster
             const section = item.querySelector('a').getAttribute('href').substring(1);
             showContent(section);
         });
     });
 
+    // Collapsible sidebar menu for Dashboard
+    const dashboardMenu = document.getElementById('dashboardMenu');
+    const dashboardToggle = dashboardMenu.querySelector('.sidebar-parent-toggle');
+    const dashboardSubmenu = dashboardMenu.querySelector('.sidebar-submenu');
+
+    dashboardToggle.addEventListener('click', function(e) {
+        e.preventDefault();
+        dashboardMenu.classList.toggle('open');
+        // Alt menüyü göster/gizle
+        if (dashboardMenu.classList.contains('open')) {
+            dashboardSubmenu.style.display = 'block';
+        } else {
+            dashboardSubmenu.style.display = 'none';
+        }
+    });
+
+    // Alt menü itemleri için içerik gösterme
+    const dashboardSubitems = document.querySelectorAll('.dashboard-subitem');
+    dashboardSubitems.forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            showContent(this.getAttribute('href').replace('#', ''));
+            // Aktiflik vurgusu
+            dashboardSubitems.forEach(i => i.parentElement.classList.remove('active'));
+            this.parentElement.classList.add('active');
+        });
+    });
+
+    // İçerik gösterme fonksiyonunu güncelle
     function showContent(section) {
-        // Tüm içerikleri gizle
         Object.values(contentSections).forEach(content => {
             if (content) content.style.display = 'none';
         });
-
-        // Seçilen içeriği göster
-        if (contentSections[section]) {
+        // Fivem ve Discord dashboard için özel içerik gösterimi
+        if (section === 'fivem-dashboard') {
+            document.querySelector('.dashboard-content').style.display = 'block';
+        } else if (section === 'discord-dashboard') {
+            document.querySelector('.dashboard-content').style.display = 'block';
+            // Burada isterseniz sadece Discord ile ilgili alanları gösterecek şekilde özelleştirebilirsiniz
+        } else if (contentSections[section]) {
             contentSections[section].style.display = 'block';
             
             // Dashboard içeriği gösterildiğinde verileri yükle
