@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!token) {
         // Token yoksa anasayfaya yönlendir
         window.location.href = '/';
+        return;
     }
 
     // Sidebar toggle
@@ -64,6 +65,14 @@ document.addEventListener('DOMContentLoaded', function () {
         // Seçilen içeriği göster
         if (contentSections[section]) {
             contentSections[section].style.display = 'block';
+            
+            // Dashboard içeriği gösterildiğinde verileri yükle
+            if (section === 'dashboard') {
+                console.log('Loading dashboard data...');
+                if (typeof updateServerStats === 'function') updateServerStats();
+                if (typeof refreshUserHistory === 'function') refreshUserHistory();
+                if (typeof refreshServerActivity === 'function') refreshServerActivity();
+            }
         }
     }
 

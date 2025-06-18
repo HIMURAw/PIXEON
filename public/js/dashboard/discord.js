@@ -528,7 +528,7 @@ async function refreshUserHistory() {
     const historyDate = document.getElementById('historyDate').value;
 
     try {
-        const response = await fetch(`/api/discordUsers/history?type=${historyType}&date=${historyDate}`);
+        const response = await fetch(`/api/discordUsers/historyList?type=${historyType}&date=${historyDate}`);
         const data = await response.json();
 
         if (data.error) {
@@ -539,15 +539,66 @@ async function refreshUserHistory() {
         const historyList = document.querySelector('.history-list');
         historyList.innerHTML = '';
 
+        if (!data.history || data.history.length === 0) {
+            historyList.innerHTML = `
+                <div class="no-history">
+                    <i class="fas fa-history"></i>
+                    <p>Geçmiş kaydı bulunamadı</p>
+                </div>
+            `;
+            return;
+        }
+
         data.history.forEach(item => {
             const historyItem = document.createElement('div');
             historyItem.className = 'history-item';
+            
+            // Action type'a göre icon ve renk belirle
+            let actionIcon, actionColor;
+            switch(item.action) {
+                case 'warn':
+                    actionIcon = 'fa-exclamation-triangle';
+                    actionColor = '#faa61a';
+                    break;
+                case 'kick':
+                    actionIcon = 'fa-user-slash';
+                    actionColor = '#f04747';
+                    break;
+                case 'ban':
+                    actionIcon = 'fa-ban';
+                    actionColor = '#ed4245';
+                    break;
+                case 'unban':
+                    actionIcon = 'fa-unlock';
+                    actionColor = '#43b581';
+                    break;
+                default:
+                    actionIcon = 'fa-info-circle';
+                    actionColor = '#7289da';
+            }
+
             historyItem.innerHTML = `
                 <div class="history-info">
-                    <span class="history-user">${item.user.username}</span>
-                    <span class="history-action">${item.action}</span>
+                    <div class="history-action" style="color: ${actionColor}">
+                        <i class="fas ${actionIcon}"></i>
+                        <span>${item.action.toUpperCase()}</span>
+                    </div>
+                    <div class="history-details">
+                        <div class="history-user">
+                            <strong>${item.user.username}</strong>
+                        </div>
+                        <div class="history-reason">
+                            ${item.reason || 'Sebep belirtilmedi'}
+                        </div>
+                        <div class="history-moderator">
+                            <i class="fas fa-user-shield"></i>
+                            ${item.moderator.username}
+                        </div>
+                    </div>
                 </div>
-                <span class="history-timestamp">${new Date(item.timestamp).toLocaleString('tr-TR')}</span>
+                <div class="history-timestamp">
+                    ${item.formattedDate}
+                </div>
             `;
             historyList.appendChild(historyItem);
         });
