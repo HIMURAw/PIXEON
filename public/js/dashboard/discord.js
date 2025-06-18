@@ -639,7 +639,7 @@ let activityChart;
 
 async function refreshServerActivity() {
     try {
-        const response = await fetch('/api/discordServer/activity');
+        const response = await fetch('/api/discordUsers/activity');
         const data = await response.json();
 
         if (data.error) {
@@ -656,7 +656,7 @@ async function refreshServerActivity() {
         updateActivityChart(data.activityData);
     } catch (error) {
         console.error('Error fetching server activity:', error);
-        showNotification('Sunucu aktivitesi yüklenirken bir hata oluştu', 'success');
+        showNotification('Sunucu aktivitesi yüklenirken bir hata oluştu', 'error');
     }
 }
 
