@@ -495,4 +495,45 @@ router.get('/historyList', async (req, res) => {
     }
 });
 
+// Sunucu aktivite istatistikleri
+router.get('/activity', async (req, res) => {
+    try {
+        const guild = await client.guilds.fetch(Config.discord.guidid);
+        if (!guild) {
+            return res.status(404).json({ error: 'Server not found' });
+        }
+        await guild.members.fetch({ withPresences: true });
+        await guild.channels.fetch();
+
+        // Aktif kullanıcılar (online, idle, dnd)
+        const activeUsers = guild.members.cache.filter(m => m.presence && ['online', 'idle', 'dnd'].includes(m.presence.status)).size;
+        // Ses kanalında olan kullanıcılar
+        const voiceChannelUsers = guild.channels.cache.filter(c => c.type === 2).reduce((acc, channel) => acc + channel.members.size, 0);
+        // Toplam kullanıcı
+        const totalUsers = guild.memberCount;
+        // Ses kanalı kullanım yüzdesi
+        const voiceChannelUsage = totalUsers > 0 ? Math.round((voiceChannelUsers / totalUsers) * 100) : 0;
+        // Mesaj aktivitesi (örnek: son 24 saatteki mesaj sayısı, burada 0 dönecek, gerçek veri için log tutmanız gerekir)
+        const messageActivity = 0;
+
+        // Grafik için örnek veri
+        const activityData = {
+            labels: ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'],
+            activeUsers: [10, 12, 15, 13, 17, 20, activeUsers],
+            voiceChannelUsage: [5, 7, 8, 6, 9, 10, voiceChannelUsage],
+            messageActivity: [100, 120, 140, 110, 160, 180, messageActivity]
+        };
+
+        res.json({
+            activeUsers,
+            voiceChannelUsage,
+            messageActivity,
+            activityData
+        });
+    } catch (error) {
+        console.error('Error fetching server activity:', error);
+        res.status(500).json({ error: 'Sunucu aktivitesi alınırken hata oluştu' });
+    }
+});
+
 module.exports = router;
