@@ -457,7 +457,7 @@ router.get('/historyList', async (req, res) => {
         const params = [];
 
         if (type && type !== 'all') {
-            sql += ' AND action_type = ?';
+            sql += ' AND action = ?';
             params.push(type);
         }
         if (date) {
@@ -473,14 +473,14 @@ router.get('/historyList', async (req, res) => {
         const history = rows.map(row => ({
             id: row.id,
             user: {
-                id: row.userId,
+                id: row.user_id,
                 username: row.username
             },
-            action: row.action_type,
+            action: row.action,
             reason: row.reason,
             moderator: {
-                id: row.moderatorId,
-                username: row.moderatorUsername
+                id: row.moderator_id,
+                username: row.moderator_username
             },
             timestamp: row.timestamp,
             formattedDate: row.timestamp
