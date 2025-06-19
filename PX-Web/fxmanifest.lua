@@ -2,10 +2,10 @@
 fx_version 'cerulean'
 game 'gta5'
 
-author 'Umut'
+author 'HIMURA'
 description 'PX‑Web: Sunucu içi HTTP API'
 version '1.0.0'
 
--- Sunucu tarafı kod
-server_script 'server/sv_playersDB.lua'
+client_script 'client/*.lua'
+server_script 'server/*.lua'
 dependency 'oxmysql' -- veya mysql-async, hangisini kullanıyorsan
