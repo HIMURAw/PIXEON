@@ -29,18 +29,6 @@ SetHttpHandler(function(req, res)
         return
     end
 
-    -- Diğer endpointler (örnek: /cars)
-    if req.path == '/cars' then
-        fetchCharacters(function(rows)
-            res.writeHead(200, {
-                ['Content-Type'] = 'application/json',
-                ['Access-Control-Allow-Origin'] = '*'
-            })
-            res.send(json.encode(rows))
-        end)
-        return
-    end
-
     -- 404
     res.writeHead(404, { ['Content-Type'] = 'text/plain' })
     res.send('Not found')
