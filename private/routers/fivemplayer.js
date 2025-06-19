@@ -3,8 +3,8 @@ const router = express.Router();
 const config = require('../../config.json');
 const superagent = require('superagent');
 
-const ServerIP = config.fivemServerIP || 'localhost';
-const ServerPort = config.fivemServerPort || '30120';
+const ServerIP = config.fivem.serverIP || 'localhost';
+const ServerPort = config.fivem.serverPort || '30120';
 
 
 // FiveM sunucusundan players.json'u proxy'le
@@ -21,11 +21,13 @@ router.get('/players-online', async (req, res) => {
 // FiveM sunucusundan oyuncu pozisyonlarını al
 router.get('/positions', async (req, res) => {
     try {
+        console.log(`FiveM positions API çağrısı: http://${ServerIP}:${ServerPort}/px-web/positions`);
         const response = await superagent.get(`http://${ServerIP}:${ServerPort}/px-web/positions`);
+        console.log('FiveM positions response:', response.text);
         res.json(JSON.parse(response.text));
     } catch (error) {
         console.error('FiveM positions alınırken hata:', error);
-        res.status(500).json({ error: 'FiveM positions alınırken hata oluştu' });
+        res.status(500).json({ error: 'FiveM positions alınırken hata oluştu', details: error.message });
     }
 });
 
