@@ -1,30 +1,65 @@
+console.log('Map.js dosyası yüklendi!');
+
 // FiveM Map JavaScript
 class FiveMMap {
     constructor() {
+        console.log('FiveMMap constructor başlatıldı');
+        
         this.canvas = document.getElementById('fivemMap');
+        if (!this.canvas) {
+            console.error('Canvas elementi bulunamadı!');
+            return;
+        }
+        console.log('Canvas elementi bulundu:', this.canvas);
+        
         this.ctx = this.canvas.getContext('2d');
+        if (!this.ctx) {
+            console.error('Canvas context alınamadı!');
+            return;
+        }
+        console.log('Canvas context alındı');
+        
         this.players = [];
         this.markers = [];
         this.isFullscreen = false;
         
+        console.log('FiveMMap init() çağrılıyor...');
         this.init();
     }
 
     init() {
+        console.log('Init fonksiyonu başladı');
         this.setupCanvas();
+        console.log('SetupCanvas tamamlandı');
         this.setupEventListeners();
+        console.log('SetupEventListeners tamamlandı');
         this.loadPlayers();
+        console.log('LoadPlayers çağrıldı');
         this.startAutoRefresh();
+        console.log('StartAutoRefresh tamamlandı');
+        console.log('Init fonksiyonu tamamlandı');
     }
 
     setupCanvas() {
+        console.log('SetupCanvas başladı');
+        
         // Canvas boyutunu container'a göre ayarla
         const container = this.canvas.parentElement;
-        const rect = container.getBoundingClientRect();
+        console.log('Container:', container);
         
-        // Canvas boyutunu ayarla
-        this.canvas.width = rect.width;
-        this.canvas.height = rect.height;
+        // Container görünür değilse sabit boyutlar kullan
+        if (container.style.display === 'none' || container.offsetWidth === 0) {
+            console.log('Container görünür değil, sabit boyutlar kullanılıyor');
+            this.canvas.width = 800;
+            this.canvas.height = 600;
+        } else {
+            const rect = container.getBoundingClientRect();
+            console.log('Container rect:', rect);
+            
+            // Canvas boyutunu ayarla
+            this.canvas.width = rect.width || 800;
+            this.canvas.height = rect.height || 600;
+        }
         
         console.log('Canvas boyutları:', this.canvas.width, 'x', this.canvas.height);
         
@@ -110,6 +145,12 @@ class FiveMMap {
     }
 
     drawMapBackground() {
+        // Canvas boyutları 0 ise çizim yapma
+        if (this.canvas.width === 0 || this.canvas.height === 0) {
+            console.log('Canvas boyutları 0, çizim iptal edildi');
+            return;
+        }
+        
         // Test çizimi - canvas'ın çalıştığını doğrula
         this.ctx.fillStyle = 'red';
         this.ctx.fillRect(0, 0, 100, 100);
@@ -167,7 +208,7 @@ class FiveMMap {
         };
         
         // Harita görselini yükle (public/assets klasöründen)
-        const imagePath = '/assets/gta-5-map.jpg';
+        const imagePath = '/assets/gta5-map.jpeg';
         console.log('Görsel yolu:', imagePath);
         
         // Farklı yükleme yöntemi
@@ -319,15 +360,39 @@ class FiveMMap {
 
 // Sayfa yüklendiğinde haritayı başlat
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM yüklendi, harita başlatılıyor...');
+    
+    // Haritayı hemen başlat (test için)
+    try {
+        window.fivemMap = new FiveMMap();
+        console.log('FiveMMap sınıfı başarıyla başlatıldı!');
+    } catch (error) {
+        console.error('FiveMMap başlatılırken hata:', error);
+    }
+    
     // Map content görünür olduğunda haritayı başlat
     const observer = new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
             if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
                 const mapContent = document.querySelector('.map-content');
                 if (mapContent && mapContent.style.display !== 'none') {
-                    if (!window.fivemMap) {
-                        window.fivemMap = new FiveMMap();
-                    }
+                    console.log('Map content görünür oldu, harita yeniden başlatılıyor...');
+                    
+                    // Canvas'ı yeniden boyutlandır
+                    setTimeout(() => {
+                        if (window.fivemMap) {
+                            console.log('Canvas yeniden boyutlandırılıyor...');
+                            window.fivemMap.setupCanvas();
+                            window.fivemMap.drawMap();
+                        } else {
+                            try {
+                                window.fivemMap = new FiveMMap();
+                                console.log('FiveMMap sınıfı başarıyla başlatıldı!');
+                            } catch (error) {
+                                console.error('FiveMMap başlatılırken hata:', error);
+                            }
+                        }
+                    }, 100);
                 }
             }
         });
@@ -336,6 +401,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const mapContent = document.querySelector('.map-content');
     if (mapContent) {
         observer.observe(mapContent, { attributes: true });
+        console.log('Map content observer başlatıldı');
+    } else {
+        console.error('Map content bulunamadı!');
     }
 }); 
 

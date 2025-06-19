@@ -1,3 +1,5 @@
+console.log('Dashboard.js dosyası yüklendi!');
+
 document.addEventListener('DOMContentLoaded', function () {
     // Token kontrolü
     function getCookie(name) {
