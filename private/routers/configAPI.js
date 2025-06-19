@@ -3,7 +3,7 @@ const express = require('express');
 const path = require('path');
 const router = express.Router();
 
-router.get('/api/config', (req, res) => {
+router.get('/server-config', (req, res) => {
     res.json({
         serverIP: config.fivem.serverIP,
         serverPort: config.fivem.serverPort
