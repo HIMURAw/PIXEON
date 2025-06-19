@@ -59,6 +59,12 @@
                             <span>Settings</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="#maps">
+                            <i class="fas fa-map"></i>
+                            <span>Fivem Map</span>
+                        </a>
+                    </li>
                 </ul>
             </nav>
             <div class="sidebar-footer">
@@ -598,6 +604,41 @@
                     </div>
                 </div>
             </div>
+
+            <!-- FiveM Map Content -->
+            <div class="map-content" style="display: none;">
+                <div class="map-header">
+                    <h2><i class="fas fa-map"></i> FiveM Map</h2>
+                    <div class="map-controls">
+                        <button id="refreshMapBtn" class="btn-refresh" title="Haritayı Yenile">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                        <button id="fullscreenMapBtn" class="btn-fullscreen" title="Tam Ekran">
+                            <i class="fas fa-expand"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="map-container">
+                    <div class="map-wrapper">
+                        <canvas id="fivemMap" width="800" height="600"></canvas>
+                        <div class="map-overlay">
+                            
+                            <div class="player-count">
+                                <i class="fas fa-users"></i>
+                                <span id="onlinePlayerCount">0</span> Oyuncu Online
+                            </div>
+                        </div>
+                    </div>
+                    <div class="map-sidebar">
+                        <div class="player-list">
+                            <h3><i class="fas fa-users"></i> Online Oyuncular</h3>
+                            <div id="playerListContainer">
+                                <div class="loading-spinner">Oyuncular yükleniyor...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
 
@@ -651,6 +692,7 @@
     <script src="/js/dashboard.js"></script>
     <script src="/js/dashboard/discord.js"></script>
     <script src="js/dashboard/fivem.js"></script>
+    <script src="js/dashboard/map.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
 </body>
 

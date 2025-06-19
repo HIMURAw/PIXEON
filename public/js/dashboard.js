@@ -36,7 +36,8 @@ document.addEventListener('DOMContentLoaded', function () {
         'players': document.querySelector('.players-content'),
         'servers': document.querySelector('.servers-content'),
         'bans': document.querySelector('.bans-content'),
-        'settings': document.querySelector('.settings-content')
+        'settings': document.querySelector('.settings-content'),
+        'maps': document.querySelector('.map-content')
     };
 
     // İlk yüklemede dashboard içeriğini göster
