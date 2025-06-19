@@ -337,20 +337,34 @@ class FiveMMap {
     }
 
     mapCoordinateToCanvas(coord, axis) {
-        // GTA 5 koordinat aralığı: -4000 ile 4000 arası
+        // GTA 5 koordinat aralığı: -4000 ile 4000 arası (daha geniş)
         const gtaRange = 8000; // -4000 to 4000
         const canvasSize = axis === 'x' ? this.canvas.width : this.canvas.height;
+        
+        // Harita görselinin boyutlarına göre offset hesapla
+        const mapScale = 0.6; // Harita %60 boyutunda
+        const mapSize = axis === 'x' ? this.canvas.width * mapScale : this.canvas.height * mapScale;
+        const offset = (canvasSize - mapSize) / 2;
         
         // Koordinatı 0-1 aralığına normalize et
         const normalized = (coord + 4000) / gtaRange;
         
-        // Canvas koordinatına çevir
-        const result = normalized * canvasSize;
+        // Y koordinatını ters çevir (GTA 5'te Y ekseni ters)
+        let adjustedNormalized = normalized;
+        if (axis === 'y') {
+            adjustedNormalized = 1 - normalized;
+        }
+        
+        // Canvas koordinatına çevir (harita alanı içinde)
+        const result = offset + (adjustedNormalized * mapSize);
         
         console.log(`Koordinat çevirisi (${axis}):`, {
             original: coord,
             normalized: normalized,
+            adjustedNormalized: adjustedNormalized,
             canvasSize: canvasSize,
+            mapSize: mapSize,
+            offset: offset,
             result: result
         });
         
