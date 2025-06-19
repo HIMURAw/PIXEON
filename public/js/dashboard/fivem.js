@@ -8,10 +8,18 @@ async function getFivemConfig() {
     return fivemConfig;
 }
 
-getFivemConfig().then(cfg => {
-    console.log(cfg.serverIP, cfg.serverPort);
-});
 
 // Kullanım
 // const cfg = await getFivemConfig();
 // console.log('Response: ', cfg.serverIP)
+
+
+Fivem_playersDB_API = {
+    async getPlayers() {
+        const cfg = await getFivemConfig();
+        const res = await fetch(`http://${cfg.serverIP}:${cfg.serverPort}/characters`);
+        return await res.json();
+    }
+}
+
+console.log('Fivem_playersDB_API: ', Fivem_playersDB_API);

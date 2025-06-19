@@ -60,8 +60,6 @@ router.get('/announcements', async (req, res) => {
 // Tüm kanalları getir
 router.get('/channels', async (req, res) => {
     try {
-
-
         const guild = await client.guilds.fetch(Config.discord.guidid);
         if (!guild) {
             return res.status(404).json({ error: 'Sunucu bulunamadı' });
