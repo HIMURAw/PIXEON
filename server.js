@@ -159,7 +159,7 @@ app.use('/api/auth', loginRouter);
 app.use('/api/discordUsers', discordUsersRouter);
 app.use('/api/discordServer', discordServerRouter);
 app.use('/api/discordChannel', discordChannelRouter);
-//app.use('/api/fivem/players', fivemPlayersRouter);
+app.use('/api/fivem', fivemPlayersRouter);
 
 
 
