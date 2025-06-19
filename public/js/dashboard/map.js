@@ -1,67 +1,59 @@
-console.log('Map.js dosyası yüklendi!');
-
 // FiveM Map JavaScript
 class FiveMMap {
     constructor() {
-        console.log('FiveMMap constructor başlatıldı');
-        
         this.canvas = document.getElementById('fivemMap');
         if (!this.canvas) {
             console.error('Canvas elementi bulunamadı!');
             return;
         }
-        console.log('Canvas elementi bulundu:', this.canvas);
         
         this.ctx = this.canvas.getContext('2d');
         if (!this.ctx) {
             console.error('Canvas context alınamadı!');
             return;
         }
-        console.log('Canvas context alındı');
         
         this.players = [];
         this.markers = [];
         this.isFullscreen = false;
         
-        console.log('FiveMMap init() çağrılıyor...');
+        // Sadece Pan özellikleri
+        this.panX = 0;
+        this.panY = 0;
+        this.isDragging = false;
+        this.lastMouseX = 0;
+        this.lastMouseY = 0;
+        
+        // Harita görseli
+        this.mapImage = null;
+        this.mapImageLoaded = false;
+        
         this.init();
     }
 
     init() {
-        console.log('Init fonksiyonu başladı');
         this.setupCanvas();
-        console.log('SetupCanvas tamamlandı');
         this.setupEventListeners();
-        console.log('SetupEventListeners tamamlandı');
+        this.loadMapImage();
         this.loadPlayers();
-        console.log('LoadPlayers çağrıldı');
         this.startAutoRefresh();
-        console.log('StartAutoRefresh tamamlandı');
-        console.log('Init fonksiyonu tamamlandı');
     }
 
     setupCanvas() {
-        console.log('SetupCanvas başladı');
-        
         // Canvas boyutunu container'a göre ayarla
         const container = this.canvas.parentElement;
-        console.log('Container:', container);
         
         // Container görünür değilse sabit boyutlar kullan
         if (container.style.display === 'none' || container.offsetWidth === 0) {
-            console.log('Container görünür değil, sabit boyutlar kullanılıyor');
             this.canvas.width = 800;
             this.canvas.height = 600;
         } else {
             const rect = container.getBoundingClientRect();
-            console.log('Container rect:', rect);
             
             // Canvas boyutunu ayarla
             this.canvas.width = rect.width || 800;
             this.canvas.height = rect.height || 600;
         }
-        
-        console.log('Canvas boyutları:', this.canvas.width, 'x', this.canvas.height);
         
         // Harita arka planını çiz
         this.drawMapBackground();
@@ -84,6 +76,47 @@ class FiveMMap {
             });
         }
 
+        // Reset view butonu
+        const resetViewBtn = document.getElementById('resetViewBtn');
+        if (resetViewBtn) {
+            resetViewBtn.addEventListener('click', () => {
+                this.resetView();
+            });
+        }
+
+        // Mouse drag ile pan
+        this.canvas.addEventListener('mousedown', (e) => {
+            this.isDragging = true;
+            this.lastMouseX = e.clientX;
+            this.lastMouseY = e.clientY;
+            this.canvas.style.cursor = 'grabbing';
+        });
+
+        this.canvas.addEventListener('mousemove', (e) => {
+            if (this.isDragging) {
+                const deltaX = e.clientX - this.lastMouseX;
+                const deltaY = e.clientY - this.lastMouseY;
+                
+                this.panX += deltaX;
+                this.panY += deltaY;
+                
+                this.lastMouseX = e.clientX;
+                this.lastMouseY = e.clientY;
+                
+                this.drawMap();
+            }
+        });
+
+        this.canvas.addEventListener('mouseup', () => {
+            this.isDragging = false;
+            this.canvas.style.cursor = 'grab';
+        });
+
+        this.canvas.addEventListener('mouseleave', () => {
+            this.isDragging = false;
+            this.canvas.style.cursor = 'grab';
+        });
+
         // Canvas yeniden boyutlandırma
         window.addEventListener('resize', () => {
             this.setupCanvas();
@@ -91,12 +124,23 @@ class FiveMMap {
         });
     }
 
+    resetView() {
+        this.panX = 0;
+        this.panY = 0;
+        this.drawMap();
+    }
+
     async loadPlayers() {
         try {
+            console.log('Oyuncu pozisyonları yükleniyor...');
             const response = await fetch('/api/fivem/positions');
+            console.log('API Response:', response);
+            
             if (!response.ok) throw new Error('Oyuncu pozisyonları alınamadı');
             
             this.players = await response.json();
+            console.log('Yüklenen oyuncular:', this.players);
+            
             this.updatePlayerList();
             this.drawMap();
             
@@ -144,77 +188,70 @@ class FiveMMap {
         });
     }
 
+    loadMapImage() {
+        this.mapImage = new Image();
+        this.mapImage.crossOrigin = 'anonymous';
+        
+        this.mapImage.onload = () => {
+            this.mapImageLoaded = true;
+            this.drawMap();
+        };
+        
+        this.mapImage.onerror = () => {
+            this.mapImageLoaded = false;
+            this.drawMap();
+        };
+        
+        // Harita görselini yükle
+        this.mapImage.src = '/assets/gta5-map.jpeg';
+    }
+
     drawMapBackground() {
         // Canvas boyutları 0 ise çizim yapma
         if (this.canvas.width === 0 || this.canvas.height === 0) {
-            console.log('Canvas boyutları 0, çizim iptal edildi');
             return;
         }
         
-        // Test çizimi - canvas'ın çalıştığını doğrula
-        this.ctx.fillStyle = 'red';
-        this.ctx.fillRect(0, 0, 100, 100);
-        console.log('Test çizimi yapıldı - kırmızı kare');
+        // Canvas'ı temizle
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         
-        // GTA 5 harita görselini yükle
-        const mapImage = new Image();
+        // Transform'u kaydet
+        this.ctx.save();
         
-        console.log('Harita görseli yükleniyor...');
-        console.log('Canvas boyutları:', this.canvas.width, 'x', this.canvas.height);
+        // Pan uygula
+        this.ctx.translate(this.panX, this.panY);
         
-        // Cross-origin ayarı
-        mapImage.crossOrigin = 'anonymous';
-        
-        mapImage.onload = () => {
-            console.log('Harita görseli başarıyla yüklendi!');
-            console.log('Görsel boyutları:', mapImage.width, 'x', mapImage.height);
-            
-            // Canvas'ı temizle
-            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-            
+        if (this.mapImageLoaded && this.mapImage) {
             // Harita görselini canvas'a çiz (aspect ratio koruyarak)
-            const aspectRatio = mapImage.width / mapImage.height;
+            const aspectRatio = this.mapImage.width / this.mapImage.height;
             const canvasAspectRatio = this.canvas.width / this.canvas.height;
             
             let drawWidth, drawHeight, offsetX, offsetY;
             
             if (aspectRatio > canvasAspectRatio) {
                 // Görsel daha geniş, yüksekliğe göre ölçekle
-                drawHeight = this.canvas.height;
+                drawHeight = this.canvas.height * 0.6; // %60 boyut
                 drawWidth = drawHeight * aspectRatio;
                 offsetX = (this.canvas.width - drawWidth) / 2;
-                offsetY = 0;
+                offsetY = (this.canvas.height - drawHeight) / 2;
             } else {
                 // Görsel daha yüksek, genişliğe göre ölçekle
-                drawWidth = this.canvas.width;
+                drawWidth = this.canvas.width * 0.6; // %60 boyut
                 drawHeight = drawWidth / aspectRatio;
-                offsetX = 0;
+                offsetX = (this.canvas.width - drawWidth) / 2;
                 offsetY = (this.canvas.height - drawHeight) / 2;
             }
             
-            console.log('Çizim boyutları:', drawWidth, 'x', drawHeight);
-            console.log('Offset:', offsetX, offsetY);
-            
-            this.ctx.drawImage(mapImage, offsetX, offsetY, drawWidth, drawHeight);
-            this.drawGrid();
-        };
-        
-        mapImage.onerror = (error) => {
-            console.error('Harita görseli yüklenemedi:', error);
-            console.log('Gradient arka plan kullanılıyor...');
+            this.ctx.drawImage(this.mapImage, offsetX, offsetY, drawWidth, drawHeight);
+        } else {
             // Görsel yüklenemezse gradient kullan
             this.drawGradientBackground();
-            this.drawGrid();
-        };
+        }
         
-        // Harita görselini yükle (public/assets klasöründen)
-        const imagePath = '/assets/gta5-map.jpeg';
-        console.log('Görsel yolu:', imagePath);
+        // Transform'u geri yükle
+        this.ctx.restore();
         
-        // Farklı yükleme yöntemi
-        setTimeout(() => {
-            mapImage.src = imagePath;
-        }, 100);
+        this.drawGrid();
     }
 
     drawGradientBackground() {
@@ -230,23 +267,38 @@ class FiveMMap {
     }
 
     drawGrid() {
-        // Grid çizgileri
+        // Transform'u kaydet
+        this.ctx.save();
+        
+        // Pan uygula
+        this.ctx.translate(this.panX, this.panY);
+        
+        // Grid çizgileri - daha geniş alana çiz
         this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
         this.ctx.lineWidth = 1;
         
-        for (let x = 0; x < this.canvas.width; x += 50) {
+        // Grid alanını genişlet (canvas boyutunun 3 katı)
+        const gridWidth = this.canvas.width * 3;
+        const gridHeight = this.canvas.height * 3;
+        const startX = -gridWidth / 2;
+        const startY = -gridHeight / 2;
+        
+        for (let x = startX; x < startX + gridWidth; x += 50) {
             this.ctx.beginPath();
-            this.ctx.moveTo(x, 0);
-            this.ctx.lineTo(x, this.canvas.height);
+            this.ctx.moveTo(x, startY);
+            this.ctx.lineTo(x, startY + gridHeight);
             this.ctx.stroke();
         }
         
-        for (let y = 0; y < this.canvas.height; y += 50) {
+        for (let y = startY; y < startY + gridHeight; y += 50) {
             this.ctx.beginPath();
-            this.ctx.moveTo(0, y);
-            this.ctx.lineTo(this.canvas.width, y);
+            this.ctx.moveTo(startX, y);
+            this.ctx.lineTo(startX + gridWidth, y);
             this.ctx.stroke();
         }
+        
+        // Transform'u geri yükle
+        this.ctx.restore();
     }
 
     drawMap() {
@@ -255,14 +307,33 @@ class FiveMMap {
     }
 
     drawPlayers() {
-        this.players.forEach(player => {
+        console.log('Oyuncular çiziliyor, toplam:', this.players.length);
+        
+        // Transform'u kaydet
+        this.ctx.save();
+        
+        // Pan uygula
+        this.ctx.translate(this.panX, this.panY);
+        
+        this.players.forEach((player, index) => {
             // GTA 5 koordinatlarını canvas koordinatlarına çevir
             const canvasX = this.mapCoordinateToCanvas(player.x, 'x');
             const canvasY = this.mapCoordinateToCanvas(player.y, 'y');
             
+            console.log(`Oyuncu ${index + 1}:`, {
+                name: player.name,
+                x: player.x,
+                y: player.y,
+                canvasX: canvasX,
+                canvasY: canvasY
+            });
+            
             // Oyuncu marker'ını çiz
             this.drawPlayerMarker(canvasX, canvasY, player);
         });
+        
+        // Transform'u geri yükle
+        this.ctx.restore();
     }
 
     mapCoordinateToCanvas(coord, axis) {
@@ -274,7 +345,16 @@ class FiveMMap {
         const normalized = (coord + 4000) / gtaRange;
         
         // Canvas koordinatına çevir
-        return normalized * canvasSize;
+        const result = normalized * canvasSize;
+        
+        console.log(`Koordinat çevirisi (${axis}):`, {
+            original: coord,
+            normalized: normalized,
+            canvasSize: canvasSize,
+            result: result
+        });
+        
+        return result;
     }
 
     drawPlayerMarker(x, y, player) {
@@ -360,12 +440,9 @@ class FiveMMap {
 
 // Sayfa yüklendiğinde haritayı başlat
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM yüklendi, harita başlatılıyor...');
-    
     // Haritayı hemen başlat (test için)
     try {
         window.fivemMap = new FiveMMap();
-        console.log('FiveMMap sınıfı başarıyla başlatıldı!');
     } catch (error) {
         console.error('FiveMMap başlatılırken hata:', error);
     }
@@ -376,18 +453,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
                 const mapContent = document.querySelector('.map-content');
                 if (mapContent && mapContent.style.display !== 'none') {
-                    console.log('Map content görünür oldu, harita yeniden başlatılıyor...');
-                    
                     // Canvas'ı yeniden boyutlandır
                     setTimeout(() => {
                         if (window.fivemMap) {
-                            console.log('Canvas yeniden boyutlandırılıyor...');
                             window.fivemMap.setupCanvas();
                             window.fivemMap.drawMap();
                         } else {
                             try {
                                 window.fivemMap = new FiveMMap();
-                                console.log('FiveMMap sınıfı başarıyla başlatıldı!');
                             } catch (error) {
                                 console.error('FiveMMap başlatılırken hata:', error);
                             }
@@ -401,7 +474,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const mapContent = document.querySelector('.map-content');
     if (mapContent) {
         observer.observe(mapContent, { attributes: true });
-        console.log('Map content observer başlatıldı');
     } else {
         console.error('Map content bulunamadı!');
     }
