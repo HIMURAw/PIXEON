@@ -349,10 +349,15 @@ class FiveMMap {
         // Koordinatı 0-1 aralığına normalize et
         const normalized = (coord + 4000) / gtaRange;
         
-        // Y koordinatını ters çevir (GTA 5'te Y ekseni ters)
+        // Y koordinatını ters çevir ve aşağı kaydır
         let adjustedNormalized = normalized;
         if (axis === 'y') {
             adjustedNormalized = 1 - normalized;
+            // Y koordinatını biraz aşağı kaydır
+            adjustedNormalized += 0.4; // %10 aşağı kaydır
+        } else if (axis === 'x') {
+            // X koordinatını sol tarafa kaydır
+            adjustedNormalized -= 0.05; // %20 sol tarafa kaydır
         }
         
         // Canvas koordinatına çevir (harita alanı içinde)
