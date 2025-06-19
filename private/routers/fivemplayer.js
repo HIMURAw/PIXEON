@@ -1,13 +1,16 @@
 const express = require('express');
 const router = express.Router();
 const fetch = require('node-fetch');
+const config = require('../../config.json');
 
-// FiveM sunucusundan oyuncu listesini çek
+const ServerIP = config.fivemServerIP || 'localhost';
+const ServerPort = config.fivemServerPort || '30120';
+
 router.get('/players', async (req, res) => {
     try {
         // FiveM sunucusundaki Lua HTTP handler'ın endpointi
         // Örneğin: http://localhost:30120/characters
-        const response = await fetch('http://localhost:30120/characters');
+        const response = await fetch('http://213.142.159.118:30120/px-web/characters');
         if (!response.ok) {
             return res.status(500).json({ error: 'FiveM sunucusundan veri alınamadı' });
         }
