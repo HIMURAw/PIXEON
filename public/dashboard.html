@@ -397,13 +397,13 @@
                 </div>
 
                 <!-- Server Info -->
-                <div class="server-info">
+                <div class="server-info" id="fivem-server-info">
                     <h2>Loading...</h2>
                     <p class="last-updated">Last updated: -</p>
                 </div>
 
                 <!-- Discord Server Details -->
-                <div class="discord-details">
+                <div class="discord-details" id="fivem-discord-details">
                     <!-- Channels Section -->
                     <div class="detail-card">
                         <div class="card-header">
@@ -415,7 +415,7 @@
                             </div>
                         </div>
                         <div class="card-content">
-                            <div class="channels-list">
+                            <div class="channels-list" id="fivem-channels-list">
                                 <div class="loading-spinner">Loading channels...</div>
                             </div>
                         </div>
@@ -432,7 +432,7 @@
                             </div>
                         </div>
                         <div class="card-content">
-                            <div class="members-list">
+                            <div class="members-list" id="fivem-members-list">
                                 <div class="loading-spinner">Loading members...</div>
                             </div>
                         </div>
@@ -449,7 +449,7 @@
                             </div>
                         </div>
                         <div class="card-content">
-                            <div class="messages-list">
+                            <div class="messages-list" id="fivem-messages-list">
                                 <div class="loading-spinner">Loading messages...</div>
                             </div>
                         </div>
@@ -466,7 +466,7 @@
                             </div>
                         </div>
                         <div class="card-content">
-                            <div class="banned-users-list" id="bannedUsersList">
+                            <div class="banned-users-list" id="fivem-bannedUsersList">
                                 <!-- Banlı kullanıcılar buraya dinamik olarak eklenecek -->
                                 <div class="loading-spinner">
                                     <i class="fas fa-spinner fa-spin"></i>
@@ -487,17 +487,17 @@
                             </div>
                         </div>
                         <div class="card-content">
-                            <div class="user-history">
-                                <div class="history-filters">
-                                    <select id="historyType">
+                            <div class="user-history" id="fivem-user-history">
+                                <div class="history-filters" id="fivem-history-filters">
+                                    <select id="fivem-historyType">
                                         <option value="all">Tüm Geçmiş</option>
                                         <option value="kick">Kickler</option>
                                         <option value="ban">Banlar</option>
                                         <option value="unban">Kaldırılan Banlar</option>
                                     </select>
-                                    <input type="date" id="historyDate">
+                                    <input type="date" id="fivem-historyDate">
                                 </div>
-                                <div class="history-list">
+                                <div class="history-list" id="fivem-history-list">
                                     <div class="loading-spinner">Loading history...</div>
                                 </div>
                             </div>
@@ -515,22 +515,22 @@
                             </div>
                         </div>
                         <div class="card-content">
-                            <div class="activity-stats">
-                                <div class="activity-chart">
-                                    <canvas id="activityChart"></canvas>
+                            <div class="activity-stats" id="fivem-activity-stats">
+                                <div class="activity-chart" id="fivem-activity-chart">
+                                    <canvas id="fivem-activityChart"></canvas>
                                 </div>
-                                <div class="activity-metrics">
+                                <div class="activity-metrics" id="fivem-activity-metrics">
                                     <div class="metric">
                                         <span class="metric-label">Aktif Kullanıcılar</span>
-                                        <span class="metric-value" id="activeUsers">0</span>
+                                        <span class="metric-value" id="fivem-activeUsers">0</span>
                                     </div>
                                     <div class="metric">
                                         <span class="metric-label">Ses Kanalı Kullanımı</span>
-                                        <span class="metric-value" id="voiceChannelUsage">0%</span>
+                                        <span class="metric-value" id="fivem-voiceChannelUsage">0%</span>
                                     </div>
                                     <div class="metric">
                                         <span class="metric-label">Mesaj Aktivitesi</span>
-                                        <span class="metric-value" id="messageActivity">0</span>
+                                        <span class="metric-value" id="fivem-messageActivity">0</span>
                                     </div>
                                 </div>
                             </div>
