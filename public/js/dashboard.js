@@ -86,14 +86,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // İçerik gösterme fonksiyonunu güncelle
     function showContent(section) {
+        // Tüm ana içerikleri gizle
         Object.values(contentSections).forEach(content => {
             if (content) content.style.display = 'none';
         });
-        // Fivem ve Discord dashboard için özel içerik gösterimi
+        // Hem discord hem fivem dashboard içeriklerini gizle
+        var discordDashboard = document.getElementById('discord-dashboard-content');
+        var fivemDashboard = document.getElementById('fivem-dashboard-content');
+        if (discordDashboard) discordDashboard.style.display = 'none';
+        if (fivemDashboard) fivemDashboard.style.display = 'none';
+        // Seçili olanı göster
         if (section === 'fivem-dashboard') {
-            // Burada Fivem dashboard içeriği gösterilecek (eklenirse)
+            if (fivemDashboard) fivemDashboard.style.display = 'block';
         } else if (section === 'discord-dashboard') {
-            document.getElementById('discord-dashboard-content').style.display = 'block';
+            if (discordDashboard) discordDashboard.style.display = 'block';
         } else if (contentSections[section]) {
             contentSections[section].style.display = 'block';
             // Dashboard içeriği gösterildiğinde verileri yükle
