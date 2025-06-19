@@ -154,12 +154,14 @@ const discordUsersRouter = require('./private/routers/discordUsers.js');
 const discordServerRouter = require('./private/routers/discordServer.js');
 const discordChannelRouter = require('./private/routers/discordChannel.js');
 const fivemPlayersRouter = require('./private/routers/fivemplayer.js');
+const ConfigRouter = require('./private/routers/configAPI.js');
 
 app.use('/api/auth', loginRouter);
 app.use('/api/discordUsers', discordUsersRouter);
 app.use('/api/discordServer', discordServerRouter);
 app.use('/api/discordChannel', discordChannelRouter);
 app.use('/api/fivem', fivemPlayersRouter);
+app.use('/api/config', ConfigRouter);
 
 
 
