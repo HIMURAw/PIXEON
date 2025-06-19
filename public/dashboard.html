@@ -28,8 +28,10 @@
                             <i class="fas fa-chevron-down sidebar-arrow"></i>
                         </a>
                         <ul class="sidebar-submenu" style="display: none;">
-                            <li><a href="#fivem-dashboard" class="dashboard-subitem"><i class="fab fa-steam-symbol"></i> Fivem Dashboard</a></li>
-                            <li><a href="#discord-dashboard" class="dashboard-subitem"><i class="fab fa-discord"></i> Discord Dashboard</a></li>
+                            <li><a href="#discord-dashboard" class="dashboard-subitem"><i class="fab fa-discord"></i>
+                                    Discord Dashboard</a></li>
+                            <li><a href="#fivem-dashboard" class="dashboard-subitem"><i class="fab fa-steam-symbol"></i>
+                                    Fivem Dashboard</a></li>
                         </ul>
                     </li>
                     <li>
@@ -87,8 +89,233 @@
                 </div>
             </header>
 
-            <!-- Dashboard Content -->
+            <!-- Discord Dashboard Content -->
             <div class="dashboard-content" id="discord-dashboard-content">
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Total Members</h3>
+                            <p>Loading...</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-server"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Online Members</h3>
+                            <p>Loading...</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-ban"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Active Bans</h3>
+                            <p>12</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Aktiflik Oranı</h3>
+                            <p>65%</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Additional Stats Cards -->
+                <div class="stats-grid" style="margin-top: 20px;">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-headset"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Ses Kanalları</h3>
+                            <p>Loading...</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Aktif Kanallar</h3>
+                            <p>Loading...</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-rocket"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Boost Sayısı</h3>
+                            <p>Loading...</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Sunucu Yaşı</h3>
+                            <p>Loading...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Server Info -->
+                <div class="server-info">
+                    <h2>Loading...</h2>
+                    <p class="last-updated">Last updated: -</p>
+                </div>
+
+                <!-- Discord Server Details -->
+                <div class="discord-details">
+                    <!-- Channels Section -->
+                    <div class="detail-card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-hashtag"></i> Channels</h3>
+                            <div class="card-actions">
+                                <button class="btn-refresh" title="Refresh">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="channels-list">
+                                <div class="loading-spinner">Loading channels...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Members Section -->
+                    <div class="detail-card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-users"></i> Members</h3>
+                            <div class="card-actions">
+                                <button class="btn-refresh" title="Refresh">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="members-list">
+                                <div class="loading-spinner">Loading members...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Messages Section -->
+                    <div class="detail-card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-comment-alt"></i> Recent Messages</h3>
+                            <div class="card-actions">
+                                <button class="btn-refresh" title="Refresh">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="messages-list">
+                                <div class="loading-spinner">Loading messages...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Moderation Panel -->
+                    <div class="detail-card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-user-slash"></i> Banlı Kullanıcılar</h3>
+                            <div class="card-actions">
+                                <button class="btn-refresh" title="Yenile" onclick="refreshBannedUsers()">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="banned-users-list" id="bannedUsersList">
+                                <!-- Banlı kullanıcılar buraya dinamik olarak eklenecek -->
+                                <div class="loading-spinner">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                    <span>Banlı kullanıcılar yükleniyor...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- User History -->
+                    <div class="detail-card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-history"></i> User History</h3>
+                            <div class="card-actions">
+                                <button class="btn-refresh" title="Refresh" onclick="refreshUserHistory()">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="user-history">
+                                <div class="history-filters">
+                                    <select id="historyType">
+                                        <option value="all">Tüm Geçmiş</option>
+                                        <option value="kick">Kickler</option>
+                                        <option value="ban">Banlar</option>
+                                        <option value="unban">Kaldırılan Banlar</option>
+                                    </select>
+                                    <input type="date" id="historyDate">
+                                </div>
+                                <div class="history-list">
+                                    <div class="loading-spinner">Loading history...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Server Activity -->
+                    <div class="detail-card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-chart-line"></i> Server Activity</h3>
+                            <div class="card-actions">
+                                <button class="btn-refresh" title="Refresh" onclick="refreshServerActivity()">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="activity-stats">
+                                <div class="activity-chart">
+                                    <canvas id="activityChart"></canvas>
+                                </div>
+                                <div class="activity-metrics">
+                                    <div class="metric">
+                                        <span class="metric-label">Aktif Kullanıcılar</span>
+                                        <span class="metric-value" id="activeUsers">0</span>
+                                    </div>
+                                    <div class="metric">
+                                        <span class="metric-label">Ses Kanalı Kullanımı</span>
+                                        <span class="metric-value" id="voiceChannelUsage">0%</span>
+                                    </div>
+                                    <div class="metric">
+                                        <span class="metric-label">Mesaj Aktivitesi</span>
+                                        <span class="metric-value" id="messageActivity">0</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FiveM Dashboard Content -->
+            <div class="dashboard-content" id="fivem-dashboard-content">
                 <!-- Stats Cards -->
                 <div class="stats-grid">
                     <div class="stat-card">
@@ -373,6 +600,10 @@
         </main>
     </div>
 
+
+    <!-- Modal -->
+
+
     <!-- Member Details Modal -->
     <div id="memberModal" class="modal">
         <div class="modal-content">
@@ -418,6 +649,7 @@
     <!-- Scripts -->
     <script src="/js/dashboard.js"></script>
     <script src="/js/dashboard/discord.js"></script>
+    <script src="js/dashboard/fivem.js"></script>
     <script src="js/dashboard/players"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
 </body>
