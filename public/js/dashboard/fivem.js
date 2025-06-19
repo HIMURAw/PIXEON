@@ -34,6 +34,21 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (p) p.textContent = totalPlayers;
             }
         });
+
+        // Online oyuncu sayısını backend proxy API'sinden çek ve ekrana yaz
+        const onlineUrl = '/api/fivem/players-online';
+        const onlineResponse = await fetch(onlineUrl);
+        if (!onlineResponse.ok) throw new Error('Online oyuncular alınamadı');
+        const onlineData = await onlineResponse.json();
+        const onlinePlayers = Array.isArray(onlineData) ? onlineData.length : (onlineData?.length || 0);
+        // Tüm stat-card'ları gez, başlığı Online Players olanı bul
+        statCards.forEach(card => {
+            const h3 = card.querySelector('.stat-info h3');
+            if (h3 && h3.textContent.trim() === 'Online Players') {
+                const p = card.querySelector('.stat-info p');
+                if (p) p.textContent = onlinePlayers;
+            }
+        });
     } catch (err) {
         console.error('Oyuncu sayısı alınamadı:', err);
     }
