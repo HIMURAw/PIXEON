@@ -21,9 +21,7 @@ router.get('/players-online', async (req, res) => {
 // FiveM sunucusundan oyuncu pozisyonlarını al
 router.get('/positions', async (req, res) => {
     try {
-        console.log(`FiveM positions API çağrısı: http://${ServerIP}:${ServerPort}/px-web/positions`);
         const response = await superagent.get(`http://${ServerIP}:${ServerPort}/px-web/positions`);
-        console.log('FiveM positions response:', response.text);
         res.json(JSON.parse(response.text));
     } catch (error) {
         console.error('FiveM positions alınırken hata:', error);
