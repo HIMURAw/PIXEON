@@ -185,12 +185,32 @@ class FiveMMap {
         const container = document.getElementById('playerListContainer');
         if (!container) return;
 
-        if (this.players.length === 0) {
+        // Arama kutusu ekle
+        let searchBox = document.getElementById('playerSearchBox');
+        if (!searchBox) {
+            const searchDiv = document.createElement('div');
+            searchDiv.className = 'player-search-box';
+            searchDiv.innerHTML = `
+                <input type="text" id="playerSearchBox" placeholder="Oyuncu ara..." autocomplete="off" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #333; margin-bottom: 10px; background: #23272a; color: #fff;" />
+            `;
+            container.parentElement.insertBefore(searchDiv, container);
+            searchBox = document.getElementById('playerSearchBox');
+            searchBox.addEventListener('input', () => this.updatePlayerList());
+        }
+        const searchValue = searchBox.value?.toLowerCase() || '';
+
+        // Filtrelenmiş oyuncular
+        const filteredPlayers = this.players.filter(player =>
+            player.name.toLowerCase().includes(searchValue) ||
+            String(player.id).includes(searchValue)
+        );
+
+        if (filteredPlayers.length === 0) {
             container.innerHTML = '<div class="no-players">Online oyuncu bulunamadı</div>';
             return;
         }
 
-        container.innerHTML = this.players.map(player => `
+        container.innerHTML = filteredPlayers.map(player => `
             <div class="player-item-map" data-player-id="${player.id}">
                 <div class="player-avatar-map">
                     ${player.name.charAt(0).toUpperCase()}
