@@ -366,22 +366,29 @@ class FiveMMap {
     }
 
     drawPlayerMarker(x, y, player) {
+        // Marker boyutu ve renk seçimi
+        const isHighlighted = player.highlighted;
+        const radius = isHighlighted ? 16 : 8;
+        const color = isHighlighted ? '#ffb300' : '#007bff';
+        const borderColor = isHighlighted ? '#fff700' : 'white';
+        const borderWidth = isHighlighted ? 4 : 2;
+
         // Marker arka planı
         this.ctx.beginPath();
-        this.ctx.arc(x, y, 8, 0, 2 * Math.PI);
-        this.ctx.fillStyle = '#007bff';
+        this.ctx.arc(x, y, radius, 0, 2 * Math.PI);
+        this.ctx.fillStyle = color;
         this.ctx.fill();
 
         // Marker kenarlığı
-        this.ctx.strokeStyle = 'white';
-        this.ctx.lineWidth = 2;
+        this.ctx.strokeStyle = borderColor;
+        this.ctx.lineWidth = borderWidth;
         this.ctx.stroke();
 
         // Oyuncu adı
-        this.ctx.fillStyle = 'white';
-        this.ctx.font = '12px Arial';
+        this.ctx.fillStyle = isHighlighted ? '#fff700' : 'white';
+        this.ctx.font = isHighlighted ? 'bold 15px Arial' : '12px Arial';
         this.ctx.textAlign = 'center';
-        this.ctx.fillText(player.name, x, y - 15);
+        this.ctx.fillText(player.name, x, y - radius - 5);
     }
 
     highlightPlayer(playerId) {
