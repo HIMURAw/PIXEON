@@ -1061,6 +1061,16 @@
         </div>
     </div>
 
+    <!-- Map Player Modal -->
+    <div id="mapPlayerModal" class="modal" style="display:none; position:fixed; z-index:10000; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.6); justify-content:center; align-items:center;">
+        <div class="modal-content" style="background:#23272a; color:#fff; border-radius:10px; padding:32px 24px; min-width:320px; min-height:180px; position:relative; box-shadow:0 8px 32px #000a;">
+            <span id="closeMapPlayerModal" style="position:absolute; top:12px; right:18px; font-size:1.5rem; cursor:pointer; color:#fff;">&times;</span>
+            <h2 id="mapPlayerModalName" style="margin-bottom:10px;"></h2>
+            <div style="margin-bottom:8px;">ID: <span id="mapPlayerModalId"></span></div>
+            <div style="margin-bottom:8px;">Konum: <span id="mapPlayerModalCoords"></span></div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="/js/dashboard.js"></script>
     <script src="/js/dashboard/discord.js"></script>
