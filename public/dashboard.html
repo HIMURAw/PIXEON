@@ -35,11 +35,16 @@
                                         class="fab fa-steam-symbol"></i> Fivem Dashboard</a></li>
                         </ul>
                     </li>
-                    <li>
-                        <a href="#players">
+                    <li class="sidebar-parent" id="playersMenu">
+                        <a href="#" class="sidebar-parent-toggle">
                             <i class="fas fa-users"></i>
                             <span>Players</span>
+                            <i class="fas fa-chevron-down sidebar-arrow"></i>
                         </a>
+                        <ul class="sidebar-submenu" style="display: none;">
+                            <li><a href="#fivem-players" class="players-subitem"><span class="submenu-dot"></span><i class="fas fa-gamepad"></i> FiveM Players</a></li>
+                            <li><a href="#discord-members" class="players-subitem"><span class="submenu-dot"></span><i class="fab fa-discord"></i> Discord Members</a></li>
+                        </ul>
                     </li>
                     <li>
                         <a href="#servers">
@@ -561,6 +566,98 @@
                             <!-- Server status will be here -->
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- FiveM Players Content -->
+            <div class="fivem-players-content" style="display: none;">
+                <div class="content-header">
+                    <h2><i class="fas fa-gamepad"></i> FiveM Players</h2>
+                    <div class="header-actions">
+                        <button class="btn-refresh" id="refreshFivemPlayers" title="Refresh Players">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Online Players</h3>
+                            <p id="fivem-online-count">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-server"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Max Players</h3>
+                            <p id="fivem-max-players">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Server Load</h3>
+                            <p id="fivem-server-load">0%</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Uptime</h3>
+                            <p id="fivem-uptime">Loading...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Players List -->
+                <div class="detail-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-list"></i> Online Players</h3>
+                        <div class="card-actions">
+                            <button class="btn-refresh" id="refreshPlayersList" title="Refresh">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div class="players-table-container">
+                            <table class="data-table" id="fivem-players-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Ping</th>
+                                        <th>Connected</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="fivem-players-tbody">
+                                    <tr>
+                                        <td colspan="5" class="loading-spinner">Loading players...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Discord Members Content -->
+            <div class="discord-members-content" style="display: none;">
+                <h2><i class="fab fa-discord"></i> Discord Members</h2>
+                <div class="discord-members-list">
+                    <!-- Discord members will be dynamically added here -->
                 </div>
             </div>
 
