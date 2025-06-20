@@ -491,13 +491,78 @@ class FiveMMap {
         }
     }
 
-    showMapPlayerModal(player) {
+    async showMapPlayerModal(player) {
         const modal = document.getElementById('mapPlayerModal');
         if (!modal) return;
-        document.getElementById('mapPlayerModalName').textContent = player.name;
-        document.getElementById('mapPlayerModalId').textContent = player.id;
-        document.getElementById('mapPlayerModalCoords').textContent = `X: ${Math.round(player.x)}, Y: ${Math.round(player.y)}`;
-        modal.style.display = 'flex';
+        try {
+            const response = await fetch('/api/fivem/characters-map');
+            if (!response.ok) throw new Error('Karakterler alınamadı');
+            const characters = await response.json();
+            let char = characters.find(c => String(c.id) === String(player.id));
+            if (!char && player.citizenid) {
+                char = characters.find(c => String(c.citizenid) === String(player.citizenid));
+            }
+            if (!char && player.name) {
+                char = characters.find(c => String(c.name).toLowerCase() === String(player.name).toLowerCase());
+            }
+            if (!char) throw new Error('Karakter bulunamadı (id, citizenid veya name ile eşleşmedi)');
+
+            // JSON string alanları parse et
+            const money = typeof char.money === 'string' ? JSON.parse(char.money) : char.money || {};
+            const charinfo = typeof char.charinfo === 'string' ? JSON.parse(char.charinfo) : char.charinfo || {};
+            const job = typeof char.job === 'string' ? JSON.parse(char.job) : char.job || {};
+            const gang = typeof char.gang === 'string' ? JSON.parse(char.gang) : char.gang || {};
+            const position = typeof char.position === 'string' ? JSON.parse(char.position) : char.position || {};
+            const metadata = typeof char.metadata === 'string' ? JSON.parse(char.metadata) : char.metadata || {};
+            // inventory kaldırıldı
+
+            document.getElementById('mapPlayerModalName').textContent = char.name || '-';
+            document.getElementById('mapPlayerModalId').textContent = player.id || '-';
+            document.getElementById('mapPlayerModalCoords').textContent = `X: ${Math.round(position.x ?? char.x ?? 0)}, Y: ${Math.round(position.y ?? char.y ?? 0)}`;
+
+            let html = '';
+            html += `<div style='margin-bottom:8px;'><b>ID:</b> ${player.id ?? '-'}</div>`;
+            html += `<div style='margin-bottom:8px;'><b>CitizenID:</b> ${char.citizenid ?? '-'}</div>`;
+            html += `<div style='margin-bottom:8px;'><b>İsim:</b> ${charinfo.firstname || ''} ${charinfo.lastname || ''}</div>`;
+            html += `<div style='margin-bottom:8px;'><b>Telefon:</b> ${charinfo.phone || '-'}</div>`;
+            html += `<div style='margin-bottom:8px;'><b>Doğum Tarihi:</b> ${charinfo.birthdate || '-'}</div>`;
+            html += `<div style='margin-bottom:8px;'><b>Cinsiyet:</b> ${charinfo.gender === 0 ? 'Erkek' : charinfo.gender === 1 ? 'Kadın' : '-'}</div>`;
+            html += `<div style='margin-bottom:8px;'><b>Uyruk:</b> ${charinfo.nationality || '-'}</div>`;
+            html += `<div style='margin-bottom:8px;'><b>Job:</b> ${job.label || job.name || '-'}${job.grade?.name ? ' (' + job.grade.name + ')' : ''}</div>`;
+            html += `<div style='margin-bottom:8px;'><b>Gang:</b> ${gang.label || gang.name || '-'}${gang.grade?.name ? ' (' + gang.grade.name + ')' : ''}</div>`;
+            html += `<div style='margin-bottom:8px;'><b>Para:</b> 💵 $${money.cash ?? 0} | 🏦 $${money.bank ?? 0} | ₿ ${money.crypto ?? 0}</div>`;
+            html += `<div style='margin-bottom:8px;'><b>Konum:</b> X: ${Math.round(position.x ?? char.x ?? 0)}, Y: ${Math.round(position.y ?? char.y ?? 0)}, Z: ${Math.round(position.z ?? char.z ?? 0)}</div>`;
+            html += `<div style='margin-bottom:8px;'><b>Armor:</b> ${metadata.armor ?? 0}</div>`;
+            html += `<div style='margin-bottom:8px;'><b>Hunger:</b> ${Math.round(metadata.hunger ?? 0)}%</div>`;
+            html += `<div style='margin-bottom:8px;'><b>Thirst:</b> ${Math.round(metadata.thirst ?? 0)}%</div>`;
+            html += `<div style='margin-bottom:8px;'><b>Bloodtype:</b> ${metadata.bloodtype || '-'}</div>`;
+            html += `<div style='margin-bottom:8px;'><b>Stres:</b> ${metadata.stress ?? 0}%</div>`;
+            html += `<div style='margin-bottom:8px;'><b>Ehliyet:</b> ${metadata.licences?.driver ? 'Var' : 'Yok'} | <b>Silah:</b> ${metadata.licences?.weapon ? 'Var' : 'Yok'} | <b>İşyeri:</b> ${metadata.licences?.business ? 'Var' : 'Yok'}</div>`;
+            html += `<div style='margin-bottom:8px;'><b>Hapiste mi?:</b> ${metadata.injail ? 'Evet' : 'Hayır'} | <b>Kelepçeli mi?:</b> ${metadata.ishandcuffed ? 'Evet' : 'Hayır'} | <b>Ölü mü?:</b> ${metadata.isdead ? 'Evet' : 'Hayır'}</div>`;
+            html += `<div style='margin-bottom:8px;'><b>Cüzdan ID:</b> ${metadata.walletid || '-'}</div>`;
+            html += `<div style='margin-bottom:8px;'><b>Parmak İzi:</b> ${metadata.fingerprint || '-'}</div>`;
+            html += `<div style='margin-bottom:8px;'><b>Son Güncelleme:</b> ${char.last_updated ? new Date(char.last_updated).toLocaleString('tr-TR') : '-'}</div>`;
+
+            let detailDiv = document.getElementById('mapPlayerModalDetails');
+            if (!detailDiv) {
+                detailDiv = document.createElement('div');
+                detailDiv.id = 'mapPlayerModalDetails';
+                detailDiv.style.marginTop = '16px';
+                document.querySelector('#mapPlayerModal .modal-content').appendChild(detailDiv);
+            }
+            detailDiv.innerHTML = html;
+            modal.style.display = 'flex';
+        } catch (err) {
+            let detailDiv = document.getElementById('mapPlayerModalDetails');
+            if (!detailDiv) {
+                detailDiv = document.createElement('div');
+                detailDiv.id = 'mapPlayerModalDetails';
+                detailDiv.style.marginTop = '16px';
+                document.querySelector('#mapPlayerModal .modal-content').appendChild(detailDiv);
+            }
+            detailDiv.innerHTML = `<div style='color:red;'>Karakter verisi alınamadı: ${err.message}</div>`;
+            modal.style.display = 'flex';
+        }
     }
     closeMapPlayerModal() {
         const modal = document.getElementById('mapPlayerModal');
