@@ -147,6 +147,29 @@ class FiveMMap {
             this.setupCanvas();
             this.drawMap();
         });
+
+        // Marker tıklama (canvas click)
+        this.canvas.addEventListener('click', (e) => {
+            // Pan/zoom'u hesaba katarak mouse pozisyonunu hesapla
+            const rect = this.canvas.getBoundingClientRect();
+            const mouseX = (e.clientX - rect.left - this.panX) / this.zoom;
+            const mouseY = (e.clientY - rect.top - this.panY) / this.zoom;
+            if (Array.isArray(this._markerHitboxes)) {
+                for (const marker of this._markerHitboxes) {
+                    const dx = mouseX - marker.x;
+                    const dy = mouseY - marker.y;
+                    if (Math.sqrt(dx * dx + dy * dy) <= marker.radius) {
+                        // Modal aç
+                        if (window.openCharacterModal) {
+                            window.openCharacterModal(marker.player);
+                        } else {
+                            alert('Karakter modal fonksiyonu bulunamadı!');
+                        }
+                        break;
+                    }
+                }
+            }
+        });
     }
 
     resetView() {
@@ -331,6 +354,10 @@ class FiveMMap {
         this.ctx.save();
         this.ctx.translate(this.panX, this.panY);
         this.ctx.scale(this.zoom, this.zoom);
+
+        // Marker tıklama için geçici olarak marker pozisyonlarını tut
+        this._markerHitboxes = [];
+
         this.players.forEach((player, index) => {
             const canvasX = this.mapCoordinateToCanvas(player.x, 'x');
             const canvasY = this.mapCoordinateToCanvas(player.y, 'y');
@@ -341,7 +368,16 @@ class FiveMMap {
                 canvasX: canvasX,
                 canvasY: canvasY
             });
+            // Marker'ı çiz
             this.drawPlayerMarker(canvasX, canvasY, player);
+            // Marker hitbox'unu kaydet
+            const radius = player.highlighted ? 16 : 8;
+            this._markerHitboxes.push({
+                x: canvasX,
+                y: canvasY,
+                radius,
+                player
+            });
         });
         this.ctx.restore();
     }
@@ -392,14 +428,17 @@ class FiveMMap {
     }
 
     highlightPlayer(playerId) {
+        // Seçili oyuncu zaten highlighted ise kaldır
+        const selectedPlayer = this.players.find(p => p.id == playerId);
+        const wasHighlighted = selectedPlayer && selectedPlayer.highlighted;
+
         // Tüm marker'ları normal haline getir
         this.players.forEach(player => {
             player.highlighted = false;
         });
 
-        // Seçili oyuncuyu vurgula
-        const selectedPlayer = this.players.find(p => p.id == playerId);
-        if (selectedPlayer) {
+        // Eğer zaten highlighted değilse, seçili oyuncuyu vurgula
+        if (selectedPlayer && !wasHighlighted) {
             selectedPlayer.highlighted = true;
         }
 
