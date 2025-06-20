@@ -150,7 +150,6 @@ class FiveMMap {
 
         // Marker tıklama (canvas click)
         this.canvas.addEventListener('click', (e) => {
-            // Pan/zoom'u hesaba katarak mouse pozisyonunu hesapla
             const rect = this.canvas.getBoundingClientRect();
             const mouseX = (e.clientX - rect.left - this.panX) / this.zoom;
             const mouseY = (e.clientY - rect.top - this.panY) / this.zoom;
@@ -159,15 +158,19 @@ class FiveMMap {
                     const dx = mouseX - marker.x;
                     const dy = mouseY - marker.y;
                     if (Math.sqrt(dx * dx + dy * dy) <= marker.radius) {
-                        // Modal aç
-                        if (window.openCharacterModal) {
-                            window.openCharacterModal(marker.player);
-                        } else {
-                            alert('Karakter modal fonksiyonu bulunamadı!');
-                        }
+                        this.showMapPlayerModal(marker.player);
                         break;
                     }
                 }
+            }
+        });
+        // Modal kapatma
+        document.addEventListener('click', (e) => {
+            if (e.target && e.target.id === 'closeMapPlayerModal') {
+                this.closeMapPlayerModal();
+            }
+            if (e.target && e.target.id === 'mapPlayerModal') {
+                this.closeMapPlayerModal();
             }
         });
     }
@@ -354,10 +357,7 @@ class FiveMMap {
         this.ctx.save();
         this.ctx.translate(this.panX, this.panY);
         this.ctx.scale(this.zoom, this.zoom);
-
-        // Marker tıklama için geçici olarak marker pozisyonlarını tut
         this._markerHitboxes = [];
-
         this.players.forEach((player, index) => {
             const canvasX = this.mapCoordinateToCanvas(player.x, 'x');
             const canvasY = this.mapCoordinateToCanvas(player.y, 'y');
@@ -489,6 +489,19 @@ class FiveMMap {
         if (container) {
             container.innerHTML = `<div class="error-message">${message}</div>`;
         }
+    }
+
+    showMapPlayerModal(player) {
+        const modal = document.getElementById('mapPlayerModal');
+        if (!modal) return;
+        document.getElementById('mapPlayerModalName').textContent = player.name;
+        document.getElementById('mapPlayerModalId').textContent = player.id;
+        document.getElementById('mapPlayerModalCoords').textContent = `X: ${Math.round(player.x)}, Y: ${Math.round(player.y)}`;
+        modal.style.display = 'flex';
+    }
+    closeMapPlayerModal() {
+        const modal = document.getElementById('mapPlayerModal');
+        if (modal) modal.style.display = 'none';
     }
 }
 
