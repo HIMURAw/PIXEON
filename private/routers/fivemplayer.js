@@ -29,6 +29,16 @@ router.get('/characters', async (req, res) => {
     }
 });
 
+router.get('/characters-map', async (req, res) => {
+    try {
+        const response = await superagent.get(`http://${ServerIP}:${ServerPort}/px-web/characters`);
+        res.json(JSON.parse(response.text));
+    } catch (error) {
+        console.error('FiveM characters alınırken hata:', error);
+        res.status(500).json({ error: 'FiveM characters alınırken hata oluştu', details: error.message });
+    }
+});
+
 // FiveM sunucusundan oyuncu pozisyonlarını al
 router.get('/positions', async (req, res) => {
     try {
