@@ -33,6 +33,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const menuItems = document.querySelectorAll('.sidebar-nav li');
     const contentSections = {
         'dashboard': document.querySelector('.dashboard-content'),
+        'fivem-players': document.querySelector('.fivem-players-content'),
+        'discord-members': document.querySelector('.discord-members-content'),
         'players': document.querySelector('.players-content'),
         'servers': document.querySelector('.servers-content'),
         'bans': document.querySelector('.bans-content'),
