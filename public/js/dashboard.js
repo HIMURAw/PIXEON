@@ -73,6 +73,22 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    // Collapsible sidebar menu for Players
+    const playersMenu = document.getElementById('playersMenu');
+    const playersToggle = playersMenu.querySelector('.sidebar-parent-toggle');
+    const playersSubmenu = playersMenu.querySelector('.sidebar-submenu');
+
+    playersToggle.addEventListener('click', function(e) {
+        e.preventDefault();
+        playersMenu.classList.toggle('open');
+        // Alt menüyü göster/gizle
+        if (playersMenu.classList.contains('open')) {
+            playersSubmenu.style.display = 'block';
+        } else {
+            playersSubmenu.style.display = 'none';
+        }
+    });
+
     // Alt menü itemleri için içerik gösterme
     const dashboardSubitems = document.querySelectorAll('.dashboard-subitem');
     dashboardSubitems.forEach(item => {
@@ -81,6 +97,18 @@ document.addEventListener('DOMContentLoaded', function () {
             showContent(this.getAttribute('href').replace('#', ''));
             // Aktiflik vurgusu
             dashboardSubitems.forEach(i => i.parentElement.classList.remove('active'));
+            this.parentElement.classList.add('active');
+        });
+    });
+
+    // Players alt menü itemleri için içerik gösterme
+    const playersSubitems = document.querySelectorAll('.players-subitem');
+    playersSubitems.forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            showContent(this.getAttribute('href').replace('#', ''));
+            // Aktiflik vurgusu
+            playersSubitems.forEach(i => i.parentElement.classList.remove('active'));
             this.parentElement.classList.add('active');
         });
     });
