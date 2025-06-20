@@ -639,13 +639,15 @@
                                         <th>Oyuncu</th>
                                         <th>Karakter</th>
                                         <th>İş</th>
+                                        <th>Gang</th>
                                         <th>Para</th>
+                                        <th>Durum</th>
                                         <th>İşlemler</th>
                                     </tr>
                                 </thead>
                                 <tbody id="fivem-players-tbody">
                                     <tr>
-                                        <td colspan="6" class="loading-spinner">Karakterler yükleniyor...</td>
+                                        <td colspan="8" class="loading-spinner">Karakterler yükleniyor...</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -783,6 +785,276 @@
                     <div class="member-roles">
                         <h4>Roller</h4>
                         <div class="roles-list" id="modalRoles"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Character Details Modal -->
+    <div id="characterModal" class="modal">
+        <div class="modal-content character-modal">
+            <div class="modal-header">
+                <h2><i class="fas fa-user"></i> Karakter Detayları</h2>
+                <button class="close-modal" onclick="closeCharacterModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="character-details">
+                    <div class="character-header">
+                        <div class="character-avatar">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <div class="character-title">
+                            <h3 id="modalCharacterName"></h3>
+                            <span id="modalCitizenId"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="character-sections">
+                        <!-- Personal Info Section -->
+                        <div class="character-section">
+                            <h4><i class="fas fa-id-card"></i> Kişisel Bilgiler</h4>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <label>İsim</label>
+                                    <span id="modalFullName"></span>
+                                </div>
+                                <div class="info-item">
+                                    <label>Telefon</label>
+                                    <span id="modalPhone"></span>
+                                </div>
+                                <div class="info-item">
+                                    <label>Uyruk</label>
+                                    <span id="modalNationality"></span>
+                                </div>
+                                <div class="info-item">
+                                    <label>Doğum Tarihi</label>
+                                    <span id="modalBirthdate"></span>
+                                </div>
+                                <div class="info-item">
+                                    <label>Cinsiyet</label>
+                                    <span id="modalGender"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Job Info Section -->
+                        <div class="character-section">
+                            <h4><i class="fas fa-briefcase"></i> İş Bilgileri</h4>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <label>İş</label>
+                                    <span id="modalJob"></span>
+                                </div>
+                                <div class="info-item">
+                                    <label>Seviye</label>
+                                    <span id="modalJobGrade"></span>
+                                </div>
+                                <div class="info-item">
+                                    <label>Maaş</label>
+                                    <span id="modalJobPayment"></span>
+                                </div>
+                                <div class="info-item">
+                                    <label>Görevde</label>
+                                    <span id="modalJobOnduty"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Gang Info Section -->
+                        <div class="character-section">
+                            <h4><i class="fas fa-users"></i> Gang Bilgileri</h4>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <label>Gang</label>
+                                    <span id="modalGang"></span>
+                                </div>
+                                <div class="info-item">
+                                    <label>Seviye</label>
+                                    <span id="modalGangGrade"></span>
+                                </div>
+                                <div class="info-item">
+                                    <label>Boss</label>
+                                    <span id="modalGangBoss"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Money Info Section -->
+                        <div class="character-section">
+                            <h4><i class="fas fa-dollar-sign"></i> Para Durumu</h4>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <label>Nakit</label>
+                                    <span id="modalCash"></span>
+                                </div>
+                                <div class="info-item">
+                                    <label>Banka</label>
+                                    <span id="modalBank"></span>
+                                </div>
+                                <div class="info-item">
+                                    <label>Kripto</label>
+                                    <span id="modalCrypto"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Status Info Section -->
+                        <div class="character-section">
+                            <h4><i class="fas fa-heartbeat"></i> Durum Bilgileri</h4>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <label>Açlık</label>
+                                    <span id="modalHunger"></span>
+                                </div>
+                                <div class="info-item">
+                                    <label>Susuzluk</label>
+                                    <span id="modalThirst"></span>
+                                </div>
+                                <div class="info-item">
+                                    <label>Zırh</label>
+                                    <span id="modalArmor"></span>
+                                </div>
+                                <div class="info-item">
+                                    <label>Kan Grubu</label>
+                                    <span id="modalBloodtype"></span>
+                                </div>
+                                <div class="info-item">
+                                    <label>Stres</label>
+                                    <span id="modalStress"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Licenses Section -->
+                        <div class="character-section">
+                            <h4><i class="fas fa-id-badge"></i> Lisans Bilgileri</h4>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <label>Sürücü</label>
+                                    <span id="modalDriverLicense"></span>
+                                </div>
+                                <div class="info-item">
+                                    <label>Silah</label>
+                                    <span id="modalWeaponLicense"></span>
+                                </div>
+                                <div class="info-item">
+                                    <label>İş</label>
+                                    <span id="modalBusinessLicense"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Other Info Section -->
+                        <div class="character-section">
+                            <h4><i class="fas fa-info-circle"></i> Diğer Bilgiler</h4>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <label>Hapiste</label>
+                                    <span id="modalJail"></span>
+                                </div>
+                                <div class="info-item">
+                                    <label>Kelepçeli</label>
+                                    <span id="modalHandcuffed"></span>
+                                </div>
+                                <div class="info-item">
+                                    <label>Ölü</label>
+                                    <span id="modalDead"></span>
+                                </div>
+                                <div class="info-item">
+                                    <label>Wallet ID</label>
+                                    <span id="modalWalletId"></span>
+                                </div>
+                                <div class="info-item">
+                                    <label>Fingerprint</label>
+                                    <span id="modalFingerprint"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Last Updated Section -->
+                        <div class="character-section">
+                            <h4><i class="fas fa-clock"></i> Son Güncelleme</h4>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <label>Güncelleme Zamanı</label>
+                                    <span id="modalLastUpdated"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inventory Modal -->
+    <div id="inventoryModal" class="modal">
+        <div class="modal-content inventory-modal">
+            <div class="modal-header">
+                <h2><i class="fas fa-box"></i> Envanter</h2>
+                <button class="close-modal" onclick="closeInventoryModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="inventory-details">
+                    <div class="inventory-header">
+                        <div class="character-info">
+                            <h3 id="inventoryCharacterName"></h3>
+                            <span id="inventoryCitizenId"></span>
+                        </div>
+                        <div class="inventory-stats">
+                            <span class="item-count">Toplam: <span id="inventoryItemCount">0</span> item</span>
+                            <span class="weight-info">Ağırlık: <span id="inventoryWeight">0</span>kg</span>
+                        </div>
+                    </div>
+                    
+                    <div class="inventory-grid" id="inventoryGrid">
+                        <!-- Items will be loaded here -->
+                    </div>
+                    
+                    <div class="inventory-empty" id="inventoryEmpty" style="display: none;">
+                        <div class="empty-state">
+                            <i class="fas fa-box-open"></i>
+                            <h3>Envanter Boş</h3>
+                            <p>Bu karakterin envanterinde hiçbir item bulunmuyor.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Location Modal -->
+    <div id="locationModal" class="modal">
+        <div class="modal-content location-modal">
+            <div class="modal-header">
+                <h2><i class="fas fa-map-marker-alt"></i> Karakter Konumu</h2>
+                <button class="close-modal" onclick="closeLocationModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="location-details">
+                    <div class="location-header">
+                        <div class="character-info">
+                            <h3 id="locationCharacterName"></h3>
+                            <span id="locationCitizenId"></span>
+                        </div>
+                    </div>
+                    <div class="location-coords">
+                        <div class="coord-item">
+                            <label>X:</label>
+                            <span id="locationX"></span>
+                        </div>
+                        <div class="coord-item">
+                            <label>Y:</label>
+                            <span id="locationY"></span>
+                        </div>
+                        <div class="coord-item">
+                            <label>Z:</label>
+                            <span id="locationZ"></span>
+                        </div>
+                    </div>
+                    <div class="location-map-preview" id="locationMapPreview">
+                        <!-- Harita önizlemesi veya görseli buraya gelecek -->
                     </div>
                 </div>
             </div>
