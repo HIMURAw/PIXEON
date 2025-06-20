@@ -37,10 +37,16 @@ class FiveMPlayersManager {
             if (!response.ok) throw new Error('Server info alınamadı');
             
             this.serverInfo = await response.json();
+            console.log('Server info loaded:', this.serverInfo);
             this.updateServerStats();
         } catch (error) {
             console.error('Server info yüklenirken hata:', error);
-            this.showError('Server bilgileri yüklenemedi');
+            // Server info yüklenemezse varsayılan değerler kullan
+            this.serverInfo = {
+                sv_maxclients: 100,
+                uptime: 0
+            };
+            this.updateServerStats();
         }
     }
 
@@ -99,25 +105,60 @@ class FiveMPlayersManager {
             onlineCount.textContent = this.players.length;
         }
 
-        // Max players (sabit değer)
+        // Max players (server info'dan al)
         const maxPlayers = document.getElementById('fivem-max-players');
         if (maxPlayers) {
-            maxPlayers.textContent = '100'; // Varsayılan değer
+            if (this.serverInfo && this.serverInfo.sv_maxclients) {
+                maxPlayers.textContent = this.serverInfo.sv_maxclients;
+            } else {
+                maxPlayers.textContent = '100'; // Varsayılan değer
+            }
         }
 
         // Server load (karakter sayısına göre)
         const serverLoad = document.getElementById('fivem-server-load');
         if (serverLoad) {
-            const load = Math.round((this.players.length / 100) * 100);
+            const maxClients = this.serverInfo && this.serverInfo.sv_maxclients ? this.serverInfo.sv_maxclients : 100;
+            const load = Math.round((this.players.length / maxClients) * 100);
             serverLoad.textContent = `${load}%`;
         }
 
-        // Uptime (son güncelleme zamanından hesapla)
+        // Uptime (server info'dan al)
         const uptime = document.getElementById('fivem-uptime');
-        if (uptime && this.players.length > 0) {
-            const lastUpdate = Math.max(...this.players.map(p => p.last_updated));
-            uptime.textContent = this.formatLastUpdate(lastUpdate);
+        if (uptime) {
+            if (this.serverInfo && this.serverInfo.uptime) {
+                uptime.textContent = this.formatUptime(this.serverInfo.uptime);
+            } else {
+                uptime.textContent = 'Bilinmiyor';
+            }
         }
+    }
+
+    formatUptime(uptime) {
+        if (!uptime) return 'Bilinmiyor';
+        
+        const hours = Math.floor(uptime / 3600);
+        const days = Math.floor(hours / 24);
+        
+        if (days > 0) {
+            return `${days}g ${hours % 24}s`;
+        }
+        return `${hours}s`;
+    }
+
+    formatLastUpdate(timestamp) {
+        if (!timestamp) return 'Bilinmiyor';
+        
+        const now = Date.now();
+        const diff = now - timestamp;
+        
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        const days = Math.floor(hours / 24);
+        
+        if (days > 0) {
+            return `${days}g ${hours % 24}s önce`;
+        }
+        return `${hours}s önce`;
     }
 
     updatePlayersTable() {
@@ -125,7 +166,7 @@ class FiveMPlayersManager {
         if (!tbody) return;
 
         if (this.players.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" class="no-data">Kayıtlı karakter bulunamadı</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="8" class="no-data">Kayıtlı karakter bulunamadı</td></tr>';
             return;
         }
 
@@ -136,33 +177,53 @@ class FiveMPlayersManager {
                     <div class="player-info">
                         <span class="player-name">${player.name}</span>
                         <small class="player-citizenid">${player.citizenid}</small>
+                        <small class="player-license">${player.license}</small>
                     </div>
                 </td>
                 <td>
                     <div class="character-info">
                         <span class="character-name">${player.charinfo.firstname || ''} ${player.charinfo.lastname || ''}</span>
-                        <small class="character-phone">${player.charinfo.phone || 'N/A'}</small>
+                        <small class="character-phone">📞 ${player.charinfo.phone || 'N/A'}</small>
+                        <small class="character-nationality">🌍 ${player.charinfo.nationality || 'N/A'}</small>
                     </div>
                 </td>
                 <td>
                     <div class="job-info">
                         <span class="job-name">${player.job.label || 'İşsiz'}</span>
                         <small class="job-grade">${player.job.grade?.name || ''}</small>
+                        <small class="job-payment">💰 $${player.job.payment || 0}/saat</small>
+                    </div>
+                </td>
+                <td>
+                    <div class="gang-info">
+                        <span class="gang-name">${player.gang.label || 'Gang Yok'}</span>
+                        <small class="gang-grade">${player.gang.grade?.name || ''}</small>
                     </div>
                 </td>
                 <td>
                     <div class="money-info">
-                        <span class="money-cash">$${player.money.cash || 0}</span>
-                        <small class="money-bank">Bank: $${player.money.bank || 0}</small>
+                        <span class="money-cash">💵 $${player.money.cash || 0}</span>
+                        <small class="money-bank">🏦 $${player.money.bank || 0}</small>
+                        <small class="money-crypto">₿ ${player.money.crypto || 0}</small>
+                    </div>
+                </td>
+                <td>
+                    <div class="status-info">
+                        <span class="status-hunger">🍽️ ${Math.round(player.metadata.hunger || 0)}%</span>
+                        <small class="status-thirst">💧 ${Math.round(player.metadata.thirst || 0)}%</small>
+                        <small class="status-armor">🛡️ ${player.metadata.armor || 0}</small>
                     </div>
                 </td>
                 <td>
                     <div class="player-actions">
-                        <button class="btn-action" title="Karakter Detayları" onclick="fivemPlayersManager.showCharacterDetails(${player.id})">
+                        <button class="btn-action" title="Karakter Detayları" onclick="openCharacterModal(${JSON.stringify(player).replace(/"/g, '&quot;')})">
                             <i class="fas fa-eye"></i>
                         </button>
-                        <button class="btn-action" title="Envanter" onclick="fivemPlayersManager.showInventory(${player.id})">
+                        <button class="btn-action" title="Envanter" onclick="openInventoryModal(${JSON.stringify(player).replace(/"/g, '&quot;')})">
                             <i class="fas fa-box"></i>
+                        </button>
+                        <button class="btn-action" title="Konum" onclick="fivemPlayersManager.showPosition(${player.id})">
+                            <i class="fas fa-map-marker-alt"></i>
                         </button>
                     </div>
                 </td>
@@ -177,47 +238,29 @@ class FiveMPlayersManager {
         }
     }
 
-    formatLastUpdate(timestamp) {
-        if (!timestamp) return 'Unknown';
-        
-        const now = Date.now();
-        const diff = now - timestamp;
-        
-        const hours = Math.floor(diff / (1000 * 60 * 60));
-        const days = Math.floor(hours / 24);
-        
-        if (days > 0) {
-            return `${days}g ${hours % 24}s önce`;
-        }
-        return `${hours}s önce`;
-    }
-
-    showCharacterDetails(characterId) {
-        const character = this.players.find(p => p.id === characterId);
-        if (!character) return;
-
-        const details = `
-            <h3>${character.name}</h3>
-            <p><strong>Citizen ID:</strong> ${character.citizenid}</p>
-            <p><strong>İsim:</strong> ${character.charinfo.firstname || ''} ${character.charinfo.lastname || ''}</p>
-            <p><strong>Telefon:</strong> ${character.charinfo.phone || 'N/A'}</p>
-            <p><strong>İş:</strong> ${character.job.label || 'İşsiz'}</p>
-            <p><strong>Gang:</strong> ${character.gang.label || 'Gang Yok'}</p>
-            <p><strong>Para:</strong> $${character.money.cash || 0} (Nakit) / $${character.money.bank || 0} (Banka)</p>
-            <p><strong>Son Güncelleme:</strong> ${this.formatLastUpdate(character.last_updated)}</p>
-        `;
-
-        alert(details); // Geçici olarak alert kullanıyoruz, daha sonra modal yapabiliriz
-    }
-
     showInventory(characterId) {
         const character = this.players.find(p => p.id === characterId);
         if (!character) return;
 
-        const inventory = character.inventory || [];
-        const items = inventory.map(item => `${item.name} (${item.count})`).join(', ');
-        
-        alert(`Envanter: ${items || 'Boş'}`);
+        openInventoryModal(character);
+    }
+
+    showPosition(characterId) {
+        const character = this.players.find(p => p.id === characterId);
+        if (!character) return;
+
+        const position = character.position;
+        const details = `
+=== KONUM BİLGİLERİ ===
+👤 Karakter: ${character.name}
+📍 X: ${position.x || 0}
+📍 Y: ${position.y || 0}
+📍 Z: ${position.z || 0}
+
+🌍 Koordinatlar: ${position.x}, ${position.y}, ${position.z}
+        `;
+
+        alert(details);
     }
 
     async kickPlayer(playerId) {
@@ -279,7 +322,7 @@ class FiveMPlayersManager {
     showError(message) {
         const tbody = document.getElementById('fivem-players-tbody');
         if (tbody) {
-            tbody.innerHTML = `<tr><td colspan="6" class="error-message">${message}</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="8" class="error-message">${message}</td></tr>`;
         }
     }
 
@@ -299,4 +342,237 @@ let fivemPlayersManager;
 // Sayfa yüklendiğinde başlat
 document.addEventListener('DOMContentLoaded', () => {
     fivemPlayersManager = new FiveMPlayersManager();
-}); 
+});
+
+// Modal functions
+function openCharacterModal(character) {
+    const modal = document.getElementById('characterModal');
+    
+    // Fill modal with character data
+    document.getElementById('modalCharacterName').textContent = character.charinfo?.firstname + ' ' + character.charinfo?.lastname || 'Bilinmiyor';
+    document.getElementById('modalCitizenId').textContent = 'Citizen ID: ' + character.citizenid;
+    
+    // Personal Info
+    document.getElementById('modalFullName').textContent = character.charinfo?.firstname + ' ' + character.charinfo?.lastname || 'Bilinmiyor';
+    document.getElementById('modalPhone').textContent = character.charinfo?.phone || 'Bilinmiyor';
+    document.getElementById('modalNationality').textContent = character.charinfo?.nationality || 'Bilinmiyor';
+    document.getElementById('modalBirthdate').textContent = character.charinfo?.birthdate || 'Bilinmiyor';
+    document.getElementById('modalGender').textContent = character.charinfo?.gender === 0 ? 'Erkek' : 'Kadın';
+    
+    // Job Info
+    document.getElementById('modalJob').textContent = character.job?.label || 'İşsiz';
+    document.getElementById('modalJobGrade').textContent = character.job?.grade?.name || 'Bilinmiyor';
+    document.getElementById('modalJobPayment').textContent = character.job?.grade?.payment ? '$' + character.job.grade.payment.toLocaleString() : 'Bilinmiyor';
+    document.getElementById('modalJobOnduty').textContent = character.job?.onduty ? 'Evet' : 'Hayır';
+    
+    // Gang Info
+    document.getElementById('modalGang').textContent = character.gang?.label || 'Gangsiz';
+    document.getElementById('modalGangGrade').textContent = character.gang?.grade?.name || 'Bilinmiyor';
+    document.getElementById('modalGangBoss').textContent = character.gang?.isboss ? 'Evet' : 'Hayır';
+    
+    // Money Info
+    document.getElementById('modalCash').textContent = '$' + (character.money?.cash || 0).toLocaleString();
+    document.getElementById('modalBank').textContent = '$' + (character.money?.bank || 0).toLocaleString();
+    document.getElementById('modalCrypto').textContent = (character.money?.crypto || 0).toLocaleString();
+    
+    // Status Info
+    document.getElementById('modalHunger').textContent = (character.metadata?.hunger || 0) + '%';
+    document.getElementById('modalThirst').textContent = (character.metadata?.thirst || 0) + '%';
+    document.getElementById('modalArmor').textContent = (character.metadata?.armor || 0) + '%';
+    document.getElementById('modalBloodtype').textContent = character.metadata?.bloodtype || 'Bilinmiyor';
+    document.getElementById('modalStress').textContent = (character.metadata?.stress || 0) + '%';
+    
+    // Licenses
+    const licenses = character.metadata?.licences || {};
+    document.getElementById('modalDriverLicense').textContent = licenses.driver ? 'Var' : 'Yok';
+    document.getElementById('modalWeaponLicense').textContent = licenses.weapon ? 'Var' : 'Yok';
+    document.getElementById('modalBusinessLicense').textContent = licenses.business ? 'Var' : 'Yok';
+    
+    // Other Info
+    document.getElementById('modalJail').textContent = character.metadata?.injail ? 'Evet' : 'Hayır';
+    document.getElementById('modalHandcuffed').textContent = character.metadata?.ishandcuffed ? 'Evet' : 'Hayır';
+    document.getElementById('modalDead').textContent = character.metadata?.isdead ? 'Evet' : 'Hayır';
+    document.getElementById('modalWalletId').textContent = character.metadata?.walletid || 'Bilinmiyor';
+    document.getElementById('modalFingerprint').textContent = character.metadata?.fingerprint || 'Bilinmiyor';
+    
+    // Last Updated
+    const lastUpdated = new Date(character.lastupdated || Date.now());
+    document.getElementById('modalLastUpdated').textContent = lastUpdated.toLocaleString('tr-TR');
+    
+    modal.style.display = 'block';
+}
+
+function closeCharacterModal() {
+    const modal = document.getElementById('characterModal');
+    modal.style.display = 'none';
+}
+
+function openInventoryModal(character) {
+    const modal = document.getElementById('inventoryModal');
+    
+    // Fill modal header with character info
+    document.getElementById('inventoryCharacterName').textContent = character.charinfo?.firstname + ' ' + character.charinfo?.lastname || 'Bilinmiyor';
+    document.getElementById('inventoryCitizenId').textContent = 'Citizen ID: ' + character.citizenid;
+    
+    // Load inventory items
+    loadInventoryItems(character.inventory || []);
+    
+    modal.style.display = 'block';
+}
+
+function closeInventoryModal() {
+    const modal = document.getElementById('inventoryModal');
+    modal.style.display = 'none';
+}
+
+function loadInventoryItems(inventory) {
+    const grid = document.getElementById('inventoryGrid');
+    const empty = document.getElementById('inventoryEmpty');
+    const itemCount = document.getElementById('inventoryItemCount');
+    const weightInfo = document.getElementById('inventoryWeight');
+    
+    if (!inventory || inventory.length === 0) {
+        grid.style.display = 'none';
+        empty.style.display = 'block';
+        itemCount.textContent = '0';
+        weightInfo.textContent = '0';
+        return;
+    }
+    
+    grid.style.display = 'grid';
+    empty.style.display = 'none';
+    
+    // Calculate total weight
+    let totalWeight = 0;
+    inventory.forEach(item => {
+        if (item.weight) {
+            totalWeight += item.weight * (item.count || 1);
+        }
+    });
+    
+    itemCount.textContent = inventory.length;
+    weightInfo.textContent = totalWeight.toFixed(2);
+    
+    // Generate item cards
+    grid.innerHTML = inventory.map((item, index) => {
+        const itemImage = getItemImage(item.name);
+        const itemIcon = getItemIcon(item.name);
+        const metadata = item.metadata || {};
+        
+        let metadataHtml = '';
+        if (Object.keys(metadata).length > 0) {
+            metadataHtml = '<div class="item-metadata">';
+            Object.entries(metadata).forEach(([key, value]) => {
+                if (value && value !== '' && value !== null && value !== undefined) {
+                    metadataHtml += `<div class="metadata-item"><span class="metadata-label">${key}:</span> ${value}</div>`;
+                }
+            });
+            metadataHtml += '</div>';
+        }
+        
+        return `
+            <div class="inventory-item" title="${item.name}">
+                <div class="item-slot">${index + 1}</div>
+                ${item.weight ? `<div class="item-weight">${item.weight}kg</div>` : ''}
+                <div class="item-image">
+                    ${itemImage ? `<img src="${itemImage}" alt="${item.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />` : ''}
+                    <i class="${itemIcon}" style="${itemImage ? 'display: none;' : ''}"></i>
+                </div>
+                <div class="item-name">${item.name}</div>
+                <div class="item-count">x${item.count || 1}</div>
+                ${metadataHtml}
+            </div>
+        `;
+    }).join('');
+}
+
+function getItemImage(itemName) {
+    // Küçük harfe çevir, boşlukları ve özel karakterleri kaldır
+    const cleanName = itemName.toLowerCase().replace(/[^a-z0-9_]/g, '');
+    // PNG olarak varsayalım
+    return `/assets/images/${cleanName}.png`;
+}
+
+function getItemIcon(itemName) {
+    // Item icon mapping for fallback
+    const itemIcons = {
+        // Weapons
+        'weapon_': 'fas fa-gun',
+        
+        // Food & Drinks
+        'sandwich': 'fas fa-hamburger',
+        'water': 'fas fa-tint',
+        'coffee': 'fas fa-coffee',
+        'burger': 'fas fa-hamburger',
+        'hotdog': 'fas fa-hotdog',
+        'taco': 'fas fa-taco',
+        'pizza': 'fas fa-pizza-slice',
+        
+        // Medical
+        'bandage': 'fas fa-band-aid',
+        'painkillers': 'fas fa-pills',
+        'medkit': 'fas fa-first-aid',
+        
+        // Tools
+        'lockpick': 'fas fa-key',
+        'screwdriverset': 'fas fa-screwdriver',
+        'toolbox': 'fas fa-tools',
+        
+        // Materials
+        'metalscrap': 'fas fa-cube',
+        'copper': 'fas fa-circle',
+        'aluminum': 'fas fa-circle',
+        'iron': 'fas fa-circle',
+        'rubber': 'fas fa-circle',
+        'glass': 'fas fa-circle',
+        
+        // Electronics
+        'phone': 'fas fa-mobile-alt',
+        'laptop': 'fas fa-laptop',
+        'tablet': 'fas fa-tablet-alt',
+        
+        // Clothing
+        'clothing': 'fas fa-tshirt',
+        'shoes': 'fas fa-shoe-prints',
+        'hat': 'fas fa-hat-cowboy',
+        
+        // Drugs
+        'weed': 'fas fa-leaf',
+        'cokebaggy': 'fas fa-pills',
+        'meth': 'fas fa-pills',
+        
+        // Money
+        'money': 'fas fa-dollar-sign',
+        'cryptostick': 'fas fa-bitcoin',
+        
+        // Default
+        'default': 'fas fa-box'
+    };
+    
+    // Check for weapon prefix
+    if (itemName.startsWith('weapon_')) {
+        return itemIcons['weapon_'];
+    }
+    
+    // Check for clothing prefix
+    if (itemName.includes('clothing')) {
+        return itemIcons['clothing'];
+    }
+    
+    // Return specific icon or default
+    return itemIcons[itemName] || itemIcons['default'];
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const characterModal = document.getElementById('characterModal');
+    const inventoryModal = document.getElementById('inventoryModal');
+    
+    if (event.target === characterModal) {
+        characterModal.style.display = 'none';
+    }
+    
+    if (event.target === inventoryModal) {
+        inventoryModal.style.display = 'none';
+    }
+} 
