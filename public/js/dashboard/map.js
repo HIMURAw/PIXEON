@@ -17,12 +17,18 @@ class FiveMMap {
         this.markers = [];
         this.isFullscreen = false;
 
-        // Sadece Pan özellikleri
+        // Pan özellikleri
         this.panX = 0;
         this.panY = 0;
         this.isDragging = false;
         this.lastMouseX = 0;
         this.lastMouseY = 0;
+
+        // Zoom özellikleri
+        this.zoom = 1;
+        this.minZoom = 0.5;
+        this.maxZoom = 2.5;
+        this.zoomStep = 0.1;
 
         // Harita görseli
         this.mapImage = null;
@@ -117,6 +123,25 @@ class FiveMMap {
             this.canvas.style.cursor = 'grab';
         });
 
+        // Mouse wheel ile zoom
+        this.canvas.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const { offsetX, offsetY, deltaY } = e;
+            let zoomDirection = deltaY < 0 ? 1 : -1;
+            let newZoom = this.zoom + zoomDirection * this.zoomStep;
+            newZoom = Math.max(this.minZoom, Math.min(this.maxZoom, newZoom));
+            if (newZoom === this.zoom) return;
+
+            // Zoom merkezini mouse konumuna göre ayarla
+            const wx = (offsetX - this.panX) / this.zoom;
+            const wy = (offsetY - this.panY) / this.zoom;
+            this.panX -= wx * (newZoom - this.zoom);
+            this.panY -= wy * (newZoom - this.zoom);
+
+            this.zoom = newZoom;
+            this.drawMap();
+        }, { passive: false });
+
         // Canvas yeniden boyutlandırma
         window.addEventListener('resize', () => {
             this.setupCanvas();
@@ -127,6 +152,7 @@ class FiveMMap {
     resetView() {
         this.panX = 0;
         this.panY = 0;
+        this.zoom = 1;
         this.drawMap();
     }
 
@@ -207,50 +233,34 @@ class FiveMMap {
     }
 
     drawMapBackground() {
-        // Canvas boyutları 0 ise çizim yapma
         if (this.canvas.width === 0 || this.canvas.height === 0) {
             return;
         }
-
-        // Canvas'ı temizle
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-        // Transform'u kaydet
         this.ctx.save();
-
-        // Pan uygula
+        // Pan ve zoom uygula
         this.ctx.translate(this.panX, this.panY);
-
+        this.ctx.scale(this.zoom, this.zoom);
         if (this.mapImageLoaded && this.mapImage) {
-            // Harita görselini canvas'a çiz (aspect ratio koruyarak)
             const aspectRatio = this.mapImage.width / this.mapImage.height;
             const canvasAspectRatio = this.canvas.width / this.canvas.height;
-
             let drawWidth, drawHeight, offsetX, offsetY;
-
             if (aspectRatio > canvasAspectRatio) {
-                // Görsel daha geniş, yüksekliğe göre ölçekle
-                drawHeight = this.canvas.height * 0.6; // %60 boyut
+                drawHeight = this.canvas.height * 0.6;
                 drawWidth = drawHeight * aspectRatio;
                 offsetX = (this.canvas.width - drawWidth) / 2;
                 offsetY = (this.canvas.height - drawHeight) / 2;
             } else {
-                // Görsel daha yüksek, genişliğe göre ölçekle
-                drawWidth = this.canvas.width * 0.6; // %60 boyut
+                drawWidth = this.canvas.width * 0.6;
                 drawHeight = drawWidth / aspectRatio;
                 offsetX = (this.canvas.width - drawWidth) / 2;
                 offsetY = (this.canvas.height - drawHeight) / 2;
             }
-
             this.ctx.drawImage(this.mapImage, offsetX, offsetY, drawWidth, drawHeight);
         } else {
-            // Görsel yüklenemezse gradient kullan
             this.drawGradientBackground();
         }
-
-        // Transform'u geri yükle
         this.ctx.restore();
-
         this.drawGrid();
     }
 
@@ -267,37 +277,27 @@ class FiveMMap {
     }
 
     drawGrid() {
-        // Transform'u kaydet
         this.ctx.save();
-
-        // Pan uygula
         this.ctx.translate(this.panX, this.panY);
-
-        // Grid çizgileri - daha geniş alana çiz
+        this.ctx.scale(this.zoom, this.zoom);
         this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
-        this.ctx.lineWidth = 1;
-
-        // Grid alanını genişlet (canvas boyutunun 3 katı)
+        this.ctx.lineWidth = 1 / this.zoom;
         const gridWidth = this.canvas.width * 3;
         const gridHeight = this.canvas.height * 3;
         const startX = -gridWidth / 2;
         const startY = -gridHeight / 2;
-
         for (let x = startX; x < startX + gridWidth; x += 50) {
             this.ctx.beginPath();
             this.ctx.moveTo(x, startY);
             this.ctx.lineTo(x, startY + gridHeight);
             this.ctx.stroke();
         }
-
         for (let y = startY; y < startY + gridHeight; y += 50) {
             this.ctx.beginPath();
             this.ctx.moveTo(startX, y);
             this.ctx.lineTo(startX + gridWidth, y);
             this.ctx.stroke();
         }
-
-        // Transform'u geri yükle
         this.ctx.restore();
     }
 
@@ -308,18 +308,12 @@ class FiveMMap {
 
     drawPlayers() {
         console.log('Oyuncular çiziliyor, toplam:', this.players.length);
-
-        // Transform'u kaydet
         this.ctx.save();
-
-        // Pan uygula
         this.ctx.translate(this.panX, this.panY);
-
+        this.ctx.scale(this.zoom, this.zoom);
         this.players.forEach((player, index) => {
-            // GTA 5 koordinatlarını canvas koordinatlarına çevir
             const canvasX = this.mapCoordinateToCanvas(player.x, 'x');
             const canvasY = this.mapCoordinateToCanvas(player.y, 'y');
-
             console.log(`Oyuncu ${index + 1}:`, {
                 name: player.name,
                 x: player.x,
@@ -327,52 +321,27 @@ class FiveMMap {
                 canvasX: canvasX,
                 canvasY: canvasY
             });
-
-            // Oyuncu marker'ını çiz
             this.drawPlayerMarker(canvasX, canvasY, player);
         });
-
-        // Transform'u geri yükle
         this.ctx.restore();
     }
 
     mapCoordinateToCanvas(coord, axis) {
-        // GTA 5 koordinat aralığı: -4000 ile 4000 arası (daha geniş)
-        const gtaRange = 8000; // -4000 to 4000
+        const gtaRange = 8000;
         const canvasSize = axis === 'x' ? this.canvas.width : this.canvas.height;
-
-        // Harita görselinin boyutlarına göre offset hesapla
-        const mapScale = 0.6; // Harita %60 boyutunda
+        const mapScale = 0.6;
         const mapSize = axis === 'x' ? this.canvas.width * mapScale : this.canvas.height * mapScale;
         const offset = (canvasSize - mapSize) / 2;
-
-        // Koordinatı 0-1 aralığına normalize et
         const normalized = (coord + 4000) / gtaRange;
-
-        // Y koordinatını ters çevir ve aşağı kaydır
         let adjustedNormalized = normalized;
         if (axis === 'y') {
             adjustedNormalized = 1 - normalized;
-            // Y koordinatını biraz aşağı kaydır
-            adjustedNormalized += 0.4; // %10 aşağı kaydır
+            adjustedNormalized += 0.4;
         } else if (axis === 'x') {
-            // X koordinatını sol tarafa kaydır
-            adjustedNormalized -= 0.05; // %20 sol tarafa kaydır
+            adjustedNormalized -= 0.05;
         }
-
-        // Canvas koordinatına çevir (harita alanı içinde)
+        // Zoom'u hesaba kat (çünkü pan/zoom canvas'a uygulanıyor, burada gerek yok)
         const result = offset + (adjustedNormalized * mapSize);
-
-        console.log(`Koordinat çevirisi (${axis}):`, {
-            original: coord,
-            normalized: normalized,
-            adjustedNormalized: adjustedNormalized,
-            canvasSize: canvasSize,
-            mapSize: mapSize,
-            offset: offset,
-            result: result
-        });
-
         return result;
     }
 
