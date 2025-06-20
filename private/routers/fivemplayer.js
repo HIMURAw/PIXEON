@@ -10,7 +10,7 @@ const ServerPort = config.fivem.serverPort || '30120';
 // FiveM sunucusundan characters.json'u proxy'le
 router.get('/players-online', async (req, res) => {
     try {
-        const response = await superagent.get(`http://${ServerIP}:${ServerPort}/px-web/characters`);
+        const response = await superagent.get(`http://${ServerIP}:${ServerPort}/players.json`);
         res.json(JSON.parse(response.text));
     } catch (error) {
         console.error('FiveM characters.json alınırken hata:', error);
