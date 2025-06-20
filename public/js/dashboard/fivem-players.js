@@ -115,12 +115,17 @@ class FiveMPlayersManager {
             }
         }
 
-        // Server load (karakter sayısına göre)
+        // PD count (sadece polis job'ı olanlar)
         const serverLoad = document.getElementById('fivem-server-load');
         if (serverLoad) {
-            const maxClients = this.serverInfo && this.serverInfo.sv_maxclients ? this.serverInfo.sv_maxclients : 100;
-            const load = Math.round((this.players.length / maxClients) * 100);
-            serverLoad.textContent = `${load}%`;
+            const pdCount = this.players.filter(player => 
+                player.job && player.job.name && 
+                (player.job.name.toLowerCase() === 'police' || 
+                 player.job.name.toLowerCase() === 'lspd' ||
+                 player.job.name.toLowerCase() === 'bcso' ||
+                 player.job.name.toLowerCase() === 'sasp')
+            ).length;
+            serverLoad.textContent = pdCount;
         }
 
         // Uptime (server info'dan al)
@@ -222,7 +227,7 @@ class FiveMPlayersManager {
                         <button class="btn-action" title="Envanter" onclick="openInventoryModal(${JSON.stringify(player).replace(/"/g, '&quot;')})">
                             <i class="fas fa-box"></i>
                         </button>
-                        <button class="btn-action" title="Konum" onclick="fivemPlayersManager.showPosition(${player.id})">
+                        <button class="btn-action" title="Konum" onclick="openLocationModal(${JSON.stringify(player).replace(/"/g, '&quot;')})">
                             <i class="fas fa-map-marker-alt"></i>
                         </button>
                     </div>
@@ -561,6 +566,27 @@ function getItemIcon(itemName) {
     
     // Return specific icon or default
     return itemIcons[itemName] || itemIcons['default'];
+}
+
+function openLocationModal(character) {
+    const modal = document.getElementById('locationModal');
+    document.getElementById('locationCharacterName').textContent = character.charinfo?.firstname + ' ' + character.charinfo?.lastname || 'Bilinmiyor';
+    document.getElementById('locationCitizenId').textContent = 'Citizen ID: ' + character.citizenid;
+    const pos = character.position || {};
+    document.getElementById('locationX').textContent = pos.x !== undefined ? pos.x : '0';
+    document.getElementById('locationY').textContent = pos.y !== undefined ? pos.y : '0';
+    document.getElementById('locationZ').textContent = pos.z !== undefined ? pos.z : '0';
+
+    // Harita önizlemesi için marker'ı yerleştir (örnek, merkezde göster)
+    const mapPreview = document.getElementById('locationMapPreview');
+    mapPreview.innerHTML = '<span class="location-map-marker"><i class="fas fa-map-marker-alt"></i></span>';
+    // İleride koordinata göre marker konumu ayarlanabilir
+
+    modal.style.display = 'block';
+}
+
+function closeLocationModal() {
+    document.getElementById('locationModal').style.display = 'none';
 }
 
 // Close modal when clicking outside

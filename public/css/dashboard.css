@@ -2637,3 +2637,92 @@ body {
         font-size: 1.2rem;
     }
 }
+
+/* Location Modal Styles */
+.location-modal {
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.location-details {
+    padding: 1rem;
+}
+
+.location-header {
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 1rem;
+}
+
+.location-header .character-info h3 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 1.2rem;
+}
+
+.location-header .character-info span {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.location-coords {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+    justify-content: center;
+}
+
+.coord-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 1rem;
+}
+
+.coord-item label {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.coord-item span {
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.location-map-preview {
+    width: 100%;
+    height: 180px;
+    background: url('/assets/gta5-map.jpeg') center center/cover no-repeat;
+    border-radius: var(--border-radius);
+    position: relative;
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.location-map-marker {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--accent-color);
+    font-size: 2rem;
+    pointer-events: none;
+}
+
+@media (max-width: 600px) {
+    .location-modal {
+        max-width: 95vw;
+        margin: 1rem;
+    }
+    .location-map-preview {
+        height: 120px;
+    }
+}
