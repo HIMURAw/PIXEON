@@ -1,36 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const axios = require('axios');
-const crypto = require('crypto');
 const Config = require('../../config.json');
 const { pool } = require('../DB/connect');
 
 // NOT: config.json'a "clientSecret" eklemelisin!
 // "clientSecret": "BURAYA_SECRET"
-
-// Şifreleme anahtarı (config.json'a ekleyebilirsin)
-const ENCRYPTION_KEY = Config.dev?.encryptionKey || 'perronunanasininaminiyalayanutkininsikininkiliamacrypticin';
-const ALGORITHM = 'aes-256-cbc';
-
-// Şifreleme fonksiyonu
-function encrypt(text) {
-    const iv = crypto.randomBytes(16);
-    const cipher = crypto.createCipheriv(ALGORITHM, Buffer.from(ENCRYPTION_KEY.slice(0, 32)), iv);
-    let encrypted = cipher.update(text, 'utf8', 'hex');
-    encrypted += cipher.final('hex');
-    return iv.toString('hex') + ':' + encrypted;
-}
-
-// Çözme fonksiyonu
-function decrypt(text) {
-    const textParts = text.split(':');
-    const iv = Buffer.from(textParts.shift(), 'hex');
-    const encryptedText = textParts.join(':');
-    const decipher = crypto.createDecipheriv(ALGORITHM, Buffer.from(ENCRYPTION_KEY.slice(0, 32)), iv);
-    let decrypted = decipher.update(encryptedText, 'hex', 'utf8');
-    decrypted += decipher.final('utf8');
-    return decrypted;
-}
 
 // Discord OAuth Callback - Kullanıcı giriş yaptığında çalışır
 router.get('/callback', async (req, res) => {
@@ -91,11 +66,25 @@ router.get('/callback', async (req, res) => {
             JSON.stringify(roles)
         ]);
 
-        // 5. Cookie set et - sadece username'i sakla
+        // 5. Cookie set et - username ve avatar'ı sakla
         const username = user.username + '#' + user.discriminator;
+        
+        // Avatar URL'ini oluştur
+        let avatarUrl = '';
+        if (user.avatar) {
+            avatarUrl = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
+        } else {
+            avatarUrl = 'https://cdn.discordapp.com/embed/avatars/0.png';
+        }
 
-        // Cookie'yi 30 gün boyunca sakla (base64 encode ile)
-        res.cookie('auth_token', Buffer.from(username).toString('base64'), {
+        // Cookie'ye username ve avatar'ı JSON olarak sakla
+        const userData = {
+            username: username,
+            avatar: avatarUrl
+        };
+        
+        const encodedUserData = encodeURIComponent(JSON.stringify(userData));
+        res.cookie('auth_token', encodedUserData, {
             maxAge: 30 * 24 * 60 * 60 * 1000, // 30 gün
             httpOnly: false, // JavaScript'ten erişilebilir olsun
             secure: false, // HTTPS kullanıyorsan true yap
@@ -112,19 +101,11 @@ router.get('/callback', async (req, res) => {
 });
 
 // Username ile kullanıcı bilgilerini döndüren endpoint
-router.get('/api/user/:encodedUsername', async (req, res) => {
+router.get('/api/user/:username', async (req, res) => {
     try {
-        // Base64 decode yap
-        const encodedUsername = req.params.encodedUsername;
-        let username;
-
-        try {
-            username = Buffer.from(encodedUsername, 'base64').toString('utf8');
-            console.log('Decoded username:', username); // Debug için
-        } catch (decodeError) {
-            console.error('Decode error:', decodeError);
-            return res.status(400).json({ error: 'Invalid token' });
-        }
+        // Direkt username'i kullan (base64 decode yok)
+        const username = req.params.username;
+        console.log('Username from params:', username);
 
         // SQL'den kullanıcıyı çek
         const [rows] = await pool.query(
@@ -132,7 +113,7 @@ router.get('/api/user/:encodedUsername', async (req, res) => {
             [username]
         );
 
-        console.log('SQL query result:', rows); // Debug için
+        console.log('SQL query result:', rows);
 
         if (rows.length === 0) {
             return res.status(404).json({ error: 'User not found' });
@@ -145,11 +126,24 @@ router.get('/api/user/:encodedUsername', async (req, res) => {
     }
 });
 
+// Test kullanıcısını veritabanına ekle
+router.get('/add-user', async (req, res) => {
+    try {
+        await pool.query(`
+            INSERT INTO discord_users (discord_id, username, avatar, email, roles) 
+            VALUES ('123456789', 'himura_1#0', null, 'test@test.com', '[]')
+            ON DUPLICATE KEY UPDATE username=VALUES(username)
+        `);
+        res.json({ message: 'User added' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
 
-router.get('/user/check', (req, res) => {
+router.get('/api/user/check', (req, res) => {
     console.log('=== /user/check endpoint called ===');
     console.log('Request cookies:', req.cookies);
-    
+
     // Cookie'den username'i al
     const authToken = req.cookies.auth_token;
     console.log('Auth token from cookie:', authToken);
@@ -159,15 +153,9 @@ router.get('/user/check', (req, res) => {
         return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    // Base64 decode yap
-    let username;
-    try {
-        username = Buffer.from(authToken, 'base64').toString('utf8');
-        console.log('Decoded username from cookie:', username);
-    } catch (decodeError) {
-        console.error('Decode error:', decodeError);
-        return res.status(400).json({ error: 'Invalid token' });
-    }
+    // URL-decode yap ve direkt username'i kullan
+    const username = decodeURIComponent(authToken);
+    console.log('Username from cookie (decoded):', username);
 
     // SQL'den kullanıcıyı çek - tüm bilgileri al
     console.log('Executing SQL query for username:', username);
@@ -180,11 +168,13 @@ router.get('/user/check', (req, res) => {
                 return res.status(500).json({ error: 'Database error' });
             }
             console.log('SQL query results:', results);
+            console.log('Number of results:', results.length);
             if (results.length === 0) {
                 console.log('User not found in database for username:', username);
                 return res.status(404).json({ error: 'User not found' });
             }
             console.log('User found in database:', results[0]);
+            console.log('Sending response:', results[0]);
             res.json(results[0]);
         }
     );
