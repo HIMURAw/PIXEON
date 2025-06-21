@@ -215,4 +215,31 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.href = discordAuthUrl;
         });
     }
+
+    // Kullanıcı profilini göster
+    async function showUserProfile() {
+        const token = getCookie('auth_token');
+        if (!token) return;
+        try {
+            const res = await fetch('/api/auth/me', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!res.ok) return;
+            const data = await res.json();
+            if (data.username) {
+                document.getElementById('user-profile').style.display = 'flex';
+                document.getElementById('user-name').textContent = data.username;
+                let avatarUrl = '';
+                if (data.avatar) {
+                    // Discord CDN avatar url'si
+                    avatarUrl = `https://cdn.discordapp.com/avatars/${data.discord_id}/${data.avatar}.png`;
+                } else {
+                    // Discord default avatar
+                    avatarUrl = 'https://cdn.discordapp.com/embed/avatars/0.png';
+                }
+                document.getElementById('user-avatar').src = avatarUrl;
+            }
+        } catch (e) {}
+    }
+    showUserProfile();
 });
