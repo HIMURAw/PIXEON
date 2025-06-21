@@ -43,13 +43,24 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Login Modal
-    loginBtn.addEventListener('click', () => {
+    loginBtn.addEventListener('click', async () => {
         const token = getCookie('auth_token');
         if (token) {
-            // Token varsa dashboard'a yönlendir
-            window.location.href = '/dashboard';
+            // SQL'den rollerini çek
+            const res = await fetch('/api/auth/discord-roles', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await res.json();
+            // adminRoleId'yi configten çek
+            const cfgRes = await fetch('/api/discord/oauth-config');
+            const { adminRoleId } = await cfgRes.json();
+
+            if (data.roles && data.roles.includes(adminRoleId)) {
+                window.location.href = '/dashboard';
+            } else {
+                loginModal.style.display = 'flex';
+            }
         } else {
-            // Token yoksa login modalını göster
             loginModal.style.display = 'flex';
         }
     });

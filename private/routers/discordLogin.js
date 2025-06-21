@@ -65,8 +65,6 @@ router.get('/callback', async (req, res) => {
             JSON.stringify(roles)
         ]);
 
-        // 5. İstediğin sayfaya yönlendir
-        res.redirect('/dashboard');
     } catch (err) {
         console.error(err);
         res.status(500).send('Discord login failed');

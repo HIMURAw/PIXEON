@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const { checkLogin } = require('./models/userModel');
+const { pool } = require('./connect');
+const Config = require('../../config.json');
 
 // JWT secret key - gerçek uygulamada bu değer environment variable olarak saklanmalı
 const JWT_SECRET = 'your-super-secret-key-here';
@@ -70,6 +72,27 @@ router.get('/verify', (req, res) => {
             status: 'error',
             message: 'Invalid token'
         });
+    }
+});
+
+// Kullanıcının Discord rollerini SQL'den dönen endpoint
+router.get('/discord-roles', async (req, res) => {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) return res.json({ roles: [] });
+
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        // decoded.username ile kullanıcıyı bul
+        // discord_id ile eşleştirmek için ek bilgi gerekebilir, örneğin username ile eşleşiyorsa:
+        const [rows] = await pool.query('SELECT roles FROM discord_users WHERE username = ?', [decoded.username]);
+        if (rows.length === 0) return res.json({ roles: [] });
+        let roles = [];
+        try {
+            roles = JSON.parse(rows[0].roles);
+        } catch (e) {}
+        res.json({ roles });
+    } catch (err) {
+        res.json({ roles: [] });
     }
 });
 
