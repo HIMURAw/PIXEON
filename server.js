@@ -180,8 +180,12 @@ app.use('/api/discordChannel', discordChannelRouter);
 app.use('/api/fivem', fivemPlayersRouter);
 app.use('/api/config', ConfigRouter);
 
-
-
+app.get('/api/discord/oauth-config', (req, res) => {
+    res.json({
+        clientId: Config.discord.clientId,
+        redirectUri: Config.discord.redirectUri // Burayı kendi redirect URI'n ile değiştir
+    });
+});
 
 createAdminsTable().catch(console.error);
 
