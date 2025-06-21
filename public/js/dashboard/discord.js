@@ -360,7 +360,7 @@ function updateMembersList(members) {
 
         memberElement.innerHTML = `
             <div class="member-avatar">
-                <img src="${member.avatarURL || 'https://cdn.discordapp.com/embed/avatars/0.png'}" alt="${member.username}">
+                <img src="${member.avatarURL || '/assets/images/default-avatar.png'}" alt="${member.username}" onerror="this.src='/assets/images/default-avatar.png'">
                 <span class="status-indicator ${member.presence?.status || 'offline'}"></span>
             </div>
             <div class="member-info">
@@ -376,7 +376,10 @@ function updateMembersList(members) {
             modal.style.display = 'block';
 
             // Modal içeriğini doldur
-            document.getElementById('modalAvatar').src = member.avatarURL || 'https://cdn.discordapp.com/embed/avatars/0.png';
+            document.getElementById('modalAvatar').src = member.avatarURL || '/assets/images/default-avatar.png';
+            document.getElementById('modalAvatar').onerror = function() {
+                this.src = '/assets/images/default-avatar.png';
+            };
             document.getElementById('modalName').textContent = member.nickname || member.username;
             document.getElementById('modalUsername').textContent = `@${member.username}`;
             document.getElementById('modalJoinedAt').textContent = new Date(member.joinedAt).toLocaleDateString('tr-TR');
