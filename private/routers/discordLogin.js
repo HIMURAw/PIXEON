@@ -15,7 +15,7 @@ router.get('/callback', async (req, res) => {
         // 1. Access token al
         const tokenRes = await axios.post('https://discord.com/api/oauth2/token', new URLSearchParams({
             client_id: Config.discord.clientId,
-            client_secret: Config.discord.clientSecret, // config.json'a eklemelisin!
+            client_secret: Config.discord.clientSecret,
             grant_type: 'authorization_code',
             code,
             redirect_uri: Config.discord.redirectUri,
