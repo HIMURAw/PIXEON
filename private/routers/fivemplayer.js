@@ -50,6 +50,17 @@ router.get('/positions', async (req, res) => {
     }
 });
 
+router.get('/fivem-bans', async (req, res) => {
+    try {
+        const response = await superagent.get(`http://${ServerIP}:${ServerPort}/px-web/bans`);
+        res.json(JSON.parse(response.text));
+    } catch (error) {
+        console.error('FiveM banlı kişiler alınırken hata:', error);
+        res.status(500).json({ error: 'FiveM banlı kişiler alınırken hata oluştu', details: error.message });
+    }
+});
+
+
 // FiveM sunucusundan server bilgilerini al
 router.get('/info', async (req, res) => {
     try {
