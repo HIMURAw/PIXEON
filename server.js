@@ -7,10 +7,14 @@ const { joinVoiceChannel } = require('@discordjs/voice');
 const fs = require('fs');
 const { pool, checkConnection } = require('./private/DB/connect');
 const session = require('express-session');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 
 const port = Config.port || 3000;
+
+// Cookie parser middleware - cookie'leri okumak için gerekli
+app.use(cookieParser());
 
 app.use(session({
     secret: Config.dev.secretKey, // Güçlü bir secret kullan!

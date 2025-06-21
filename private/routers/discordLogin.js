@@ -145,4 +145,49 @@ router.get('/api/user/:encodedUsername', async (req, res) => {
     }
 });
 
+
+router.get('/user/check', (req, res) => {
+    console.log('=== /user/check endpoint called ===');
+    console.log('Request cookies:', req.cookies);
+    
+    // Cookie'den username'i al
+    const authToken = req.cookies.auth_token;
+    console.log('Auth token from cookie:', authToken);
+    
+    if (!authToken) {
+        console.log('No auth token found - returning 401');
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    // Base64 decode yap
+    let username;
+    try {
+        username = Buffer.from(authToken, 'base64').toString('utf8');
+        console.log('Decoded username from cookie:', username);
+    } catch (decodeError) {
+        console.error('Decode error:', decodeError);
+        return res.status(400).json({ error: 'Invalid token' });
+    }
+
+    // SQL'den kullanıcıyı çek - tüm bilgileri al
+    console.log('Executing SQL query for username:', username);
+    pool.query(
+        'SELECT discord_id, username, avatar, email FROM discord_users WHERE username = ?',
+        [username],
+        (err, results) => {
+            if (err) {
+                console.error('Database error:', err);
+                return res.status(500).json({ error: 'Database error' });
+            }
+            console.log('SQL query results:', results);
+            if (results.length === 0) {
+                console.log('User not found in database for username:', username);
+                return res.status(404).json({ error: 'User not found' });
+            }
+            console.log('User found in database:', results[0]);
+            res.json(results[0]);
+        }
+    );
+});
+
 module.exports = router;
