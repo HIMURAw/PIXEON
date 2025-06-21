@@ -10,6 +10,7 @@ class FiveMPlayersManager {
         this.setupEventListeners();
         this.loadServerInfo();
         this.loadPlayers();
+        this.loadBanCount();
         this.startAutoRefresh();
     }
 
@@ -337,6 +338,24 @@ class FiveMPlayersManager {
             showNotification(message, type);
         } else {
             console.log(`${type.toUpperCase()}: ${message}`);
+        }
+    }
+
+    async loadBanCount() {
+        try {
+            const response = await fetch('/api/fivem/fivem-bans');
+            if (!response.ok) throw new Error('Banlı kişiler alınamadı');
+            const data = await response.json();
+            const banCountElement = document.querySelector('.stat-card .fa-ban')?.parentElement?.nextElementSibling?.querySelector('p');
+            if (banCountElement) {
+                banCountElement.textContent = data.banCount !== undefined ? data.banCount : '0';
+            }
+        } catch (error) {
+            console.error('Banlı kişiler yüklenirken hata:', error);
+            const banCountElement = document.querySelector('.stat-card .fa-ban')?.parentElement?.nextElementSibling?.querySelector('p');
+            if (banCountElement) {
+                banCountElement.textContent = '0';
+            }
         }
     }
 }
