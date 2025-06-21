@@ -218,28 +218,109 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Kullanıcı profilini göster
     async function showUserProfile() {
-        const token = getCookie('auth_token');
-        if (!token) return;
+        const username = getCookie('auth_token');
+        console.log('Cookie username:', username); // Debug için
+        
+        if (!username) {
+            console.log('Username bulunamadı - default durum gösteriliyor'); // Debug için
+            // Default durum - giriş yapmamış kullanıcı
+            document.getElementById('user-profile').style.display = 'flex';
+            document.getElementById('user-avatar').src = 'https://cdn.discordapp.com/embed/avatars/0.png';
+            document.getElementById('user-name').textContent = 'Guest';
+            
+            // Login butonunu göster
+            document.getElementById('loginBtn').style.display = 'block';
+            
+            // Çıkış butonunu kaldır (eğer varsa)
+            const logoutBtn = document.getElementById('logout-btn');
+            if (logoutBtn) logoutBtn.remove();
+            
+            return;
+        }
+        
         try {
-            const res = await fetch('/api/auth/me', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (!res.ok) return;
-            const data = await res.json();
-            if (data.username) {
+            // Username ile SQL'den kullanıcı bilgilerini çek
+            const response = await fetch(`/api/user/${encodeURIComponent(username)}`);
+            console.log('API response status:', response.status); // Debug için
+            
+            if (!response.ok) {
+                console.log('API error:', response.status); // Debug için
+                // API hatası durumunda default duruma dön
                 document.getElementById('user-profile').style.display = 'flex';
-                document.getElementById('user-name').textContent = data.username;
+                document.getElementById('user-avatar').src = 'https://cdn.discordapp.com/embed/avatars/0.png';
+                document.getElementById('user-name').textContent = 'Guest';
+                document.getElementById('loginBtn').style.display = 'block';
+                return;
+            }
+            
+            const userData = await response.json();
+            console.log('User data from SQL:', userData); // Debug için
+            
+            if (userData.username) {
+                console.log('Kullanıcı profili gösteriliyor:', userData.username); // Debug için
+                document.getElementById('user-profile').style.display = 'flex';
+                document.getElementById('user-name').textContent = userData.username;
+                
                 let avatarUrl = '';
-                if (data.avatar) {
+                if (userData.avatar) {
                     // Discord CDN avatar url'si
-                    avatarUrl = `https://cdn.discordapp.com/avatars/${data.discord_id}/${data.avatar}.png`;
+                    avatarUrl = `https://cdn.discordapp.com/avatars/${userData.discord_id}/${userData.avatar}.png`;
                 } else {
                     // Discord default avatar
                     avatarUrl = 'https://cdn.discordapp.com/embed/avatars/0.png';
                 }
                 document.getElementById('user-avatar').src = avatarUrl;
+                
+                // Login butonunu gizle
+                document.getElementById('loginBtn').style.display = 'none';
+                
+                // Çıkış butonu ekle (eğer yoksa)
+                if (!document.getElementById('logout-btn')) {
+                    const logoutBtn = document.createElement('button');
+                    logoutBtn.id = 'logout-btn';
+                    logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i>';
+                    logoutBtn.style.cssText = 'background:none; border:none; color:var(--accent-color); cursor:pointer; font-size:16px; margin-left:8px;';
+                    logoutBtn.title = 'Çıkış Yap';
+                    logoutBtn.addEventListener('click', logout);
+                    document.getElementById('user-profile').appendChild(logoutBtn);
+                }
+            } else {
+                console.log('Username bulunamadı'); // Debug için
+                // Default duruma dön
+                document.getElementById('user-profile').style.display = 'flex';
+                document.getElementById('user-avatar').src = 'https://cdn.discordapp.com/embed/avatars/0.png';
+                document.getElementById('user-name').textContent = 'Guest';
+                document.getElementById('loginBtn').style.display = 'block';
             }
-        } catch (e) {}
+        } catch (e) {
+            console.error('API fetch error:', e);
+            // Hata durumunda default duruma dön
+            document.getElementById('user-profile').style.display = 'flex';
+            document.getElementById('user-avatar').src = 'https://cdn.discordapp.com/embed/avatars/0.png';
+            document.getElementById('user-name').textContent = 'Guest';
+            document.getElementById('loginBtn').style.display = 'block';
+        }
     }
+
+    // Çıkış yapma fonksiyonu
+    function logout() {
+        deleteCookie('auth_token');
+        
+        // Default duruma dön
+        document.getElementById('user-profile').style.display = 'flex';
+        document.getElementById('user-avatar').src = 'https://cdn.discordapp.com/embed/avatars/0.png';
+        document.getElementById('user-name').textContent = 'Guest';
+        document.getElementById('loginBtn').style.display = 'block';
+        
+        // Çıkış butonunu kaldır
+        const logoutBtn = document.getElementById('logout-btn');
+        if (logoutBtn) logoutBtn.remove();
+        
+        console.log('Çıkış yapıldı - default duruma dönüldü');
+        
+        // Sayfayı yenile (opsiyonel)
+        // window.location.reload();
+    }
+
     showUserProfile();
 });

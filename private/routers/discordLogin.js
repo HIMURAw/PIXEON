@@ -65,13 +65,45 @@ router.get('/callback', async (req, res) => {
             JSON.stringify(roles)
         ]);
 
+        // 5. Cookie set et - sadece username'i sakla
+        const username = user.username + '#' + user.discriminator;
+        
+        // Cookie'yi 30 gün boyunca sakla
+        res.cookie('auth_token', username, {
+            maxAge: 30 * 24 * 60 * 60 * 1000, // 30 gün
+            httpOnly: false, // JavaScript'ten erişilebilir olsun
+            secure: false, // HTTPS kullanıyorsan true yap
+            sameSite: 'lax'
+        });
+
         // Başarılı girişten sonra ana sayfaya yönlendir
-        req.session.userId = user.id;
         res.redirect('/');
 
     } catch (err) {
         console.error(err);
         res.status(500).send('Discord login failed');
+    }
+});
+
+// Username ile kullanıcı bilgilerini döndüren endpoint
+router.get('/api/user/:username', async (req, res) => {
+    try {
+        const username = req.params.username;
+        
+        // SQL'den kullanıcıyı çek
+        const [rows] = await pool.query(
+            'SELECT discord_id, username, avatar, email FROM discord_users WHERE username = ?',
+            [username]
+        );
+        
+        if (rows.length === 0) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+        
+        res.json(rows[0]);
+    } catch (err) {
+        console.error('User fetch error:', err);
+        res.status(500).json({ error: 'Database error' });
     }
 });
 
