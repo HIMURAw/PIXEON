@@ -191,4 +191,17 @@ document.addEventListener('DOMContentLoaded', () => {
         this.querySelector('i').classList.toggle('fa-eye');
         this.querySelector('i').classList.toggle('fa-eye-slash');
     });
+
+    // Discord ile giriş butonu
+    const discordLoginBtn = document.querySelector('.btn-discord');
+    if (discordLoginBtn) {
+        discordLoginBtn.addEventListener('click', async function () {
+            // Sunucudan clientId ve redirectUri'yı çek
+            const res = await fetch('/api/discord/oauth-config');
+            const { clientId, redirectUri } = await res.json();
+            const scope = 'identify email';
+            const discordAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${scope}`;
+            window.location.href = discordAuthUrl;
+        });
+    }
 });

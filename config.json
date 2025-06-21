@@ -7,7 +7,8 @@
         "clientId": "1247325679326986250",
         "guidid": "1269430268402335867",
         "voicechannel": "1271919365368840212",
-        "AnnoncementChannel": "1292162697521266841"
+        "AnnoncementChannel": "1292162697521266841",
+        "redirectUri": "http://localhost:3000/auth/discord/callback"
     },
     "db": {
         "host": "localhost",
