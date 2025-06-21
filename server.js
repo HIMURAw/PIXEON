@@ -172,6 +172,7 @@ const discordServerRouter = require('./private/routers/discordServer.js');
 const discordChannelRouter = require('./private/routers/discordChannel.js');
 const fivemPlayersRouter = require('./private/routers/fivemplayer.js');
 const ConfigRouter = require('./private/routers/configAPI.js');
+const discordLoginRouter = require('./private/routers/discordLogin');
 
 app.use('/api/auth', loginRouter);
 app.use('/api/discordUsers', discordUsersRouter);
@@ -179,6 +180,7 @@ app.use('/api/discordServer', discordServerRouter);
 app.use('/api/discordChannel', discordChannelRouter);
 app.use('/api/fivem', fivemPlayersRouter);
 app.use('/api/config', ConfigRouter);
+app.use('/auth/discord', discordLoginRouter);
 
 app.get('/api/discord/oauth-config', (req, res) => {
     res.json({
