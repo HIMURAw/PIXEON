@@ -65,6 +65,10 @@ router.get('/callback', async (req, res) => {
             JSON.stringify(roles)
         ]);
 
+        // Başarılı girişten sonra ana sayfaya yönlendir
+        req.session.userId = user.id;
+        res.redirect('/');
+
     } catch (err) {
         console.error(err);
         res.status(500).send('Discord login failed');

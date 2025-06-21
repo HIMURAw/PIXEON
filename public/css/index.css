@@ -790,3 +790,39 @@ body {
 .toggle-password i {
     font-size: 16px;
 }
+
+#user-profile {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    margin-left: 1rem;
+    background: rgba(100,255,218,0.07);
+    padding: 4px 12px 4px 4px;
+    border-radius: 20px;
+    transition: background 0.2s;
+}
+#user-profile:hover {
+    background: rgba(100,255,218,0.15);
+}
+#user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--accent-color);
+    background: #222;
+}
+#user-name {
+    color: var(--accent-color);
+    font-weight: 600;
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+}
+
+@media (max-width: 768px) {
+    #user-profile {
+        margin-left: 0;
+        margin-top: 1rem;
+        justify-content: center;
+    }
+}

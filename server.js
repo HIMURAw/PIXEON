@@ -6,10 +6,18 @@ const { createAdminsTable } = require('./private/DB/models/userModel');
 const { joinVoiceChannel } = require('@discordjs/voice');
 const fs = require('fs');
 const { pool, checkConnection } = require('./private/DB/connect');
+const session = require('express-session');
 
 const app = express();
 
 const port = Config.port || 3000;
+
+app.use(session({
+    secret: Config.dev.secretKey, // Güçlü bir secret kullan!
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: false } // Eğer HTTPS kullanıyorsan true yapabilirsin
+}));
 
 // Discord Client oluştur
 const client = new Client({
@@ -137,10 +145,10 @@ app.use((req, res, next) => {
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
     res.header('Access-Control-Allow-Credentials', 'true');
-    
+
     // SameSite cookie policy
     res.header('Set-Cookie', 'SameSite=None; Secure');
-    
+
     if (req.method === 'OPTIONS') {
         res.sendStatus(200);
     } else {
@@ -173,6 +181,7 @@ const discordChannelRouter = require('./private/routers/discordChannel.js');
 const fivemPlayersRouter = require('./private/routers/fivemplayer.js');
 const ConfigRouter = require('./private/routers/configAPI.js');
 const discordLoginRouter = require('./private/routers/discordLogin');
+const { config } = require('process');
 
 app.use('/api/auth', loginRouter);
 app.use('/api/discordUsers', discordUsersRouter);
@@ -209,6 +218,8 @@ client.on('ready', () => {
         adapterCreator: channel.guild.voiceAdapterCreator
     });
 });
+
+
 
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);

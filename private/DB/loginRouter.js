@@ -96,4 +96,18 @@ router.get('/discord-roles', async (req, res) => {
     }
 });
 
+// Kullanıcı bilgilerini dönen endpoint
+router.get('/api/auth/me', async (req, res) => {
+    // Örneğin session veya JWT ile kullanıcıyı buluyorsan:
+    // Eğer session kullanıyorsan:
+    const userId = req.session?.userId;
+    if (!userId) return res.status(401).json({ error: 'Not logged in' });
+
+    // SQL'den kullanıcıyı çek
+    const [rows] = await pool.query('SELECT discord_id, username, avatar FROM discord_users WHERE discord_id = ?', [userId]);
+    if (!rows.length) return res.status(404).json({ error: 'User not found' });
+
+    res.json(rows[0]);
+});
+
 module.exports = router; 
