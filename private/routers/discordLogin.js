@@ -1,18 +1,44 @@
 const express = require('express');
 const router = express.Router();
 const axios = require('axios');
+const crypto = require('crypto');
 const Config = require('../../config.json');
 const { pool } = require('../DB/connect');
 
 // NOT: config.json'a "clientSecret" eklemelisin!
 // "clientSecret": "BURAYA_SECRET"
 
+// Şifreleme anahtarı (config.json'a ekleyebilirsin)
+const ENCRYPTION_KEY = Config.dev?.encryptionKey || 'your-secret-encryption-key-32-chars-long';
+const ALGORITHM = 'aes-256-cbc';
+
+// Şifreleme fonksiyonu
+function encrypt(text) {
+    const iv = crypto.randomBytes(16);
+    const cipher = crypto.createCipheriv(ALGORITHM, Buffer.from(ENCRYPTION_KEY.slice(0, 32)), iv);
+    let encrypted = cipher.update(text, 'utf8', 'hex');
+    encrypted += cipher.final('hex');
+    return iv.toString('hex') + ':' + encrypted;
+}
+
+// Çözme fonksiyonu
+function decrypt(text) {
+    const textParts = text.split(':');
+    const iv = Buffer.from(textParts.shift(), 'hex');
+    const encryptedText = textParts.join(':');
+    const decipher = crypto.createDecipheriv(ALGORITHM, Buffer.from(ENCRYPTION_KEY.slice(0, 32)), iv);
+    let decrypted = decipher.update(encryptedText, 'hex', 'utf8');
+    decrypted += decipher.final('utf8');
+    return decrypted;
+}
+
+// Discord OAuth Callback - Kullanıcı giriş yaptığında çalışır
 router.get('/callback', async (req, res) => {
     const code = req.query.code;
     if (!code) return res.status(400).send('No code provided');
 
     try {
-        // 1. Access token al
+        // 1. Discord'dan access token al
         const tokenRes = await axios.post('https://discord.com/api/oauth2/token', new URLSearchParams({
             client_id: Config.discord.clientId,
             client_secret: Config.discord.clientSecret,
@@ -26,13 +52,13 @@ router.get('/callback', async (req, res) => {
 
         const accessToken = tokenRes.data.access_token;
 
-        // 2. Kullanıcı bilgilerini çek
+        // 2. Discord'dan kullanıcı bilgilerini çek
         const userRes = await axios.get('https://discord.com/api/users/@me', {
             headers: { Authorization: `Bearer ${accessToken}` }
         });
         const user = userRes.data;
 
-        // 3. Kullanıcının sunucu içindeki rollerini çek
+        // 3. Kullanıcının Discord sunucusundaki rollerini çek
         let roles = [];
         try {
             const memberRes = await axios.get(
@@ -51,7 +77,7 @@ router.get('/callback', async (req, res) => {
             roles = [];
         }
 
-        // 4. SQL'e kaydet (rolleri JSON olarak kaydediyoruz)
+        // 4. Kullanıcı bilgilerini SQL veritabanına kaydet
         const sql = `
             INSERT INTO discord_users (discord_id, username, avatar, email, roles)
             VALUES (?, ?, ?, ?, ?)
@@ -68,8 +94,8 @@ router.get('/callback', async (req, res) => {
         // 5. Cookie set et - sadece username'i sakla
         const username = user.username + '#' + user.discriminator;
         
-        // Cookie'yi 30 gün boyunca sakla
-        res.cookie('auth_token', username, {
+        // Cookie'yi 30 gün boyunca sakla (base64 encode ile)
+        res.cookie('auth_token', Buffer.from(username).toString('base64'), {
             maxAge: 30 * 24 * 60 * 60 * 1000, // 30 gün
             httpOnly: false, // JavaScript'ten erişilebilir olsun
             secure: false, // HTTPS kullanıyorsan true yap
@@ -80,21 +106,33 @@ router.get('/callback', async (req, res) => {
         res.redirect('/');
 
     } catch (err) {
-        console.error(err);
+        console.error('Discord login error:', err);
         res.status(500).send('Discord login failed');
     }
 });
 
 // Username ile kullanıcı bilgilerini döndüren endpoint
-router.get('/api/user/:username', async (req, res) => {
+router.get('/api/user/:encodedUsername', async (req, res) => {
     try {
-        const username = req.params.username;
+        // Base64 decode yap
+        const encodedUsername = req.params.encodedUsername;
+        let username;
+        
+        try {
+            username = Buffer.from(encodedUsername, 'base64').toString('utf8');
+            console.log('Decoded username:', username); // Debug için
+        } catch (decodeError) {
+            console.error('Decode error:', decodeError);
+            return res.status(400).json({ error: 'Invalid token' });
+        }
         
         // SQL'den kullanıcıyı çek
         const [rows] = await pool.query(
             'SELECT discord_id, username, avatar, email FROM discord_users WHERE username = ?',
             [username]
         );
+        
+        console.log('SQL query result:', rows); // Debug için
         
         if (rows.length === 0) {
             return res.status(404).json({ error: 'User not found' });

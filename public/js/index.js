@@ -98,6 +98,19 @@ document.addEventListener('DOMContentLoaded', () => {
         document.cookie = name + '=; Max-Age=-99999999; path=/';
     }
 
+    // Şifre çözme fonksiyonu (base64 decode)
+    function decryptToken(encodedToken) {
+        try {
+            // Önce URL decode yap, sonra base64 decode
+            const urlDecoded = decodeURIComponent(encodedToken);
+            console.log('URL decoded token:', urlDecoded); // Debug için
+            return atob(urlDecoded);
+        } catch (e) {
+            console.error('Token decode error:', e);
+            return null;
+        }
+    }
+
     // Sayfa yüklendiğinde token kontrolü
     document.addEventListener('DOMContentLoaded', function () {
         const token = getCookie('auth_token');
@@ -207,7 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const discordLoginBtn = document.querySelector('.btn-discord');
     if (discordLoginBtn) {
         discordLoginBtn.addEventListener('click', async function () {
-            // Sunucudan clientId ve redirectUri'yı çek
+            // Sunucudan Discord OAuth ayarlarını çek
             const res = await fetch('/api/discord/oauth-config');
             const { clientId, redirectUri } = await res.json();
             const scope = 'identify email guilds guilds.members.read';
@@ -216,13 +229,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Kullanıcı profilini göster
+    // Kullanıcı profilini göster - ANA FONKSİYON
     async function showUserProfile() {
-        const username = getCookie('auth_token');
-        console.log('Cookie username:', username); // Debug için
+        const encodedToken = getCookie('auth_token');
+        console.log('Cookie encoded token:', encodedToken); // Debug için
         
-        if (!username) {
-            console.log('Username bulunamadı - default durum gösteriliyor'); // Debug için
+        if (!encodedToken) {
+            console.log('Token bulunamadı - default durum gösteriliyor');
             // Default durum - giriş yapmamış kullanıcı
             document.getElementById('user-profile').style.display = 'flex';
             document.getElementById('user-avatar').src = 'https://cdn.discordapp.com/embed/avatars/0.png';
@@ -239,12 +252,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         try {
-            // Username ile SQL'den kullanıcı bilgilerini çek
-            const response = await fetch(`/api/user/${encodeURIComponent(username)}`);
-            console.log('API response status:', response.status); // Debug için
+            // Base64 encoded token'ı çöz
+            const decryptedUsername = decryptToken(encodedToken);
+            console.log('Decoded username:', decryptedUsername); // Debug için
+            
+            if (!decryptedUsername) {
+                console.log('Token çözülemedi - default duruma dön');
+                document.getElementById('user-profile').style.display = 'flex';
+                document.getElementById('user-avatar').src = 'https://cdn.discordapp.com/embed/avatars/0.png';
+                document.getElementById('user-name').textContent = 'Guest';
+                document.getElementById('loginBtn').style.display = 'block';
+                return;
+            }
+            
+            // Çözülmüş username ile SQL'den kullanıcı bilgilerini çek
+            const response = await fetch(`/api/user/${encodeURIComponent(decryptedUsername)}`);
+            console.log('API response status:', response.status);
             
             if (!response.ok) {
-                console.log('API error:', response.status); // Debug için
+                console.log('API error:', response.status);
                 // API hatası durumunda default duruma dön
                 document.getElementById('user-profile').style.display = 'flex';
                 document.getElementById('user-avatar').src = 'https://cdn.discordapp.com/embed/avatars/0.png';
@@ -254,10 +280,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             const userData = await response.json();
-            console.log('User data from SQL:', userData); // Debug için
+            console.log('User data from SQL:', userData);
             
             if (userData.username) {
-                console.log('Kullanıcı profili gösteriliyor:', userData.username); // Debug için
+                console.log('Kullanıcı profili gösteriliyor:', userData.username);
                 document.getElementById('user-profile').style.display = 'flex';
                 document.getElementById('user-name').textContent = userData.username;
                 
@@ -285,7 +311,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.getElementById('user-profile').appendChild(logoutBtn);
                 }
             } else {
-                console.log('Username bulunamadı'); // Debug için
+                console.log('Username bulunamadı');
                 // Default duruma dön
                 document.getElementById('user-profile').style.display = 'flex';
                 document.getElementById('user-avatar').src = 'https://cdn.discordapp.com/embed/avatars/0.png';
@@ -317,10 +343,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (logoutBtn) logoutBtn.remove();
         
         console.log('Çıkış yapıldı - default duruma dönüldü');
-        
-        // Sayfayı yenile (opsiyonel)
-        // window.location.reload();
     }
 
+    // Sayfa yüklendiğinde kullanıcı profilini göster
     showUserProfile();
 });

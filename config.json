@@ -1,7 +1,8 @@
 {
     "dev": {
         "port": "3000",
-        "secretKey": "perronunanasininaminiyalayanutkininsikininkili"
+        "secretKey": "perronunanasininaminiyalayanutkininsikininkili",
+        "encryptionKey": "perronunanasininaminiyalayanutkininsikininkiliamacrypticin"
     },
     "discord": {
         "token": "MTI0NzMyNTY3OTMyNjk4NjI1MA.GUB21K.fk3XSiLfM5f6uiMaev7Nw_2ijDYa-b77_iaD30",
