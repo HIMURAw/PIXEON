@@ -185,7 +185,8 @@ app.use('/auth/discord', discordLoginRouter);
 app.get('/api/discord/oauth-config', (req, res) => {
     res.json({
         clientId: Config.discord.clientId,
-        redirectUri: Config.discord.redirectUri // Burayı kendi redirect URI'n ile değiştir
+        redirectUri: Config.discord.redirectUri,
+        adminRoleId: Config.discord.adminRoleId
     });
 });
 
