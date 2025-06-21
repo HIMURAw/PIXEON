@@ -229,6 +229,23 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Çıkış yapma fonksiyonu
+    function logout() {
+        deleteCookie('auth_token');
+        
+        // Default duruma dön
+        document.getElementById('user-profile').style.display = 'flex';
+        document.getElementById('user-avatar').src = 'https://cdn.discordapp.com/embed/avatars/0.png';
+        document.getElementById('user-name').textContent = 'Guest';
+        document.getElementById('loginBtn').style.display = 'block';
+        
+        // Çıkış butonunu kaldır
+        const logoutBtn = document.getElementById('logout-btn');
+        if (logoutBtn) logoutBtn.remove();
+        
+        console.log('Çıkış yapıldı - default duruma dönüldü');
+    }
+
     // Kullanıcı profilini göster - ANA FONKSİYON
     async function showUserProfile() {
         const encodedToken = getCookie('auth_token');
@@ -252,21 +269,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         try {
-            // Base64 encoded token'ı çöz
-            const decryptedUsername = decryptToken(encodedToken);
-            console.log('Decoded username:', decryptedUsername); // Debug için
+            // Cookie'deki username ile SQL'den kullanıcı bilgilerini çek
+            const response = await fetch('/auth/discord/user/check', {
+                method: 'GET',
+                credentials: 'include' // Cookie'leri gönder
+            });
             
-            if (!decryptedUsername) {
-                console.log('Token çözülemedi - default duruma dön');
-                document.getElementById('user-profile').style.display = 'flex';
-                document.getElementById('user-avatar').src = 'https://cdn.discordapp.com/embed/avatars/0.png';
-                document.getElementById('user-name').textContent = 'Guest';
-                document.getElementById('loginBtn').style.display = 'block';
-                return;
-            }
-            
-            // Çözülmüş username ile SQL'den kullanıcı bilgilerini çek
-            const response = await fetch(`/api/user/${encodeURIComponent(decryptedUsername)}`);
             console.log('API response status:', response.status);
             
             if (!response.ok) {
@@ -287,6 +295,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('user-profile').style.display = 'flex';
                 document.getElementById('user-name').textContent = userData.username;
                 
+                // Avatar bilgisini kullan
                 let avatarUrl = '';
                 if (userData.avatar) {
                     // Discord CDN avatar url'si
@@ -326,23 +335,6 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('user-name').textContent = 'Guest';
             document.getElementById('loginBtn').style.display = 'block';
         }
-    }
-
-    // Çıkış yapma fonksiyonu
-    function logout() {
-        deleteCookie('auth_token');
-        
-        // Default duruma dön
-        document.getElementById('user-profile').style.display = 'flex';
-        document.getElementById('user-avatar').src = 'https://cdn.discordapp.com/embed/avatars/0.png';
-        document.getElementById('user-name').textContent = 'Guest';
-        document.getElementById('loginBtn').style.display = 'block';
-        
-        // Çıkış butonunu kaldır
-        const logoutBtn = document.getElementById('logout-btn');
-        if (logoutBtn) logoutBtn.remove();
-        
-        console.log('Çıkış yapıldı - default duruma dönüldü');
     }
 
     // Sayfa yüklendiğinde kullanıcı profilini göster
