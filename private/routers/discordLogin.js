@@ -19,7 +19,7 @@ router.get('/callback', async (req, res) => {
             grant_type: 'authorization_code',
             code,
             redirect_uri: Config.discord.redirectUri,
-            scope: 'identify email'
+            scope: 'identify email guilds guilds.members.read'
         }), {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
         });
@@ -32,20 +32,40 @@ router.get('/callback', async (req, res) => {
         });
         const user = userRes.data;
 
-        // 3. SQL'e kaydet
+        // 3. Kullanıcının sunucu içindeki rollerini çek
+        let roles = [];
+        try {
+            const memberRes = await axios.get(
+                `https://discord.com/api/users/@me/guilds/${Config.discord.guidid}/member`,
+                { headers: { Authorization: `Bearer ${accessToken}` } }
+            );
+            if (memberRes.data && Array.isArray(memberRes.data.roles)) {
+                roles = memberRes.data.roles;
+            } else if (memberRes.data && memberRes.data.roles) {
+                roles = Array.isArray(memberRes.data.roles) ? memberRes.data.roles : [memberRes.data.roles];
+            } else {
+                roles = [];
+            }
+        } catch (err) {
+            console.warn('Kullanıcı sunucuda değil veya rolleri alınamadı:', err.response?.data || err.message);
+            roles = [];
+        }
+
+        // 4. SQL'e kaydet (rolleri JSON olarak kaydediyoruz)
         const sql = `
-            INSERT INTO discord_users (discord_id, username, avatar, email)
-            VALUES (?, ?, ?, ?)
-            ON DUPLICATE KEY UPDATE username=VALUES(username), avatar=VALUES(avatar), email=VALUES(email)
+            INSERT INTO discord_users (discord_id, username, avatar, email, roles)
+            VALUES (?, ?, ?, ?, ?)
+            ON DUPLICATE KEY UPDATE username=VALUES(username), avatar=VALUES(avatar), email=VALUES(email), roles=VALUES(roles)
         `;
         await pool.query(sql, [
             user.id,
             user.username + '#' + user.discriminator,
             user.avatar,
-            user.email || null
+            user.email || null,
+            JSON.stringify(roles)
         ]);
 
-        // 4. İstediğin sayfaya yönlendir
+        // 5. İstediğin sayfaya yönlendir
         res.redirect('/dashboard');
     } catch (err) {
         console.error(err);

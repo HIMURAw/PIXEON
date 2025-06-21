@@ -199,7 +199,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Sunucudan clientId ve redirectUri'yı çek
             const res = await fetch('/api/discord/oauth-config');
             const { clientId, redirectUri } = await res.json();
-            const scope = 'identify email';
+            const scope = 'identify email guilds guilds.members.read';
             const discordAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${scope}`;
             window.location.href = discordAuthUrl;
         });
