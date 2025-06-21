@@ -9,7 +9,7 @@ const { pool } = require('../DB/connect');
 // "clientSecret": "BURAYA_SECRET"
 
 // Şifreleme anahtarı (config.json'a ekleyebilirsin)
-const ENCRYPTION_KEY = Config.dev?.encryptionKey || 'your-secret-encryption-key-32-chars-long';
+const ENCRYPTION_KEY = Config.dev?.encryptionKey || 'perronunanasininaminiyalayanutkininsikininkiliamacrypticin';
 const ALGORITHM = 'aes-256-cbc';
 
 // Şifreleme fonksiyonu
@@ -93,7 +93,7 @@ router.get('/callback', async (req, res) => {
 
         // 5. Cookie set et - sadece username'i sakla
         const username = user.username + '#' + user.discriminator;
-        
+
         // Cookie'yi 30 gün boyunca sakla (base64 encode ile)
         res.cookie('auth_token', Buffer.from(username).toString('base64'), {
             maxAge: 30 * 24 * 60 * 60 * 1000, // 30 gün
@@ -117,7 +117,7 @@ router.get('/api/user/:encodedUsername', async (req, res) => {
         // Base64 decode yap
         const encodedUsername = req.params.encodedUsername;
         let username;
-        
+
         try {
             username = Buffer.from(encodedUsername, 'base64').toString('utf8');
             console.log('Decoded username:', username); // Debug için
@@ -125,19 +125,19 @@ router.get('/api/user/:encodedUsername', async (req, res) => {
             console.error('Decode error:', decodeError);
             return res.status(400).json({ error: 'Invalid token' });
         }
-        
+
         // SQL'den kullanıcıyı çek
         const [rows] = await pool.query(
             'SELECT discord_id, username, avatar, email FROM discord_users WHERE username = ?',
             [username]
         );
-        
+
         console.log('SQL query result:', rows); // Debug için
-        
+
         if (rows.length === 0) {
             return res.status(404).json({ error: 'User not found' });
         }
-        
+
         res.json(rows[0]);
     } catch (err) {
         console.error('User fetch error:', err);
