@@ -139,6 +139,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (typeof updateServerStats === 'function') updateServerStats();
                 if (typeof refreshUserHistory === 'function') refreshUserHistory();
                 if (typeof refreshServerActivity === 'function') refreshServerActivity();
+                updateActiveBansCount();
             }
         }
     }
@@ -315,4 +316,27 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Sayfa yüklendiğinde admin profilini yükle
     loadAdminProfile();
+
+    // Banlı oyuncu sayısını güncelle
+
+});
+
+function updateActiveBansCount() {
+    const el = document.getElementById('active-bans-count');
+    if (!el) return; // Eleman yoksa fonksiyonu durdur
+    fetch('/api/fivem/fivem-bans')
+        .then(res => res.json())
+        .then(data => {
+            // API'den dönen veri dizi ise uzunluğunu, obje ise .bans dizisinin uzunluğunu al
+            const count = Array.isArray(data) ? data.length : (data.banCount !== undefined ? data.banCount : (data.bans ? data.bans.length : 0));
+            el.textContent = count;
+        })
+        .catch(err => {
+            el.textContent = '!';
+            console.error('Banlı oyuncu sayısı alınamadı:', err);
+        });
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    updateActiveBansCount();
 });
