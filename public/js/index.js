@@ -98,6 +98,88 @@ document.addEventListener('DOMContentLoaded', () => {
         document.cookie = name + '=; Max-Age=-99999999; path=/';
     }
 
+    // Admin rol kontrolü
+    async function checkAdminRole() {
+        try {
+            console.log('=== Admin Role Check Başladı ===');
+            
+            const encodedUserData = getCookie('auth_token');
+            if (!encodedUserData) {
+                console.log('No auth token found');
+                return false;
+            }
+            
+            // Çift URL-decode yap
+            let decodedUserData = decodeURIComponent(encodedUserData);
+            if (decodedUserData.includes('%')) {
+                decodedUserData = decodeURIComponent(decodedUserData);
+            }
+            
+            const userData = JSON.parse(decodedUserData);
+            console.log('User data from cookie:', userData);
+            
+            if (!userData || !userData.username) {
+                console.log('No username in user data');
+                return false;
+            }
+            
+            // Admin role ID'yi config'den çek
+            console.log('Fetching admin role ID from config...');
+            const configResponse = await fetch('/auth/discord/admin-role-id');
+            console.log('Config response status:', configResponse.status);
+            
+            if (!configResponse.ok) {
+                console.log('Config response not ok');
+                return false;
+            }
+            
+            const configData = await configResponse.json();
+            const adminRoleId = configData.adminRoleId;
+            console.log('Admin role ID from config:', adminRoleId);
+            
+            // Rolleri cookie'den kontrol et
+            if (!userData.roles) {
+                console.log('No roles in user data');
+                return false;
+            }
+            
+            console.log('User roles from cookie:', userData.roles);
+            console.log('Admin role ID to check:', adminRoleId);
+            console.log('Roles includes admin role:', userData.roles.includes(adminRoleId));
+            
+            const isAdmin = userData.roles.includes(adminRoleId);
+            console.log('Is admin:', isAdmin);
+            
+            return isAdmin;
+        } catch (error) {
+            console.error('Admin role check error:', error);
+            return false;
+        }
+    }
+
+    // Admin login butonunu yönet
+    async function manageAdminButton() {
+        console.log('=== Manage Admin Button Başladı ===');
+        
+        const adminBtn = document.getElementById('adminLoginBtn');
+        console.log('Admin button element:', adminBtn);
+        
+        const isAdmin = await checkAdminRole();
+        console.log('Is admin result:', isAdmin);
+        
+        if (isAdmin) {
+            console.log('Showing admin button');
+            adminBtn.style.display = 'inline-block';
+            adminBtn.addEventListener('click', () => {
+                console.log('Admin button clicked, redirecting to dashboard');
+                window.location.href = '/dashboard';
+            });
+        } else {
+            console.log('Hiding admin button');
+            adminBtn.style.display = 'none';
+        }
+    }
+
     // Kullanıcı profilini göster - ANA FONKSİYON
     async function showUserProfile() {
         const encodedUserData = getCookie('auth_token');
@@ -153,9 +235,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i>';
                     logoutBtn.style.cssText = 'background:none; border:none; color:var(--accent-color); cursor:pointer; font-size:16px; margin-left:8px;';
                     logoutBtn.title = 'Çıkış Yap';
-                    logoutBtn.addEventListener('click', logout);
+                    logoutBtn.addEventListener('click', () => {
+                        // Onay sorusu göster
+                        if (confirm('Çıkmak istediğinize emin misiniz?')) {
+                            logout();
+                        }
+                    });
                     document.getElementById('user-profile').appendChild(logoutBtn);
                 }
+                
+                // Admin butonunu kontrol et
+                manageAdminButton();
             } else {
                 console.log('Username bulunamadı veya boş');
                 console.log('userData:', userData);
