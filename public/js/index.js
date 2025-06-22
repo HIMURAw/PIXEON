@@ -236,10 +236,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     logoutBtn.style.cssText = 'background:none; border:none; color:var(--accent-color); cursor:pointer; font-size:16px; margin-left:8px;';
                     logoutBtn.title = 'Çıkış Yap';
                     logoutBtn.addEventListener('click', () => {
-                        // Onay sorusu göster
-                        if (confirm('Çıkmak istediğinize emin misiniz?')) {
-                            logout();
-                        }
+                        showConfirmModal({
+                            title: "Çıkış Yap",
+                            message: "Çıkmak istediğinize emin misiniz?",
+                            onOk: logout,
+                            onCancel: () => {}
+                        });
                     });
                     document.getElementById('user-profile').appendChild(logoutBtn);
                 }
@@ -363,4 +365,28 @@ function toggleConfirmModal() {
     } else {
         modal.style.display = 'block';
     }
+}
+
+function showConfirmModal({ title = "Emin misiniz?", message = "", onOk, onCancel }) {
+    const modal = document.getElementById('confirm-modal');
+    document.getElementById('confirm-modal-title').textContent = title;
+    document.getElementById('confirm-modal-message').textContent = message;
+    modal.classList.add('show');
+
+    function closeModal() {
+        modal.classList.remove('show');
+    }
+
+    document.getElementById('confirm-modal-ok').onclick = () => {
+        closeModal();
+        if (typeof onOk === 'function') onOk();
+    };
+    document.getElementById('confirm-modal-cancel').onclick = () => {
+        closeModal();
+        if (typeof onCancel === 'function') onCancel();
+    };
+    document.getElementById('confirm-modal-close').onclick = closeModal;
+    modal.onclick = (e) => {
+        if (e.target === modal) closeModal();
+    };
 }
