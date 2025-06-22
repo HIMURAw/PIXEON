@@ -857,57 +857,81 @@ body {
     margin-right: 8px;
 }
 
+/* Confirm Modal Styles */
 .confirm-modal {
     display: none;
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
-    z-index: 1000;
-    justify-content: center;
+    z-index: 9999;
+    left: 0; top: 0; width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.45);
     align-items: center;
-}
-
-.confirm-modal-content {
-    background-color: #222;
-    padding: 20px;
-    border-radius: 5px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    text-align: center;
-    color: #fff;
-}
-
-.confirm-modal-content p {
-    margin-bottom: 10px;
-}
-
-.confirm-buttons {
-    display: flex;
     justify-content: center;
-    gap: 10px;
+    animation: fadeInModalBg 0.3s;
 }
-
-.confirm-buttons button {
-    padding: 8px 16px;
-    border-radius: 4px;
-    border: none;
+.confirm-modal.show {
+    display: flex;
+    animation: fadeInModalBg 0.3s;
+}
+@keyframes fadeInModalBg {
+    from { background: rgba(0,0,0,0); }
+    to   { background: rgba(0,0,0,0.45); }
+}
+.confirm-modal-content {
+    background: #23272a;
+    color: #fff;
+    border-radius: 16px;
+    padding: 32px 24px 24px 24px;
+    min-width: 320px;
+    max-width: 90vw;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+    text-align: center;
+    position: relative;
+    animation: modalPopIn 0.35s cubic-bezier(.68,-0.55,.27,1.55);
+}
+@keyframes modalPopIn {
+    0% { transform: scale(0.7) translateY(40px); opacity: 0; }
+    100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+.confirm-modal-close {
+    position: absolute;
+    right: 18px; top: 12px;
+    font-size: 2rem;
+    color: #aaa;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: color 0.2s;
 }
-
-.confirm-buttons button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-.confirm-buttons .btn-primary {
-    background-color: #7289da;
+.confirm-modal-close:hover {
     color: #fff;
 }
-
-.confirm-buttons .btn-secondary {
-    background-color: #2f3136;
+.confirm-modal-actions {
+    margin-top: 24px;
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+}
+.btn.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: #fff;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.btn.btn-primary:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+}
+.btn.btn-secondary {
+    background: #444;
+    color: #fff;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.btn.btn-secondary:hover {
+    background: #222;
 }
