@@ -66,7 +66,7 @@ router.get('/callback', async (req, res) => {
             JSON.stringify(roles)
         ]);
 
-        // 5. Cookie set et - username ve avatar'ı sakla
+        // 5. Cookie set et - username, avatar ve rollerini sakla
         const username = user.username + '#' + user.discriminator;
         
         // Avatar URL'ini oluştur
@@ -77,10 +77,11 @@ router.get('/callback', async (req, res) => {
             avatarUrl = 'https://cdn.discordapp.com/embed/avatars/0.png';
         }
 
-        // Cookie'ye username ve avatar'ı JSON olarak sakla
+        // Cookie'ye username, avatar ve rollerini JSON olarak sakla
         const userData = {
             username: username,
-            avatar: avatarUrl
+            avatar: avatarUrl,
+            roles: roles // Discord'dan gelen roller
         };
         
         const encodedUserData = encodeURIComponent(JSON.stringify(userData));
@@ -178,6 +179,17 @@ router.get('/api/user/check', (req, res) => {
             res.json(results[0]);
         }
     );
+});
+
+// Admin role ID'yi config.json'dan çek
+router.get('/admin-role-id', (req, res) => {
+    try {
+        const adminRoleId = Config.discord.adminRoleId;
+        res.json({ adminRoleId: adminRoleId });
+    } catch (error) {
+        console.error('Error getting admin role ID:', error);
+        res.status(500).json({ error: 'Failed to get admin role ID' });
+    }
 });
 
 module.exports = router;
