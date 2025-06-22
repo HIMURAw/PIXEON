@@ -31,6 +31,10 @@ local function fetchJobs(cb)
     ox:query('SELECT job FROM players', {}, function(result) cb(result) end)
 end
 
+local function fetchPlayTime(cb)
+    ox:query('SELECT * FROM player_playtime', {}, function(result) cb(result) end)
+end
+
 SetHttpHandler(function(req, res)
     -- /resources: scriptleri listele
     if req.method == 'GET' and req.path == '/resources' then
@@ -40,6 +44,17 @@ SetHttpHandler(function(req, res)
             ['Access-Control-Allow-Origin'] = '*'
         })
         res.send(json.encode(resourceList))
+        return
+    end
+
+    if req.method == 'GET' and req.path == '/playtime' then
+        ox:query('SELECT identifier, total_seconds FROM player_playtime', {}, function(rows)
+            res.writeHead(200, {
+                ['Content-Type'] = 'application/json',
+                ['Access-Control-Allow-Origin'] = '*'
+            })
+            res.send(json.encode(rows))
+        end)
         return
     end
 
