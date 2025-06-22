@@ -234,7 +234,7 @@ body {
     text-align: center;
     padding: 0 2rem;
     background: linear-gradient(rgba(10, 25, 47, 0.9), rgba(10, 25, 47, 0.9)),
-                url('assets/hero-bg.jpg') center/cover;
+        url('assets/hero-bg.jpg') center/cover;
 }
 
 .hero-content {
@@ -596,6 +596,7 @@ body {
         transform: translateY(-20px);
         opacity: 0;
     }
+
     to {
         transform: translateY(0);
         opacity: 1;
@@ -751,7 +752,7 @@ body {
     .social-buttons {
         flex-direction: column;
     }
-    
+
     .modal-content {
         width: 95%;
         margin: 1rem;
@@ -767,7 +768,8 @@ body {
 
 .password-input-container input {
     width: 100%;
-    padding-right: 40px; /* Göz ikonu için alan bırak */
+    padding-right: 40px;
+    /* Göz ikonu için alan bırak */
 }
 
 .toggle-password {
@@ -796,14 +798,16 @@ body {
     align-items: center;
     gap: 8px;
     margin-left: 1rem;
-    background: rgba(100,255,218,0.07);
+    background: rgba(100, 255, 218, 0.07);
     padding: 4px 12px 4px 4px;
     border-radius: 20px;
     transition: background 0.2s;
 }
+
 #user-profile:hover {
-    background: rgba(100,255,218,0.15);
+    background: rgba(100, 255, 218, 0.15);
 }
+
 #user-avatar {
     width: 32px;
     height: 32px;
@@ -812,6 +816,7 @@ body {
     border: 2px solid var(--accent-color);
     background: #222;
 }
+
 #user-name {
     color: var(--accent-color);
     font-weight: 600;
@@ -850,4 +855,59 @@ body {
 
 .admin-login-btn i {
     margin-right: 8px;
+}
+
+.confirm-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.confirm-modal-content {
+    background-color: #222;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    color: #fff;
+}
+
+.confirm-modal-content p {
+    margin-bottom: 10px;
+}
+
+.confirm-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.confirm-buttons button {
+    padding: 8px 16px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.confirm-buttons button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.confirm-buttons .btn-primary {
+    background-color: #7289da;
+    color: #fff;
+}
+
+.confirm-buttons .btn-secondary {
+    background-color: #2f3136;
+    color: #fff;
 }

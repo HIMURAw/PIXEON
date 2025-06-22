@@ -15,7 +15,8 @@
         <div class="navbar-container">
             <!-- Kullanıcı profil kutusu - en sol tarafta -->
             <div id="user-profile" style="display:flex; align-items:center; gap:8px; margin-right: 1rem;">
-                <img id="user-avatar" src="https://cdn.discordapp.com/embed/avatars/0.png" alt="Avatar" style="width:32px; height:32px; border-radius:50%; object-fit:cover;">
+                <img id="user-avatar" src="https://cdn.discordapp.com/embed/avatars/0.png" alt="Avatar"
+                    style="width:32px; height:32px; border-radius:50%; object-fit:cover;">
                 <span id="user-name" style="color:var(--accent-color); font-weight:600;">Guest</span>
             </div>
             <div class="navbar-brand">
@@ -89,7 +90,7 @@
                 <h1>Welcome to PR Gun & PvP</h1>
                 <p>Experience the ultimate FiveM PvP experience</p>
                 <div class="hero-buttons">
-                    <a href="#" class="btn btn-primary">Join Server</a>
+                    <a href="#" class="btn btn-primary" onclick="toggleConfirmModal()">Join Server</a>
                     <a href="#" class="btn btn-secondary">Discord</a>
                 </div>
                 <div class="server-stats">
@@ -199,6 +200,17 @@
             </button>
         </div>
     </footer>
+
+    <section class="confirm-modal" id="confirm-modal">
+        <div class="confirm-modal-content">
+            <h2>Confirm Action</h2>
+            <p>Are you sure you want to proceed?</p>
+            <div class="confirm-buttons">
+                <button id="confirmYes" class="btn btn-primary">Yes</button>
+                <button id="confirmNo" class="btn btn-secondary">No</button>
+            </div>
+        </div>
+    </section>
 
     <script src="js/index.js"></script>
 </body>
