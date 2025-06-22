@@ -274,4 +274,45 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     `;
     document.head.appendChild(style);
+
+    // Admin profil bilgilerini yükle
+    function loadAdminProfile() {
+        try {
+            const encodedUserData = getCookie('auth_token');
+            if (!encodedUserData) {
+                console.log('No auth token found for admin profile');
+                return;
+            }
+            
+            // Çift URL-decode yap
+            let decodedUserData = decodeURIComponent(encodedUserData);
+            if (decodedUserData.includes('%')) {
+                decodedUserData = decodeURIComponent(decodedUserData);
+            }
+            
+            const userData = JSON.parse(decodedUserData);
+            console.log('Admin profile data:', userData);
+            
+            if (userData && userData.username) {
+                // Admin avatar'ını güncelle
+                const adminAvatar = document.getElementById('admin-avatar');
+                if (adminAvatar && userData.avatar) {
+                    adminAvatar.src = userData.avatar;
+                }
+                
+                // Admin username'ini güncelle
+                const adminUsername = document.getElementById('admin-username');
+                if (adminUsername) {
+                    adminUsername.textContent = userData.username;
+                }
+                
+                console.log('Admin profile updated:', userData.username);
+            }
+        } catch (error) {
+            console.error('Error loading admin profile:', error);
+        }
+    }
+
+    // Sayfa yüklendiğinde admin profilini yükle
+    loadAdminProfile();
 });

@@ -215,6 +215,14 @@ body {
     transform: scale(1.05);
 }
 
+.admin-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #7289da;
+}
+
 .admin-icon {
     font-size: 24px;
     color: #7289da;
