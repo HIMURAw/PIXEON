@@ -33,12 +33,12 @@
                             <li><a href="#discord-dashboard" class="dashboard-subitem"><span
                                         class="submenu-dot"></span><i class="fab fa-discord"></i> Discord Dashboard</a>
                             </li>
-                            <li><a href="#discord-dashboard" class="dashboard-subitem"><span
+                            <li><a href="#purchase-dashboard-content" class="dashboard-subitem"><span
                                         class="submenu-dot"></span><i class="fa-solid fa-wallet"></i></i> Purchase
                                     Dashboard</a>
                             </li>
-                            <li><a href="#discord-dashboard" class="dashboard-subitem"><span
-                                        class="submenu-dot"></span><i class="fa-solid fa-chart-line"></i> Activite
+                            <li><a href="#activity-dashboard-content" class="dashboard-subitem"><span
+                                        class="submenu-dot"></span><i class="fa-solid fa-chart-line"></i> Activity
                                     Dashboard</a>
                             </li>
                         </ul>
@@ -51,18 +51,18 @@
                             <i class="fas fa-chevron-down sidebar-arrow"></i>
                         </a>
                         <ul class="sidebar-submenu" style="display: none;">
-                            <li><a href="#discord-dashboard" class="log-subitem"><span
+                            <li><a href="#discord-login-history" class="log-subitem"><span
                                         class="submenu-dot"></span><i class="fa-solid fa-users"></i> Discord Login &
                                     Logout
                                     History</a>
                             </li>
-                            <li><a href="#discord-dashboard" class="log-subitem"><span
-                                        class="submenu-dot"></span><i class="fa-solid fa-wallet"></i></i> Purchase
-                                    Dashboard</a>
+                            <li><a href="#purchase-history" class="log-subitem"><span
+                                        class="submenu-dot"></span><i class="fa-solid fa-wallet"></i> Purchase
+                                    History</a>
                             </li>
-                            <li><a href="#discord-dashboard" class="log-subitem"><span
-                                        class="submenu-dot"></span><i class="fa-solid fa-chart-line"></i> Activite
-                                    Dashboard</a>
+                            <li><a href="#activity-history" class="log-subitem"><span
+                                        class="submenu-dot"></span><i class="fa-solid fa-chart-line"></i> Activity
+                                    History</a>
                             </li>
                         </ul>
                     </li>
@@ -106,7 +106,7 @@
             </header>
 
             <!-- Discord Dashboard Content -->
-            <div class="dashboard-content" id="discord-dashboard-content">
+            <div class="dashboard-content" id="discord-dashboard">
                 <!-- Stats Cards -->
                 <div class="stats-grid">
                     <div class="stat-card">
@@ -330,20 +330,7 @@
                 </div>
             </div>
 
-            <!-- Settings Content -->
-            <div class="settings-content" style="display: none;">
-                <h2>Settings</h2>
-                <div class="settings-grid">
-                    <div class="settings-card">
-                        <div class="card-header">
-                            <h3>General Settings</h3>
-                        </div>
-                        <div class="card-content">
-                            <!-- Settings form will be here -->
-                        </div>
-                    </div>
-                </div>
-            </div>
+
 
             <!-- Discord Members Content -->
             <div class="discord-members-content" style="display: none;">
@@ -389,8 +376,359 @@
                 </div>
             </div>
 
+
+
+
+
+    <!-- PAGES -->
+
+            <!-- Purchase Dashboard Content -->
+            <div class="purchase-dashboard-content" id="purchase-dashboard-content">
+                <!-- Satış İstatistikleri -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Toplam Kazanç</h3>
+                            <p id="totalEarnings">₺0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Toplam Satış</h3>
+                            <p id="totalSales">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Müşteri Sayısı</h3>
+                            <p id="customerCount">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Ortalama Sipariş</h3>
+                            <p id="averageOrder">₺0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ek İstatistikler -->
+                <div class="stats-grid" style="margin-top: 20px;">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                            <i class="fas fa-calendar-day"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Bugünkü Satış</h3>
+                            <p id="todaySales">₺0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
+                            <i class="fas fa-calendar-week"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Bu Hafta</h3>
+                            <p id="weeklySales">₺0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Bu Ay</h3>
+                            <p id="monthlySales">₺0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>En Popüler Ürün</h3>
+                            <p id="popularProduct">-</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Satış Özeti -->
+                <div class="sales-summary">
+                    <h2>Satış Özeti</h2>
+                    <p class="last-updated">Son güncelleme: <span id="lastUpdated">-</span></p>
+                </div>
+    
+                <!-- Satış Detayları -->
+                <div class="discord-details">
+                    <!-- Son Satışlar -->
+                    <div class="detail-card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-clock"></i> Son Satışlar</h3>
+                            <div class="card-actions">
+                                <button class="btn-refresh" title="Yenile" onclick="refreshRecentSales()">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="recent-sales-list" id="recentSalesList">
+                                <div class="loading-spinner">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                    <span>Son satışlar yükleniyor...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- En Çok Satan Ürünler -->
+                    <div class="detail-card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-trophy"></i> En Çok Satan Ürünler</h3>
+                            <div class="card-actions">
+                                <button class="btn-refresh" title="Yenile" onclick="refreshTopProducts()">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="top-products-list" id="topProductsList">
+                                <div class="loading-spinner">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                    <span>En çok satan ürünler yükleniyor...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Satış Grafiği -->
+                    <div class="detail-card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-chart-area"></i> Satış Grafiği</h3>
+                            <div class="card-actions">
+                                <select id="chartPeriod" onchange="updateSalesChart()">
+                                    <option value="7">Son 7 Gün</option>
+                                    <option value="30">Son 30 Gün</option>
+                                    <option value="90">Son 3 Ay</option>
+                                </select>
+                                <button class="btn-refresh" title="Yenile" onclick="refreshSalesChart()">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="sales-chart">
+                                <canvas id="salesChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Müşteri Analizi -->
+                    <div class="detail-card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-user-chart"></i> Müşteri Analizi</h3>
+                            <div class="card-actions">
+                                <button class="btn-refresh" title="Yenile" onclick="refreshCustomerAnalysis()">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="customer-analysis">
+                                <div class="customer-metrics">
+                                    <div class="metric">
+                                        <span class="metric-label">Yeni Müşteriler</span>
+                                        <span class="metric-value" id="newCustomers">0</span>
+                                    </div>
+                                    <div class="metric">
+                                        <span class="metric-label">Tekrar Eden Müşteriler</span>
+                                        <span class="metric-value" id="returningCustomers">0</span>
+                                    </div>
+                                    <div class="metric">
+                                        <span class="metric-label">Ortalama Müşteri Değeri</span>
+                                        <span class="metric-value" id="customerLifetimeValue">₺0</span>
+                                    </div>
+                                </div>
+                                <div class="customer-chart">
+                                    <canvas id="customerChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Satış Kategorileri -->
+                    <div class="detail-card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-tags"></i> Satış Kategorileri</h3>
+                            <div class="card-actions">
+                                <button class="btn-refresh" title="Yenile" onclick="refreshCategorySales()">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="category-sales">
+                                <div class="category-chart">
+                                    <canvas id="categoryChart"></canvas>
+                                </div>
+                                <div class="category-list" id="categoryList">
+                                    <div class="loading-spinner">
+                                        <i class="fas fa-spinner fa-spin"></i>
+                                        <span>Kategori satışları yükleniyor...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Satış Performansı -->
+                    <div class="detail-card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-tachometer-alt"></i> Satış Performansı</h3>
+                            <div class="card-actions">
+                                <button class="btn-refresh" title="Yenile" onclick="refreshPerformanceMetrics()">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="performance-metrics">
+                                <div class="performance-item">
+                                    <div class="performance-label">Dönüşüm Oranı</div>
+                                    <div class="performance-value" id="conversionRate">0%</div>
+                                    <div class="performance-bar">
+                                        <div class="performance-fill" id="conversionBar" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                                <div class="performance-item">
+                                    <div class="performance-label">Sepet Ortalaması</div>
+                                    <div class="performance-value" id="cartAverage">₺0</div>
+                                    <div class="performance-bar">
+                                        <div class="performance-fill" id="cartBar" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                                <div class="performance-item">
+                                    <div class="performance-label">Müşteri Memnuniyeti</div>
+                                    <div class="performance-value" id="customerSatisfaction">0%</div>
+                                    <div class="performance-bar">
+                                        <div class="performance-fill" id="satisfactionBar" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+                <!-- Activity Dashboard Content -->
+            <div class="activity-dashboard-content" id="activity-dashboard-content">
+            <h2>Activity Dashboard</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-chart-line"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Daily Activity</h3>
+                        <p>Loading...</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-clock"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Peak Hours</h3>
+                        <p>Loading...</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-calendar"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Weekly Trends</h3>
+                        <p>Loading...</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-trophy"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Top Performers</h3>
+                        <p>Loading...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <!-- Discord Login History Content -->
+        <div class="discord-login-history-content" id="discord-login-history" style="display: none;">
+            <h2>Discord Login & Logout History</h2>
+            <div class="history-list">
+                <div class="loading-spinner">Loading login history...</div>
+            </div>
+        </div>
+    
+        <!-- Purchase History Content -->
+        <div class="purchase-history-content" id="purchase-history" style="display: none;">
+            <h2>Purchase History</h2>
+            <div class="history-list">
+                <div class="loading-spinner">Loading purchase history...</div>
+            </div>
+        </div>
+    
+        <!-- Activity History Content -->
+        <div class="activity-history-content" id="activity-history" style="display: none;">
+            <h2>Activity History</h2>
+            <div class="history-list">
+                <div class="loading-spinner">Loading activity history...</div>
+            </div>
+        </div>
+    
+        <!-- Settings Content -->
+        <div class="settings-content" id="settings" style="display: none;">
+            <h2>Settings</h2>
+            <div class="settings-grid">
+                <div class="settings-card">
+                    <div class="card-header">
+                        <h3>General Settings</h3>
+                    </div>
+                    <div class="card-content">
+                        <!-- Settings form will be here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
         </main>
     </div>
+
+
+
+
+
+
+
+
+
+
+    <!-- MODALS -->
 
     <!-- Member Details Modal -->
     <div id="memberModal" class="modal">
