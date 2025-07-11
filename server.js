@@ -85,14 +85,18 @@ async function registerCommands() {
         if (!Config.discord.clientId) {
             throw new Error('Client ID is missing in config.json');
         }
+        if (!Config.discord.guidid) {
+            throw new Error('Guild ID (guidid) is missing in config.json');
+        }
 
         const rest = new REST().setToken(token);
+        // Komutları sadece belirli bir sunucuya kaydet
         const data = await rest.put(
-            Routes.applicationCommands(Config.discord.clientId),
+            Routes.applicationGuildCommands(Config.discord.clientId, Config.discord.guidid),
             { body: commands },
         );
 
-        console.log(`✅ Successfully reloaded ${data.length} application (/) commands.`);
+        console.log(`✅ Successfully reloaded ${data.length} guild application (/) commands.`);
         console.log('📝 Registered commands:');
         data.forEach(cmd => {
             console.log(`   - /${cmd.name}: ${cmd.description}`);
@@ -182,7 +186,6 @@ const loginRouter = require('./private/DB/loginRouter');
 const discordUsersRouter = require('./private/routers/discordUsers.js');
 const discordServerRouter = require('./private/routers/discordServer.js');
 const discordChannelRouter = require('./private/routers/discordChannel.js');
-const fivemPlayersRouter = require('./private/routers/fivemplayer.js');
 const ConfigRouter = require('./private/routers/configAPI.js');
 const discordLoginRouter = require('./private/routers/discordLogin');
 const { config } = require('process');
@@ -191,7 +194,6 @@ app.use('/api/auth', loginRouter);
 app.use('/api/discordUsers', discordUsersRouter);
 app.use('/api/discordServer', discordServerRouter);
 app.use('/api/discordChannel', discordChannelRouter);
-app.use('/api/fivem', fivemPlayersRouter);
 app.use('/api/config', ConfigRouter);
 app.use('/auth/discord', discordLoginRouter);
 
