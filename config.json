@@ -5,7 +5,7 @@
         "encryptionKey": "perronunanasininaminiyalayanutkininsikininkiliamacrypticin"
     },
     "discord": {
-        "token": "MTI0NzMyNTY3OTMyNjk4NjI1MA.GUB21K.fk3XSiLfM5f6uiMaev7Nw_2ijDYa-b77_iaD30",
+        "token": "MTIzODI2ODU2MjE3MTIzNjM4NA.GxHzP7.2p7U9PZmEBhvy2JVXGVCUltY1UHtQc2SsSdLv8",
         "clientId": "1247325679326986250",
         "guidid": "1269430268402335867",
         "voicechannel": "1271919365368840212",
@@ -19,9 +19,5 @@
         "user": "root",
         "password": "",
         "database": "fivemwebpanel"
-    },
-    "fivem": {
-        "serverIP": "213.142.159.118",
-        "serverPort": "30120"
     }
 }
