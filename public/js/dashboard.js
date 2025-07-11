@@ -32,21 +32,21 @@ document.addEventListener('DOMContentLoaded', function () {
     // Sidebar menü işlemleri
     const menuItems = document.querySelectorAll('.sidebar-nav li');
     const contentSections = {
-        'dashboard': document.querySelector('.dashboard-content'),
-        'fivem-players': document.querySelector('.fivem-players-content'),
-        'discord-members': document.querySelector('.discord-members-content'),
-        'players': document.querySelector('.players-content'),
-        'servers': document.querySelector('.servers-content'),
-        'bans': document.querySelector('.bans-content'),
-        'settings': document.querySelector('.settings-content'),
+        'discord-dashboard': document.getElementById('discord-dashboard'),
+        'purchase-dashboard-content': document.getElementById('purchase-dashboard-content'),
+        'activity-dashboard-content': document.getElementById('activity-dashboard-content'),
+        'discord-login-history': document.getElementById('discord-login-history'),
+        'purchase-history': document.getElementById('purchase-history'),
+        'activity-history': document.getElementById('activity-history'),
+        'settings': document.getElementById('settings'),
     };
 
-    // İlk yüklemede dashboard içeriğini göster
-    showContent('dashboard');
+    // İlk yüklemede Discord dashboard içeriğini göster
+    showContent('discord-dashboard');
 
     menuItems.forEach(item => {
         item.addEventListener('click', (e) => {
-            // Eğer sidebar-parent (dashboard) ise, bu event çalışmasın
+            // Eğer sidebar-parent ise, bu event çalışmasın
             if (item.classList.contains('sidebar-parent')) return;
             e.preventDefault();
             // Aktif menü öğesini güncelle
@@ -109,7 +109,8 @@ document.addEventListener('DOMContentLoaded', function () {
     dashboardSubitems.forEach(item => {
         item.addEventListener('click', function (e) {
             e.preventDefault();
-            showContent(this.getAttribute('href').replace('#', ''));
+            const targetSection = this.getAttribute('href').replace('#', '');
+            showContent(targetSection);
             // Aktiflik vurgusu
             dashboardSubitems.forEach(i => i.parentElement.classList.remove('active'));
             this.parentElement.classList.add('active');
@@ -121,39 +122,31 @@ document.addEventListener('DOMContentLoaded', function () {
     logSubitems.forEach(item => {
         item.addEventListener('click', function (e) {
             e.preventDefault();
-            showContent(this.getAttribute('href').replace('#', ''));
+            const targetSection = this.getAttribute('href').replace('#', '');
+            showContent(targetSection);
             // Aktiflik vurgusu
             logSubitems.forEach(i => i.parentElement.classList.remove('active'));
             this.parentElement.classList.add('active');
         });
     });
 
-    // İçerik gösterme fonksiyonunu güncelle
+    // İçerik gösterme fonksiyonu
     function showContent(section) {
-        // Tüm ana içerikleri gizle
-        Object.values(contentSections).forEach(content => {
-            if (content) content.style.display = 'none';
+        console.log('Switching to section:', section);
+        
+        // Tüm content section'ları gizle
+        const allContentSections = document.querySelectorAll('.dashboard-content, .purchase-dashboard-content, .activity-dashboard-content, .discord-login-history-content, .purchase-history-content, .activity-history-content, .settings-content');
+        allContentSections.forEach(content => {
+            content.style.display = 'none';
         });
-        // Hem discord hem fivem dashboard içeriklerini gizle
-        var discordDashboard = document.getElementById('discord-dashboard-content');
-        var fivemDashboard = document.getElementById('fivem-dashboard-content');
-        if (discordDashboard) discordDashboard.style.display = 'none';
-        if (fivemDashboard) fivemDashboard.style.display = 'none';
+        
         // Seçili olanı göster
-        if (section === 'fivem-dashboard') {
-            if (fivemDashboard) fivemDashboard.style.display = 'block';
-        } else if (section === 'discord-dashboard') {
-            if (discordDashboard) discordDashboard.style.display = 'block';
-        } else if (contentSections[section]) {
-            contentSections[section].style.display = 'block';
-            // Dashboard içeriği gösterildiğinde verileri yükle
-            if (section === 'dashboard') {
-                console.log('Loading dashboard data...');
-                if (typeof updateServerStats === 'function') updateServerStats();
-                if (typeof refreshUserHistory === 'function') refreshUserHistory();
-                if (typeof refreshServerActivity === 'function') refreshServerActivity();
-                updateActiveBansCount();
-            }
+        const targetSection = document.getElementById(section);
+        if (targetSection) {
+            targetSection.style.display = 'block';
+            console.log('Successfully showed:', section);
+        } else {
+            console.error('Section not found:', section);
         }
     }
 
@@ -202,9 +195,221 @@ document.addEventListener('DOMContentLoaded', function () {
     const adminProfile = document.querySelector('.admin-profile');
     if (adminProfile) {
         adminProfile.addEventListener('click', function () {
-            // Profil menüsü
+            // Admin profile modal
         });
     }
+
+    // Purchase Dashboard Functions
+    function loadPurchaseDashboard() {
+        console.log('Loading purchase dashboard...');
+        
+        // Simulate loading data
+        setTimeout(() => {
+            updateSalesStats();
+            loadRecentSales();
+            loadTopProducts();
+            loadCustomerAnalysis();
+            loadCategorySales();
+            loadPerformanceMetrics();
+            updateLastUpdated();
+        }, 1000);
+    }
+
+    function updateSalesStats() {
+        // Simulate sales data
+        const stats = {
+            totalEarnings: 15420.50,
+            totalSales: 342,
+            customerCount: 156,
+            averageOrder: 45.09,
+            todaySales: 1250.75,
+            weeklySales: 8750.25,
+            monthlySales: 15420.50,
+            popularProduct: 'Premium VIP Paket'
+        };
+
+        document.getElementById('totalEarnings').textContent = `₺${stats.totalEarnings.toLocaleString()}`;
+        document.getElementById('totalSales').textContent = stats.totalSales.toLocaleString();
+        document.getElementById('customerCount').textContent = stats.customerCount.toLocaleString();
+        document.getElementById('averageOrder').textContent = `₺${stats.averageOrder.toLocaleString()}`;
+        document.getElementById('todaySales').textContent = `₺${stats.todaySales.toLocaleString()}`;
+        document.getElementById('weeklySales').textContent = `₺${stats.weeklySales.toLocaleString()}`;
+        document.getElementById('monthlySales').textContent = `₺${stats.monthlySales.toLocaleString()}`;
+        document.getElementById('popularProduct').textContent = stats.popularProduct;
+    }
+
+    function loadRecentSales() {
+        const recentSalesList = document.getElementById('recentSalesList');
+        const sales = [
+            { customer: 'Ahmet Yılmaz', product: 'Premium VIP Paket', amount: 150.00, date: '2 saat önce' },
+            { customer: 'Mehmet Demir', product: 'Gold Paket', amount: 75.00, date: '3 saat önce' },
+            { customer: 'Ayşe Kaya', product: 'Silver Paket', amount: 50.00, date: '4 saat önce' },
+            { customer: 'Ali Özkan', product: 'Premium VIP Paket', amount: 150.00, date: '5 saat önce' },
+            { customer: 'Fatma Şahin', product: 'Bronze Paket', amount: 25.00, date: '6 saat önce' }
+        ];
+
+        recentSalesList.innerHTML = sales.map(sale => `
+            <div class="sale-item">
+                <div class="sale-avatar">${sale.customer.charAt(0)}</div>
+                <div class="sale-info">
+                    <div class="sale-customer">${sale.customer}</div>
+                    <div class="sale-product">${sale.product}</div>
+                    <div class="sale-date">${sale.date}</div>
+                </div>
+                <div class="sale-amount">₺${sale.amount.toLocaleString()}</div>
+            </div>
+        `).join('');
+    }
+
+    function loadTopProducts() {
+        const topProductsList = document.getElementById('topProductsList');
+        const products = [
+            { name: 'Premium VIP Paket', category: 'VIP', sales: 89, revenue: 13350.00 },
+            { name: 'Gold Paket', category: 'Premium', sales: 67, revenue: 5025.00 },
+            { name: 'Silver Paket', category: 'Premium', sales: 45, revenue: 2250.00 },
+            { name: 'Bronze Paket', category: 'Basic', sales: 34, revenue: 850.00 },
+            { name: 'Starter Paket', category: 'Basic', sales: 28, revenue: 560.00 }
+        ];
+
+        topProductsList.innerHTML = products.map((product, index) => `
+            <div class="product-item">
+                <div class="product-rank rank-${index + 1}">${index + 1}</div>
+                <div class="product-info">
+                    <div class="product-name">${product.name}</div>
+                    <div class="product-category">${product.category}</div>
+                    <div class="product-sales">${product.sales} satış</div>
+                </div>
+                <div class="product-revenue">₺${product.revenue.toLocaleString()}</div>
+            </div>
+        `).join('');
+    }
+
+    function loadCustomerAnalysis() {
+        document.getElementById('newCustomers').textContent = '23';
+        document.getElementById('returningCustomers').textContent = '133';
+        document.getElementById('customerLifetimeValue').textContent = '₺98.85';
+    }
+
+    function loadCategorySales() {
+        const categoryList = document.getElementById('categoryList');
+        const categories = [
+            { name: 'VIP Paketler', percentage: 45 },
+            { name: 'Premium Paketler', percentage: 30 },
+            { name: 'Basic Paketler', percentage: 15 },
+            { name: 'Özel Ürünler', percentage: 10 }
+        ];
+
+        categoryList.innerHTML = categories.map(category => `
+            <div class="category-item">
+                <span class="category-name">${category.name}</span>
+                <span class="category-percentage">%${category.percentage}</span>
+            </div>
+        `).join('');
+    }
+
+    function loadPerformanceMetrics() {
+        const metrics = {
+            conversionRate: 3.2,
+            cartAverage: 45.09,
+            customerSatisfaction: 4.8
+        };
+
+        document.getElementById('conversionRate').textContent = `%${metrics.conversionRate}`;
+        document.getElementById('cartAverage').textContent = `₺${metrics.cartAverage}`;
+        document.getElementById('customerSatisfaction').textContent = `${metrics.customerSatisfaction}/5`;
+
+        // Update progress bars
+        document.getElementById('conversionBar').style.width = `${metrics.conversionRate * 10}%`;
+        document.getElementById('cartBar').style.width = `${(metrics.cartAverage / 100) * 100}%`;
+        document.getElementById('satisfactionBar').style.width = `${(metrics.customerSatisfaction / 5) * 100}%`;
+    }
+
+    function updateLastUpdated() {
+        const now = new Date();
+        const timeString = now.toLocaleString('tr-TR');
+        document.getElementById('lastUpdated').textContent = timeString;
+    }
+
+    // Refresh functions
+    function refreshRecentSales() {
+        const button = event.target.closest('.btn-refresh');
+        const icon = button.querySelector('i');
+        icon.style.animation = 'spin 1s linear';
+        
+        setTimeout(() => {
+            loadRecentSales();
+            icon.style.animation = '';
+        }, 1000);
+    }
+
+    function refreshTopProducts() {
+        const button = event.target.closest('.btn-refresh');
+        const icon = button.querySelector('i');
+        icon.style.animation = 'spin 1s linear';
+        
+        setTimeout(() => {
+            loadTopProducts();
+            icon.style.animation = '';
+        }, 1000);
+    }
+
+    function refreshCustomerAnalysis() {
+        const button = event.target.closest('.btn-refresh');
+        const icon = button.querySelector('i');
+        icon.style.animation = 'spin 1s linear';
+        
+        setTimeout(() => {
+            loadCustomerAnalysis();
+            icon.style.animation = '';
+        }, 1000);
+    }
+
+    function refreshCategorySales() {
+        const button = event.target.closest('.btn-refresh');
+        const icon = button.querySelector('i');
+        icon.style.animation = 'spin 1s linear';
+        
+        setTimeout(() => {
+            loadCategorySales();
+            icon.style.animation = '';
+        }, 1000);
+    }
+
+    function refreshPerformanceMetrics() {
+        const button = event.target.closest('.btn-refresh');
+        const icon = button.querySelector('i');
+        icon.style.animation = 'spin 1s linear';
+        
+        setTimeout(() => {
+            loadPerformanceMetrics();
+            icon.style.animation = '';
+        }, 1000);
+    }
+
+    function refreshSalesChart() {
+        const button = event.target.closest('.btn-refresh');
+        const icon = button.querySelector('i');
+        icon.style.animation = 'spin 1s linear';
+        
+        setTimeout(() => {
+            // Update chart logic here
+            icon.style.animation = '';
+        }, 1000);
+    }
+
+    function updateSalesChart() {
+        // Chart update logic here
+        console.log('Updating sales chart...');
+    }
+
+    // Load purchase dashboard when switching to it
+    const originalShowContent = showContent;
+    showContent = function(section) {
+        originalShowContent(section);
+        if (section === 'purchase-dashboard-content') {
+            loadPurchaseDashboard();
+        }
+    };
 
     // Responsive sidebar
     function checkScreenSize() {

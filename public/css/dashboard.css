@@ -131,7 +131,9 @@ body {
     flex: 1;
     margin-left: var(--sidebar-width);
     min-height: 100vh;
-    background-color: #f4f6f9;
+    background-color: var(--primary-color);
+    display: flex;
+    flex-direction: column;
 }
 
 /* Header Styles */
@@ -145,6 +147,7 @@ body {
     position: sticky;
     top: 0;
     z-index: 100;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .header-left {
@@ -296,6 +299,11 @@ body {
     grid-template-columns: repeat(3, 1fr);
     gap: 20px;
     margin-top: 20px;
+}
+
+/* Purchase Dashboard için özel grid düzeni */
+.purchase-dashboard-content .discord-details {
+    grid-template-columns: repeat(2, 1fr);
 }
 
 .detail-card {
@@ -1172,18 +1180,334 @@ body {
 }
 
 /* Content Sections */
-.discord-members-content,
-.servers-content,
-.bans-content,
+.dashboard-content,
+.purchase-dashboard-content,
+.activity-dashboard-content,
+.discord-login-history-content,
+.purchase-history-content,
+.activity-history-content,
 .settings-content {
+    flex: 1;
     padding: 20px;
     background-color: var(--primary-color);
+    overflow-y: auto;
+    display: none; /* Varsayılan olarak gizli */
+}
+
+/* İlk dashboard content'i varsayılan olarak görünür */
+#discord-dashboard {
+    display: block;
+}
+
+/* History Content Styles */
+.discord-login-history-content,
+.purchase-history-content,
+.activity-history-content {
+    padding: 20px;
+    background-color: var(--primary-color);
+}
+
+.history-list {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 20px;
+    border: 1px solid var(--border-color);
+    min-height: 400px;
+}
+
+/* Purchase Dashboard Specific Styles */
+.purchase-dashboard-content h2,
+.activity-dashboard-content h2,
+.discord-login-history-content h2,
+.purchase-history-content h2,
+.activity-history-content h2 {
+    font-size: 1.5rem;
+    color: var(--text-primary);
+    margin: 0 0 20px 0;
+    font-weight: 600;
+}
+
+/* Sales Summary */
+.sales-summary {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 30px;
+    border: 1px solid var(--border-color);
+}
+
+/* Recent Sales List */
+.recent-sales-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.sale-item {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    border-bottom: 1px solid var(--border-color);
+    transition: background-color 0.2s;
+}
+
+.sale-item:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.sale-item:last-child {
+    border-bottom: none;
+}
+
+.sale-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 12px;
+    background: var(--accent-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+}
+
+.sale-info {
+    flex: 1;
+}
+
+.sale-customer {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.sale-product {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 2px;
+}
+
+.sale-date {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.sale-amount {
+    font-weight: 600;
+    color: #28a745;
+    font-size: 1.1rem;
+}
+
+/* Top Products List */
+.top-products-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.product-item {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    border-bottom: 1px solid var(--border-color);
+    transition: background-color 0.2s;
+}
+
+.product-item:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.product-item:last-child {
+    border-bottom: none;
+}
+
+.product-rank {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--accent-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    margin-right: 12px;
+    font-size: 0.9rem;
+}
+
+.product-rank.rank-1 {
+    background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+    color: #333;
+}
+
+.product-rank.rank-2 {
+    background: linear-gradient(135deg, #c0c0c0 0%, #e5e5e5 100%);
+    color: #333;
+}
+
+.product-rank.rank-3 {
+    background: linear-gradient(135deg, #cd7f32 0%, #daa520 100%);
+    color: white;
+}
+
+.product-info {
+    flex: 1;
+}
+
+.product-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.product-category {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 2px;
+}
+
+.product-sales {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.product-revenue {
+    font-weight: 600;
+    color: #28a745;
+    font-size: 1.1rem;
+}
+
+/* Customer Analysis */
+.customer-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.customer-chart {
+    height: 200px;
+    margin-top: 20px;
+}
+
+/* Category Sales */
+.category-sales {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.category-chart {
+    height: 200px;
+    margin-bottom: 20px;
+}
+
+.category-list {
+    flex: 1;
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.category-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.category-item:last-child {
+    border-bottom: none;
+}
+
+.category-name {
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.category-percentage {
+    font-weight: 600;
+    color: var(--accent-color);
+}
+
+/* Performance Metrics */
+.performance-metrics {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.performance-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.performance-label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.performance-value {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.performance-bar {
+    width: 100%;
+    height: 8px;
+    background-color: var(--border-color);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.performance-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-color) 0%, #28a745 100%);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+/* Sales Chart */
+.sales-chart {
+    height: 250px;
+    position: relative;
+}
+
+/* Chart Period Selector */
+#chartPeriod {
+    background: var(--secondary-color);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    padding: 6px 10px;
+    border-radius: 4px;
+    margin-right: 10px;
+    font-size: 0.9rem;
+}
+
+#chartPeriod:focus {
+    outline: none;
+    border-color: var(--accent-color);
 }
 
 /* Responsive Design */
 @media (max-width: 1200px) {
     .discord-details {
         grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .main-content {
+        margin-left: 0;
+    }
+    
+    .sidebar {
+        transform: translateX(-100%);
+    }
+    
+    .sidebar.active {
+        transform: translateX(0);
     }
 }
 
@@ -1206,6 +1530,18 @@ body {
 
     .discord-details {
         grid-template-columns: 1fr;
+    }
+    
+    .purchase-dashboard-content .discord-details {
+        grid-template-columns: 1fr;
+    }
+    
+    .main-content {
+        margin-left: 0;
+    }
+    
+    .sidebar-toggle {
+        display: block;
     }
 }
 
@@ -1247,5 +1583,9 @@ body {
     .message-avatar {
         width: 32px;
         height: 32px;
+    }
+    
+    .main-content {
+        margin-left: 0;
     }
 }
