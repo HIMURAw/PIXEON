@@ -33,8 +33,6 @@
                             <li><a href="#discord-dashboard" class="dashboard-subitem"><span
                                         class="submenu-dot"></span><i class="fab fa-discord"></i> Discord Dashboard</a>
                             </li>
-                            <li><a href="#fivem-dashboard" class="dashboard-subitem"><span class="submenu-dot"></span><i
-                                        class="fab fa-steam-symbol"></i> Fivem Dashboard</a></li>
                         </ul>
                     </li>
                     <li class="sidebar-parent" id="playersMenu">
@@ -44,8 +42,6 @@
                             <i class="fas fa-chevron-down sidebar-arrow"></i>
                         </a>
                         <ul class="sidebar-submenu" style="display: none;">
-                            <li><a href="#fivem-players" class="players-subitem"><span class="submenu-dot"></span><i
-                                        class="fas fa-gamepad"></i> FiveM Players</a></li>
                             <li><a href="#discord-members" class="players-subitem"><span class="submenu-dot"></span><i
                                         class="fab fa-discord"></i> Discord Members</a></li>
                         </ul>
@@ -66,12 +62,6 @@
                         <a href="#settings">
                             <i class="fas fa-cog"></i>
                             <span>Settings</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#maps">
-                            <i class="fas fa-map"></i>
-                            <span>Fivem Map</span>
                         </a>
                     </li>
                 </ul>
@@ -99,7 +89,8 @@
                 </div>
                 <div class="header-right">
                     <div class="admin-profile">
-                        <img id="admin-avatar" src="https://cdn.discordapp.com/embed/avatars/0.png" alt="Admin Avatar" class="admin-avatar">
+                        <img id="admin-avatar" src="https://cdn.discordapp.com/embed/avatars/0.png" alt="Admin Avatar"
+                            class="admin-avatar">
                         <span id="admin-username">Admin</span>
                     </div>
                 </div>
@@ -330,228 +321,26 @@
                 </div>
             </div>
 
-            <!-- FiveM Dashboard Content -->
-            <div class="dashboard-content" id="fivem-dashboard-content">
-                <!-- Stats Cards -->
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon">
-                            <i class="fas fa-users"></i>
+            <!-- Settings Content -->
+            <div class="settings-content" style="display: none;">
+                <h2>Settings</h2>
+                <div class="settings-grid">
+                    <div class="settings-card">
+                        <div class="card-header">
+                            <h3>General Settings</h3>
                         </div>
-                        <div class="stat-info">
-                            <h3>Total Players</h3>
-                            <p>Loading...</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">
-                            <i class="fas fa-server"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3>Online Players</h3>
-                            <p>Loading...</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">
-                            <i class="fas fa-ban"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3>Server Bans</h3>
-                            <p id="active-bans-count">Loading...</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">
-                            <i class="fas fa-chart-line"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3>Aktiflik Oranı</h3>
-                            <p>65%</p>
+                        <div class="card-content">
+                            <!-- Settings form will be here -->
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Additional Stats Cards -->
-                <div class="stats-grid" style="margin-top: 20px;">
-                    <div class="stat-card">
-                        <div class="stat-icon">
-                            <i class="fas fa-headset"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3>Ses Kanalları</h3>
-                            <p>Loading...</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">
-                            <i class="fas fa-comments"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3>Aktif Kanallar</h3>
-                            <p>Loading...</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">
-                            <i class="fas fa-rocket"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3>Boost Sayısı</h3>
-                            <p>Loading...</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">
-                            <i class="fas fa-clock"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3>Sunucu Yaşı</h3>
-                            <p>Loading...</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Server Info -->
-                <div class="server-info" id="fivem-server-info">
-                    <h2>Loading...</h2>
-                    <p class="last-updated">Last updated: -</p>
-                </div>
-
-                <!-- Discord Server Details -->
-                <div class="discord-details" id="fivem-discord-details">
-                    <!-- Channels Section -->
-                    <div class="detail-card">
-                        <div class="card-header">
-                            <h3><i class="fas fa-hashtag"></i> Channels</h3>
-                            <div class="card-actions">
-                                <button class="btn-refresh" title="Refresh">
-                                    <i class="fas fa-sync-alt"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="card-content">
-                            <div class="channels-list" id="fivem-channels-list">
-                                <div class="loading-spinner">Loading channels...</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Members Section -->
-                    <div class="detail-card">
-                        <div class="card-header">
-                            <h3><i class="fas fa-users"></i> Members</h3>
-                            <div class="card-actions">
-                                <button class="btn-refresh" title="Refresh">
-                                    <i class="fas fa-sync-alt"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="card-content">
-                            <div class="members-list" id="fivem-members-list">
-                                <div class="loading-spinner">Loading members...</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Recent Messages Section -->
-                    <div class="detail-card">
-                        <div class="card-header">
-                            <h3><i class="fas fa-comment-alt"></i> Recent Messages</h3>
-                            <div class="card-actions">
-                                <button class="btn-refresh" title="Refresh">
-                                    <i class="fas fa-sync-alt"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="card-content">
-                            <div class="messages-list" id="fivem-messages-list">
-                                <div class="loading-spinner">Loading messages...</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Moderation Panel -->
-                    <div class="detail-card">
-                        <div class="card-header">
-                            <h3><i class="fas fa-user-slash"></i> Banlı Kullanıcılar</h3>
-                            <div class="card-actions">
-                                <button class="btn-refresh" title="Yenile" onclick="refreshBannedUsers()">
-                                    <i class="fas fa-sync-alt"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="card-content">
-                            <div class="banned-users-list" id="fivem-bannedUsersList">
-                                <!-- Banlı kullanıcılar buraya dinamik olarak eklenecek -->
-                                <div class="loading-spinner">
-                                    <i class="fas fa-spinner fa-spin"></i>
-                                    <span>Banlı kullanıcılar yükleniyor...</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- User History -->
-                    <div class="detail-card">
-                        <div class="card-header">
-                            <h3><i class="fas fa-history"></i> User History</h3>
-                            <div class="card-actions">
-                                <button class="btn-refresh" title="Refresh" onclick="refreshUserHistory()">
-                                    <i class="fas fa-sync-alt"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="card-content">
-                            <div class="user-history" id="fivem-user-history">
-                                <div class="history-filters" id="fivem-history-filters">
-                                    <select id="fivem-historyType">
-                                        <option value="all">Tüm Geçmiş</option>
-                                        <option value="kick">Kickler</option>
-                                        <option value="ban">Banlar</option>
-                                        <option value="unban">Kaldırılan Banlar</option>
-                                    </select>
-                                    <input type="date" id="fivem-historyDate">
-                                </div>
-                                <div class="history-list" id="fivem-history-list">
-                                    <div class="loading-spinner">Loading history...</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Server Activity -->
-                    <div class="detail-card">
-                        <div class="card-header">
-                            <h3><i class="fas fa-chart-line"></i> Server Activity</h3>
-                            <div class="card-actions">
-                                <button class="btn-refresh" title="Refresh" onclick="refreshServerActivity()">
-                                    <i class="fas fa-sync-alt"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="card-content">
-                            <div class="activity-stats" id="fivem-activity-stats">
-                                <div class="activity-chart" id="fivem-activity-chart">
-                                    <canvas id="fivem-activityChart"></canvas>
-                                </div>
-                                <div class="activity-metrics" id="fivem-activity-metrics">
-                                    <div class="metric">
-                                        <span class="metric-label">Aktif Kullanıcılar</span>
-                                        <span class="metric-value" id="fivem-activeUsers">0</span>
-                                    </div>
-                                    <div class="metric">
-                                        <span class="metric-label">Ses Kanalı Kullanımı</span>
-                                        <span class="metric-value" id="fivem-voiceChannelUsage">0%</span>
-                                    </div>
-                                    <div class="metric">
-                                        <span class="metric-label">Mesaj Aktivitesi</span>
-                                        <span class="metric-value" id="fivem-messageActivity">0</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            <!-- Discord Members Content -->
+            <div class="discord-members-content" style="display: none;">
+                <h2><i class="fab fa-discord"></i> Discord Members</h2>
+                <div class="discord-members-list">
+                    <!-- Discord members will be dynamically added here -->
                 </div>
             </div>
 
@@ -573,109 +362,6 @@
                 </div>
             </div>
 
-            <!-- FiveM Players Content -->
-            <div class="fivem-players-content" style="display: none;">
-                <div class="content-header">
-                    <h2><i class="fas fa-gamepad"></i> FiveM Players</h2>
-                    <div class="header-actions">
-                        <button class="btn-refresh" id="refreshFivemPlayers" title="Refresh Players">
-                            <i class="fas fa-sync-alt"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Stats Cards -->
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon">
-                            <i class="fas fa-server"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3>Total Player</h3>
-                            <p id="fivem-max-players">0</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3>Online Players</h3>
-                            <p id="fivem-online-count">0</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">
-                            <i class="fas fa-chart-line"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3>PD</h3>
-                            <p id="fivem-server-load">0%</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">
-                            <i class="fas fa-clock"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3>Whitelist</h3>
-                            <p id="fivem-uptime">Loading...</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Players List -->
-                <div class="detail-card">
-                    <div class="card-header">
-                        <h3><i class="fas fa-list"></i> Online Players</h3>
-                        <div class="card-actions">
-                            <button class="btn-refresh" id="refreshPlayersList" title="Refresh">
-                                <i class="fas fa-sync-alt"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="card-content">
-                        <div class="players-table-container">
-                            <table class="data-table" id="fivem-players-table">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Oyuncu</th>
-                                        <th>Karakter</th>
-                                        <th>İş</th>
-                                        <th>Gang</th>
-                                        <th>Para</th>
-                                        <th>Durum</th>
-                                        <th>İşlemler</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="fivem-players-tbody">
-                                    <tr>
-                                        <td colspan="8" class="loading-spinner">Karakterler yükleniyor...</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Discord Members Content -->
-            <div class="discord-members-content" style="display: none;">
-                <h2><i class="fab fa-discord"></i> Discord Members</h2>
-                <div class="discord-members-list">
-                    <!-- Discord members will be dynamically added here -->
-                </div>
-            </div>
-
-            <!-- In-Game Players Content -->
-            <div class="players-content" style="display: none;">
-                <h2>In-Game Players</h2>
-                <div class="players-list">
-                    <!-- Players will be dynamically added here -->
-                </div>
-            </div>
-
             <!-- Bans Content -->
             <div class="bans-content" style="display: none;">
                 <h2>Ban Management</h2>
@@ -694,64 +380,8 @@
                 </div>
             </div>
 
-            <!-- Settings Content -->
-            <div class="settings-content" style="display: none;">
-                <h2>Settings</h2>
-                <div class="settings-grid">
-                    <div class="settings-card">
-                        <div class="card-header">
-                            <h3>General Settings</h3>
-                        </div>
-                        <div class="card-content">
-                            <!-- Settings form will be here -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- FiveM Map Content -->
-            <div class="map-content" style="display: none;">
-                <div class="map-header">
-                    <h2><i class="fas fa-map"></i> FiveM Map</h2>
-                    <div class="map-controls">
-                        <button id="refreshMapBtn" class="btn-refresh" title="Haritayı Yenile">
-                            <i class="fas fa-sync-alt"></i>
-                        </button>
-                        <button id="resetViewBtn" class="btn-reset" title="Görünümü Sıfırla">
-                            <i class="fas fa-home"></i>
-                        </button>
-                        <button id="fullscreenMapBtn" class="btn-fullscreen" title="Tam Ekran">
-                            <i class="fas fa-expand"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="map-container">
-                    <div class="map-wrapper">
-                        <canvas id="fivemMap" width="800" height="600"></canvas>
-                        <div class="map-overlay">
-
-                            <div class="player-count">
-                                <i class="fas fa-users"></i>
-                                <span id="onlinePlayerCount">0</span> Oyuncu Online
-                            </div>
-                        </div>
-                    </div>
-                    <div class="map-sidebar">
-                        <div class="player-list">
-                            <h3><i class="fas fa-users"></i> Online Oyuncular</h3>
-                            <div id="playerListContainer">
-                                <div class="loading-spinner">Oyuncular yükleniyor...</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </main>
     </div>
-
-
-    <!-- Modal -->
-
 
     <!-- Member Details Modal -->
     <div id="memberModal" class="modal">
@@ -795,295 +425,9 @@
         </div>
     </div>
 
-    <!-- Character Details Modal -->
-    <div id="characterModal" class="modal">
-        <div class="modal-content character-modal">
-            <div class="modal-header">
-                <h2><i class="fas fa-user"></i> Karakter Detayları</h2>
-                <button class="close-modal" onclick="closeCharacterModal()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="character-details">
-                    <div class="character-header">
-                        <div class="character-avatar">
-                            <i class="fas fa-user-circle"></i>
-                        </div>
-                        <div class="character-title">
-                            <h3 id="modalCharacterName"></h3>
-                            <span id="modalCitizenId"></span>
-                        </div>
-                    </div>
-
-                    <div class="character-sections">
-                        <!-- Personal Info Section -->
-                        <div class="character-section">
-                            <h4><i class="fas fa-id-card"></i> Kişisel Bilgiler</h4>
-                            <div class="info-grid">
-                                <div class="info-item">
-                                    <label>İsim</label>
-                                    <span id="modalFullName"></span>
-                                </div>
-                                <div class="info-item">
-                                    <label>Telefon</label>
-                                    <span id="modalPhone"></span>
-                                </div>
-                                <div class="info-item">
-                                    <label>Uyruk</label>
-                                    <span id="modalNationality"></span>
-                                </div>
-                                <div class="info-item">
-                                    <label>Doğum Tarihi</label>
-                                    <span id="modalBirthdate"></span>
-                                </div>
-                                <div class="info-item">
-                                    <label>Cinsiyet</label>
-                                    <span id="modalGender"></span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Job Info Section -->
-                        <div class="character-section">
-                            <h4><i class="fas fa-briefcase"></i> İş Bilgileri</h4>
-                            <div class="info-grid">
-                                <div class="info-item">
-                                    <label>İş</label>
-                                    <span id="modalJob"></span>
-                                </div>
-                                <div class="info-item">
-                                    <label>Seviye</label>
-                                    <span id="modalJobGrade"></span>
-                                </div>
-                                <div class="info-item">
-                                    <label>Maaş</label>
-                                    <span id="modalJobPayment"></span>
-                                </div>
-                                <div class="info-item">
-                                    <label>Görevde</label>
-                                    <span id="modalJobOnduty"></span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Gang Info Section -->
-                        <div class="character-section">
-                            <h4><i class="fas fa-users"></i> Gang Bilgileri</h4>
-                            <div class="info-grid">
-                                <div class="info-item">
-                                    <label>Gang</label>
-                                    <span id="modalGang"></span>
-                                </div>
-                                <div class="info-item">
-                                    <label>Seviye</label>
-                                    <span id="modalGangGrade"></span>
-                                </div>
-                                <div class="info-item">
-                                    <label>Boss</label>
-                                    <span id="modalGangBoss"></span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Money Info Section -->
-                        <div class="character-section">
-                            <h4><i class="fas fa-dollar-sign"></i> Para Durumu</h4>
-                            <div class="info-grid">
-                                <div class="info-item">
-                                    <label>Nakit</label>
-                                    <span id="modalCash"></span>
-                                </div>
-                                <div class="info-item">
-                                    <label>Banka</label>
-                                    <span id="modalBank"></span>
-                                </div>
-                                <div class="info-item">
-                                    <label>Kripto</label>
-                                    <span id="modalCrypto"></span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Status Info Section -->
-                        <div class="character-section">
-                            <h4><i class="fas fa-heartbeat"></i> Durum Bilgileri</h4>
-                            <div class="info-grid">
-                                <div class="info-item">
-                                    <label>Açlık</label>
-                                    <span id="modalHunger"></span>
-                                </div>
-                                <div class="info-item">
-                                    <label>Susuzluk</label>
-                                    <span id="modalThirst"></span>
-                                </div>
-                                <div class="info-item">
-                                    <label>Zırh</label>
-                                    <span id="modalArmor"></span>
-                                </div>
-                                <div class="info-item">
-                                    <label>Kan Grubu</label>
-                                    <span id="modalBloodtype"></span>
-                                </div>
-                                <div class="info-item">
-                                    <label>Stres</label>
-                                    <span id="modalStress"></span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Licenses Section -->
-                        <div class="character-section">
-                            <h4><i class="fas fa-id-badge"></i> Lisans Bilgileri</h4>
-                            <div class="info-grid">
-                                <div class="info-item">
-                                    <label>Sürücü</label>
-                                    <span id="modalDriverLicense"></span>
-                                </div>
-                                <div class="info-item">
-                                    <label>Silah</label>
-                                    <span id="modalWeaponLicense"></span>
-                                </div>
-                                <div class="info-item">
-                                    <label>İş</label>
-                                    <span id="modalBusinessLicense"></span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Other Info Section -->
-                        <div class="character-section">
-                            <h4><i class="fas fa-info-circle"></i> Diğer Bilgiler</h4>
-                            <div class="info-grid">
-                                <div class="info-item">
-                                    <label>Hapiste</label>
-                                    <span id="modalJail"></span>
-                                </div>
-                                <div class="info-item">
-                                    <label>Kelepçeli</label>
-                                    <span id="modalHandcuffed"></span>
-                                </div>
-                                <div class="info-item">
-                                    <label>Ölü</label>
-                                    <span id="modalDead"></span>
-                                </div>
-                                <div class="info-item">
-                                    <label>Wallet ID</label>
-                                    <span id="modalWalletId"></span>
-                                </div>
-                                <div class="info-item">
-                                    <label>Fingerprint</label>
-                                    <span id="modalFingerprint"></span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Last Updated Section -->
-                        <div class="character-section">
-                            <h4><i class="fas fa-clock"></i> Son Güncelleme</h4>
-                            <div class="info-grid">
-                                <div class="info-item">
-                                    <label>Güncelleme Zamanı</label>
-                                    <span id="modalLastUpdated"></span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Inventory Modal -->
-    <div id="inventoryModal" class="modal">
-        <div class="modal-content inventory-modal">
-            <div class="modal-header">
-                <h2><i class="fas fa-box"></i> Envanter</h2>
-                <button class="close-modal" onclick="closeInventoryModal()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="inventory-details">
-                    <div class="inventory-header">
-                        <div class="character-info">
-                            <h3 id="inventoryCharacterName"></h3>
-                            <span id="inventoryCitizenId"></span>
-                        </div>
-                        <div class="inventory-stats">
-                            <span class="item-count">Toplam: <span id="inventoryItemCount">0</span> item</span>
-                            <span class="weight-info">Ağırlık: <span id="inventoryWeight">0</span>kg</span>
-                        </div>
-                    </div>
-
-                    <div class="inventory-grid" id="inventoryGrid">
-                        <!-- Items will be loaded here -->
-                    </div>
-
-                    <div class="inventory-empty" id="inventoryEmpty" style="display: none;">
-                        <div class="empty-state">
-                            <i class="fas fa-box-open"></i>
-                            <h3>Envanter Boş</h3>
-                            <p>Bu karakterin envanterinde hiçbir item bulunmuyor.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Location Modal -->
-    <div id="locationModal" class="modal">
-        <div class="modal-content location-modal">
-            <div class="modal-header">
-                <h2><i class="fas fa-map-marker-alt"></i> Karakter Konumu</h2>
-                <button class="close-modal" onclick="closeLocationModal()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="location-details">
-                    <div class="location-header">
-                        <div class="character-info">
-                            <h3 id="locationCharacterName"></h3>
-                            <span id="locationCitizenId"></span>
-                        </div>
-                    </div>
-                    <div class="location-coords">
-                        <div class="coord-item">
-                            <label>X:</label>
-                            <span id="locationX"></span>
-                        </div>
-                        <div class="coord-item">
-                            <label>Y:</label>
-                            <span id="locationY"></span>
-                        </div>
-                        <div class="coord-item">
-                            <label>Z:</label>
-                            <span id="locationZ"></span>
-                        </div>
-                    </div>
-                    <div class="location-map-preview" id="locationMapPreview">
-                        <!-- Harita önizlemesi veya görseli buraya gelecek -->
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Map Player Modal -->
-    <div id="mapPlayerModal" class="modal"
-        style="display:none; position:fixed; z-index:10000; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.6); justify-content:center; align-items:center;">
-        <div class="modal-content"
-            style="background:#23272a; color:#fff; border-radius:10px; padding:32px 24px; min-width:320px; min-height:180px; position:relative; box-shadow:0 8px 32px #000a;">
-            <span id="closeMapPlayerModal"
-                style="position:absolute; top:12px; right:18px; font-size:1.5rem; cursor:pointer; color:#fff;">&times;</span>
-            <h2 id="mapPlayerModalName" style="margin-bottom:10px;"></h2>
-            <div style="margin-bottom:8px;">ID: <span id="mapPlayerModalId"></span></div>
-            <div style="margin-bottom:8px;">Konum: <span id="mapPlayerModalCoords"></span></div>
-        </div>
-    </div>
-
     <!-- Scripts -->
     <script src="/js/dashboard.js"></script>
     <script src="/js/dashboard/discord.js"></script>
-    <script src="/js/dashboard/fivem.js"></script>
-    <script src="/js/dashboard/fivem-players.js"></script>
-    <script src="/js/dashboard/map.js" onerror="console.error('Map.js yüklenemedi!')"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
 </body>
 

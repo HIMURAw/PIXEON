@@ -39,7 +39,6 @@ document.addEventListener('DOMContentLoaded', function () {
         'servers': document.querySelector('.servers-content'),
         'bans': document.querySelector('.bans-content'),
         'settings': document.querySelector('.settings-content'),
-        'maps': document.querySelector('.map-content')
     };
 
     // İlk yüklemede dashboard içeriğini göster
@@ -64,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const dashboardToggle = dashboardMenu.querySelector('.sidebar-parent-toggle');
     const dashboardSubmenu = dashboardMenu.querySelector('.sidebar-submenu');
 
-    dashboardToggle.addEventListener('click', function(e) {
+    dashboardToggle.addEventListener('click', function (e) {
         e.preventDefault();
         dashboardMenu.classList.toggle('open');
         // Alt menüyü göster/gizle
@@ -80,7 +79,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const playersToggle = playersMenu.querySelector('.sidebar-parent-toggle');
     const playersSubmenu = playersMenu.querySelector('.sidebar-submenu');
 
-    playersToggle.addEventListener('click', function(e) {
+    playersToggle.addEventListener('click', function (e) {
         e.preventDefault();
         playersMenu.classList.toggle('open');
         // Alt menüyü göster/gizle
@@ -94,7 +93,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Alt menü itemleri için içerik gösterme
     const dashboardSubitems = document.querySelectorAll('.dashboard-subitem');
     dashboardSubitems.forEach(item => {
-        item.addEventListener('click', function(e) {
+        item.addEventListener('click', function (e) {
             e.preventDefault();
             showContent(this.getAttribute('href').replace('#', ''));
             // Aktiflik vurgusu
@@ -106,7 +105,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Players alt menü itemleri için içerik gösterme
     const playersSubitems = document.querySelectorAll('.players-subitem');
     playersSubitems.forEach(item => {
-        item.addEventListener('click', function(e) {
+        item.addEventListener('click', function (e) {
             e.preventDefault();
             showContent(this.getAttribute('href').replace('#', ''));
             // Aktiflik vurgusu
@@ -217,10 +216,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const notification = document.createElement('div');
         notification.className = `notification ${type}`;
-        
+
         // Bildirim tipine göre ikon seç
         let icon;
-        switch(type) {
+        switch (type) {
             case 'success':
                 icon = 'fa-check-circle';
                 break;
@@ -235,21 +234,21 @@ document.addEventListener('DOMContentLoaded', function () {
                 icon = 'fa-info-circle';
                 break;
         }
-        
+
         notification.innerHTML = `
             <i class="fas ${icon}"></i>
             <span>${message}</span>
             <div class="progress-bar"></div>
         `;
-        
+
         // Bildirimi container'a ekle
         container.appendChild(notification);
-        
+
         // Animasyon için setTimeout kullan
         setTimeout(() => {
             notification.classList.add('show');
         }, 100);
-        
+
         // 3 saniye sonra bildirimi kaldır
         setTimeout(() => {
             notification.classList.add('hide');
@@ -284,29 +283,29 @@ document.addEventListener('DOMContentLoaded', function () {
                 console.log('No auth token found for admin profile');
                 return;
             }
-            
+
             // Çift URL-decode yap
             let decodedUserData = decodeURIComponent(encodedUserData);
             if (decodedUserData.includes('%')) {
                 decodedUserData = decodeURIComponent(decodedUserData);
             }
-            
+
             const userData = JSON.parse(decodedUserData);
             console.log('Admin profile data:', userData);
-            
+
             if (userData && userData.username) {
                 // Admin avatar'ını güncelle
                 const adminAvatar = document.getElementById('admin-avatar');
                 if (adminAvatar && userData.avatar) {
                     adminAvatar.src = userData.avatar;
                 }
-                
+
                 // Admin username'ini güncelle
                 const adminUsername = document.getElementById('admin-username');
                 if (adminUsername) {
                     adminUsername.textContent = userData.username;
                 }
-                
+
                 console.log('Admin profile updated:', userData.username);
             }
         } catch (error) {
