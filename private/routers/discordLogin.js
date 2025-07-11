@@ -4,10 +4,7 @@ const axios = require('axios');
 const Config = require('../../config.json');
 const { pool } = require('../DB/connect');
 
-// NOT: config.json'a "clientSecret" eklemelisin!
-// "clientSecret": "BURAYA_SECRET"
 
-// Discord OAuth Callback - Kullanıcı giriş yaptığında çalışır
 router.get('/callback', async (req, res) => {
     const code = req.query.code;
     if (!code) return res.status(400).send('No code provided');

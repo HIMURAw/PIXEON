@@ -12,10 +12,11 @@
     },
     "discord": {
         "token": "MTIzODI2ODU2MjE3MTIzNjM4NA.GxHzP7.2p7U9PZmEBhvy2JVXGVCUltY1UHtQc2SsSdLv8",
-        "clientId": "1247325679326986250",
+        "clientId": "1238268562171236384",
         "guidid": "1269430268402335867",
-        "voicechannel": "1271919365368840212",
+        "voicechannel": "1391498861960237219",
         "AnnoncementChannel": "1392487272666108024",
+        "commaentChannel": "1292529004577816750",
         "redirectUri": "http://localhost:3000/auth/discord/callback",
         "clientSecret": "cGlHdaaoi813mDxYus3uRLe0WFgT8VOp",
         "adminRoleId": "1392601717555855490"
