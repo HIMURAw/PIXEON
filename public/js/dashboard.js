@@ -65,28 +65,42 @@ document.addEventListener('DOMContentLoaded', function () {
 
     dashboardToggle.addEventListener('click', function (e) {
         e.preventDefault();
-        dashboardMenu.classList.toggle('open');
-        // Alt menüyü göster/gizle
-        if (dashboardMenu.classList.contains('open')) {
-            dashboardSubmenu.style.display = 'block';
+        const isOpen = dashboardMenu.classList.contains('open');
+        
+        if (isOpen) {
+            // Kapanırken animasyon
+            dashboardMenu.classList.add('closing');
+            setTimeout(() => {
+                dashboardMenu.classList.remove('open', 'closing');
+                dashboardSubmenu.style.display = 'none';
+            }, 300);
         } else {
-            dashboardSubmenu.style.display = 'none';
+            // Açılırken
+            dashboardMenu.classList.add('open');
+            dashboardSubmenu.style.display = 'block';
         }
     });
 
-    // Collapsible sidebar menu for Players
-    const playersMenu = document.getElementById('playersMenu');
-    const playersToggle = playersMenu.querySelector('.sidebar-parent-toggle');
-    const playersSubmenu = playersMenu.querySelector('.sidebar-submenu');
+    // Collapsible sidebar menu for Log
+    const logMenu = document.getElementById('logMenu');
+    const logToggle = logMenu.querySelector('.sidebar-parent-toggle');
+    const logSubmenu = logMenu.querySelector('.sidebar-submenu');
 
-    playersToggle.addEventListener('click', function (e) {
+    logToggle.addEventListener('click', function (e) {
         e.preventDefault();
-        playersMenu.classList.toggle('open');
-        // Alt menüyü göster/gizle
-        if (playersMenu.classList.contains('open')) {
-            playersSubmenu.style.display = 'block';
+        const isOpen = logMenu.classList.contains('open');
+        
+        if (isOpen) {
+            // Kapanırken animasyon
+            logMenu.classList.add('closing');
+            setTimeout(() => {
+                logMenu.classList.remove('open', 'closing');
+                logSubmenu.style.display = 'none';
+            }, 300);
         } else {
-            playersSubmenu.style.display = 'none';
+            // Açılırken
+            logMenu.classList.add('open');
+            logSubmenu.style.display = 'block';
         }
     });
 
@@ -102,14 +116,14 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // Players alt menü itemleri için içerik gösterme
-    const playersSubitems = document.querySelectorAll('.players-subitem');
-    playersSubitems.forEach(item => {
+    // Log alt menü itemleri için içerik gösterme
+    const logSubitems = document.querySelectorAll('.log-subitem');
+    logSubitems.forEach(item => {
         item.addEventListener('click', function (e) {
             e.preventDefault();
             showContent(this.getAttribute('href').replace('#', ''));
             // Aktiflik vurgusu
-            playersSubitems.forEach(i => i.parentElement.classList.remove('active'));
+            logSubitems.forEach(i => i.parentElement.classList.remove('active'));
             this.parentElement.classList.add('active');
         });
     });
