@@ -51,18 +51,47 @@
                             <i class="fas fa-chevron-down sidebar-arrow"></i>
                         </a>
                         <ul class="sidebar-submenu" style="display: none;">
-                            <li><a href="#discord-login-history" class="log-subitem"><span
-                                        class="submenu-dot"></span><i class="fa-solid fa-users"></i> Discord Login &
+                            <li><a href="#discord-login-history" class="log-subitem"><span class="submenu-dot"></span><i
+                                        class="fa-solid fa-users"></i> Discord Login &
                                     Logout
                                     History</a>
                             </li>
-                            <li><a href="#purchase-history" class="log-subitem"><span
-                                        class="submenu-dot"></span><i class="fa-solid fa-wallet"></i> Purchase
+                            <li><a href="#purchase-history" class="log-subitem"><span class="submenu-dot"></span><i
+                                        class="fa-solid fa-wallet"></i> Purchase
                                     History</a>
                             </li>
-                            <li><a href="#activity-history" class="log-subitem"><span
-                                        class="submenu-dot"></span><i class="fa-solid fa-chart-line"></i> Activity
+                            <li><a href="#activity-history" class="log-subitem"><span class="submenu-dot"></span><i
+                                        class="fa-solid fa-chart-line"></i> Activity
                                     History</a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li class="sidebar-parent" id="auditMenu">
+                        <a href="#" class="sidebar-parent-toggle">
+                            <i class="fa-solid fa-shield-alt"></i>
+                            <span>Audit Panel</span>
+                            <i class="fas fa-chevron-down sidebar-arrow"></i>
+                        </a>
+                        <ul class="sidebar-submenu" style="display: none;">
+                            <li><a href="#comments-content" class="audit-subitem"><span class="submenu-dot"></span><i
+                                        class="fa-solid fa-comments"></i> Comments</a>
+                            </li>
+                            <li><a href="#ticket-content" class="audit-subitem"><span class="submenu-dot"></span><i
+                                        class="fa-solid fa-ticket-alt"></i> Ticket</a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li class="sidebar-parent" id="webManagerMenu">
+                        <a href="#" class="sidebar-parent-toggle">
+                            <i class="fa-solid fa-globe"></i>
+                            <span>Web Manager</span>
+                            <i class="fas fa-chevron-down sidebar-arrow"></i>
+                        </a>
+                        <ul class="sidebar-submenu" style="display: none;">
+                            <li><a href="#add-product-content" class="webmanager-subitem"><span class="submenu-dot"></span><i
+                                        class="fa-solid fa-plus"></i> Add product</a>
                             </li>
                         </ul>
                     </li>
@@ -380,7 +409,7 @@
 
 
 
-    <!-- PAGES -->
+            <!-- PAGES -->
 
             <!-- Purchase Dashboard Content -->
             <div class="purchase-dashboard-content" id="purchase-dashboard-content">
@@ -469,7 +498,7 @@
                     <h2>Satış Özeti</h2>
                     <p class="last-updated">Son güncelleme: <span id="lastUpdated">-</span></p>
                 </div>
-    
+
                 <!-- Satış Detayları -->
                 <div class="discord-details">
                     <!-- Son Satışlar -->
@@ -630,93 +659,916 @@
                     </div>
                 </div>
             </div>
-        </div>
-    
-                <!-- Activity Dashboard Content -->
+
+            <!-- Activity Dashboard Content -->
             <div class="activity-dashboard-content" id="activity-dashboard-content">
-            <h2>Activity Dashboard</h2>
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fa-solid fa-chart-line"></i>
+                <!-- Aktivite İstatistikleri -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                            <i class="fa-solid fa-chart-line"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Günlük Aktivite</h3>
+                            <p id="dailyActivity">0</p>
+                        </div>
                     </div>
-                    <div class="stat-info">
-                        <h3>Daily Activity</h3>
-                        <p>Loading...</p>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                            <i class="fa-solid fa-clock"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Pik Saatler</h3>
+                            <p id="peakHours">14:00-16:00</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                            <i class="fa-solid fa-calendar"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Haftalık Trend</h3>
+                            <p id="weeklyTrend">+15%</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                            <i class="fa-solid fa-trophy"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>En Aktif Kullanıcı</h3>
+                            <p id="topPerformer">-</p>
+                        </div>
                     </div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fa-solid fa-clock"></i>
+
+                <!-- Ek Aktivite İstatistikleri -->
+                <div class="stats-grid" style="margin-top: 20px;">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Aktif Kullanıcılar</h3>
+                            <p id="activeUsers">0</p>
+                        </div>
                     </div>
-                    <div class="stat-info">
-                        <h3>Peak Hours</h3>
-                        <p>Loading...</p>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
+                            <i class="fa-solid fa-comments"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Günlük Mesaj</h3>
+                            <p id="dailyMessages">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);">
+                            <i class="fa-solid fa-headset"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Ses Kanalı Kullanımı</h3>
+                            <p id="voiceUsage">0%</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);">
+                            <i class="fa-solid fa-calendar-day"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Bu Ay Aktivite</h3>
+                            <p id="monthlyActivity">0</p>
+                        </div>
                     </div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fa-solid fa-calendar"></i>
+
+                <!-- Aktivite Özeti -->
+                <div class="sales-summary">
+                    <h2>Aktivite Özeti</h2>
+                    <p class="last-updated">Son güncelleme: <span id="activityLastUpdated">-</span></p>
+                </div>
+
+                <!-- Aktivite Detayları -->
+                <div class="discord-details">
+                    <!-- Gerçek Zamanlı Aktivite -->
+                    <div class="detail-card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-broadcast-tower"></i> Gerçek Zamanlı Aktivite</h3>
+                            <div class="card-actions">
+                                <button class="btn-refresh" title="Yenile" onclick="refreshRealTimeActivity()">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="real-time-activity" id="realTimeActivity">
+                                <div class="activity-stream">
+                                    <div class="activity-item">
+                                        <div class="activity-icon">
+                                            <i class="fas fa-user-plus"></i>
+                                        </div>
+                                        <div class="activity-content">
+                                            <span class="activity-user">Yeni kullanıcı katıldı</span>
+                                            <span class="activity-time">2 dakika önce</span>
+                                        </div>
+                                    </div>
+                                    <div class="activity-item">
+                                        <div class="activity-icon">
+                                            <i class="fas fa-comment"></i>
+                                        </div>
+                                        <div class="activity-content">
+                                            <span class="activity-user">Mesaj gönderildi</span>
+                                            <span class="activity-time">5 dakika önce</span>
+                                        </div>
+                                    </div>
+                                    <div class="activity-item">
+                                        <div class="activity-icon">
+                                            <i class="fas fa-headset"></i>
+                                        </div>
+                                        <div class="activity-content">
+                                            <span class="activity-user">Ses kanalına katıldı</span>
+                                            <span class="activity-time">8 dakika önce</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="stat-info">
-                        <h3>Weekly Trends</h3>
-                        <p>Loading...</p>
+
+                    <!-- Aktivite Grafiği -->
+                    <div class="detail-card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-chart-area"></i> Aktivite Grafiği</h3>
+                            <div class="card-actions">
+                                <select id="activityChartPeriod" onchange="updateActivityChart()">
+                                    <option value="24">Son 24 Saat</option>
+                                    <option value="7">Son 7 Gün</option>
+                                    <option value="30">Son 30 Gün</option>
+                                </select>
+                                <button class="btn-refresh" title="Yenile" onclick="refreshActivityChart()">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="activity-chart">
+                                <canvas id="activityChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- En Aktif Kullanıcılar -->
+                    <div class="detail-card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-trophy"></i> En Aktif Kullanıcılar</h3>
+                            <div class="card-actions">
+                                <button class="btn-refresh" title="Yenile" onclick="refreshTopUsers()">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="top-users-list" id="topUsersList">
+                                <div class="user-item">
+                                    <div class="user-rank">1</div>
+                                    <div class="user-avatar">
+                                        <img src="https://cdn.discordapp.com/embed/avatars/0.png" alt="User">
+                                    </div>
+                                    <div class="user-info">
+                                        <div class="user-name">Kullanıcı 1</div>
+                                        <div class="user-activity">Aktivite: 95%</div>
+                                    </div>
+                                    <div class="user-score">95</div>
+                                </div>
+                                <div class="user-item">
+                                    <div class="user-rank">2</div>
+                                    <div class="user-avatar">
+                                        <img src="https://cdn.discordapp.com/embed/avatars/1.png" alt="User">
+                                    </div>
+                                    <div class="user-info">
+                                        <div class="user-name">Kullanıcı 2</div>
+                                        <div class="user-activity">Aktivite: 87%</div>
+                                    </div>
+                                    <div class="user-score">87</div>
+                                </div>
+                                <div class="user-item">
+                                    <div class="user-rank">3</div>
+                                    <div class="user-avatar">
+                                        <img src="https://cdn.discordapp.com/embed/avatars/2.png" alt="User">
+                                    </div>
+                                    <div class="user-info">
+                                        <div class="user-name">Kullanıcı 3</div>
+                                        <div class="user-activity">Aktivite: 82%</div>
+                                    </div>
+                                    <div class="user-score">82</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Kanal Aktivitesi -->
+                    <div class="detail-card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-hashtag"></i> Kanal Aktivitesi</h3>
+                            <div class="card-actions">
+                                <button class="btn-refresh" title="Yenile" onclick="refreshChannelActivity()">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="channel-activity">
+                                <div class="channel-item">
+                                    <div class="channel-icon">
+                                        <i class="fas fa-hashtag"></i>
+                                    </div>
+                                    <div class="channel-info">
+                                        <div class="channel-name">genel</div>
+                                        <div class="channel-stats">
+                                            <span>Mesaj: 1,234</span>
+                                            <span>Kullanıcı: 45</span>
+                                        </div>
+                                    </div>
+                                    <div class="channel-activity-bar">
+                                        <div class="activity-fill" style="width: 85%"></div>
+                                    </div>
+                                </div>
+                                <div class="channel-item">
+                                    <div class="channel-icon">
+                                        <i class="fas fa-hashtag"></i>
+                                    </div>
+                                    <div class="channel-info">
+                                        <div class="channel-name">sohbet</div>
+                                        <div class="channel-stats">
+                                            <span>Mesaj: 856</span>
+                                            <span>Kullanıcı: 32</span>
+                                        </div>
+                                    </div>
+                                    <div class="channel-activity-bar">
+                                        <div class="activity-fill" style="width: 65%"></div>
+                                    </div>
+                                </div>
+                                <div class="channel-item">
+                                    <div class="channel-icon">
+                                        <i class="fas fa-headset"></i>
+                                    </div>
+                                    <div class="channel-info">
+                                        <div class="channel-name">Ses Kanalı</div>
+                                        <div class="channel-stats">
+                                            <span>Kullanıcı: 12</span>
+                                            <span>Süre: 2h 30m</span>
+                                        </div>
+                                    </div>
+                                    <div class="channel-activity-bar">
+                                        <div class="activity-fill" style="width: 45%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Zaman Analizi -->
+                    <div class="detail-card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-clock"></i> Zaman Analizi</h3>
+                            <div class="card-actions">
+                                <button class="btn-refresh" title="Yenile" onclick="refreshTimeAnalysis()">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="time-analysis">
+                                <div class="time-chart">
+                                    <canvas id="timeChart"></canvas>
+                                </div>
+                                <div class="time-metrics">
+                                    <div class="time-metric">
+                                        <span class="metric-label">En Aktif Saat</span>
+                                        <span class="metric-value" id="peakHour">14:00</span>
+                                    </div>
+                                    <div class="time-metric">
+                                        <span class="metric-label">En Aktif Gün</span>
+                                        <span class="metric-value" id="peakDay">Cumartesi</span>
+                                    </div>
+                                    <div class="time-metric">
+                                        <span class="metric-label">Ortalama Oturum</span>
+                                        <span class="metric-value" id="avgSession">2h 15m</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Aktivite Performansı -->
+                    <div class="detail-card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-tachometer-alt"></i> Aktivite Performansı</h3>
+                            <div class="card-actions">
+                                <button class="btn-refresh" title="Yenile" onclick="refreshActivityPerformance()">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="activity-performance">
+                                <div class="performance-item">
+                                    <div class="performance-label">Kullanıcı Katılımı</div>
+                                    <div class="performance-value" id="userEngagement">78%</div>
+                                    <div class="performance-bar">
+                                        <div class="performance-fill" id="engagementBar" style="width: 78%"></div>
+                                    </div>
+                                </div>
+                                <div class="performance-item">
+                                    <div class="performance-label">Mesaj Aktivitesi</div>
+                                    <div class="performance-value" id="messageActivity">65%</div>
+                                    <div class="performance-bar">
+                                        <div class="performance-fill" id="messageBar" style="width: 65%"></div>
+                                    </div>
+                                </div>
+                                <div class="performance-item">
+                                    <div class="performance-label">Ses Kanalı Kullanımı</div>
+                                    <div class="performance-value" id="voiceActivity">45%</div>
+                                    <div class="performance-bar">
+                                        <div class="performance-fill" id="voiceBar" style="width: 45%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fa-solid fa-trophy"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>Top Performers</h3>
-                        <p>Loading...</p>
+            </div>
+
+
+<!-- Activity Dashboard Content -->
+<div class="activity-dashboard-content" id="activity-dashboard-content">
+    <!-- Aktivite İstatistikleri -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <i class="fa-solid fa-chart-line"></i>
+            </div>
+            <div class="stat-info">
+                <h3>Günlük Aktivite</h3>
+                <p id="dailyActivity">0</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                <i class="fa-solid fa-clock"></i>
+            </div>
+            <div class="stat-info">
+                <h3>Pik Saatler</h3>
+                <p id="peakHours">14:00-16:00</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                <i class="fa-solid fa-calendar"></i>
+            </div>
+            <div class="stat-info">
+                <h3>Haftalık Trend</h3>
+                <p id="weeklyTrend">+15%</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                <i class="fa-solid fa-trophy"></i>
+            </div>
+            <div class="stat-info">
+                <h3>En Aktif Kullanıcı</h3>
+                <p id="topPerformer">-</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ek Aktivite İstatistikleri -->
+    <div class="stats-grid" style="margin-top: 20px;">
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                <i class="fa-solid fa-users"></i>
+            </div>
+            <div class="stat-info">
+                <h3>Aktif Kullanıcılar</h3>
+                <p id="activeUsers">0</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
+                <i class="fa-solid fa-comments"></i>
+            </div>
+            <div class="stat-info">
+                <h3>Günlük Mesaj</h3>
+                <p id="dailyMessages">0</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);">
+                <i class="fa-solid fa-headset"></i>
+            </div>
+            <div class="stat-info">
+                <h3>Ses Kanalı Kullanımı</h3>
+                <p id="voiceUsage">0%</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);">
+                <i class="fa-solid fa-calendar-day"></i>
+            </div>
+            <div class="stat-info">
+                <h3>Bu Ay Aktivite</h3>
+                <p id="monthlyActivity">0</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Aktivite Özeti -->
+    <div class="sales-summary">
+        <h2>Aktivite Özeti</h2>
+        <p class="last-updated">Son güncelleme: <span id="activityLastUpdated">-</span></p>
+    </div>
+
+    <!-- Aktivite Detayları -->
+    <div class="discord-details">
+        <!-- Gerçek Zamanlı Aktivite -->
+        <div class="detail-card">
+            <div class="card-header">
+                <h3><i class="fas fa-broadcast-tower"></i> Gerçek Zamanlı Aktivite</h3>
+                <div class="card-actions">
+                    <button class="btn-refresh" title="Yenile" onclick="refreshRealTimeActivity()">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="real-time-activity" id="realTimeActivity">
+                    <div class="activity-stream">
+                        <div class="activity-item">
+                            <div class="activity-icon">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <div class="activity-content">
+                                <span class="activity-user">Yeni kullanıcı katıldı</span>
+                                <span class="activity-time">2 dakika önce</span>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-icon">
+                                <i class="fas fa-comment"></i>
+                            </div>
+                            <div class="activity-content">
+                                <span class="activity-user">Mesaj gönderildi</span>
+                                <span class="activity-time">5 dakika önce</span>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-icon">
+                                <i class="fas fa-headset"></i>
+                            </div>
+                            <div class="activity-content">
+                                <span class="activity-user">Ses kanalına katıldı</span>
+                                <span class="activity-time">8 dakika önce</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    
-        <!-- Discord Login History Content -->
-        <div class="discord-login-history-content" id="discord-login-history" style="display: none;">
-            <h2>Discord Login & Logout History</h2>
-            <div class="history-list">
-                <div class="loading-spinner">Loading login history...</div>
+
+        <!-- Aktivite Grafiği -->
+        <div class="detail-card">
+            <div class="card-header">
+                <h3><i class="fas fa-chart-area"></i> Aktivite Grafiği</h3>
+                <div class="card-actions">
+                    <select id="activityChartPeriod" onchange="updateActivityChart()">
+                        <option value="24">Son 24 Saat</option>
+                        <option value="7">Son 7 Gün</option>
+                        <option value="30">Son 30 Gün</option>
+                    </select>
+                    <button class="btn-refresh" title="Yenile" onclick="refreshActivityChart()">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="activity-chart">
+                    <canvas id="activityChart"></canvas>
+                </div>
             </div>
         </div>
-    
-        <!-- Purchase History Content -->
-        <div class="purchase-history-content" id="purchase-history" style="display: none;">
-            <h2>Purchase History</h2>
-            <div class="history-list">
-                <div class="loading-spinner">Loading purchase history...</div>
+
+        <!-- En Aktif Kullanıcılar -->
+        <div class="detail-card">
+            <div class="card-header">
+                <h3><i class="fas fa-trophy"></i> En Aktif Kullanıcılar</h3>
+                <div class="card-actions">
+                    <button class="btn-refresh" title="Yenile" onclick="refreshTopUsers()">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="top-users-list" id="topUsersList">
+                    <div class="user-item">
+                        <div class="user-rank">1</div>
+                        <div class="user-avatar">
+                            <img src="https://cdn.discordapp.com/embed/avatars/0.png" alt="User">
+                        </div>
+                        <div class="user-info">
+                            <div class="user-name">Kullanıcı 1</div>
+                            <div class="user-activity">Aktivite: 95%</div>
+                        </div>
+                        <div class="user-score">95</div>
+                    </div>
+                    <div class="user-item">
+                        <div class="user-rank">2</div>
+                        <div class="user-avatar">
+                            <img src="https://cdn.discordapp.com/embed/avatars/1.png" alt="User">
+                        </div>
+                        <div class="user-info">
+                            <div class="user-name">Kullanıcı 2</div>
+                            <div class="user-activity">Aktivite: 87%</div>
+                        </div>
+                        <div class="user-score">87</div>
+                    </div>
+                    <div class="user-item">
+                        <div class="user-rank">3</div>
+                        <div class="user-avatar">
+                            <img src="https://cdn.discordapp.com/embed/avatars/2.png" alt="User">
+                        </div>
+                        <div class="user-info">
+                            <div class="user-name">Kullanıcı 3</div>
+                            <div class="user-activity">Aktivite: 82%</div>
+                        </div>
+                        <div class="user-score">82</div>
+                    </div>
+                </div>
             </div>
         </div>
-    
-        <!-- Activity History Content -->
-        <div class="activity-history-content" id="activity-history" style="display: none;">
-            <h2>Activity History</h2>
-            <div class="history-list">
-                <div class="loading-spinner">Loading activity history...</div>
+
+        <!-- Kanal Aktivitesi -->
+        <div class="detail-card">
+            <div class="card-header">
+                <h3><i class="fas fa-hashtag"></i> Kanal Aktivitesi</h3>
+                <div class="card-actions">
+                    <button class="btn-refresh" title="Yenile" onclick="refreshChannelActivity()">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="channel-activity">
+                    <div class="channel-item">
+                        <div class="channel-icon">
+                            <i class="fas fa-hashtag"></i>
+                        </div>
+                        <div class="channel-info">
+                            <div class="channel-name">genel</div>
+                            <div class="channel-stats">
+                                <span>Mesaj: 1,234</span>
+                                <span>Kullanıcı: 45</span>
+                            </div>
+                        </div>
+                        <div class="channel-activity-bar">
+                            <div class="activity-fill" style="width: 85%"></div>
+                        </div>
+                    </div>
+                    <div class="channel-item">
+                        <div class="channel-icon">
+                            <i class="fas fa-hashtag"></i>
+                        </div>
+                        <div class="channel-info">
+                            <div class="channel-name">sohbet</div>
+                            <div class="channel-stats">
+                                <span>Mesaj: 856</span>
+                                <span>Kullanıcı: 32</span>
+                            </div>
+                        </div>
+                        <div class="channel-activity-bar">
+                            <div class="activity-fill" style="width: 65%"></div>
+                        </div>
+                    </div>
+                    <div class="channel-item">
+                        <div class="channel-icon">
+                            <i class="fas fa-headset"></i>
+                        </div>
+                        <div class="channel-info">
+                            <div class="channel-name">Ses Kanalı</div>
+                            <div class="channel-stats">
+                                <span>Kullanıcı: 12</span>
+                                <span>Süre: 2h 30m</span>
+                            </div>
+                        </div>
+                        <div class="channel-activity-bar">
+                            <div class="activity-fill" style="width: 45%"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    
+
+        <!-- Zaman Analizi -->
+        <div class="detail-card">
+            <div class="card-header">
+                <h3><i class="fas fa-clock"></i> Zaman Analizi</h3>
+                <div class="card-actions">
+                    <button class="btn-refresh" title="Yenile" onclick="refreshTimeAnalysis()">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="time-analysis">
+                    <div class="time-chart">
+                        <canvas id="timeChart"></canvas>
+                    </div>
+                    <div class="time-metrics">
+                        <div class="time-metric">
+                            <span class="metric-label">En Aktif Saat</span>
+                            <span class="metric-value" id="peakHour">14:00</span>
+                        </div>
+                        <div class="time-metric">
+                            <span class="metric-label">En Aktif Gün</span>
+                            <span class="metric-value" id="peakDay">Cumartesi</span>
+                        </div>
+                        <div class="time-metric">
+                            <span class="metric-label">Ortalama Oturum</span>
+                            <span class="metric-value" id="avgSession">2h 15m</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Aktivite Performansı -->
+        <div class="detail-card">
+            <div class="card-header">
+                <h3><i class="fas fa-tachometer-alt"></i> Aktivite Performansı</h3>
+                <div class="card-actions">
+                    <button class="btn-refresh" title="Yenile" onclick="refreshActivityPerformance()">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="activity-performance">
+                    <div class="performance-item">
+                        <div class="performance-label">Kullanıcı Katılımı</div>
+                        <div class="performance-value" id="userEngagement">78%</div>
+                        <div class="performance-bar">
+                            <div class="performance-fill" id="engagementBar" style="width: 78%"></div>
+                        </div>
+                    </div>
+                    <div class="performance-item">
+                        <div class="performance-label">Mesaj Aktivitesi</div>
+                        <div class="performance-value" id="messageActivity">65%</div>
+                        <div class="performance-bar">
+                            <div class="performance-fill" id="messageBar" style="width: 65%"></div>
+                        </div>
+                    </div>
+                    <div class="performance-item">
+                        <div class="performance-label">Ses Kanalı Kullanımı</div>
+                        <div class="performance-value" id="voiceActivity">45%</div>
+                        <div class="performance-bar">
+                            <div class="performance-fill" id="voiceBar" style="width: 45%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Discord Login History Content -->
+<div class="discord-login-history-content" id="discord-login-history" style="display: none;">
+    <h2>Discord Login & Logout History</h2>
+    <div class="history-list">
+        <div class="loading-spinner">Loading login history...</div>
+    </div>
+</div>
+
+<!-- Purchase History Content -->
+<div class="purchase-history-content" id="purchase-history" style="display: none;">
+    <h2>Purchase History</h2>
+    <div class="history-list">
+        <div class="loading-spinner">Loading purchase history...</div>
+    </div>
+</div>
+
+<!-- Activity History Content -->
+<div class="activity-history-content" id="activity-history" style="display: none;">
+    <h2>Activity History</h2>
+    <div class="history-list">
+        <div class="loading-spinner">Loading activity history...</div>
+    </div>
+</div>
+
         <!-- Settings Content -->
-        <div class="settings-content" id="settings" style="display: none;">
-            <h2>Settings</h2>
-            <div class="settings-grid">
-                <div class="settings-card">
-                    <div class="card-header">
-                        <h3>General Settings</h3>
-                    </div>
-                    <div class="card-content">
-                        <!-- Settings form will be here -->
-                    </div>
+    <div class="settings-content" id="settings" style="display: none;">
+        <h2>Settings</h2>
+        <div class="settings-grid">
+            <div class="settings-card">
+                <div class="card-header">
+                    <h3>General Settings</h3>
+                </div>
+                <div class="card-content">
+                    <!-- Settings form will be here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Comments Content -->
+    <div class="comments-content" id="comments-content" style="display: none;">
+        <h2><i class="fa-solid fa-comments"></i> Comments Management</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <i class="fa-solid fa-comments"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>Total Comments</h3>
+                    <p id="totalComments">0</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                    <i class="fa-solid fa-clock"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>Pending Review</h3>
+                    <p id="pendingComments">0</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                    <i class="fa-solid fa-check"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>Approved</h3>
+                    <p id="approvedComments">0</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                    <i class="fa-solid fa-ban"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>Rejected</h3>
+                    <p id="rejectedComments">0</p>
                 </div>
             </div>
         </div>
 
+        <div class="discord-details">
+            <div class="detail-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-list"></i> Recent Comments</h3>
+                    <div class="card-actions">
+                        <button class="btn-refresh" title="Refresh" onclick="refreshComments()">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div class="comments-list" id="commentsList">
+                        <div class="loading-spinner">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <span>Comments loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ticket Content -->
+    <div class="ticket-content" id="ticket-content" style="display: none;">
+        <h2><i class="fa-solid fa-ticket-alt"></i> Ticket Management</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <i class="fa-solid fa-ticket-alt"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>Total Tickets</h3>
+                    <p id="totalTickets">0</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                    <i class="fa-solid fa-clock"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>Open Tickets</h3>
+                    <p id="openTickets">0</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                    <i class="fa-solid fa-check"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>Resolved</h3>
+                    <p id="resolvedTickets">0</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                    <i class="fa-solid fa-chart-line"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>Avg Response</h3>
+                    <p id="avgResponse">2h</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="discord-details">
+            <div class="detail-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-list"></i> Recent Tickets</h3>
+                    <div class="card-actions">
+                        <button class="btn-refresh" title="Refresh" onclick="refreshTickets()">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div class="tickets-list" id="ticketsList">
+                        <div class="loading-spinner">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <span>Tickets loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Product Content -->
+    <div class="add-product-content" id="add-product-content" style="display: none;">
+        <h2><i class="fa-solid fa-plus"></i> Add New Product</h2>
+        
+        <div class="discord-details">
+            <div class="detail-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-edit"></i> Product Information</h3>
+                </div>
+                <div class="card-content">
+                    <form id="addProductForm" class="product-form">
+                        <div class="form-group">
+                            <label for="productName">Product Name</label>
+                            <input type="text" id="productName" name="productName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="productDescription">Description</label>
+                            <textarea id="productDescription" name="productDescription" rows="4" required></textarea>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="productPrice">Price (₺)</label>
+                                <input type="number" id="productPrice" name="productPrice" step="0.01" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="productCategory">Category</label>
+                                <select id="productCategory" name="productCategory" required>
+                                    <option value="">Select Category</option>
+                                    <option value="electronics">Electronics</option>
+                                    <option value="clothing">Clothing</option>
+                                    <option value="books">Books</option>
+                                    <option value="sports">Sports</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="productImage">Product Image</label>
+                            <input type="file" id="productImage" name="productImage" accept="image/*">
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn-submit">
+                                <i class="fas fa-plus"></i> Add Product
+                            </button>
+                            <button type="reset" class="btn-reset">
+                                <i class="fas fa-undo"></i> Reset
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
-        </main>
+
+    </div>
+
+    
+
+
+
+    </main>
     </div>
 
 
