@@ -22,6 +22,7 @@
         "commaentChannel": "1292529004577816750",
         "redirectUri": "http://localhost:3000/auth/discord/callback",
         "adminRoleId": "1392601717555855490",
+        "supportRoleId": "1269431116499128414",
         "log": {
             "WebhookName": "PXDevelopment Log",
             "WebhookLogoURL": "https://cdn.discordapp.com/attachments/1392486533696720918/1392486943329353921/px.png?ex=687301c6&is=6871b046&hm=0ba273ff2d6cbc8e1e5df8e718c4d3f796cbd12d5c7c44b17c3f6391ef428340&"

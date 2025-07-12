@@ -66,6 +66,7 @@
     </div>
 
     <main class="hero-section animate-fade" id="home">
+        <div class="floating-dots"></div>
         <div class="hero-content">
             <h1>PXDevelopment</h1>
             <p>2023'den beri <b id="customerCount">+200 müşteri</b> ve <b id="serverCount">+50 Sunucu Üyesi</b> ile hizmet vermekteyiz. Discord botları ve FiveM
@@ -76,7 +77,7 @@
             </div>
             <div class="hero-buttons">
                 <a href="#products" class="btn primary">Ürünleri İncele</a>
-                <a href="#reviews" class="btn secondary">Müşteri Yorumları</a>
+                <a href="#references" class="btn secondary">Müşteri Yorumları</a>
             </div>
         </div>
         <div class="hero-visual">
@@ -164,29 +165,75 @@
 
     <!-- Hakkımızda Bölümü -->
     <section class="about-section animate-slide-up" id="about">
-        <h2>Hakkımızda</h2>
-        <div class="about-content">
-            <div class="about-text">
-                <p>PXDevelopment olarak, 2023 yılından bu yana Discord ve FiveM topluluğuna yenilikçi çözümler
-                    sunuyoruz. Müşteri memnuniyetini ve güvenliği ön planda tutan ekibimizle, her zaman en iyisini
-                    hedefliyoruz.</p>
-                <ul class="about-list">
-                    <li><b>Vizyonumuz:</b> Dijital dünyada güvenilir ve yenilikçi çözümler sunmak.</li>
-                    <li><b>Misyonumuz:</b> Müşterilerimizin ihtiyaçlarına en uygun ürünleri hızlı ve kaliteli şekilde
-                        sağlamak.</li>
-                </ul>
+        <div class="about-container">
+            <div class="about-header">
+                <h2>Hakkımızda</h2>
+                <div class="about-subtitle">2023'ten beri Discord ve FiveM topluluğuna hizmet veriyoruz</div>
             </div>
-            <!-- <div class="about-team">
-        <div class="team-member">
-          <img src="assets/himura.webp" alt="Developer" />
-          <span>himura_1</span>
-        </div>
-        <div class="team-member">
-          <img src="assets/jaxx.jpg" alt="Developer" />
-          <span>jaxxresmi</span>
-        </div>
-        </div>
-      </div> -->
+            
+            <div class="about-content">
+                <div class="about-main">
+                    <div class="about-text">
+                        <p class="about-description">
+                            PXDevelopment olarak, Discord ve FiveM topluluğuna yenilikçi çözümler sunuyoruz. 
+                            Müşteri memnuniyetini ve güvenliği ön planda tutan ekibimizle, her zaman en iyisini hedefliyoruz.
+                        </p>
+                        
+                        <div class="about-values">
+                            <div class="value-card">
+                                <div class="value-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                        <path d="M12 2L15.09 8.26L22 9L17 14.14L18.18 21L12 17.77L5.82 21L7 14.14L2 9L8.91 8.26L12 2Z" fill="#1482ff"/>
+                                    </svg>
+                                </div>
+                                <div class="value-content">
+                                    <h4>Vizyonumuz</h4>
+                                    <p>Dijital dünyada güvenilir ve yenilikçi çözümler sunmak</p>
+                                </div>
+                            </div>
+                            
+                            <div class="value-card">
+                                <div class="value-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                        <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="#1482ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <div class="value-content">
+                                    <h4>Misyonumuz</h4>
+                                    <p>Müşterilerimizin ihtiyaçlarına en uygun ürünleri hızlı ve kaliteli şekilde sağlamak</p>
+                                </div>
+                            </div>
+                            
+                            <div class="value-card">
+                                <div class="value-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                        <path d="M17 21V19C17 17.9391 16.5786 16.9217 15.8284 16.1716C15.0783 15.4214 14.0609 15 13 15H5C3.93913 15 2.92172 15.4214 2.17157 16.1716C1.42143 16.9217 1 17.9391 1 19V21M23 21V19C22.9993 18.1137 22.7044 17.2528 22.1614 16.5523C21.6184 15.8519 20.8581 15.3516 20 15.13M16 3.13C16.8604 3.35031 17.623 3.85071 18.1676 4.55232C18.7122 5.25392 19.0078 6.11683 19.0078 7.005C19.0078 7.89317 18.7122 8.75608 18.1676 9.45768C17.623 10.1593 16.8604 10.6597 16 10.88M13 7C13 9.20914 11.2091 11 9 11C6.79086 11 5 9.20914 5 7C5 4.79086 6.79086 3 9 3C11.2091 3 13 4.79086 13 7Z" stroke="#1482ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <div class="value-content">
+                                    <h4>Değerlerimiz</h4>
+                                    <p>Güven, kalite ve müşteri memnuniyeti odaklı yaklaşım</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="about-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">2+</div>
+                        <div class="stat-label">Yıllık Deneyim</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">500+</div>
+                        <div class="stat-label">Mutlu Müşteri</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">24/7</div>
+                        <div class="stat-label">Destek</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -194,19 +241,9 @@
     <section class="team-section animate-slide-up">
         <h2 class="team-title">Ekip Arkadaşlarımız</h2>
         <p class="team-desc">Profesyonel ve dinamik ekibimizle hizmetinizdeyiz</p>
-        <div class="team-list">
-            <div class="team-card">
-                <div class="team-avatar"><img src="assets/himura.webp" alt="Vorteh"></div>
-                <div class="team-name">Himura</div>
-                <div class="team-role">FİRMA SAHİBİ</div>
-                <div class="team-role">DEVELOPER</div>
-            </div>
-            <div class="team-card">
-                <div class="team-avatar"><img src="assets/jaxx.jpg" alt="D4nger"></div>
-                <div class="team-name">Jaxx</div>
-                <div class="team-role">FİRMA SAHİBİ</div>
-                <div class="team-role">DEVELOPER</div>
-            </div>
+        <div class="team-list" id="teamList">
+            <!-- Support üyeleri buraya dinamik olarak yüklenecek -->
+            <div class="loading">Takım üyeleri yükleniyor...</div>
         </div>
     </section>
 
@@ -214,121 +251,30 @@
     <section class="references-section animate-slide-up" id="references">
         <h2 class="references-title">Müşteri Değerlendirmeleri</h2>
         <p class="references-desc">Hizmetlerimizden memnun kalan müşterilerimizin görüşleri</p>
-        <div class="references-list">
-            <div class="reference-card animate-fade">
-                <div class="reference-top">
-                    <span class="stars">⭐⭐⭐⭐⭐</span>
-                    <span class="verified"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"
-                            style="vertical-align:middle;">
-                            <circle cx="8" cy="8" r="8" fill="#16a34a" />
-                            <path d="M5 8.5L7.2 10.7L11 6.5" stroke="#fff" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" />
-                        </svg> Doğrulanmış</span>
-                </div>
-                <blockquote><span class="quote-icon">“</span>Yorum..."</blockquote>
-                <div class="reference-user">
-                    <img src="assets/müşteri.png" alt="Arges RolePlay" class="reference-avatar" />
-                    <div>
-                        <span class="user-name">Müşreti1</span>
-                        <span class="user-server">Sunucu İsmi</span>
-                    </div>
-                </div>
+        <div class="references-list" id="referencesList">
+            <!-- Feedback verileri buraya dinamik olarak yüklenecek -->
+            <div class="loading">Müşteri değerlendirmeleri yükleniyor...</div>
+        </div>
+        
+        <!-- Sayfalama kontrolleri -->
+        <div class="pagination" id="pagination" style="display: none;">
+            <button class="pagination-btn" id="prevPage" onclick="changePage(-1)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15,18 9,12 15,6"></polyline>
+                </svg>
+                Önceki
+            </button>
+            
+            <div class="page-numbers" id="pageNumbers">
+                <!-- Sayfa numaraları buraya dinamik olarak eklenecek -->
             </div>
-            <div class="reference-card animate-fade">
-                <div class="reference-top">
-                    <span class="stars">⭐⭐⭐⭐⭐</span>
-                    <span class="verified"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"
-                            style="vertical-align:middle;">
-                            <circle cx="8" cy="8" r="8" fill="#16a34a" />
-                            <path d="M5 8.5L7.2 10.7L11 6.5" stroke="#fff" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" />
-                        </svg> Doğrulanmış</span>
-                </div>
-                <blockquote><span class="quote-icon">“</span>Yorum..."</blockquote>
-                <div class="reference-user">
-                    <img src="assets/müşteri.png" alt="Darama Host" class="reference-avatar" />
-                    <div>
-                        <span class="user-name">Müşreti2</span>
-                        <span class="user-server">Sunucu İsmi</span>
-                    </div>
-                </div>
-            </div>
-            <div class="reference-card animate-fade">
-                <div class="reference-top">
-                    <span class="stars">⭐⭐⭐⭐⭐</span>
-                    <span class="verified"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"
-                            style="vertical-align:middle;">
-                            <circle cx="8" cy="8" r="8" fill="#16a34a" />
-                            <path d="M5 8.5L7.2 10.7L11 6.5" stroke="#fff" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" />
-                        </svg> Doğrulanmış</span>
-                </div>
-                <blockquote><span class="quote-icon">“</span>Yorum..."</blockquote>
-                <div class="reference-user">
-                    <img src="assets/müşteri.png" alt="Kor Family" class="reference-avatar" />
-                    <div>
-                        <span class="user-name">Müşreti3</span>
-                        <span class="user-server">Sunucu İsmi</span>
-                    </div>
-                </div>
-            </div>
-            <div class="reference-card animate-fade">
-                <div class="reference-top">
-                    <span class="stars">⭐⭐⭐⭐⭐</span>
-                    <span class="verified"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"
-                            style="vertical-align:middle;">
-                            <circle cx="8" cy="8" r="8" fill="#16a34a" />
-                            <path d="M5 8.5L7.2 10.7L11 6.5" stroke="#fff" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" />
-                        </svg> Doğrulanmış</span>
-                </div>
-                <blockquote><span class="quote-icon">“</span>Yorum..."</blockquote>
-                <div class="reference-user">
-                    <img src="assets/müşteri.png" alt="Venom RolePlay" class="reference-avatar" />
-                    <div>
-                        <span class="user-name">Müşreti4</span>
-                        <span class="user-server">Sunucu İsmi</span>
-                    </div>
-                </div>
-            </div>
-            <div class="reference-card animate-fade">
-                <div class="reference-top">
-                    <span class="stars">⭐⭐⭐⭐⭐</span>
-                    <span class="verified"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"
-                            style="vertical-align:middle;">
-                            <circle cx="8" cy="8" r="8" fill="#16a34a" />
-                            <path d="M5 8.5L7.2 10.7L11 6.5" stroke="#fff" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" />
-                        </svg> Doğrulanmış</span>
-                </div>
-                <blockquote><span class="quote-icon">“</span>Yorum..."</blockquote>
-                <div class="reference-user">
-                    <img src="assets/müşteri.png" alt="Keremce Fivem" class="reference-avatar" />
-                    <div>
-                        <span class="user-name">Müşreti5</span>
-                        <span class="user-server">Sunucu İsmi</span>
-                    </div>
-                </div>
-            </div>
-            <div class="reference-card animate-fade">
-                <div class="reference-top">
-                    <span class="stars">⭐⭐⭐⭐⭐</span>
-                    <span class="verified"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"
-                            style="vertical-align:middle;">
-                            <circle cx="8" cy="8" r="8" fill="#16a34a" />
-                            <path d="M5 8.5L7.2 10.7L11 6.5" stroke="#fff" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" />
-                        </svg> Doğrulanmış</span>
-                </div>
-                <blockquote><span class="quote-icon">“</span>Yorum..."</blockquote>
-                <div class="reference-user">
-                    <img src="assets/müşteri.png" alt="Valoria RolePlay" class="reference-avatar" />
-                    <div>
-                        <span class="user-name">Müşreti6</span>
-                        <span class="user-server">Sunucu İsmi</span>
-                    </div>
-                </div>
-            </div>
+            
+            <button class="pagination-btn" id="nextPage" onclick="changePage(1)">
+                Sonraki
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="9,18 15,12 9,6"></polyline>
+                </svg>
+            </button>
         </div>
     </section>
 
