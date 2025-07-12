@@ -1195,3 +1195,164 @@ html {
     padding: 8px 8px;
   }
 }
+
+/* Çıkış Onay Modalı */
+.modal-overlay {
+  position: fixed;
+  z-index: 9999;
+  left: 0; top: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-content {
+  background: #fff;
+  color: #222;
+  border-radius: 16px;
+  padding: 32px 28px 24px 28px;
+  box-shadow: 0 8px 32px #0002;
+  min-width: 320px;
+  max-width: 90vw;
+  text-align: center;
+}
+.modal-content h3 {
+  margin-top: 0;
+  color: #1482ff;
+}
+.modal-actions {
+  margin-top: 24px;
+  display: flex;
+  gap: 18px;
+  justify-content: center;
+}
+.modal-actions .btn {
+  min-width: 80px;
+  padding: 10px 0;
+}
+
+/* Admin Panel Button Style */
+#adminLoginBtn, .admin-btn {
+  display: none; /* JS ile gösterilecek */
+  background: linear-gradient(90deg, #1482ff 0%, #2563eb 100%);
+  color: #fff;
+  border: none;
+  border-radius: 22px;
+  padding: 10px 28px;
+  font-size: 1.05em;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 12px #1482ff33;
+  cursor: pointer;
+  margin-left: 18px;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+  outline: none;
+  position: relative;
+  z-index: 2;
+}
+#adminLoginBtn.show, .admin-btn.show {
+  display: inline-block !important;
+}
+#adminLoginBtn:hover, .admin-btn:hover {
+  background: linear-gradient(90deg, #2563eb 0%, #1482ff 100%);
+  box-shadow: 0 4px 24px #1482ff55;
+  transform: translateY(-2px) scale(1.04);
+}
+#adminLoginBtn:focus, .admin-btn:focus {
+  box-shadow: 0 0 0 3px #1482ff55;
+}
+/* Responsive: stack in mobile footer */
+@media (max-width: 600px) {
+  #adminLoginBtn, .admin-btn {
+    width: 100%;
+    margin: 12px 0 0 0;
+    padding: 12px 0;
+    font-size: 1.1em;
+  }
+}
+
+/* User Info Modal Styles */
+#userInfoModal.user-info-modal {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  left: 0; top: 0; width: 100vw; height: 100vh;
+  background: rgba(20, 34, 56, 0.55);
+  justify-content: center;
+  align-items: center;
+  transition: background 0.2s;
+}
+#userInfoModal.user-info-modal[style*="display: flex"] {
+  display: flex !important;
+}
+.user-info-modal-content {
+  background: #fff;
+  border-radius: 22px;
+  box-shadow: 0 8px 40px #1482ff33;
+  padding: 36px 32px 28px 32px;
+  min-width: 320px;
+  max-width: 95vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  animation: modalPopIn 0.25s cubic-bezier(.4,2,.6,1) 1;
+}
+@keyframes modalPopIn {
+  0% { transform: scale(0.85) translateY(40px); opacity: 0; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+.user-info-modal-close {
+  position: absolute;
+  top: 18px;
+  right: 22px;
+  background: none;
+  border: none;
+  font-size: 2em;
+  color: #1482ff;
+  cursor: pointer;
+  transition: color 0.15s;
+  z-index: 2;
+}
+.user-info-modal-close:hover {
+  color: #2563eb;
+}
+.user-info-details {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-top: 18px;
+}
+.user-avatar-large {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  box-shadow: 0 2px 12px #1482ff33;
+  border: 3px solid #1482ff;
+  background: #f4f8ff;
+}
+.user-info-texts {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 1.08em;
+  color: #222;
+}
+.user-info-texts b {
+  color: #1482ff;
+}
+@media (max-width: 600px) {
+  .user-info-modal-content {
+    min-width: 0;
+    padding: 18px 8vw 18px 8vw;
+  }
+  .user-info-details {
+    flex-direction: column;
+    gap: 12px;
+  }
+  .user-avatar-large {
+    width: 64px;
+    height: 64px;
+  }
+}

@@ -1,30 +1,41 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const navbar = document.querySelector('.navbar');
-    const navbarToggle = document.getElementById('navbarToggle');
-    const navbarMenu = document.querySelector('.navbar-menu');
-    const menuItems = document.querySelectorAll('.navbar-menu a');
+    // --- FIX: Navbar null check and selector update ---
+    // Use main-header and main-nav instead of .navbar
+    const navbar = document.querySelector('.main-header'); // was .navbar
+    const navbarToggle = document.getElementById('burgerMenu'); // was navbarToggle
+    const navbarMenu = document.getElementById('mainNav'); // was .navbar-menu
+    const menuItems = navbarMenu ? navbarMenu.querySelectorAll('a') : [];
     const loginBtn = document.getElementById('loginBtn');
     const loginModal = document.getElementById('loginModal');
     const closeModal = document.getElementById('closeModal');
     const loginForm = document.getElementById('loginForm');
 
-    // Scroll effect
-    window.addEventListener('scroll', () => {
-        if (window.scrollY > 50) {
-            navbar.classList.add('scrolled');
-        } else {
-            navbar.classList.remove('scrolled');
-        }
-    });
+    // Yıldız verilerini yükle
+    loadAverageRating();
+    
+    // Müşteri sayısını yükle
+    loadCustomerCount();
+    
+    // Sunucu üye sayısını yükle
+    loadServerCount();
 
+    // Scroll effect
+    if (navbar) {
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+    }
     // Toggle menu (sadece navbarToggle varsa)
-    if (navbarToggle) {
+    if (navbarToggle && navbarMenu) {
         navbarToggle.addEventListener('click', () => {
             navbarToggle.classList.toggle('active');
             navbarMenu.classList.toggle('active');
             document.body.style.overflow = navbarMenu.classList.contains('active') ? 'hidden' : '';
         });
-
         // Close menu when clicking outside
         document.addEventListener('click', (e) => {
             if (!navbarToggle.contains(e.target) && !navbarMenu.contains(e.target)) {
@@ -33,7 +44,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.body.style.overflow = '';
             }
         });
-
         // Close menu when clicking on a menu item
         menuItems.forEach(item => {
             item.addEventListener('click', () => {
@@ -164,10 +174,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Admin login butonunu yönet
     async function manageAdminButton() {
         console.log('=== Manage Admin Button Başladı ===');
-
         const adminBtn = document.getElementById('adminLoginBtn');
         console.log('Admin button element:', adminBtn);
-
+        if (!adminBtn) {
+            console.warn('Admin button not found in DOM. Skipping admin button logic.');
+            return;
+        }
         const isAdmin = await checkAdminRole();
         console.log('Is admin result:', isAdmin);
 
@@ -271,20 +283,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Çıkış yapma fonksiyonu
     function logout() {
-        deleteCookie('auth_token');
-
-        // Default duruma dön
+        // Cookie temizle
+        document.cookie = "auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        // Arayüzü güncelle
         const discordLoginBtn = document.querySelector('.discord-btn');
         const userProfile = document.getElementById('userProfile');
         const userAvatar = document.getElementById('userAvatar');
         const userName = document.getElementById('userName');
-
         if (discordLoginBtn) discordLoginBtn.style.display = 'flex';
         if (userProfile) userProfile.style.display = 'none';
         if (userAvatar) userAvatar.src = 'https://cdn.discordapp.com/embed/avatars/0.png';
         if (userName) userName.textContent = 'Guest';
-
-        console.log('Çıkış yapıldı - default duruma dönüldü');
+        // (İsteğe bağlı) Sayfayı yenilemek isterseniz:
+        // window.location.reload();
     }
 
     // Cookie temizleme fonksiyonu
@@ -313,6 +324,47 @@ document.addEventListener('DOMContentLoaded', () => {
     // Sayfa yüklendiğinde kullanıcı profilini göster
     showUserProfile();
 
+    // --- User Info Modal Logic ---
+    const userProfileDiv = document.getElementById('userProfile');
+    const userInfoModal = document.getElementById('userInfoModal');
+    const userInfoModalClose = document.getElementById('userInfoModalClose');
+    const modalUserAvatar = document.getElementById('modalUserAvatar');
+    const modalUserName = document.getElementById('modalUserName');
+    const modalUserId = document.getElementById('modalUserId');
+
+    if (userProfileDiv && userInfoModal && userInfoModalClose) {
+        userProfileDiv.addEventListener('click', function () {
+            // Kullanıcı bilgilerini cookie'den al
+            const encodedUserData = (typeof getCookie === 'function') ? getCookie('auth_token') : null;
+            if (!encodedUserData) return;
+            let decodedUserData = decodeURIComponent(encodedUserData);
+            if (decodedUserData.includes('%')) {
+                decodedUserData = decodeURIComponent(decodedUserData);
+            }
+            let userData;
+            try {
+                userData = JSON.parse(decodedUserData);
+            } catch (e) {
+                return;
+            }
+            if (!userData || !userData.username) return;
+            // Modal içini doldur
+            if (modalUserAvatar) modalUserAvatar.src = userData.avatar || 'https://cdn.discordapp.com/embed/avatars/0.png';
+            if (modalUserName) modalUserName.textContent = userData.username;
+            if (modalUserId) modalUserId.textContent = userData.id || '-';
+            // Modalı göster
+            userInfoModal.style.display = 'flex';
+        });
+        userInfoModalClose.addEventListener('click', function () {
+            userInfoModal.style.display = 'none';
+        });
+        // Modal dışına tıklayınca kapat
+        userInfoModal.addEventListener('click', function (e) {
+            if (e.target === userInfoModal) {
+                userInfoModal.style.display = 'none';
+            }
+        });
+    }
 
     // Add active class to current page link
     const currentPath = window.location.pathname;
@@ -358,6 +410,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const userAvatar = document.getElementById('userAvatar');
     const userName = document.getElementById('userName');
     const logoutBtn = document.getElementById('logoutBtn');
+    const logoutModal = document.getElementById('logoutModal');
+    const logoutConfirm = document.getElementById('logoutConfirm');
+    const logoutCancel = document.getElementById('logoutCancel');
 
     if (discordLoginBtn) {
         console.log('Discord butonu bulundu:', discordLoginBtn);
@@ -393,12 +448,20 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('Discord butonu bulunamadı!');
     }
 
-    // Çıkış butonu event listener
-    if (logoutBtn) {
+    if (logoutBtn && logoutModal && logoutConfirm && logoutCancel) {
         logoutBtn.addEventListener('click', function () {
-            if (confirm('Çıkmak istediğinize emin misiniz?')) {
-                logout();
-            }
+            logoutModal.style.display = 'flex';
+        });
+        logoutCancel.addEventListener('click', function () {
+            logoutModal.style.display = 'none';
+        });
+        logoutConfirm.addEventListener('click', function () {
+            logoutModal.style.display = 'none';
+            logout();
+        });
+        // Modal dışında bir yere tıklayınca kapat
+        logoutModal.addEventListener('click', function (e) {
+            if (e.target === logoutModal) logoutModal.style.display = 'none';
         });
     }
 });
@@ -538,144 +601,130 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
+
 });
 
+// Ortalama yıldız verilerini yükle ve güncelle
+async function loadAverageRating() {
+    try {
+        const response = await fetch('/api/discord/products/average-rating');
+        const data = await response.json();
+        
+        if (data.success && data.data) {
+            const averageRating = data.data.averageRating;
+            const totalProducts = data.data.totalProducts;
+            
+            // Ana sayfa hero bölümündeki yıldızı güncelle
+            const heroRatingElement = document.getElementById('heroRating');
+            
+            if (heroRatingElement) {
+                heroRatingElement.innerHTML = `<span class="star">★</span> ${averageRating}/5 Müşteri Memnuniyeti`;
+            }
+            
+            // Logo yanındaki badge'deki yıldızı güncelle
+            const badgeRatingElement = document.getElementById('badgeRating');
+            
+            if (badgeRatingElement) {
+                badgeRatingElement.textContent = `${averageRating}/5`;
+            }
+            
+            // Eğer hiç ürün yoksa varsayılan değer göster
+            if (totalProducts === 0) {
+                if (heroRatingElement) {
+                    heroRatingElement.innerHTML = `<span class="star">★</span> 0.0/5 Müşteri Memnuniyeti`;
+                }
+                if (badgeRatingElement) {
+                    badgeRatingElement.textContent = '0.0/5';
+                }
+            }
+            
+            console.log('Yıldız verileri başarıyla güncellendi:', data.data);
+        } else {
+            console.error('Yıldız verileri alınamadı:', data);
+        }
+    } catch (error) {
+        console.error('Yıldız verileri yüklenirken hata oluştu:', error);
+        // Hata durumunda varsayılan değerleri göster
+        const heroRatingElement = document.getElementById('heroRating');
+        const badgeRatingElement = document.getElementById('badgeRating');
+        
+        if (heroRatingElement) {
+            heroRatingElement.innerHTML = `<span class="star">★</span> 4.9/5 Müşteri Memnuniyeti`;
+        }
+        if (badgeRatingElement) {
+            badgeRatingElement.textContent = '4.9/5';
+        }
+    }
+}
 
-document.addEventListener('DOMContentLoaded', function () {
-    // Accordion SSS
-    document.querySelectorAll('.accordion-header').forEach(function (header) {
-        header.addEventListener('click', function () {
-            const item = header.parentElement;
-            const isActive = item.classList.contains('active');
-            // Tümünü kapat
-            document.querySelectorAll('.accordion-item').forEach(function (i) {
-                i.classList.remove('active');
-            });
-            // Eğer tıklanan zaten açıksa kapalı kalsın, değilse aç
-            if (!isActive) {
-                item.classList.add('active');
+// Sunucu üye sayısını yükle ve güncelle
+async function loadServerCount() {
+    try {
+        const response = await fetch('/api/discord/server');
+        const data = await response.json();
+        
+        if (data.success && data.data) {
+            const serverMemberCount = data.data.serverMemberCount;
+            
+            // Ana sayfa hero bölümündeki sunucu üye sayısını güncelle
+            const serverCountElement = document.getElementById('serverCount');
+            
+            if (serverCountElement) {
+                serverCountElement.textContent = `+${serverMemberCount} Sunucu Üyesi`;
             }
-        });
-    });
-    // Animasyonlar için Intersection Observer
-    function animateOnScroll(selector) {
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.15 });
-        document.querySelectorAll(selector).forEach(el => observer.observe(el));
+            
+            console.log('Sunucu üye sayısı başarıyla güncellendi:', data.data);
+        } else {
+            console.error('Sunucu üye sayısı alınamadı:', data);
+        }
+    } catch (error) {
+        console.error('Sunucu üye sayısı yüklenirken hata oluştu:', error);
+        // Hata durumunda varsayılan değeri göster
+        const serverCountElement = document.getElementById('serverCount');
+        
+        if (serverCountElement) {
+            serverCountElement.textContent = '+50 Sunucu Üyesi';
+        }
     }
-    animateOnScroll('.animate-fade');
-    animateOnScroll('.animate-slide-up');
-    // Scroll to top butonu
-    const scrollBtn = document.getElementById('scrollToTopBtn');
-    if (scrollBtn) {
-        window.addEventListener('scroll', function () {
-            if (window.scrollY > 300) {
-                scrollBtn.style.opacity = '1';
-                scrollBtn.style.pointerEvents = 'auto';
-            } else {
-                scrollBtn.style.opacity = '0';
-                scrollBtn.style.pointerEvents = 'none';
+}
+
+// Müşteri sayısını yükle ve güncelle
+async function loadCustomerCount() {
+    try {
+        const response = await fetch('/api/discord/customer');
+        const data = await response.json();
+        
+        if (data.success && data.data) {
+            const customerCount = data.data.customerCount;
+            
+            // Ana sayfa hero bölümündeki müşteri sayısını güncelle
+            const customerCountElement = document.getElementById('customerCount');
+            const customerCountElement2 = document.getElementById('customerCount-2');
+            
+            if (customerCountElement) {
+                customerCountElement.textContent = `+${customerCount} müşteri`;
             }
-        });
-        scrollBtn.addEventListener('click', function () {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-    }
-    // Burger menu
-    const burgerMenu = document.getElementById('burgerMenu');
-    const mainNav = document.getElementById('mainNav');
-    if (burgerMenu && mainNav) {
-        burgerMenu.addEventListener('click', function () {
-            const isOpen = mainNav.classList.toggle('open');
-            burgerMenu.classList.toggle('active', isOpen);
-            burgerMenu.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-        });
-        // Menüden bir linke tıklanınca menüyü kapat (mobilde)
-        mainNav.querySelectorAll('a').forEach(function (link) {
-            link.addEventListener('click', function () {
-                if (window.innerWidth <= 900) {
-                    mainNav.classList.remove('open');
-                    burgerMenu.classList.remove('active');
-                    burgerMenu.setAttribute('aria-expanded', 'false');
-                }
-            });
-        });
-        // Menü dışında bir yere tıklanınca menüyü kapat
-        document.addEventListener('click', function (e) {
-            const isBurger = burgerMenu.contains(e.target);
-            const isNav = mainNav.contains(e.target);
-            if (mainNav.classList.contains('open') && !isBurger && !isNav) {
-                mainNav.classList.remove('open');
-                burgerMenu.classList.remove('active');
-                burgerMenu.setAttribute('aria-expanded', 'false');
+            
+            if (customerCountElement2) {
+                customerCountElement2.textContent = `+${customerCount} Müşteri`;
             }
-        });
+            
+            console.log('Müşteri sayısı başarıyla güncellendi:', data.data);
+        } else {
+            console.error('Müşteri sayısı alınamadı:', data);
+        }
+    } catch (error) {
+        console.error('Müşteri sayısı yüklenirken hata oluştu:', error);
+        // Hata durumunda varsayılan değeri göster
+        const customerCountElement = document.getElementById('customerCount');
+        const customerCountElement2 = document.getElementById('customerCount-2');
+        
+        if (customerCountElement) {
+            customerCountElement.textContent = '+200 müşteri';
+        }
+        
+        if (customerCountElement2) {
+            customerCountElement2.textContent = '+200 Müşteri';
+        }
     }
-    // Chat bubble/modal
-    const chatBubbleBtn = document.getElementById('chatBubbleBtn');
-    const chatModal = document.getElementById('chatModal');
-    const chatModalClose = document.getElementById('chatModalClose');
-    if (chatBubbleBtn && chatModal && chatModalClose) {
-        chatBubbleBtn.addEventListener('click', function (e) {
-            chatModal.classList.add('open');
-        });
-        chatModalClose.addEventListener('click', function () {
-            chatModal.classList.remove('open');
-        });
-        // Modal dışına tıklayınca kapat
-        document.addEventListener('click', function (e) {
-            const isChatBubble = chatBubbleBtn.contains(e.target);
-            const isModal = chatModal.contains(e.target);
-            if (chatModal.classList.contains('open') && !isChatBubble && !isModal) {
-                chatModal.classList.remove('open');
-            }
-        });
-        // Modal içine tıklayınca kapatma (sadece dışına tıklayınca kapat)
-        chatModal.addEventListener('click', function (e) {
-            if (e.target === chatModal) {
-                chatModal.classList.remove('open');
-            }
-        });
-    }
-    // Sepete ekle fonksiyonu
-    function updateCartCount() {
-        const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-        document.getElementById('cartCount').textContent = cart.length;
-    }
-    document.querySelectorAll('.add-to-cart-btn').forEach(function (btn) {
-        btn.addEventListener('click', function (e) {
-            e.preventDefault();
-            const product = btn.getAttribute('data-product');
-            const price = btn.getAttribute('data-price');
-            let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-            cart.push({ product, price });
-            localStorage.setItem('cart', JSON.stringify(cart));
-            updateCartCount();
-            // Bildirim
-            let notif = document.createElement('div');
-            notif.textContent = 'Ürün sepete eklendi!';
-            notif.style.position = 'fixed';
-            notif.style.top = '24px';
-            notif.style.right = '24px';
-            notif.style.background = '#1482ff';
-            notif.style.color = '#fff';
-            notif.style.padding = '12px 24px';
-            notif.style.borderRadius = '18px';
-            notif.style.fontWeight = '700';
-            notif.style.zIndex = '9999';
-            notif.style.boxShadow = '0 2px 16px #1482ff55';
-            document.body.appendChild(notif);
-            setTimeout(function () { notif.remove(); }, 1400);
-        });
-    });
-    document.getElementById('cartIconBtn').addEventListener('click', function () {
-        window.location.href = 'sepet.html';
-    });
-    updateCartCount();
-});
+}

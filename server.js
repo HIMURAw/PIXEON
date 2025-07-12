@@ -228,6 +228,7 @@ const discordChannelRouter = require('./private/routers/discordChannel.js');
 const ConfigRouter = require('./private/routers/configAPI.js');
 const discordLoginRouter = require('./private/routers/discordLogin');
 const CommentRouter = require('./private/routers/Comment.js');
+const indexAPIRouter = require('./private/routers/indexAPI.js');
 const { config } = require('process');
 
 app.use('/api/auth', loginRouter);
@@ -236,6 +237,7 @@ app.use('/api/discordServer', discordServerRouter);
 app.use('/api/comment', CommentRouter);
 app.use('/api/discordChannel', discordChannelRouter);
 app.use('/api/config', ConfigRouter);
+app.use('/api', indexAPIRouter);
 app.use('/auth/discord', discordLoginRouter);
 
 app.get('/api/discord/oauth-config', (req, res) => {
