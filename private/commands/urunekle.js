@@ -1,4 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder, ChannelType, PermissionFlagsBits } = require('discord.js');
+const { pool } = require('../DB/connect.js');
 const Config = require('../../config.json');
 
 module.exports = {
@@ -63,11 +64,40 @@ module.exports = {
             .setImage(photo);
 
         try {
+            // Veritabanına ürün kaydı
+            const insertQuery = `
+                INSERT INTO discord_products 
+                (channel_id, channel_name, product_title, price_tl, price_usd, price_eur, photo_url, details, added_by) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON DUPLICATE KEY UPDATE 
+                channel_name = VALUES(channel_name),
+                product_title = VALUES(product_title),
+                price_tl = VALUES(price_tl),
+                price_usd = VALUES(price_usd),
+                price_eur = VALUES(price_eur),
+                photo_url = VALUES(photo_url),
+                details = VALUES(details),
+                added_by = VALUES(added_by),
+                added_at = CURRENT_TIMESTAMP
+            `;
+            
+            await pool.query(insertQuery, [
+                channel.id,
+                channel.name,
+                info,
+                priceTL,
+                priceUSD,
+                priceEUR,
+                photo,
+                customDetails || null,
+                interaction.user.id
+            ]);
+
             await channel.send({ embeds: [embed] });
-            await interaction.reply({ content: '✅ Ürün başarıyla gönderildi!', flags: 64 });
+            await interaction.reply({ content: '✅ Ürün başarıyla gönderildi ve veritabanına kaydedildi!', flags: 64 });
         } catch (err) {
-            console.error('Mesaj gönderme hatası:', err);
-            await interaction.reply({ content: '❌ Embed mesajı gönderilemedi. Lütfen botun izinlerini kontrol et.', flags: 64 });
+            console.error('Ürün ekleme hatası:', err);
+            await interaction.reply({ content: '❌ Ürün eklenirken bir hata oluştu. Lütfen botun izinlerini kontrol et.', flags: 64 });
         }
     }
 };

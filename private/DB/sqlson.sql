@@ -78,6 +78,25 @@ CREATE TABLE IF NOT EXISTS `product_feedback` (
   KEY `created_at` (`created_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- Dumping structure for table fivemwebpanel.products
+CREATE TABLE IF NOT EXISTS `discord_products` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `channel_id` varchar(255) NOT NULL,
+  `channel_name` varchar(255) NOT NULL,
+  `product_title` varchar(255) NOT NULL,
+  `price_tl` decimal(10,2) NOT NULL,
+  `price_usd` decimal(10,2) NOT NULL,
+  `price_eur` decimal(10,2) NOT NULL,
+  `photo_url` text NOT NULL,
+  `details` text DEFAULT NULL,
+  `added_by` varchar(255) NOT NULL,
+  `added_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `channel_id` (`channel_id`),
+  KEY `added_by` (`added_by`),
+  KEY `added_at` (`added_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
