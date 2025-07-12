@@ -53,7 +53,7 @@ module.exports = {
                     price_eur,
                     added_at,
                     added_by
-                FROM products 
+                FROM discord_products 
                 ORDER BY ${orderBy}
             `;
 
