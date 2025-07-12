@@ -18,7 +18,7 @@
         "AnnoncementChannel": "1392487272666108024",
         "commaentChannel": "1292529004577816750",
         "redirectUri": "http://localhost:3000/auth/discord/callback",
-        "clientSecret": "cGlHdaaoi813mDxYus3uRLe0WFgT8VOp",
+        "clientSecret": "qRcEVZsH2j4esmz0P14jNFVuLA8NBnCH",
         "adminRoleId": "1392601717555855490"
     },
     "web": {}
