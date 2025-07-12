@@ -1356,3 +1356,34 @@ html {
     height: 64px;
   }
 }
+
+/* Team List Loading ve Error Durumları */
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: #e0eaff;
+  font-size: 1.1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.no-members {
+  text-align: center;
+  padding: 40px;
+  color: #94a3b8;
+  font-size: 1.1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.error {
+  text-align: center;
+  padding: 40px;
+  color: #ff6b6b;
+  font-size: 1.1rem;
+  background: rgba(255, 107, 107, 0.1);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 107, 107, 0.3);
+}

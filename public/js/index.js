@@ -18,6 +18,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Sunucu üye sayısını yükle
     loadServerCount();
+    
+    // Support üyelerini yükle
+    loadSupportMembers();
 
     // Scroll effect
     if (navbar) {
@@ -728,3 +731,246 @@ async function loadCustomerCount() {
         }
     }
 }
+
+// Support üyelerini yükle ve güncelle
+async function loadSupportMembers() {
+    try {
+        const response = await fetch('/api/discord/support');
+        const data = await response.json();
+        
+        const teamListElement = document.getElementById('teamList');
+        
+        if (!teamListElement) {
+            console.error('Team list elementi bulunamadı');
+            return;
+        }
+        
+        if (data.success && data.data && data.data.members) {
+            const members = data.data.members;
+            
+            if (members.length === 0) {
+                teamListElement.innerHTML = '<div class="no-members">Henüz support üyesi bulunmuyor</div>';
+                return;
+            }
+            
+            // Support üyelerini HTML'e ekle
+            const membersHTML = members.map(member => {
+                return `
+                    <div class="team-card" onclick="window.open('https://discord.com/users/${member.id}', '_blank')" style="cursor: pointer;">
+                        <div class="team-avatar">
+                            <img src="${member.avatar}" alt="${member.displayName || member.username}" 
+                                 onerror="this.src='assets/müşteri.png'">
+                        </div>
+                        <div class="team-name">${member.displayName || member.username}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            teamListElement.innerHTML = membersHTML;
+            
+            console.log('Support üyeleri başarıyla yüklendi:', data.data);
+        } else {
+            console.error('Support üyeleri alınamadı:', data);
+            teamListElement.innerHTML = '<div class="error">Support üyeleri yüklenirken hata oluştu</div>';
+        }
+    } catch (error) {
+        console.error('Support üyeleri yüklenirken hata oluştu:', error);
+        const teamListElement = document.getElementById('teamList');
+        
+        if (teamListElement) {
+            teamListElement.innerHTML = '<div class="error">Support üyeleri yüklenirken hata oluştu</div>';
+        }
+    }
+}
+
+// Sayfalama değişkenleri
+let allFeedbacks = [];
+let currentPage = 1;
+const itemsPerPage = 3;
+
+// Müşteri değerlendirmelerini yükle ve güncelle
+async function loadReferences() {
+    const referencesList = document.getElementById('referencesList');
+    const pagination = document.getElementById('pagination');
+    if (!referencesList) return;
+
+    try {
+        const response = await fetch('/api/product-feedback');
+        const data = await response.json();
+
+        console.log('API feedback data:', data);
+
+        if (!data.success || !data.data || !data.data.feedbacks || data.data.feedbacks.length === 0) {
+            referencesList.innerHTML = '<div class="no-members">Henüz müşteri değerlendirmesi bulunmuyor.</div>';
+            pagination.style.display = 'none';
+            return;
+        }
+
+        allFeedbacks = data.data.feedbacks;
+        console.log('Feedbacks:', allFeedbacks);
+
+        // Sayfalama göster ve ilk sayfayı yükle
+        if (allFeedbacks.length > itemsPerPage) {
+            pagination.style.display = 'flex';
+            renderPage(1);
+            renderPagination();
+        } else {
+            pagination.style.display = 'none';
+            renderAllFeedbacks();
+        }
+    } catch (error) {
+        referencesList.innerHTML = '<div class="error">Müşteri değerlendirmeleri yüklenirken hata oluştu.</div>';
+        pagination.style.display = 'none';
+        console.error('Müşteri değerlendirmeleri yüklenirken hata:', error);
+    }
+}
+
+// Belirli bir sayfayı render et
+function renderPage(page) {
+    currentPage = page;
+    const referencesList = document.getElementById('referencesList');
+    const startIndex = (page - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const pageFeedbacks = allFeedbacks.slice(startIndex, endIndex);
+
+    const stars = rating => '★'.repeat(rating) + '☆'.repeat(5 - rating);
+    const verifiedSVG = `
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="vertical-align:middle;">
+            <circle cx="8" cy="8" r="8" fill="#16a34a" />
+            <path d="M5 8.5L7.2 10.7L11 6.5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg> Doğrulanmış
+    `;
+
+    referencesList.innerHTML = pageFeedbacks.map(fb => `
+        <div class="reference-card animate-fade">
+            <div class="reference-top">
+                <span class="stars">${stars(fb.rating)}</span>
+                <span class="verified">${verifiedSVG}</span>
+            </div>
+            <blockquote><span class="quote-icon">"</span>${fb.message}</blockquote>
+            <div class="reference-user">
+                <img src="${fb.avatar_url || 'assets/müşteri.png'}" alt="${fb.username}" class="reference-avatar" onerror="this.src='assets/müşteri.png'" />
+                <div>
+                    <span class="user-name">${fb.username}</span>
+                    <span class="user-server">${fb.product_channel_name}</span>
+                </div>
+            </div>
+        </div>
+    `).join('');
+
+    // Animasyonu tetikle
+    setTimeout(() => {
+        const cards = referencesList.querySelectorAll('.animate-fade');
+        cards.forEach(card => {
+            card.classList.add('visible');
+        });
+    }, 100);
+}
+
+// Tüm feedback'leri render et (sayfalama yoksa)
+function renderAllFeedbacks() {
+    const referencesList = document.getElementById('referencesList');
+    
+    const stars = rating => '★'.repeat(rating) + '☆'.repeat(5 - rating);
+    const verifiedSVG = `
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="vertical-align:middle;">
+            <circle cx="8" cy="8" r="8" fill="#16a34a" />
+            <path d="M5 8.5L7.2 10.7L11 6.5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg> Doğrulanmış
+    `;
+
+    referencesList.innerHTML = allFeedbacks.map(fb => `
+        <div class="reference-card animate-fade">
+            <div class="reference-top">
+                <span class="stars">${stars(fb.rating)}</span>
+                <span class="verified">${verifiedSVG}</span>
+            </div>
+            <blockquote><span class="quote-icon">"</span>${fb.message}</blockquote>
+            <div class="reference-user">
+                <img src="${fb.avatar_url || 'assets/müşteri.png'}" alt="${fb.username}" class="reference-avatar" onerror="this.src='assets/müşteri.png'" />
+                <div>
+                    <span class="user-name">${fb.username}</span>
+                    <span class="user-server">${fb.product_channel_name}</span>
+                </div>
+            </div>
+        </div>
+    `).join('');
+
+    // Animasyonu tetikle
+    setTimeout(() => {
+        const cards = referencesList.querySelectorAll('.animate-fade');
+        cards.forEach(card => {
+            card.classList.add('visible');
+        });
+    }, 100);
+}
+
+// Sayfalama kontrollerini render et
+function renderPagination() {
+    const totalPages = Math.ceil(allFeedbacks.length / itemsPerPage);
+    const pageNumbers = document.getElementById('pageNumbers');
+    const prevBtn = document.getElementById('prevPage');
+    const nextBtn = document.getElementById('nextPage');
+
+    // Önceki/Sonraki butonlarını güncelle
+    prevBtn.disabled = currentPage === 1;
+    nextBtn.disabled = currentPage === totalPages;
+
+    // Sayfa numaralarını oluştur
+    let paginationHTML = '';
+    
+    if (totalPages <= 7) {
+        // 7 sayfa veya daha azsa tüm sayfaları göster
+        for (let i = 1; i <= totalPages; i++) {
+            paginationHTML += `<span class="page-number ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</span>`;
+        }
+    } else {
+        // 7'den fazla sayfa varsa akıllı sayfalama
+        if (currentPage <= 4) {
+            // İlk sayfalardayız
+            for (let i = 1; i <= 5; i++) {
+                paginationHTML += `<span class="page-number ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</span>`;
+            }
+            paginationHTML += `<span class="page-number dots">...</span>`;
+            paginationHTML += `<span class="page-number" onclick="goToPage(${totalPages})">${totalPages}</span>`;
+        } else if (currentPage >= totalPages - 3) {
+            // Son sayfalardayız
+            paginationHTML += `<span class="page-number" onclick="goToPage(1)">1</span>`;
+            paginationHTML += `<span class="page-number dots">...</span>`;
+            for (let i = totalPages - 4; i <= totalPages; i++) {
+                paginationHTML += `<span class="page-number ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</span>`;
+            }
+        } else {
+            // Ortadaki sayfalardayız
+            paginationHTML += `<span class="page-number" onclick="goToPage(1)">1</span>`;
+            paginationHTML += `<span class="page-number dots">...</span>`;
+            for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+                paginationHTML += `<span class="page-number ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</span>`;
+            }
+            paginationHTML += `<span class="page-number dots">...</span>`;
+            paginationHTML += `<span class="page-number" onclick="goToPage(${totalPages})">${totalPages}</span>`;
+        }
+    }
+
+    pageNumbers.innerHTML = paginationHTML;
+}
+
+// Belirli bir sayfaya git
+function goToPage(page) {
+    renderPage(page);
+    renderPagination();
+}
+
+// Sayfa değiştir (önceki/sonraki)
+function changePage(direction) {
+    const newPage = currentPage + direction;
+    const totalPages = Math.ceil(allFeedbacks.length / itemsPerPage);
+    
+    if (newPage >= 1 && newPage <= totalPages) {
+        goToPage(newPage);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadReferences();
+});
