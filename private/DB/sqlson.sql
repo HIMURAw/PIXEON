@@ -62,6 +62,22 @@ INSERT INTO `user_history` (`id`, `user_id`, `username`, `action`, `reason`, `ti
 	(10, '1309627108875698219', 'roro0131310seif', 'unban', 'Sebep belirtilmedi', '2025-06-17 23:59:03', '768372430631731210', 'himura_1'),
 	(11, '1274422892402053313', 'regular5x', 'unban', 'Sebep belirtilmedi', '2025-06-17 23:59:05', '768372430631731210', 'himura_1');
 
+-- Dumping structure for table fivemwebpanel.product_feedback
+CREATE TABLE IF NOT EXISTS `product_feedback` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` varchar(255) NOT NULL,
+  `username` varchar(255) NOT NULL,
+  `product_channel_id` varchar(255) NOT NULL,
+  `product_channel_name` varchar(255) NOT NULL,
+  `rating` int(1) NOT NULL CHECK (rating >= 1 AND rating <= 5),
+  `message` text NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  KEY `product_channel_id` (`product_channel_id`),
+  KEY `created_at` (`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;

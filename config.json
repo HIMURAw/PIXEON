@@ -15,6 +15,7 @@
         "clientId": "1238268562171236384",
         "guidid": "1269430268402335867",
         "serverName": "PXDevelopment",
+        "serverLogo": "https://cdn.discordapp.com/attachments/1392486533696720918/1392486943329353921/px.png?ex=687301c6&is=6871b046&hm=0ba273ff2d6cbc8e1e5df8e718c4d3f796cbd12d5c7c44b17c3f6391ef428340&",
         "voicechannel": "1391498861960237219",
         "AnnoncementChannel": "1392487272666108024",
         "commaentChannel": "1292529004577816750",
@@ -27,8 +28,15 @@
         },
         "shopBot": {
             "near": "Bu ürün çok yakında satışa çıkacak! Takipte kalın ve fırsatları kaçırmayın. 🎉",
+            "customerRoleId": "1283221241720864851",
+            "feedbackChannelId": "1292529004577816750",
             "dolar": 40.17,
-            "euro": 46.97
+            "euro": 46.97,
+            "productCategoryIds": [
+                "1271181568077201560",
+                "1392450251843174430",
+                "1392450503710998588"
+            ]
         }
     },
     "web": {}
