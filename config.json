@@ -26,7 +26,9 @@
             "WebhookLogoURL": "https://cdn.discordapp.com/attachments/1392486533696720918/1392486943329353921/px.png?ex=687301c6&is=6871b046&hm=0ba273ff2d6cbc8e1e5df8e718c4d3f796cbd12d5c7c44b17c3f6391ef428340&"
         },
         "shopBot": {
-            "near": "Bu ürün çok yakında satışa çıkacak! Takipte kalın ve fırsatları kaçırmayın. 🎉"
+            "near": "Bu ürün çok yakında satışa çıkacak! Takipte kalın ve fırsatları kaçırmayın. 🎉",
+            "dolar": 40.17,
+            "euro": 46.97
         }
     },
     "web": {}
