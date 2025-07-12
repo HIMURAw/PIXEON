@@ -8,6 +8,7 @@ const fs = require('fs');
 const { pool, checkConnection } = require('./private/DB/connect');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
+const { EmbedBuilder } = require('discord.js');
 
 const app = express();
 
@@ -117,24 +118,62 @@ client.once(Events.ClientReady, async () => {
     await registerCommands();
 });
 
+
 client.on(Events.InteractionCreate, async interaction => {
-    if (!interaction.isChatInputCommand()) return;
+    // Slash command handler
+    if (interaction.isChatInputCommand()) {
+        const command = client.commands.get(interaction.commandName);
 
-    const command = client.commands.get(interaction.commandName);
+        if (!command) {
+            console.error(`No command matching ${interaction.commandName} was found.`);
+            return;
+        }
 
-    if (!command) {
-        console.error(`No command matching ${interaction.commandName} was found.`);
-        return;
+        try {
+            await command.execute(interaction);
+        } catch (error) {
+            console.error(error);
+            if (interaction.replied || interaction.deferred) {
+                await interaction.followUp({ content: 'There was an error while executing this command!', flags: 64 });
+            } else {
+                await interaction.reply({ content: 'There was an error while executing this command!', flags: 64 });
+            }
+        }
     }
+    
+    // Modal submit handler
+    if (interaction.isModalSubmit()) {
+        // Duyuru modal handler
+        if (interaction.customId.startsWith('sendMessageModal-')) {
+            const [modalId, channelId] = interaction.customId.split('-');
+            const message = interaction.fields.getTextInputValue('messageInput');
 
-    try {
-        await command.execute(interaction);
-    } catch (error) {
-        console.error(error);
-        if (interaction.replied || interaction.deferred) {
-            await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
-        } else {
-            await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+            const channel = interaction.guild.channels.cache.get(channelId);
+            if (!channel) {
+                return interaction.reply({ content: '❌ Kanal bulunamadı.', flags: 64 });
+            }
+
+            const embed = new EmbedBuilder()
+                .setColor('#3498db')
+                .setTitle('📢 Yeni Duyuru')
+                .setDescription(message)
+                .setFooter({ text: `Gönderen: ${interaction.user.tag}` })
+                .setTimestamp();
+
+            // Önce embed'i gönder, sonra everyone mention'ı ekle
+            await channel.send({ content: '@everyone | @Here', embeds: [embed] });
+
+            await interaction.reply({ content: `✅ Duyuru başarıyla ${channel} kanalına gönderildi!`, flags: 64 });
+        }
+        
+        // Dümdüz mesaj modal handler
+        if (interaction.customId === 'sendPlainMessageModal') {
+            const message = interaction.fields.getTextInputValue('plainMessageInput');
+            
+            // Bot'un kullandığı kanala gönder
+            await interaction.channel.send(message);
+            
+            await interaction.reply({ content: '✅ Mesaj başarıyla gönderildi!', flags: 64 });
         }
     }
 });
@@ -226,6 +265,9 @@ client.on('ready', () => {
         adapterCreator: channel.guild.voiceAdapterCreator
     });
 });
+
+
+
 
 
 
