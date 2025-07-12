@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="assets/logo.png">
+    <title>PR Gun & PvP</title>
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body id="mainpage">
+    <nav class="navbar">
+        <div class="navbar-container">
+            <!-- Kullanıcı profil kutusu - en sol tarafta -->
+            <div id="user-profile" style="display:flex; align-items:center; gap:8px; margin-right: 1rem;">
+                <img id="user-avatar" src="https://cdn.discordapp.com/embed/avatars/0.png" alt="Avatar"
+                    style="width:32px; height:32px; border-radius:50%; object-fit:cover;">
+                <span id="user-name" style="color:var(--accent-color); font-weight:600;">Guest</span>
+            </div>
+            <div class="navbar-brand">
+                <a href="#mainpage">
+                    <img class="fivem-logo" src="assets/logo.png" alt="PR Gun & PvP Logo">
+                </a>
+                <a href="#" class="logo">PRGun</a>
+            </div>
+            <div class="navbar-toggle" id="navbarToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <ul class="navbar-menu">
+                <li><a href="#" class="active">Home</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#servers">Servers</a></li>
+                <li><a href="#contact">Contact</a></li>
+                <li><button class="login-btn" id="loginBtn"><i class="fas fa-user"></i> Login</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Login Modal -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Login</h2>
+                <button class="close-btn" id="closeModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <div class="password-input-container">
+                            <input type="password" id="password" name="password" required>
+                            <button type="button" class="toggle-password" id="togglePassword">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-options">
+                        <label class="remember-me">
+                            <input type="checkbox" name="remember">
+                            Remember me
+                        </label>
+                        <a href="#" class="forgot-password">Forgot Password?</a>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Login</button>
+                </form>
+                <div class="social-login">
+                    <p>Or login with</p>
+                    <div class="social-buttons">
+                        <button class="btn btn-social btn-discord">
+                            <i class="fab fa-discord"></i> Discord
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <h1>Welcome to PR Gun & PvP</h1>
+                <p>Experience the ultimate FiveM PvP experience</p>
+                <div class="hero-buttons">
+                    <a href="#" class="btn btn-primary">Join Server</a>
+                    <a href="#" class="btn btn-secondary">Discord</a>
+                </div>
+                <div class="server-stats">
+                    <div class="stat">
+                        <i class="fas fa-users"></i>
+                        <span>1000+ Players</span>
+                    </div>
+                    <div class="stat">
+                        <i class="fas fa-server"></i>
+                        <span>24/7 Online</span>
+                    </div>
+                    <div class="stat">
+                        <i class="fas fa-star"></i>
+                        <span>4.9/5 Rating</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section id="features" class="features">
+            <h2>Server Features</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <i class="fas fa-gun"></i>
+                    <h3>Custom Weapons</h3>
+                    <p>Unique weapon system with custom animations</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-car"></i>
+                    <h3>Vehicle System</h3>
+                    <p>Advanced vehicle mechanics and customization</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-shield-alt"></i>
+                    <h3>Anti-Cheat</h3>
+                    <p>Advanced protection against cheaters</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-trophy"></i>
+                    <h3>Ranking System</h3>
+                    <p>Compete and climb the leaderboards</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Server Info Section -->
+        <section id="servers" class="servers">
+            <h2>Our Servers</h2>
+            <div class="server-cards">
+                <div class="server-card">
+                    <h3>PvP Arena</h3>
+                    <p>Join the ultimate PvP experience</p>
+                    <div class="server-info">
+                        <span><i class="fas fa-users"></i> 128/128</span>
+                        <span><i class="fas fa-signal"></i> 32ms</span>
+                    </div>
+                    <a href="#" class="btn btn-primary">Connect</a>
+                </div>
+                <div class="server-card">
+                    <h3>Training Ground</h3>
+                    <p>Practice your skills</p>
+                    <div class="server-info">
+                        <span><i class="fas fa-users"></i> 64/64</span>
+                        <span><i class="fas fa-signal"></i> 28ms</span>
+                    </div>
+                    <a href="#" class="btn btn-primary">Connect</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>PR Gun & PvP</h3>
+                <p>Best FiveM PvP experience</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-discord"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#servers">Servers</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Contact Us</h3>
+                <ul class="contact-info">
+                    <li><i class="fas fa-envelope"></i> support@prgun.com</li>
+                    <li><i class="fab fa-discord"></i> Join our Discord</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 PR Gun & PvP. All rights reserved.</p>
+            <button id="adminLoginBtn" class="admin-login-btn" style="display:none;">
+                <i class="fas fa-shield-alt"></i> Admin Panel
+            </button>
+        </div>
+    </footer>
+
+
+    <div id="confirm-modal" class="confirm-modal">
+        <div class="confirm-modal-content">
+            <span class="confirm-modal-close" id="confirm-modal-close">&times;</span>
+            <h2 id="confirm-modal-title">Emin misiniz?</h2>
+            <p id="confirm-modal-message">Bu işlemi yapmak istediğinize emin misiniz?</p>
+            <div class="confirm-modal-actions">
+                <button id="confirm-modal-ok" class="btn btn-primary">Evet</button>
+                <button id="confirm-modal-cancel" class="btn btn-secondary">İptal</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/index.js"></script>
+</body>
+
+</html>
