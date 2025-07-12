@@ -14,6 +14,7 @@
         "token": "MTIzODI2ODU2MjE3MTIzNjM4NA.GxHzP7.2p7U9PZmEBhvy2JVXGVCUltY1UHtQc2SsSdLv8",
         "clientId": "1238268562171236384",
         "guidid": "1269430268402335867",
+        "serverName": "PXDevelopment",
         "voicechannel": "1391498861960237219",
         "AnnoncementChannel": "1392487272666108024",
         "commaentChannel": "1292529004577816750",
@@ -23,6 +24,9 @@
         "log": {
             "WebhookName": "PXDevelopment Log",
             "WebhookLogoURL": "https://cdn.discordapp.com/attachments/1392486533696720918/1392486943329353921/px.png?ex=687301c6&is=6871b046&hm=0ba273ff2d6cbc8e1e5df8e718c4d3f796cbd12d5c7c44b17c3f6391ef428340&"
+        },
+        "shopBot": {
+            "near": "Bu ürün çok yakında satışa çıkacak! Takipte kalın ve fırsatları kaçırmayın. 🎉"
         }
     },
     "web": {}
