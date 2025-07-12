@@ -17,63 +17,67 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Toggle menu
-    navbarToggle.addEventListener('click', () => {
-        navbarToggle.classList.toggle('active');
-        navbarMenu.classList.toggle('active');
-        document.body.style.overflow = navbarMenu.classList.contains('active') ? 'hidden' : '';
-    });
-
-    // Close menu when clicking outside
-    document.addEventListener('click', (e) => {
-        if (!navbarToggle.contains(e.target) && !navbarMenu.contains(e.target)) {
-            navbarMenu.classList.remove('active');
-            navbarToggle.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-    });
-
-    // Close menu when clicking on a menu item
-    menuItems.forEach(item => {
-        item.addEventListener('click', () => {
-            navbarMenu.classList.remove('active');
-            navbarToggle.classList.remove('active');
-            document.body.style.overflow = '';
+    // Toggle menu (sadece navbarToggle varsa)
+    if (navbarToggle) {
+        navbarToggle.addEventListener('click', () => {
+            navbarToggle.classList.toggle('active');
+            navbarMenu.classList.toggle('active');
+            document.body.style.overflow = navbarMenu.classList.contains('active') ? 'hidden' : '';
         });
-    });
 
-    // Login Modal
-    loginBtn.addEventListener('click', async () => {
-        const token = getCookie('auth_token');
-        if (token) {
-            // SQL'den rollerini çek
-            const res = await fetch('/api/auth/discord-roles', {
-                headers: { 'Authorization': `Bearer ${token}` }
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!navbarToggle.contains(e.target) && !navbarMenu.contains(e.target)) {
+                navbarMenu.classList.remove('active');
+                navbarToggle.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+
+        // Close menu when clicking on a menu item
+        menuItems.forEach(item => {
+            item.addEventListener('click', () => {
+                navbarMenu.classList.remove('active');
+                navbarToggle.classList.remove('active');
+                document.body.style.overflow = '';
             });
-            const data = await res.json();
-            // adminRoleId'yi configten çek
-            const cfgRes = await fetch('/api/discord/oauth-config');
-            const { adminRoleId } = await cfgRes.json();
+        });
+    }
 
-            if (data.roles && data.roles.includes(adminRoleId)) {
-                window.location.href = '/dashboard';
+    // Login Modal (sadece elementler varsa)
+    if (loginBtn && loginModal && closeModal) {
+        loginBtn.addEventListener('click', async () => {
+            const token = getCookie('auth_token');
+            if (token) {
+                // SQL'den rollerini çek
+                const res = await fetch('/api/auth/discord-roles', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                // adminRoleId'yi configten çek
+                const cfgRes = await fetch('/api/discord/oauth-config');
+                const { adminRoleId } = await cfgRes.json();
+
+                if (data.roles && data.roles.includes(adminRoleId)) {
+                    window.location.href = '/dashboard';
+                } else {
+                    loginModal.style.display = 'flex';
+                }
             } else {
                 loginModal.style.display = 'flex';
             }
-        } else {
-            loginModal.style.display = 'flex';
-        }
-    });
+        });
 
-    closeModal.addEventListener('click', () => {
-        loginModal.style.display = 'none';
-    });
-
-    window.addEventListener('click', (e) => {
-        if (e.target === loginModal) {
+        closeModal.addEventListener('click', () => {
             loginModal.style.display = 'none';
-        }
-    });
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target === loginModal) {
+                loginModal.style.display = 'none';
+            }
+        });
+    }
 
     // Cookie işlemleri için yardımcı fonksiyonlar
     function setCookie(name, value, days) {
@@ -188,16 +192,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!encodedUserData) {
             console.log('User data bulunamadı - default durum gösteriliyor');
             // Default durum - giriş yapmamış kullanıcı
-            document.getElementById('user-profile').style.display = 'flex';
-            document.getElementById('user-avatar').src = 'https://cdn.discordapp.com/embed/avatars/0.png';
-            document.getElementById('user-name').textContent = 'Guest';
+            const discordLoginBtn = document.querySelector('.discord-btn');
+            const userProfile = document.getElementById('userProfile');
+            const userAvatar = document.getElementById('userAvatar');
+            const userName = document.getElementById('userName');
 
-            // Login butonunu göster
-            document.getElementById('loginBtn').style.display = 'block';
-
-            // Çıkış butonunu kaldır (eğer varsa)
-            const logoutBtn = document.getElementById('logout-btn');
-            if (logoutBtn) logoutBtn.remove();
+            // Discord butonunu göster, kullanıcı profilini gizle
+            if (discordLoginBtn) discordLoginBtn.style.display = 'flex';
+            if (userProfile) userProfile.style.display = 'none';
+            if (userAvatar) userAvatar.src = 'https://cdn.discordapp.com/embed/avatars/0.png';
+            if (userName) userName.textContent = 'Guest';
 
             return;
         }
@@ -221,30 +225,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.log('Setting username to:', userData.username);
                 console.log('Setting avatar to:', userData.avatar);
 
-                document.getElementById('user-profile').style.display = 'flex';
-                document.getElementById('user-name').textContent = userData.username;
-                document.getElementById('user-avatar').src = userData.avatar;
+                const discordLoginBtn = document.querySelector('.discord-btn');
+                const userProfile = document.getElementById('userProfile');
+                const userAvatar = document.getElementById('userAvatar');
+                const userName = document.getElementById('userName');
 
-                // Login butonunu gizle
-                document.getElementById('loginBtn').style.display = 'none';
-
-                // Çıkış butonu ekle (eğer yoksa)
-                if (!document.getElementById('logout-btn')) {
-                    const logoutBtn = document.createElement('button');
-                    logoutBtn.id = 'logout-btn';
-                    logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i>';
-                    logoutBtn.style.cssText = 'background:none; border:none; color:var(--accent-color); cursor:pointer; font-size:16px; margin-left:8px;';
-                    logoutBtn.title = 'Çıkış Yap';
-                    logoutBtn.addEventListener('click', () => {
-                        showConfirmModal({
-                            title: "Çıkış Yap",
-                            message: "Çıkmak istediğinize emin misiniz?",
-                            onOk: logout,
-                            onCancel: () => {}
-                        });
-                    });
-                    document.getElementById('user-profile').appendChild(logoutBtn);
-                }
+                // Discord butonunu gizle, kullanıcı profilini göster
+                if (discordLoginBtn) discordLoginBtn.style.display = 'none';
+                if (userProfile) userProfile.style.display = 'flex';
+                if (userName) userName.textContent = userData.username;
+                if (userAvatar) userAvatar.src = userData.avatar;
 
                 // Admin butonunu kontrol et
                 manageAdminButton();
@@ -252,20 +242,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.log('Username bulunamadı veya boş');
                 console.log('userData:', userData);
                 // Default duruma dön
-                document.getElementById('user-profile').style.display = 'flex';
-                document.getElementById('user-avatar').src = 'https://cdn.discordapp.com/embed/avatars/0.png';
-                document.getElementById('user-name').textContent = 'Guest';
-                document.getElementById('loginBtn').style.display = 'block';
+                const discordLoginBtn = document.querySelector('.discord-btn');
+                const userProfile = document.getElementById('userProfile');
+                const userAvatar = document.getElementById('userAvatar');
+                const userName = document.getElementById('userName');
+
+                if (discordLoginBtn) discordLoginBtn.style.display = 'flex';
+                if (userProfile) userProfile.style.display = 'none';
+                if (userAvatar) userAvatar.src = 'https://cdn.discordapp.com/embed/avatars/0.png';
+                if (userName) userName.textContent = 'Guest';
             }
         } catch (e) {
             console.error('Cookie parse error:', e);
             console.error('Problematic cookie data:', encodedUserData);
             // Hata durumunda cookie'yi temizle ve default duruma dön
             deleteCookie('auth_token');
-            document.getElementById('user-profile').style.display = 'flex';
-            document.getElementById('user-avatar').src = 'https://cdn.discordapp.com/embed/avatars/0.png';
-            document.getElementById('user-name').textContent = 'Guest';
-            document.getElementById('loginBtn').style.display = 'block';
+            const discordLoginBtn = document.querySelector('.discord-btn');
+            const userProfile = document.getElementById('userProfile');
+            const userAvatar = document.getElementById('userAvatar');
+            const userName = document.getElementById('userName');
+
+            if (discordLoginBtn) discordLoginBtn.style.display = 'flex';
+            if (userProfile) userProfile.style.display = 'none';
+            if (userAvatar) userAvatar.src = 'https://cdn.discordapp.com/embed/avatars/0.png';
+            if (userName) userName.textContent = 'Guest';
         }
     }
 
@@ -274,14 +274,15 @@ document.addEventListener('DOMContentLoaded', () => {
         deleteCookie('auth_token');
 
         // Default duruma dön
-        document.getElementById('user-profile').style.display = 'flex';
-        document.getElementById('user-avatar').src = 'https://cdn.discordapp.com/embed/avatars/0.png';
-        document.getElementById('user-name').textContent = 'Guest';
-        document.getElementById('loginBtn').style.display = 'block';
+        const discordLoginBtn = document.querySelector('.discord-btn');
+        const userProfile = document.getElementById('userProfile');
+        const userAvatar = document.getElementById('userAvatar');
+        const userName = document.getElementById('userName');
 
-        // Çıkış butonunu kaldır
-        const logoutBtn = document.getElementById('logout-btn');
-        if (logoutBtn) logoutBtn.remove();
+        if (discordLoginBtn) discordLoginBtn.style.display = 'flex';
+        if (userProfile) userProfile.style.display = 'none';
+        if (userAvatar) userAvatar.src = 'https://cdn.discordapp.com/embed/avatars/0.png';
+        if (userName) userName.textContent = 'Guest';
 
         console.log('Çıkış yapıldı - default duruma dönüldü');
     }
@@ -294,10 +295,15 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('Broken cookie cleared');
 
         // Default duruma dön
-        document.getElementById('user-profile').style.display = 'flex';
-        document.getElementById('user-avatar').src = 'https://cdn.discordapp.com/embed/avatars/0.png';
-        document.getElementById('user-name').textContent = 'Guest';
-        document.getElementById('loginBtn').style.display = 'block';
+        const userProfile = document.getElementById('user-profile');
+        const userAvatar = document.getElementById('user-avatar');
+        const userName = document.getElementById('user-name');
+        const loginBtnElement = document.getElementById('loginBtn');
+
+        if (userProfile) userProfile.style.display = 'flex';
+        if (userAvatar) userAvatar.src = 'https://cdn.discordapp.com/embed/avatars/0.png';
+        if (userName) userName.textContent = 'Guest';
+        if (loginBtnElement) loginBtnElement.style.display = 'block';
 
         // Çıkış butonunu kaldır
         const logoutBtn = document.getElementById('logout-btn');
@@ -330,30 +336,69 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Şifre göster/gizle fonksiyonu
+    // Şifre göster/gizle fonksiyonu (sadece elementler varsa)
     const togglePassword = document.getElementById('togglePassword');
     const passwordInput = document.getElementById('password');
 
-    togglePassword.addEventListener('click', function () {
-        // Şifre tipini değiştir
-        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-        passwordInput.setAttribute('type', type);
+    if (togglePassword && passwordInput) {
+        togglePassword.addEventListener('click', function () {
+            // Şifre tipini değiştir
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
 
-        // İkonu değiştir
-        this.querySelector('i').classList.toggle('fa-eye');
-        this.querySelector('i').classList.toggle('fa-eye-slash');
-    });
+            // İkonu değiştir
+            this.querySelector('i').classList.toggle('fa-eye');
+            this.querySelector('i').classList.toggle('fa-eye-slash');
+        });
+    }
 
     // Discord ile giriş butonu
-    const discordLoginBtn = document.querySelector('.btn-discord');
+    const discordLoginBtn = document.querySelector('.discord-btn');
+    const userProfile = document.getElementById('userProfile');
+    const userAvatar = document.getElementById('userAvatar');
+    const userName = document.getElementById('userName');
+    const logoutBtn = document.getElementById('logoutBtn');
+
     if (discordLoginBtn) {
-        discordLoginBtn.addEventListener('click', async function () {
-            // Sunucudan Discord OAuth ayarlarını çek
-            const res = await fetch('/api/discord/oauth-config');
-            const { clientId, redirectUri } = await res.json();
-            const scope = 'identify email guilds guilds.members.read';
-            const discordAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${scope}`;
-            window.location.href = discordAuthUrl;
+        console.log('Discord butonu bulundu:', discordLoginBtn);
+        discordLoginBtn.addEventListener('click', async function (e) {
+            e.preventDefault(); // Varsayılan link davranışını engelle
+            console.log('Discord butonuna tıklandı!');
+
+            try {
+                // Sunucudan Discord OAuth ayarlarını çek
+                console.log('OAuth config endpoint\'i çağrılıyor...');
+                const res = await fetch('/api/discord/oauth-config');
+                console.log('Response status:', res.status);
+
+                if (!res.ok) {
+                    throw new Error(`HTTP error! status: ${res.status}`);
+                }
+
+                const config = await res.json();
+                console.log('OAuth config alındı:', config);
+
+                const { clientId, redirectUri } = config;
+                const scope = 'identify email guilds guilds.members.read';
+                const discordAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${scope}`;
+
+                console.log('Discord auth URL oluşturuldu:', discordAuthUrl);
+                window.location.href = discordAuthUrl;
+            } catch (error) {
+                console.error('Discord login hatası:', error);
+                alert('Discord girişi sırasında bir hata oluştu: ' + error.message);
+            }
+        });
+    } else {
+        console.error('Discord butonu bulunamadı!');
+    }
+
+    // Çıkış butonu event listener
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', function () {
+            if (confirm('Çıkmak istediğinize emin misiniz?')) {
+                logout();
+            }
         });
     }
 });
@@ -390,3 +435,247 @@ function showConfirmModal({ title = "Emin misiniz?", message = "", onOk, onCance
         if (e.target === modal) closeModal();
     };
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+    // Accordion SSS
+    document.querySelectorAll('.accordion-header').forEach(function (header) {
+        header.addEventListener('click', function () {
+            const item = header.parentElement;
+            const isActive = item.classList.contains('active');
+            // Tümünü kapat
+            document.querySelectorAll('.accordion-item').forEach(function (i) {
+                i.classList.remove('active');
+            });
+            // Eğer tıklanan zaten açıksa kapalı kalsın, değilse aç
+            if (!isActive) {
+                item.classList.add('active');
+            }
+        });
+    });
+    // Animasyonlar için Intersection Observer
+    function animateOnScroll(selector) {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.15 });
+        document.querySelectorAll(selector).forEach(el => observer.observe(el));
+    }
+    animateOnScroll('.animate-fade');
+    animateOnScroll('.animate-slide-up');
+    // Scroll to top butonu
+    const scrollBtn = document.getElementById('scrollToTopBtn');
+    if (scrollBtn) {
+        window.addEventListener('scroll', function () {
+            if (window.scrollY > 300) {
+                scrollBtn.style.opacity = '1';
+                scrollBtn.style.pointerEvents = 'auto';
+            } else {
+                scrollBtn.style.opacity = '0';
+                scrollBtn.style.pointerEvents = 'none';
+            }
+        });
+        scrollBtn.addEventListener('click', function () {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
+    // Burger menu
+    const burgerMenu = document.getElementById('burgerMenu');
+    const mainNav = document.getElementById('mainNav');
+    if (burgerMenu && mainNav) {
+        burgerMenu.addEventListener('click', function () {
+            const isOpen = mainNav.classList.toggle('open');
+            burgerMenu.classList.toggle('active', isOpen);
+            burgerMenu.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        });
+        // Menüden bir linke tıklanınca menüyü kapat (mobilde)
+        mainNav.querySelectorAll('a').forEach(function (link) {
+            link.addEventListener('click', function () {
+                if (window.innerWidth <= 900) {
+                    mainNav.classList.remove('open');
+                    burgerMenu.classList.remove('active');
+                    burgerMenu.setAttribute('aria-expanded', 'false');
+                }
+            });
+        });
+        // Menü dışında bir yere tıklanınca menüyü kapat
+        document.addEventListener('click', function (e) {
+            const isBurger = burgerMenu.contains(e.target);
+            const isNav = mainNav.contains(e.target);
+            if (mainNav.classList.contains('open') && !isBurger && !isNav) {
+                mainNav.classList.remove('open');
+                burgerMenu.classList.remove('active');
+                burgerMenu.setAttribute('aria-expanded', 'false');
+            }
+        });
+    }
+    // Chat bubble/modal
+    const chatBubbleBtn = document.getElementById('chatBubbleBtn');
+    const chatModal = document.getElementById('chatModal');
+    const chatModalClose = document.getElementById('chatModalClose');
+    if (chatBubbleBtn && chatModal && chatModalClose) {
+        chatBubbleBtn.addEventListener('click', function (e) {
+            chatModal.classList.add('open');
+        });
+        chatModalClose.addEventListener('click', function () {
+            chatModal.classList.remove('open');
+        });
+        // Modal dışına tıklayınca kapat
+        document.addEventListener('click', function (e) {
+            const isChatBubble = chatBubbleBtn.contains(e.target);
+            const isModal = chatModal.contains(e.target);
+            if (chatModal.classList.contains('open') && !isChatBubble && !isModal) {
+                chatModal.classList.remove('open');
+            }
+        });
+        // Modal içine tıklayınca kapatma (sadece dışına tıklayınca kapat)
+        chatModal.addEventListener('click', function (e) {
+            if (e.target === chatModal) {
+                chatModal.classList.remove('open');
+            }
+        });
+    }
+});
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    // Accordion SSS
+    document.querySelectorAll('.accordion-header').forEach(function (header) {
+        header.addEventListener('click', function () {
+            const item = header.parentElement;
+            const isActive = item.classList.contains('active');
+            // Tümünü kapat
+            document.querySelectorAll('.accordion-item').forEach(function (i) {
+                i.classList.remove('active');
+            });
+            // Eğer tıklanan zaten açıksa kapalı kalsın, değilse aç
+            if (!isActive) {
+                item.classList.add('active');
+            }
+        });
+    });
+    // Animasyonlar için Intersection Observer
+    function animateOnScroll(selector) {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.15 });
+        document.querySelectorAll(selector).forEach(el => observer.observe(el));
+    }
+    animateOnScroll('.animate-fade');
+    animateOnScroll('.animate-slide-up');
+    // Scroll to top butonu
+    const scrollBtn = document.getElementById('scrollToTopBtn');
+    if (scrollBtn) {
+        window.addEventListener('scroll', function () {
+            if (window.scrollY > 300) {
+                scrollBtn.style.opacity = '1';
+                scrollBtn.style.pointerEvents = 'auto';
+            } else {
+                scrollBtn.style.opacity = '0';
+                scrollBtn.style.pointerEvents = 'none';
+            }
+        });
+        scrollBtn.addEventListener('click', function () {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
+    // Burger menu
+    const burgerMenu = document.getElementById('burgerMenu');
+    const mainNav = document.getElementById('mainNav');
+    if (burgerMenu && mainNav) {
+        burgerMenu.addEventListener('click', function () {
+            const isOpen = mainNav.classList.toggle('open');
+            burgerMenu.classList.toggle('active', isOpen);
+            burgerMenu.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        });
+        // Menüden bir linke tıklanınca menüyü kapat (mobilde)
+        mainNav.querySelectorAll('a').forEach(function (link) {
+            link.addEventListener('click', function () {
+                if (window.innerWidth <= 900) {
+                    mainNav.classList.remove('open');
+                    burgerMenu.classList.remove('active');
+                    burgerMenu.setAttribute('aria-expanded', 'false');
+                }
+            });
+        });
+        // Menü dışında bir yere tıklanınca menüyü kapat
+        document.addEventListener('click', function (e) {
+            const isBurger = burgerMenu.contains(e.target);
+            const isNav = mainNav.contains(e.target);
+            if (mainNav.classList.contains('open') && !isBurger && !isNav) {
+                mainNav.classList.remove('open');
+                burgerMenu.classList.remove('active');
+                burgerMenu.setAttribute('aria-expanded', 'false');
+            }
+        });
+    }
+    // Chat bubble/modal
+    const chatBubbleBtn = document.getElementById('chatBubbleBtn');
+    const chatModal = document.getElementById('chatModal');
+    const chatModalClose = document.getElementById('chatModalClose');
+    if (chatBubbleBtn && chatModal && chatModalClose) {
+        chatBubbleBtn.addEventListener('click', function (e) {
+            chatModal.classList.add('open');
+        });
+        chatModalClose.addEventListener('click', function () {
+            chatModal.classList.remove('open');
+        });
+        // Modal dışına tıklayınca kapat
+        document.addEventListener('click', function (e) {
+            const isChatBubble = chatBubbleBtn.contains(e.target);
+            const isModal = chatModal.contains(e.target);
+            if (chatModal.classList.contains('open') && !isChatBubble && !isModal) {
+                chatModal.classList.remove('open');
+            }
+        });
+        // Modal içine tıklayınca kapatma (sadece dışına tıklayınca kapat)
+        chatModal.addEventListener('click', function (e) {
+            if (e.target === chatModal) {
+                chatModal.classList.remove('open');
+            }
+        });
+    }
+    // Sepete ekle fonksiyonu
+    function updateCartCount() {
+        const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+        document.getElementById('cartCount').textContent = cart.length;
+    }
+    document.querySelectorAll('.add-to-cart-btn').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            const product = btn.getAttribute('data-product');
+            const price = btn.getAttribute('data-price');
+            let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            cart.push({ product, price });
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartCount();
+            // Bildirim
+            let notif = document.createElement('div');
+            notif.textContent = 'Ürün sepete eklendi!';
+            notif.style.position = 'fixed';
+            notif.style.top = '24px';
+            notif.style.right = '24px';
+            notif.style.background = '#1482ff';
+            notif.style.color = '#fff';
+            notif.style.padding = '12px 24px';
+            notif.style.borderRadius = '18px';
+            notif.style.fontWeight = '700';
+            notif.style.zIndex = '9999';
+            notif.style.boxShadow = '0 2px 16px #1482ff55';
+            document.body.appendChild(notif);
+            setTimeout(function () { notif.remove(); }, 1400);
+        });
+    });
+    document.getElementById('cartIconBtn').addEventListener('click', function () {
+        window.location.href = 'sepet.html';
+    });
+    updateCartCount();
+});
