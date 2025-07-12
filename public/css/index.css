@@ -78,14 +78,71 @@ body {
   align-items: center;
   gap: 8px;
   border: none;
-  transition: background 0.2s, box-shadow 0.2s;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
 }
 .discord-btn:hover {
   background: linear-gradient(90deg, #2563eb 60%, #1482ff 100%);
   box-shadow: 0 4px 24px 0 #1482ff77;
+  cursor: pointer;
+  transform: translateY(-2px);
 }
 .discord-icon {
   font-size: 1.2em;
+}
+
+/* Kullanıcı Profili Stilleri */
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: 32px;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 25px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.user-profile:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid #1482ff;
+  object-fit: cover;
+}
+
+.user-name {
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.logout-btn {
+  background: none;
+  border: none;
+  color: #ff6b6b;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logout-btn:hover {
+  background: rgba(255, 107, 107, 0.2);
+  color: #ff5252;
+  transform: scale(1.1);
 }
 
 /* HERO YENİ DÜZEN */

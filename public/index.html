@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PXDev.store | Anasayfa</title>
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="css/index.css">
     <link rel="icon" href="logo.png">
 </head>
@@ -29,7 +29,14 @@
             <span class="burger-bar"></span>
             <span class="burger-bar"></span>
         </button>
-        <a href="#discord" class="discord-btn"> <span class="discord-icon"></span>Giriş Yap</a>
+        <button id="discordLogin" class="discord-btn btn-discord"> <span class="discord-icon"></span>Giriş Yap</button>
+        <div id="userProfile" class="user-profile" style="display: none;">
+            <img id="userAvatar" class="user-avatar" src="https://cdn.discordapp.com/embed/avatars/0.png" alt="Avatar">
+            <span id="userName" class="user-name">Guest</span>
+            <button id="logoutBtn" class="logout-btn" title="Çıkış Yap">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+        </div>
     </header>
 
     <main class="hero-section animate-fade" id="home">
@@ -61,7 +68,7 @@
                                 <path d="M23 21v-2a4 4 0 0 0-3-3.87" stroke="#1482ff" stroke-width="2" />
                                 <circle cx="17" cy="7" r="4" stroke="#1482ff" stroke-width="2" />
                             </svg></span>
-                        <span>+150 Sunucu</span>
+                        <span>+50 Sunucu</span>
                     </div>
                     <div class="stat-badge">
                         <span class="badge-icon"><svg width="18" height="18" fill="none" viewBox="0 0 24 24">
@@ -80,21 +87,53 @@
     <!-- Ürünler Bölümü -->
     <section class="products-section animate-slide-up" id="products">
         <h2>Ürünlerimiz</h2>
-        <div class="products-list">
-            <div class="product-card">
-                <h3>Discord Botu</h3>
-                <p>Sunucunuz için gelişmiş, özelleştirilebilir ve güvenli Discord botları.</p>
-                <a href="https://discord.gg/pxdev" class="btn primary">Detaylı İncele</a>
+        <p class="products-desc">Sunucunuz için en uygun bot paketini seçin ve Discord deneyiminizi üst seviyeye taşıyın
+        </p>
+        <div class="products-list premium-products">
+            <div class="premium-card">
+                <div class="premium-icon"><svg width="38" height="38" fill="none" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10" fill="#2563eb" />
+                        <path d="M8 13a4 4 0 0 1 8 0v1a4 4 0 0 1-8 0v-1Z" fill="#fff" />
+                        <circle cx="12" cy="9" r="2" fill="#fff" />
+                    </svg></div>
+                <h3>PXDev V3 Paket</h3>
+                <p>FiveM Sunucunuz İçin Resmon Değeri Düşük Kaliteli Scriptli Sunucu Paketi.</p>
+                <ul class="premium-features">
+                    <li>✔️ Özel Scriptler</li>
+                    <li>✔️ Kıyafet Paketi</li>
+                    <li>✔️ Araç Paketi</li>
+                </ul>
+                <div class="premium-price-row">
+                    <span class="premium-price">₺3000</span>
+                    <!-- <span class="premium-old">₺595</span> -->
+                </div>
+                <!-- İNDİRİM YOK-->
+                <!-- <span class="premium-discount">%60 İndirim</span> -->
+                <a href="#" class="btn premium-btn add-to-cart-btn" data-product="PXDev V3 Paket"
+                    data-price="3000">Sepete Ekle <span style="font-size:1.2em;vertical-align:middle;">+</span></a>
             </div>
-            <div class="product-card">
-                <h3>FiveM Script</h3>
-                <p>Roleplay sunucuları için optimize edilmiş, sorunsuz FiveM scriptleri.</p>
-                <a href="https://discord.gg/pxdev" class="btn primary">Detaylı İncele</a>
-            </div>
-            <div class="product-card">
-                <h3>Web Panel</h3>
-                <p>Sunucunuzu kolayca yönetebileceğiniz modern ve güvenli web panelleri.</p>
-                <a href="https://discord.gg/pxdev" class="btn primary">Detaylı İncele</a>
+            <div class="premium-card">
+                <div class="premium-icon"><svg width="38" height="38" fill="none" viewBox="0 0 24 24">
+                        <rect x="4" y="6" width="16" height="12" rx="2" fill="#2563eb" />
+                        <rect x="7" y="9" width="2" height="2" rx="1" fill="#fff" />
+                        <rect x="11" y="9" width="2" height="2" rx="1" fill="#fff" />
+                        <rect x="15" y="9" width="2" height="2" rx="1" fill="#fff" />
+                    </svg></div>
+                <h3>FiveM Sunucu Discord Bot Paketi</h3>
+                <p>FiveM sunucunuz için özel tasarlanmış kapsamlı Discord bot çözümü.</p>
+                <ul class="premium-features">
+                    <li>✔️ Guard Bots</li>
+                    <li>✔️ System Bots</li>
+                    <li>✔️ Ticket Bots</li>
+                </ul>
+                <div class="premium-price-row">
+                    <span class="premium-price">₺200</span>
+                    <!-- <span class="premium-old">₺495</span> -->
+                </div>
+                <!-- İNDİRİM YOK-->
+                <!-- <span class="premium-discount">%60 İndirim</span> -->
+                <a href="#" class="btn premium-btn add-to-cart-btn" data-product="FiveM Sunucu Discord Bot Paketi"
+                    data-price="200">Sepete Ekle <span style="font-size:1.2em;vertical-align:middle;">+</span></a>
             </div>
         </div>
     </section>
@@ -113,17 +152,37 @@
                         sağlamak.</li>
                 </ul>
             </div>
-            <div class="about-team">
-                <div class="team-member">
-                    <img src="assets/himura.webp" alt="Developer" />
-                    <span>himura_1</span>
-                </div>
-                <div class="team-member">
-                    <img src="assets/jaxx.jpg" alt="Developer" />
-                    <span>jaxxresmi</span>
-                </div>
-            </div>
+            <!-- <div class="about-team">
+        <div class="team-member">
+          <img src="assets/himura.webp" alt="Developer" />
+          <span>himura_1</span>
         </div>
+        <div class="team-member">
+          <img src="assets/jaxx.jpg" alt="Developer" />
+          <span>jaxxresmi</span>
+        </div>
+        </div>
+      </div> -->
+        </div>
+    </section>
+
+    <!-- Ekip Arkadaşlarımız Bölümü -->
+    <section class="team-section animate-slide-up">
+        <h2 class="team-title">Ekip Arkadaşlarımız</h2>
+        <p class="team-desc">Profesyonel ve dinamik ekibimizle hizmetinizdeyiz</p>
+        <div class="team-list">
+            <div class="team-card">
+                <div class="team-avatar"><img src="assets/himura.webp" alt="Vorteh"></div>
+                <div class="team-name">Himura</div>
+                <div class="team-role">FİRMA SAHİBİ</div>
+                <div class="team-role">DEVELOPER</div>
+            </div>
+            <div class="team-card">
+                <div class="team-avatar"><img src="assets/jaxx.jpg" alt="D4nger"></div>
+                <div class="team-name">Jaxx</div>
+                <div class="team-role">FİRMA SAHİBİ</div>
+                <div class="team-role">DEVELOPER</div>
+            </div>
         </div>
     </section>
 
@@ -295,8 +354,65 @@
         </div>
     </section>
 
-    <footer>
-        <p>&copy; 2025 PXDevelopment. Tüm Hakları Saklıdır.</p>
+    <footer class="footer-new">
+        <div class="footer-main">
+            <div class="footer-col footer-brand">
+                <span class="footer-logo">PX<span class="footer-highlight">Dev</span><span
+                        class="footer-dot">.store</span></span>
+                <p class="footer-desc">PXDev 2023 yılından beri +50 sunucuya ve +200 kişiye hizmet vermiştir. Kaliteli
+                    ve kullanım kolaylığı sağlayan sistemler ile sizlere hizmet vermeye devam etmektedir...</p>
+                <div class="footer-socials">
+                    <a href="https://discord.gg/pxdev" class="footer-social" aria-label="Discord"><svg width="22"
+                            height="22" fill="none" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="12" fill="#1482ff" />
+                            <path d="M7.5 17c-1.5-1-2.5-2.5-2.5-4.5C5 8.5 8.5 6 12 6s7 2.5 7 6.5c0 2-1 3.5-2.5 4.5"
+                                stroke="#fff" stroke-width="1.5" />
+                            <circle cx="9.5" cy="12" r="1.2" fill="#fff" />
+                            <circle cx="14.5" cy="12" r="1.2" fill="#fff" />
+                        </svg></a>
+                    <a href="https://discord.gg/pxdev" class="footer-social" aria-label="Twitter"><svg width="22"
+                            height="22" fill="none" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="12" fill="#2563eb" />
+                            <path
+                                d="M18 9.5c-.4.2-.8.3-1.2.4.4-.2.7-.6.8-1-.4.2-.8.4-1.2.5-.4-.4-1-.7-1.6-.7-1.2 0-2.1 1-2.1 2.1 0 .2 0 .4.1.6-1.7-.1-3.2-.9-4.2-2.1-.2.4-.3.7-.3 1.1 0 .7.4 1.3 1 1.7-.3 0-.6-.1-.8-.2v.1c0 1 .7 1.8 1.6 2-.2.1-.4.1-.7.1-.2 0-.3 0-.5-.1.3.8 1.1 1.4 2 1.4-0.8.6-1.8.9-2.8.9-.2 0-.4 0-.6-.1 1 .7 2.2 1.1 3.4 1.1 4.1 0 6.3-3.4 6.3-6.3v-.3c.4-.3.7-.6 1-.9z"
+                                fill="#fff" />
+                        </svg></a>
+                    <a href="https://discord.gg/pxdev" class="footer-social" aria-label="Instagram"><svg width="22"
+                            height="22" fill="none" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="12" fill="#1482ff" />
+                            <rect x="7" y="7" width="10" height="10" rx="3" stroke="#fff" stroke-width="1.5" />
+                            <circle cx="12" cy="12" r="2.5" stroke="#fff" stroke-width="1.5" />
+                            <circle cx="16" cy="8" r="1" fill="#fff" />
+                        </svg></a>
+                </div>
+            </div>
+            <div class="footer-col footer-links">
+                <h4>Hızlı Linkler</h4>
+                <ul>
+                    <li><a href="#home">Ana Sayfa</a></li>
+                    <li><a href="#products">Ürünler</a></li>
+                    <li><a href="#about">Hakkımızda</a></li>
+                    <li><a href="#faq">S.S.S.</a></li>
+                    <li><a href="#references">Referanslar</a></li>
+                </ul>
+            </div>
+            <div class="footer-col footer-support">
+                <h4>Destek</h4>
+                <ul>
+                    <li><a href="#">Süre Sorgulama</a></li>
+                    <li><a href="#">Discord Destek</a></li>
+                    <li><a href="#">E-posta Destek</a></li>
+                    <li><a href="#">Yardım Merkezi</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span class="footer-copyright">© 2025 PXDev.store – Tüm Hakları Saklıdır.</span>
+            <div class="footer-buttons">
+                <a href="#" class="footer-btn">Güvenli Ödeme</a>
+                <a href="#" class="footer-btn">💬 7/24 Destek</a>
+            </div>
+        </div>
     </footer>
     <button id="chatBubbleBtn" aria-label="Mesaj Gönder" class="chat-bubble-btn">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
@@ -311,111 +427,15 @@
             <textarea class="chat-textarea" placeholder="Mesajınızı buraya yazın..."></textarea>
         </div>
     </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Accordion SSS
-            document.querySelectorAll('.accordion-header').forEach(function (header) {
-                header.addEventListener('click', function () {
-                    const item = header.parentElement;
-                    const isActive = item.classList.contains('active');
-                    // Tümünü kapat
-                    document.querySelectorAll('.accordion-item').forEach(function (i) {
-                        i.classList.remove('active');
-                    });
-                    // Eğer tıklanan zaten açıksa kapalı kalsın, değilse aç
-                    if (!isActive) {
-                        item.classList.add('active');
-                    }
-                });
-            });
-            // Animasyonlar için Intersection Observer
-            function animateOnScroll(selector) {
-                const observer = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            entry.target.classList.add('visible');
-                            observer.unobserve(entry.target);
-                        }
-                    });
-                }, { threshold: 0.15 });
-                document.querySelectorAll(selector).forEach(el => observer.observe(el));
-            }
-            animateOnScroll('.animate-fade');
-            animateOnScroll('.animate-slide-up');
-            // Scroll to top butonu
-            const scrollBtn = document.getElementById('scrollToTopBtn');
-            if (scrollBtn) {
-                window.addEventListener('scroll', function () {
-                    if (window.scrollY > 300) {
-                        scrollBtn.style.opacity = '1';
-                        scrollBtn.style.pointerEvents = 'auto';
-                    } else {
-                        scrollBtn.style.opacity = '0';
-                        scrollBtn.style.pointerEvents = 'none';
-                    }
-                });
-                scrollBtn.addEventListener('click', function () {
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                });
-            }
-            // Burger menu
-            const burgerMenu = document.getElementById('burgerMenu');
-            const mainNav = document.getElementById('mainNav');
-            if (burgerMenu && mainNav) {
-                burgerMenu.addEventListener('click', function () {
-                    const isOpen = mainNav.classList.toggle('open');
-                    burgerMenu.classList.toggle('active', isOpen);
-                    burgerMenu.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-                });
-                // Menüden bir linke tıklanınca menüyü kapat (mobilde)
-                mainNav.querySelectorAll('a').forEach(function (link) {
-                    link.addEventListener('click', function () {
-                        if (window.innerWidth <= 900) {
-                            mainNav.classList.remove('open');
-                            burgerMenu.classList.remove('active');
-                            burgerMenu.setAttribute('aria-expanded', 'false');
-                        }
-                    });
-                });
-                // Menü dışında bir yere tıklanınca menüyü kapat
-                document.addEventListener('click', function (e) {
-                    const isBurger = burgerMenu.contains(e.target);
-                    const isNav = mainNav.contains(e.target);
-                    if (mainNav.classList.contains('open') && !isBurger && !isNav) {
-                        mainNav.classList.remove('open');
-                        burgerMenu.classList.remove('active');
-                        burgerMenu.setAttribute('aria-expanded', 'false');
-                    }
-                });
-            }
-            // Chat bubble/modal
-            const chatBubbleBtn = document.getElementById('chatBubbleBtn');
-            const chatModal = document.getElementById('chatModal');
-            const chatModalClose = document.getElementById('chatModalClose');
-            if (chatBubbleBtn && chatModal && chatModalClose) {
-                chatBubbleBtn.addEventListener('click', function (e) {
-                    chatModal.classList.add('open');
-                });
-                chatModalClose.addEventListener('click', function () {
-                    chatModal.classList.remove('open');
-                });
-                // Modal dışına tıklayınca kapat
-                document.addEventListener('click', function (e) {
-                    const isChatBubble = chatBubbleBtn.contains(e.target);
-                    const isModal = chatModal.contains(e.target);
-                    if (chatModal.classList.contains('open') && !isChatBubble && !isModal) {
-                        chatModal.classList.remove('open');
-                    }
-                });
-                // Modal içine tıklayınca kapatma (sadece dışına tıklayınca kapat)
-                chatModal.addEventListener('click', function (e) {
-                    if (e.target === chatModal) {
-                        chatModal.classList.remove('open');
-                    }
-                });
-            }
-        });
-    </script>
+    <button class="cart-icon-btn" id="cartIconBtn" aria-label="Sepetim">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="12" fill="#1482ff" />
+            <path d="M7 10h10M7 14h6" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M6 7h12l-1.5 9h-9z" stroke="#fff" stroke-width="2" />
+        </svg>
+        <span class="cart-count" id="cartCount">0</span>
+    </button>
+    <script src="js/index.js"></script>
 </body>
 
 </html>
