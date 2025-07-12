@@ -19,14 +19,14 @@ module.exports = {
         try {
             // Ürün kategorilerindeki kanalları al
             const productChannels = interaction.guild.channels.cache
-                .filter(channel => 
-                    channel.type === ChannelType.GuildText && 
+                .filter(channel =>
+                    channel.type === ChannelType.GuildText &&
                     allowedCategoryIds.includes(channel.parentId)
                 )
                 .sort((a, b) => a.name.localeCompare(b.name));
 
             if (productChannels.size === 0) {
-                return interaction.reply({ 
+                return interaction.reply({
                     content: '❌ Ürün kategorilerinde hiç kanal bulunamadı.'
                 });
             }
@@ -34,7 +34,7 @@ module.exports = {
             // Veritabanından ortalama puanları al
             const channelIds = Array.from(productChannels.keys());
             const placeholders = channelIds.map(() => '?').join(',');
-            
+
             let query = `
                 SELECT 
                     product_channel_id,
@@ -48,7 +48,7 @@ module.exports = {
 
             const [rows] = await pool.query(query, channelIds);
             const ratingsMap = new Map();
-            
+
             rows.forEach(row => {
                 ratingsMap.set(row.product_channel_id, {
                     avgRating: parseFloat(row.avg_rating).toFixed(1),
@@ -59,12 +59,12 @@ module.exports = {
             // Genel ortalama puanı hesapla
             let totalRating = 0;
             let totalFeedbacks = 0;
-            
+
             rows.forEach(row => {
                 totalRating += parseFloat(row.avg_rating) * row.total_feedback;
                 totalFeedbacks += row.total_feedback;
             });
-            
+
             const overallAverage = totalFeedbacks > 0 ? (totalRating / totalFeedbacks).toFixed(1) : 0;
 
             // Embed oluştur
@@ -80,7 +80,7 @@ module.exports = {
 
             productChannels.forEach(channel => {
                 const ratingData = ratingsMap.get(channel.id);
-                
+
                 if (onlyRated && !ratingData) {
                     return; // Sadece puanlı ürünler isteniyorsa, puanı olmayanları atla
                 }
@@ -95,7 +95,7 @@ module.exports = {
             });
 
             if (onlyRated && ratedCount === 0) {
-                return interaction.reply({ 
+                return interaction.reply({
                     content: '❌ Henüz değerlendirilmiş ürün bulunmuyor.'
                 });
             }
@@ -106,28 +106,28 @@ module.exports = {
                 const chunks = productList.match(/.{1,4000}/g);
                 chunks.forEach((chunk, index) => {
                     if (index === 0) {
-                        embed.addFields({ 
-                            name: `📋 Ürünler ${onlyRated ? '(Sadece Puanlı)' : ''}`, 
-                            value: chunk 
+                        embed.addFields({
+                            name: `📋 Ürünler ${onlyRated ? '(Sadece Puanlı)' : ''}`,
+                            value: chunk
                         });
                     } else {
-                        embed.addFields({ 
-                            name: `📋 Ürünler (Devam)`, 
-                            value: chunk 
+                        embed.addFields({
+                            name: `📋 Ürünler (Devam)`,
+                            value: chunk
                         });
                     }
                 });
             } else {
-                embed.addFields({ 
-                    name: `📋 Ürünler ${onlyRated ? '(Sadece Puanlı)' : ''}`, 
-                    value: productList 
+                embed.addFields({
+                    name: `📋 Ürünler ${onlyRated ? '(Sadece Puanlı)' : ''}`,
+                    value: productList
                 });
             }
 
             // İstatistikler
             const totalRated = ratingsMap.size;
             const totalProducts = productChannels.size;
-            
+
             embed.addFields({
                 name: '📊 İstatistikler',
                 value: `• Toplam Ürün: **${totalProducts}**\n• Değerlendirilen: **${totalRated}**\n• Değerlendirilmeyen: **${totalProducts - totalRated}**\n• Toplam Değerlendirme: **${totalFeedbacks}**`,
@@ -138,7 +138,7 @@ module.exports = {
 
         } catch (error) {
             console.error('Ürün listesi alınırken hata:', error);
-            await interaction.reply({ 
+            await interaction.reply({
                 content: '❌ Ürün listesi alınırken bir hata oluştu.'
             });
         }
