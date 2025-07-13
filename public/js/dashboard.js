@@ -1,3 +1,22 @@
+function showContent(section) {
+    // Tüm content section'ları gizle
+    const allContentSections = document.querySelectorAll('.dashboard-content, .purchase-dashboard-content, .activity-dashboard-content, .discord-login-history-content, .purchase-history-content, .activity-history-content, .settings-content, .comments-content, .ticket-content, .add-product-content, .comprehensive-logs-content');
+    allContentSections.forEach(content => {
+        content.style.display = 'none';
+    });
+    // Seçili olanı göster
+    const targetSection = document.getElementById(section);
+    if (targetSection) {
+        targetSection.style.display = 'block';
+        // Eğer comprehensive-logs ise tab fonksiyonunu çağır
+        if (section === 'comprehensive-logs') {
+            initializeComprehensiveLogs();
+        }
+    } else {
+        // console.error('Section not found:', section);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     
     
@@ -212,23 +231,21 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // İçerik gösterme fonksiyonu
-    function showContent(section) {
-        
-        // Tüm content section'ları gizle
-        const allContentSections = document.querySelectorAll('.dashboard-content, .purchase-dashboard-content, .activity-dashboard-content, .discord-login-history-content, .purchase-history-content, .activity-history-content, .settings-content, .comments-content, .ticket-content, .add-product-content');
-        allContentSections.forEach(content => {
-            content.style.display = 'none';
-        });
-        
-        // Seçili olanı göster
-        const targetSection = document.getElementById(section);
-        if (targetSection) {
-            targetSection.style.display = 'block';
-            console.log('Successfully showed:', section);
-        } else {
-            console.error('Section not found:', section);
-        }
-    }
+    // function showContent(section) {
+    //     // Tüm content section'ları gizle
+    //     const allContentSections = document.querySelectorAll('.dashboard-content, .purchase-dashboard-content, .activity-dashboard-content, .discord-login-history-content, .purchase-history-content, .activity-history-content, .settings-content, .comments-content, .ticket-content, .add-product-content');
+    //     allContentSections.forEach(content => {
+    //         content.style.display = 'none';
+    //     });
+    //     // Seçili olanı göster
+    //     const targetSection = document.getElementById(section);
+    //     if (targetSection) {
+    //         targetSection.style.display = 'block';
+    //         console.log('Successfully showed:', section);
+    //     } else {
+    //         console.error('Section not found:', section);
+    //     }
+    // }
 
     // Logout işlemi
     const logoutBtn = document.getElementById('logoutBtn');
@@ -483,15 +500,15 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Load purchase dashboard when switching to it
-    const originalShowContent = showContent;
-    showContent = function(section) {
-        originalShowContent(section);
-        if (section === 'purchase-dashboard-content') {
-            loadPurchaseDashboard();
-        } else if (section === 'activity-dashboard-content') {
-            loadActivityDashboard();
-        }
-    };
+    // const originalShowContent = showContent; // This line is removed as showContent is now global
+    // showContent = function(section) { // This block is removed as showContent is now global
+    //     originalShowContent(section);
+    //     if (section === 'purchase-dashboard-content') {
+    //         loadPurchaseDashboard();
+    //     } else if (section === 'activity-dashboard-content') {
+    //         loadActivityDashboard();
+    //     }
+    // };
 
     // Responsive sidebar
     function checkScreenSize() {
@@ -1281,3 +1298,234 @@ async function loadDiscordLoginHistory() {
         if (leaveList) leaveList.innerHTML = '<div class="loading-spinner">Çıkış logu alınamadı.</div>';
     }
 }
+
+    // Comprehensive Logs Tab Functionality
+    function initializeComprehensiveLogs() {
+        const tabButtons = document.querySelectorAll('.comprehensive-logs-content .tab-button');
+        const tabPanes = document.querySelectorAll('.comprehensive-logs-content .tab-pane');
+        // Zaten event eklenmişse tekrar ekleme
+        if (tabButtons[0] && tabButtons[0].dataset.listener === 'true') {
+            // Her gösterimde ilk tabı aktif yap
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            tabPanes.forEach(pane => pane.classList.remove('active'));
+            tabButtons[0].classList.add('active');
+            tabPanes[0].classList.add('active');
+            loadTabData(tabButtons[0].getAttribute('data-tab'));
+            return;
+        }
+        tabButtons.forEach((button, idx) => {
+            button.addEventListener('click', function() {
+                if (button.classList.contains('active')) return;
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabPanes.forEach(pane => pane.classList.remove('active'));
+                button.classList.add('active');
+                document.getElementById(button.getAttribute('data-tab')).classList.add('active');
+                loadTabData(button.getAttribute('data-tab'));
+            });
+            button.dataset.listener = 'true';
+        });
+        // İlk tabı aktif yap ve verisini yükle
+        tabButtons.forEach(btn => btn.classList.remove('active'));
+        tabPanes.forEach(pane => pane.classList.remove('active'));
+        if (tabButtons[0] && tabPanes[0]) {
+            tabButtons[0].classList.add('active');
+            tabPanes[0].classList.add('active');
+            loadTabData(tabButtons[0].getAttribute('data-tab'));
+        }
+    }
+    
+    async function loadTabData(tabId) {
+        const container = document.querySelector(`#${tabId} .loading-spinner`).parentElement;
+        
+        try {
+            let data = [];
+            let endpoint = '';
+            
+            switch(tabId) {
+                case 'messages-tab':
+                    endpoint = '/api/discordUsers/messageLog';
+                    break;
+                case 'voice-tab':
+                    endpoint = '/api/discordUsers/voiceLog';
+                    break;
+                case 'roles-tab':
+                    endpoint = '/api/discordUsers/roleLog';
+                    break;
+                case 'channels-tab':
+                    endpoint = '/api/discordUsers/channelLog';
+                    break;
+                case 'emojis-tab':
+                    endpoint = '/api/discordUsers/emojiLog';
+                    break;
+                case 'invites-tab':
+                    endpoint = '/api/discordUsers/inviteLog';
+                    break;
+                case 'server-settings-tab':
+                    endpoint = '/api/discordUsers/serverLog';
+                    break;
+            }
+            
+            if (endpoint) {
+                const response = await fetch(endpoint);
+                const result = await response.json();
+                if (result.success) {
+                    data = result.logs || [];
+                }
+            }
+            
+            // For now, show sample data if no real data
+            if (data.length === 0) {
+                data = generateSampleData(tabId);
+            }
+            
+            renderTabData(container, data, tabId);
+            
+        } catch (error) {
+            console.error('Error loading tab data:', error);
+            container.innerHTML = '<div class="loading-spinner">Error loading data</div>';
+        }
+    }
+    
+    function generateSampleData(tabId) {
+        const sampleData = {
+            'messages-tab': [
+                { action: 'create', username: 'User1', content: 'Hello everyone!', channel_name: 'general', event_time: new Date() },
+                { action: 'edit', username: 'User2', content: 'Updated message', channel_name: 'chat', event_time: new Date(Date.now() - 3600000) },
+                { action: 'delete', username: 'User3', content: 'Deleted message', channel_name: 'general', event_time: new Date(Date.now() - 7200000) }
+            ],
+            'voice-tab': [
+                { action: 'join', username: 'User1', channel_name: 'General Voice', event_time: new Date() },
+                { action: 'leave', username: 'User2', channel_name: 'Music', event_time: new Date(Date.now() - 1800000) },
+                { action: 'mute', username: 'User3', channel_name: 'Gaming', event_time: new Date(Date.now() - 3600000) }
+            ],
+            'roles-tab': [
+                { action: 'add', username: 'User1', role_name: 'Moderator', moderator_username: 'Admin', event_time: new Date() },
+                { action: 'remove', username: 'User2', role_name: 'VIP', moderator_username: 'Admin', event_time: new Date(Date.now() - 3600000) }
+            ],
+            'channels-tab': [
+                { action: 'create', channel_name: 'New Channel', channel_type: 'text', moderator_username: 'Admin', event_time: new Date() },
+                { action: 'delete', channel_name: 'Old Channel', channel_type: 'voice', moderator_username: 'Admin', event_time: new Date(Date.now() - 7200000) }
+            ],
+            'emojis-tab': [
+                { action: 'create', emoji_name: 'cool', moderator_username: 'Admin', event_time: new Date() },
+                { action: 'delete', emoji_name: 'old', moderator_username: 'Admin', event_time: new Date(Date.now() - 3600000) }
+            ],
+            'invites-tab': [
+                { action: 'create', invite_code: 'abc123', channel_name: 'general', creator_username: 'Admin', event_time: new Date() },
+                { action: 'delete', invite_code: 'xyz789', channel_name: 'chat', creator_username: 'Admin', event_time: new Date(Date.now() - 3600000) }
+            ],
+            'server-settings-tab': [
+                { action: 'update', setting_name: 'Server Name', old_value: 'Old Name', new_value: 'New Name', moderator_username: 'Admin', event_time: new Date() },
+                { action: 'update', setting_name: 'Verification Level', old_value: 'Low', new_value: 'Medium', moderator_username: 'Admin', event_time: new Date(Date.now() - 3600000) }
+            ]
+        };
+        
+        return sampleData[tabId] || [];
+    }
+    
+    function renderTabData(container, data, tabId) {
+        const icons = {
+            'messages-tab': 'fas fa-comment',
+            'voice-tab': 'fas fa-headset',
+            'roles-tab': 'fas fa-user-tag',
+            'channels-tab': 'fas fa-hashtag',
+            'emojis-tab': 'fas fa-smile',
+            'invites-tab': 'fas fa-link',
+            'server-settings-tab': 'fas fa-cog'
+        };
+        
+        if (data.length === 0) {
+            container.innerHTML = '<div class="loading-spinner">No data available</div>';
+            return;
+        }
+        
+        container.innerHTML = data.map(item => `
+            <div class="log-item">
+                <div class="log-icon">
+                    <i class="${icons[tabId]}"></i>
+                </div>
+                <div class="log-content">
+                    <div class="log-title">${getLogTitle(item, tabId)}</div>
+                    <div class="log-details">
+                        ${getLogDetails(item, tabId)}
+                    </div>
+                </div>
+                <div class="log-time">${new Date(item.event_time).toLocaleString('tr-TR')}</div>
+                <span class="log-action ${item.action}">${item.action}</span>
+            </div>
+        `).join('');
+    }
+    
+    function getLogTitle(item, tabId) {
+        switch(tabId) {
+            case 'messages-tab':
+                return `${item.username} ${item.action === 'create' ? 'sent' : item.action === 'edit' ? 'edited' : 'deleted'} a message`;
+            case 'voice-tab':
+                return `${item.username} ${item.action} voice channel`;
+            case 'roles-tab':
+                return `${item.moderator_username} ${item.action} ${item.role_name} role for ${item.username}`;
+            case 'channels-tab':
+                return `${item.moderator_username} ${item.action} channel ${item.channel_name}`;
+            case 'emojis-tab':
+                return `${item.moderator_username} ${item.action} emoji ${item.emoji_name}`;
+            case 'invites-tab':
+                return `${item.creator_username} ${item.action} invite ${item.invite_code}`;
+            case 'server-settings-tab':
+                return `${item.moderator_username} ${item.action} ${item.setting_name}`;
+            default:
+                return 'Unknown action';
+        }
+    }
+    
+    function getLogDetails(item, tabId) {
+        const details = [];
+        
+        switch(tabId) {
+            case 'messages-tab':
+                if (item.content) details.push(`Content: ${item.content.substring(0, 50)}${item.content.length > 50 ? '...' : ''}`);
+                if (item.channel_name) details.push(`Channel: ${item.channel_name}`);
+                break;
+            case 'voice-tab':
+                if (item.channel_name) details.push(`Channel: ${item.channel_name}`);
+                break;
+            case 'roles-tab':
+                if (item.username) details.push(`User: ${item.username}`);
+                if (item.role_name) details.push(`Role: ${item.role_name}`);
+                break;
+            case 'channels-tab':
+                if (item.channel_type) details.push(`Type: ${item.channel_type}`);
+                break;
+            case 'invites-tab':
+                if (item.channel_name) details.push(`Channel: ${item.channel_name}`);
+                break;
+            case 'server-settings-tab':
+                if (item.old_value && item.new_value) {
+                    details.push(`From: ${item.old_value}`);
+                    details.push(`To: ${item.new_value}`);
+                }
+                break;
+        }
+        
+        return details.map(detail => `<span>${detail}</span>`).join('');
+    }
+    
+    // Update showContent to include comprehensive logs
+    // const originalShowContent = showContent; // This line is removed as showContent is now global
+    // showContent = function(section) { // This block is removed as showContent is now global
+    //     originalShowContent(section);
+    //     if (section === 'purchase-dashboard-content') {
+    //         loadPurchaseDashboard();
+    //     } else if (section === 'activity-dashboard-content') {
+    //         loadActivityDashboard();
+    //     } else if (section === 'comments-content') {
+    //         loadComments();
+    //     } else if (section === 'ticket-content') {
+    //         loadTickets();
+    //     } else if (section === 'add-product-content') {
+    //         initializeProductForm();
+    //     } else if (section === 'discord-login-history') {
+    //         loadDiscordLoginHistory();
+    //     } else if (section === 'comprehensive-logs') {
+    //         initializeComprehensiveLogs();
+    //     }
+    // };

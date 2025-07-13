@@ -56,6 +56,9 @@
                                     Logout
                                     History</a>
                             </li>
+                            <li><a href="#comprehensive-logs" class="log-subitem"><span class="submenu-dot"></span><i
+                                        class="fa-solid fa-list-alt"></i> Comprehensive Logs</a>
+                            </li>
                             <li><a href="#purchase-history" class="log-subitem"><span class="submenu-dot"></span><i class="fa-solid fa-right-to-bracket"></i>Login Log</a>
                             </li>
                             <li><a href="#activity-history" class="log-subitem"><span class="submenu-dot"></span><i
@@ -1352,6 +1355,65 @@
             <ul id="discord-leave-list">
                 <div class="loading-spinner">Çıkanlar yükleniyor...</div>
             </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Comprehensive Logs Content -->
+<div class="comprehensive-logs-content" id="comprehensive-logs" style="display: none;">
+    <h2>Comprehensive Logs</h2>
+    <div class="tabs">
+        <button class="tab-button active" data-tab="messages-tab">Messages</button>
+        <button class="tab-button" data-tab="voice-tab">Voice</button>
+        <button class="tab-button" data-tab="roles-tab">Roles</button>
+        <button class="tab-button" data-tab="channels-tab">Channels</button>
+        <button class="tab-button" data-tab="emojis-tab">Emojis</button>
+        <button class="tab-button" data-tab="invites-tab">Invites</button>
+        <button class="tab-button" data-tab="server-settings-tab">Server Settings</button>
+    </div>
+
+    <div class="tab-content">
+        <div id="messages-tab" class="tab-pane active">
+            <h3>Recent Messages</h3>
+            <div class="messages-list">
+                <div class="loading-spinner">Loading messages...</div>
+            </div>
+        </div>
+        <div id="voice-tab" class="tab-pane">
+            <h3>Voice Activity</h3>
+            <div class="voice-activity-list">
+                <div class="loading-spinner">Loading voice activity...</div>
+            </div>
+        </div>
+        <div id="roles-tab" class="tab-pane">
+            <h3>Role Changes</h3>
+            <div class="role-changes-list">
+                <div class="loading-spinner">Loading role changes...</div>
+            </div>
+        </div>
+        <div id="channels-tab" class="tab-pane">
+            <h3>Channel Activity</h3>
+            <div class="channel-activity-list">
+                <div class="loading-spinner">Loading channel activity...</div>
+            </div>
+        </div>
+        <div id="emojis-tab" class="tab-pane">
+            <h3>Emoji Usage</h3>
+            <div class="emoji-usage-list">
+                <div class="loading-spinner">Loading emoji usage...</div>
+            </div>
+        </div>
+        <div id="invites-tab" class="tab-pane">
+            <h3>Invite Activity</h3>
+            <div class="invite-activity-list">
+                <div class="loading-spinner">Loading invite activity...</div>
+            </div>
+        </div>
+        <div id="server-settings-tab" class="tab-pane">
+            <h3>Server Settings Changes</h3>
+            <div class="server-settings-list">
+                <div class="loading-spinner">Loading server settings...</div>
+            </div>
         </div>
     </div>
 </div>

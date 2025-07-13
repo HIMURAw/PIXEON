@@ -2418,3 +2418,198 @@ body {
         margin: 0;
     }
 }
+
+/* Comprehensive Logs Styles */
+.comprehensive-logs-content {
+    padding: 2rem;
+    background: var(--primary-color);
+    min-height: calc(100vh - var(--header-height));
+}
+
+.comprehensive-logs-content h2 {
+    color: var(--text-primary);
+    margin-bottom: 2rem;
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+.tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 1rem;
+}
+
+.tab-button {
+    background: var(--secondary-color);
+    border: none;
+    color: var(--text-secondary);
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: all var(--transition-speed);
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.tab-button:hover {
+    background: var(--accent-color);
+    color: var(--text-primary);
+    transform: translateY(-2px);
+}
+
+.tab-button.active {
+    background: var(--accent-color);
+    color: var(--text-primary);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+.tab-content {
+    background: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.tab-pane {
+    display: none;
+}
+
+.tab-pane.active {
+    display: block;
+}
+
+.tab-pane h3 {
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.5rem;
+}
+
+.messages-list,
+.voice-activity-list,
+.role-changes-list,
+.channel-activity-list,
+.emoji-usage-list,
+.invite-activity-list,
+.server-settings-list {
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.log-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    background: var(--secondary-color);
+    border-radius: var(--border-radius);
+    border-left: 4px solid var(--accent-color);
+    transition: all var(--transition-speed);
+}
+
+.log-item:hover {
+    background: var(--primary-color);
+    transform: translateX(4px);
+}
+
+.log-item .log-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--accent-color);
+    color: white;
+    font-size: 1.2rem;
+}
+
+.log-item .log-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.log-item .log-title {
+    color: var(--text-primary);
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    font-size: 1rem;
+}
+
+.log-item .log-details {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.log-item .log-time {
+    color: var(--warning-color);
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.log-item .log-action {
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.log-item .log-action.create {
+    background: rgba(40, 167, 69, 0.2);
+    color: #28a745;
+}
+
+.log-item .log-action.delete {
+    background: rgba(220, 53, 69, 0.2);
+    color: #dc3545;
+}
+
+.log-item .log-action.update {
+    background: rgba(255, 193, 7, 0.2);
+    color: #ffc107;
+}
+
+.log-item .log-action.edit {
+    background: rgba(0, 123, 255, 0.2);
+    color: #007bff;
+}
+
+@media (max-width: 768px) {
+    .comprehensive-logs-content {
+        padding: 1rem;
+    }
+    
+    .tabs {
+        gap: 0.25rem;
+    }
+    
+    .tab-button {
+        padding: 0.5rem 1rem;
+        font-size: 0.8rem;
+    }
+    
+    .tab-content {
+        padding: 1rem;
+    }
+    
+    .log-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+    
+    .log-item .log-details {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+}

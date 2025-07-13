@@ -142,6 +142,148 @@ INSERT INTO `user_history` (`id`, `user_id`, `username`, `action`, `reason`, `ti
 	(10, '1309627108875698219', 'roro0131310seif', 'unban', 'Sebep belirtilmedi', '2025-06-17 23:59:03', '768372430631731210', 'himura_1'),
 	(11, '1274422892402053313', 'regular5x', 'unban', 'Sebep belirtilmedi', '2025-06-17 23:59:05', '768372430631731210', 'himura_1');
 
+-- Discord Message Events Log
+CREATE TABLE IF NOT EXISTS `discord_message_log` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `message_id` varchar(32) NOT NULL,
+  `channel_id` varchar(32) NOT NULL,
+  `channel_name` varchar(255) NOT NULL,
+  `user_id` varchar(32) NOT NULL,
+  `username` varchar(64) NOT NULL,
+  `avatar_url` text DEFAULT NULL,
+  `content` text DEFAULT NULL,
+  `action` enum('create','edit','delete','bulk_delete') NOT NULL,
+  `attachments_count` int(11) DEFAULT 0,
+  `mentions_count` int(11) DEFAULT 0,
+  `event_time` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `message_id` (`message_id`),
+  KEY `channel_id` (`channel_id`),
+  KEY `user_id` (`user_id`),
+  KEY `action` (`action`),
+  KEY `event_time` (`event_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Discord Voice Events Log
+CREATE TABLE IF NOT EXISTS `discord_voice_log` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` varchar(32) NOT NULL,
+  `username` varchar(64) NOT NULL,
+  `avatar_url` text DEFAULT NULL,
+  `channel_id` varchar(32) NOT NULL,
+  `channel_name` varchar(255) NOT NULL,
+  `action` enum('join','leave','move','mute','unmute','deafen','undeafen','stream_start','stream_stop','video_start','video_stop') NOT NULL,
+  `duration_seconds` int(11) DEFAULT NULL,
+  `event_time` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  KEY `channel_id` (`channel_id`),
+  KEY `action` (`action`),
+  KEY `event_time` (`event_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Discord Role Events Log
+CREATE TABLE IF NOT EXISTS `discord_role_log` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` varchar(32) NOT NULL,
+  `username` varchar(64) NOT NULL,
+  `avatar_url` text DEFAULT NULL,
+  `role_id` varchar(32) NOT NULL,
+  `role_name` varchar(255) NOT NULL,
+  `role_color` varchar(7) DEFAULT NULL,
+  `action` enum('add','remove','update') NOT NULL,
+  `moderator_id` varchar(32) DEFAULT NULL,
+  `moderator_username` varchar(64) DEFAULT NULL,
+  `reason` text DEFAULT NULL,
+  `event_time` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  KEY `role_id` (`role_id`),
+  KEY `action` (`action`),
+  KEY `moderator_id` (`moderator_id`),
+  KEY `event_time` (`event_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Discord Channel Events Log
+CREATE TABLE IF NOT EXISTS `discord_channel_log` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `channel_id` varchar(32) NOT NULL,
+  `channel_name` varchar(255) NOT NULL,
+  `channel_type` enum('text','voice','category','announcement','stage','forum') NOT NULL,
+  `action` enum('create','delete','update','permission_change') NOT NULL,
+  `old_name` varchar(255) DEFAULT NULL,
+  `new_name` varchar(255) DEFAULT NULL,
+  `moderator_id` varchar(32) DEFAULT NULL,
+  `moderator_username` varchar(64) DEFAULT NULL,
+  `reason` text DEFAULT NULL,
+  `event_time` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `channel_id` (`channel_id`),
+  KEY `action` (`action`),
+  KEY `moderator_id` (`moderator_id`),
+  KEY `event_time` (`event_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Discord Emoji Events Log
+CREATE TABLE IF NOT EXISTS `discord_emoji_log` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `emoji_id` varchar(32) NOT NULL,
+  `emoji_name` varchar(255) NOT NULL,
+  `emoji_url` text DEFAULT NULL,
+  `action` enum('create','delete','update') NOT NULL,
+  `moderator_id` varchar(32) DEFAULT NULL,
+  `moderator_username` varchar(64) DEFAULT NULL,
+  `reason` text DEFAULT NULL,
+  `event_time` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `emoji_id` (`emoji_id`),
+  KEY `action` (`action`),
+  KEY `moderator_id` (`moderator_id`),
+  KEY `event_time` (`event_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Discord Invite Events Log
+CREATE TABLE IF NOT EXISTS `discord_invite_log` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `invite_code` varchar(32) NOT NULL,
+  `channel_id` varchar(32) NOT NULL,
+  `channel_name` varchar(255) NOT NULL,
+  `creator_id` varchar(32) NOT NULL,
+  `creator_username` varchar(64) NOT NULL,
+  `action` enum('create','delete','update') NOT NULL,
+  `max_uses` int(11) DEFAULT NULL,
+  `max_age` int(11) DEFAULT NULL,
+  `uses_count` int(11) DEFAULT 0,
+  `event_time` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `invite_code` (`invite_code`),
+  KEY `channel_id` (`channel_id`),
+  KEY `creator_id` (`creator_id`),
+  KEY `action` (`action`),
+  KEY `event_time` (`event_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Discord Server Settings Log
+CREATE TABLE IF NOT EXISTS `discord_server_log` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `setting_name` varchar(255) NOT NULL,
+  `old_value` text DEFAULT NULL,
+  `new_value` text DEFAULT NULL,
+  `action` enum('update','reset') NOT NULL,
+  `moderator_id` varchar(32) NOT NULL,
+  `moderator_username` varchar(64) NOT NULL,
+  `reason` text DEFAULT NULL,
+  `event_time` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `setting_name` (`setting_name`),
+  KEY `action` (`action`),
+  KEY `moderator_id` (`moderator_id`),
+  KEY `event_time` (`event_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+
+
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
