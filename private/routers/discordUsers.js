@@ -5,6 +5,7 @@ const client = require('../../server.js');
 const db = require('../DB/connect.js');
 const { addUserHistory, getUserHistory } = require('../DB/models/userModel');
 const { AuditLogEvent, Events } = require('discord.js');
+const axios = require('axios');
 
 router.get('/serverMembers', async (req, res) => {
     try {
@@ -377,8 +378,62 @@ router.post('/unban', async (req, res) => {
 });
 
 // Discord event listeners
+client.on('guildMemberAdd', async (member) => {
+    try {
+        // Discord webhook logu
+        const data = {
+            username: 'Sunucu Log',
+            embeds: [{
+                title: 'Kullanıcı Katıldı',
+                description: `**${member.user.tag}** (${member.id}) sunucuya katıldı.`,
+                thumbnail: { url: member.user.displayAvatarURL({ dynamic: true }) },
+                timestamp: new Date(),
+                color: 0x00FF00
+            }]
+        };
+        await axios.post(Config.discord.log.LoginLogoutWebhookURL, data);
+    } catch (error) {
+        console.error('Webhooka katılma logu gönderilemedi:', error);
+    }
+    // Veritabanına kaydet
+    try {
+        await db.pool.query(
+            'INSERT INTO discord_member_log (user_id, username, avatar_url, action) VALUES (?, ?, ?, ?)',
+            [member.id, member.user.username, member.user.displayAvatarURL({ dynamic: true }), 'join']
+        );
+    } catch (dbError) {
+        console.error('Kullanıcı katılımı veritabanına kaydedilemedi:', dbError);
+    }
+});
+
 client.on('guildMemberRemove', async (member) => {
     try {
+        // Discord webhook logu
+        try {
+            const data = {
+                username: 'Sunucu Log',
+                embeds: [{
+                    title: 'Kullanıcı Ayrıldı',
+                    description: `**${member.user.tag}** (${member.id}) sunucudan ayrıldı.`,
+                    thumbnail: { url: member.user.displayAvatarURL({ dynamic: true }) },
+                    timestamp: new Date(),
+                    color: 0xFF0000
+                }]
+            };
+            await axios.post(Config.discord.log.LoginLogoutWebhookURL, data);
+        } catch (webhookError) {
+            console.error('Webhooka ayrılma logu gönderilemedi:', webhookError);
+        }
+        // Veritabanına kaydet
+        try {
+            await db.pool.query(
+                'INSERT INTO discord_member_log (user_id, username, avatar_url, action) VALUES (?, ?, ?, ?)',
+                [member.id, member.user.username, member.user.displayAvatarURL({ dynamic: true }), 'leave']
+            );
+        } catch (dbError) {
+            console.error('Kullanıcı ayrılması veritabanına kaydedilemedi:', dbError);
+        }
+
         console.log('Member removed event triggered:', member.user.username);
 
         // Check if the member was kicked
@@ -535,5 +590,43 @@ router.get('/activity', async (req, res) => {
         res.status(500).json({ error: 'Sunucu aktivitesi alınırken hata oluştu' });
     }
 });
+
+// Discord giriş/çıkış logunu listeleyen API
+router.get('/memberLog', async (req, res) => {
+    try {
+        const { action } = req.query;
+        let sql = 'SELECT user_id, username, avatar_url, action, event_time FROM discord_member_log';
+        const params = [];
+        if (action === 'join' || action === 'leave') {
+            sql += ' WHERE action = ?';
+            params.push(action);
+        }
+        sql += ' ORDER BY event_time DESC LIMIT 100';
+        const [rows] = await db.pool.query(sql, params);
+        res.json({ success: true, logs: rows });
+    } catch (error) {
+        console.error('Discord giriş/çıkış logu alınırken hata:', error);
+        res.status(500).json({ success: false, error: 'Log alınırken hata oluştu' });
+    }
+});
+
+router.get('/loginLog', async (req, res) => {
+    try {
+        const { action } = req.query;
+        let sql = 'SELECT user_id, username, avatar_url, action, event_time FROM discord_member_log';
+        const params = [];
+        if (action === 'join' || action === 'leave') {
+            sql += ' WHERE action = ?';
+            params.push(action);
+        }
+        sql += ' ORDER BY event_time DESC LIMIT 100';
+        const [rows] = await db.pool.query(sql, params);
+        res.json({ success: true, logs: rows });
+    } catch (error) {
+        console.error('Discord giriş/çıkış logu alınırken hata:', error);
+        res.status(500).json({ success: false, error: 'Log alınırken hata oluştu' });
+    }
+});
+
 
 module.exports = router;

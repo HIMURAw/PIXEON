@@ -16,7 +16,7 @@
         "clientId": "1238268562171236384",
         "guidid": "1269430268402335867",
         "serverName": "PXDevelopment",
-        "serverLogo": "https://cdn.discordapp.com/attachments/1392486533696720918/1392486943329353921/px.png?ex=687301c6&is=6871b046&hm=0ba273ff2d6cbc8e1e5df8e718c4d3f796cbd12d5c7c44b17c3f6391ef428340&",
+        "serverLogo": "https://cdn.discordapp.com/attachments/1392486533696720918/1393597767409995806/pxdev-photoaidcom-cropped.png?ex=6874694f&is=687317cf&hm=ddf111401e57619d81552fec3b0fb10fc8d3ce92ee167ed7a721abe7e6129c5b&",
         "voicechannel": "1391498861960237219",
         "AnnoncementChannel": "1392487272666108024",
         "commaentChannel": "1292529004577816750",
@@ -25,7 +25,8 @@
         "supportRoleId": "1269431116499128414",
         "log": {
             "WebhookName": "PXDevelopment Log",
-            "WebhookLogoURL": "https://cdn.discordapp.com/attachments/1392486533696720918/1392486943329353921/px.png?ex=687301c6&is=6871b046&hm=0ba273ff2d6cbc8e1e5df8e718c4d3f796cbd12d5c7c44b17c3f6391ef428340&"
+            "WebhookLogoURL": "https://cdn.discordapp.com/attachments/1392486533696720918/1393597767409995806/pxdev-photoaidcom-cropped.png?ex=6874694f&is=687317cf&hm=ddf111401e57619d81552fec3b0fb10fc8d3ce92ee167ed7a721abe7e6129c5b&",
+            "LoginLogoutWebhookURL": "https://canary.discord.com/api/webhooks/1394026563615326328/dp5nWGkfLcz3sWgmybxo2HWaAQZXvWtmxadF5uYVsSCwDkHWOLMp7nOCFecUYTQAufDB"
         },
         "shopBot": {
             "near": "Bu ürün çok yakında satışa çıkacak! Takipte kalın ve fırsatları kaçırmayın. 🎉",

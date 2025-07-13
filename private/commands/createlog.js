@@ -30,7 +30,7 @@ module.exports = {
                 '⚫・yorum-log',
                 '⚫・sistem-log',
                 '⚫・geliştirici-log',
-                '⚫・hata-log',
+                '⚫・loginlogout-log',
                 '⚫・öneri-log',
                 '⚫・ticket-log'
             ];
