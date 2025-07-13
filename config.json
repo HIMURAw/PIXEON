@@ -26,7 +26,8 @@
         "log": {
             "WebhookName": "PXDevelopment Log",
             "WebhookLogoURL": "https://cdn.discordapp.com/attachments/1392486533696720918/1393597767409995806/pxdev-photoaidcom-cropped.png?ex=6874694f&is=687317cf&hm=ddf111401e57619d81552fec3b0fb10fc8d3ce92ee167ed7a721abe7e6129c5b&",
-            "LoginLogoutWebhookURL": "https://canary.discord.com/api/webhooks/1394026563615326328/dp5nWGkfLcz3sWgmybxo2HWaAQZXvWtmxadF5uYVsSCwDkHWOLMp7nOCFecUYTQAufDB"
+            "LoginLogoutWebhookURL": "",
+            "RoleLogWebhookURL": "https://canary.discord.com/api/webhooks/1392846517055787039/sZ7v6MjClv6ucSX5mVupWTnsdGZTvZedopqNp-GDo0_pStVF9IBzCIXT_FxtxeV3kVRS"
         },
         "shopBot": {
             "near": "Bu ürün çok yakında satışa çıkacak! Takipte kalın ve fırsatları kaçırmayın. 🎉",
