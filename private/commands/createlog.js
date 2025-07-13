@@ -26,13 +26,14 @@ module.exports = {
             });
 
             const channelNames = [
-                '⚫・satış-log',
-                '⚫・yorum-log',
-                '⚫・sistem-log',
-                '⚫・geliştirici-log',
-                '⚫・loginlogout-log',
-                '⚫・öneri-log',
-                '⚫・ticket-log'
+                '⚫・join-quit-log',
+                '⚫・message-log',
+                '⚫・voice-log',
+                '⚫・role-log',
+                '⚫・channel-log',
+                '⚫・emoji-log',
+                '⚫・invite-log',
+                '⚫・server-log'
             ];
 
             const webhookInfoList = [];
