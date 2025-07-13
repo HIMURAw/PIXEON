@@ -1349,7 +1349,7 @@ async function loadDiscordLoginHistory() {
                     endpoint = '/api/discordUsers/voiceLog';
                     break;
                 case 'roles-tab':
-                    endpoint = '/api/discordUsers/roleLog';
+                    endpoint = '/api/discord/log/role';
                     break;
                 case 'channels-tab':
                     endpoint = '/api/discordUsers/channelLog';
@@ -1439,21 +1439,49 @@ async function loadDiscordLoginHistory() {
             return;
         }
         
-        container.innerHTML = data.map(item => `
-            <div class="log-item">
-                <div class="log-icon">
-                    <i class="${icons[tabId]}"></i>
-                </div>
-                <div class="log-content">
-                    <div class="log-title">${getLogTitle(item, tabId)}</div>
-                    <div class="log-details">
-                        ${getLogDetails(item, tabId)}
+        if (tabId === 'roles-tab') {
+            container.innerHTML = data.map(item => {
+                const userAvatar = item.user?.avatar_url || `https://cdn.discordapp.com/embed/avatars/${parseInt(item.user?.id || '0') % 5}.png`;
+                const moderatorAvatar = item.moderator?.avatar_url || `https://cdn.discordapp.com/embed/avatars/${parseInt(item.moderator?.id || '0') % 5}.png`;
+                
+                return `
+                <div class="log-item role-log-item">
+                    <div class="log-user-avatar">
+                        <img src="${userAvatar}" alt="${item.user?.username || 'Unknown'}" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'">
                     </div>
+                    <div class="log-content">
+                        <div class="log-title">${getLogTitle(item, tabId)}</div>
+                        <div class="log-details">
+                            ${getLogDetails(item, tabId)}
+                        </div>
+                    </div>
+                    <div class="log-time">${new Date(item.event_time).toLocaleString('tr-TR')}</div>
+                    <div class="log-moderator-avatar">
+                        <img src="${moderatorAvatar}" alt="${item.moderator?.username || 'Unknown'}" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'">
+                    </div>
+                    <span class="log-action ${item.action}">
+                        ${item.action === 'add' ? '🟢 Verildi' : item.action === 'remove' ? '🔴 Alındı' : '🟡 Güncellendi'}
+                    </span>
                 </div>
-                <div class="log-time">${new Date(item.event_time).toLocaleString('tr-TR')}</div>
-                <span class="log-action ${item.action}">${item.action}</span>
-            </div>
-        `).join('');
+            `;
+            }).join('');
+        } else {
+            container.innerHTML = data.map(item => `
+                <div class="log-item">
+                    <div class="log-icon">
+                        <i class="${icons[tabId]}"></i>
+                    </div>
+                    <div class="log-content">
+                        <div class="log-title">${getLogTitle(item, tabId)}</div>
+                        <div class="log-details">
+                            ${getLogDetails(item, tabId)}
+                        </div>
+                    </div>
+                    <div class="log-time">${new Date(item.event_time).toLocaleString('tr-TR')}</div>
+                    <span class="log-action ${item.action}">${item.action}</span>
+                </div>
+            `).join('');
+        }
     }
     
     function getLogTitle(item, tabId) {
@@ -1463,7 +1491,11 @@ async function loadDiscordLoginHistory() {
             case 'voice-tab':
                 return `${item.username} ${item.action} voice channel`;
             case 'roles-tab':
-                return `${item.moderator_username} ${item.action} ${item.role_name} role for ${item.username}`;
+                if (item.user && item.role) {
+                    const actionText = item.action === 'add' ? 'verildi' : item.action === 'remove' ? 'alındı' : 'güncellendi';
+                    return `${item.user.username} kullanıcısına ${item.role.name} rolü ${actionText}`;
+                }
+                return `${item.username} ${item.action} ${item.role_name} role`;
             case 'channels-tab':
                 return `${item.moderator_username} ${item.action} channel ${item.channel_name}`;
             case 'emojis-tab':
@@ -1489,8 +1521,10 @@ async function loadDiscordLoginHistory() {
                 if (item.channel_name) details.push(`Channel: ${item.channel_name}`);
                 break;
             case 'roles-tab':
-                if (item.username) details.push(`User: ${item.username}`);
-                if (item.role_name) details.push(`Role: ${item.role_name}`);
+                if (item.user) details.push(`Kullanıcı: ${item.user.username} (${item.user.id})`);
+                if (item.role) details.push(`Rol: ${item.role.name} (${item.role.id})`);
+                if (item.moderator) details.push(`Moderatör: ${item.moderator.username}`);
+                if (item.reason) details.push(`Sebep: ${item.reason}`);
                 break;
             case 'channels-tab':
                 if (item.channel_type) details.push(`Type: ${item.channel_type}`);

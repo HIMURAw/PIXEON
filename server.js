@@ -228,6 +228,7 @@ const discordChannelRouter = require('./private/routers/discordChannel.js');
 const ConfigRouter = require('./private/routers/configAPI.js');
 const discordLoginRouter = require('./private/routers/discordLogin');
 const discordLog = require('./private/routers/discordLog.js')
+const discordMessageLog = require('./private/routers/discordMessage.js')
 const CommentRouter = require('./private/routers/Comment.js');
 const indexAPIRouter = require('./private/routers/indexAPI.js');
 
@@ -236,6 +237,7 @@ app.use('/api/discordUsers', discordUsersRouter);
 app.use('/api/discordServer', discordServerRouter);
 app.use('/api/comment', CommentRouter);
 app.use('/api/discord/log', discordLog)
+app.use('/api/discord/log/message', discordMessageLog)
 app.use('/api/discordChannel', discordChannelRouter);
 app.use('/api/config', ConfigRouter);
 app.use('/api', indexAPIRouter);

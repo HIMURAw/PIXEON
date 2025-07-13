@@ -26,8 +26,15 @@
         "log": {
             "WebhookName": "PXDevelopment Log",
             "WebhookLogoURL": "https://cdn.discordapp.com/attachments/1392486533696720918/1393597767409995806/pxdev-photoaidcom-cropped.png?ex=6874694f&is=687317cf&hm=ddf111401e57619d81552fec3b0fb10fc8d3ce92ee167ed7a721abe7e6129c5b&",
-            "LoginLogoutWebhookURL": "",
-            "RoleLogWebhookURL": "https://canary.discord.com/api/webhooks/1392846517055787039/sZ7v6MjClv6ucSX5mVupWTnsdGZTvZedopqNp-GDo0_pStVF9IBzCIXT_FxtxeV3kVRS"
+            
+            "LoginLogoutWebhookURL": "https://discord.com/api/webhooks/1394057251697852607/0tekx9EjMGp0F9_ZE9Yy186HiC4rrCx6qTRIcEcAGZI7SHA83WgX0CTpEtzC3qpevI8o",
+            "RoleLogWebhookURL": "https://discord.com/api/webhooks/1394057323411931287/eJYyiJdzaSs9X829j_KFojL_zdfpkONS1eV3qIihG5TmC4yY2qopmMGpJYvCshrNacN8",
+            "MessageWebhookURL": "https://discord.com/api/webhooks/1394057279799558347/-6o4QPDZA77qnbiFcm_hhp21gTRjv9g24T51KyAPGTgkDXq0a7UCezZ99MZHFc9gewrS",
+            "VoiceWebhookURL": "https://discord.com/api/webhooks/1394057300217565349/GVdEAOAPnmPm59dTPhLER3lRifn47ltK1RXRbxY2P__nky-y7ZMo2b6J5f9bVzgbfNkX",
+            "ChannelWebhookURL": "https://discord.com/api/webhooks/1394057343410634904/GzV1Iy5lTJ1L6dlKsDcV-fXbMIrSrSdnylpcL11IbObCTyLh6VYXQ0vwbx35ujjhW7Rl",
+            "emojiWebhookURL": "https://discord.com/api/webhooks/1394057365896302707/Ri0IqTT3DKnzbcNpg-HP3jvylVY6mU24DSYN1EBbppRCbenLjqfdRFdhGPZRO3ZmU0CI",
+            "inviteWebhookURL": "https://discord.com/api/webhooks/1394057387547033611/eQvG_hpwkqm6ZjWqHlWr2aHm7_9tTjziheLahX2t2XpbE5xmQEgKeLi8jboHDRcFqOLM",
+            "serverWebhookURL": "https://discord.com/api/webhooks/1394057405939318806/zb2LKaf7DqkXStywf-yGkbX5_X6vzsV8ufTynRntJ9Ah97bJlScCzwpXEVljDZxHG3uE"
         },
         "shopBot": {
             "near": "Bu ürün çok yakında satışa çıkacak! Takipte kalın ve fırsatları kaçırmayın. 🎉",
