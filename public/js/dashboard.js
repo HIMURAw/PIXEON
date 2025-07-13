@@ -1,4 +1,10 @@
 document.addEventListener('DOMContentLoaded', function () {
+    
+    
+    loadDiscordLoginHistory()
+    
+    
+    
     // Token kontrolü
     function getCookie(name) {
         const nameEQ = name + "=";
@@ -10,6 +16,9 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         return null;
     }
+
+
+
 
     const token = getCookie('auth_token');
     if (!token) {
@@ -204,7 +213,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // İçerik gösterme fonksiyonu
     function showContent(section) {
-        console.log('Switching to section:', section);
         
         // Tüm content section'ları gizle
         const allContentSections = document.querySelectorAll('.dashboard-content, .purchase-dashboard-content, .activity-dashboard-content, .discord-login-history-content, .purchase-history-content, .activity-history-content, .settings-content, .comments-content, .ticket-content, .add-product-content');
@@ -913,76 +921,68 @@ function refreshActivityChart() {
     }, 1000);
 }
 
-function updateActivityChart() {
-    const period = document.getElementById('activityChartPeriod').value;
-    const activityChartCanvas = document.getElementById('activityChart');
-    
-    if (activityChartCanvas && typeof Chart !== 'undefined') {
-        const ctx = activityChartCanvas.getContext('2d');
-        
-        // Destroy existing chart if it exists
-        if (window.activityChart) {
-            window.activityChart.destroy();
-        }
-        
-        let labels, data;
-        
-        if (period === '24') {
-            labels = ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '24:00'];
-            data = [20, 15, 30, 80, 95, 70, 25];
-        } else if (period === '7') {
-            labels = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
-            data = [65, 70, 85, 90, 95, 100, 80];
-        } else {
-            labels = ['1. Hafta', '2. Hafta', '3. Hafta', '4. Hafta'];
-            data = [75, 82, 88, 92];
-        }
-        
-        window.activityChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Aktivite',
-                    data: data,
-                    borderColor: '#007bff',
-                    backgroundColor: 'rgba(0, 123, 255, 0.1)',
-                    tension: 0.4,
-                    fill: true
-                }]
+function updateActivityChart(data) {
+    if (!data || !data.labels) {
+        // Optionally, clear the chart or show a message
+        return;
+    }
+    const ctx = document.getElementById('activityChart').getContext('2d');
+    if (window.activityChart) {
+        window.activityChart.destroy();
+    }
+    window.activityChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: data.labels,
+            datasets: [{
+                label: 'Aktif Kullanıcılar',
+                data: data.activeUsers,
+                borderColor: '#7289da',
+                tension: 0.4
+            }, {
+                label: 'Ses Kanalı Kullanımı',
+                data: data.voiceChannelUsage,
+                borderColor: '#43b581',
+                tension: 0.4
+            }, {
+                label: 'Mesaj Aktivitesi',
+                data: data.messageActivity,
+                borderColor: '#faa61a',
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        color: '#fff'
+                    }
+                }
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: 'rgba(255, 255, 255, 0.1)'
-                        },
-                        ticks: {
-                            color: '#ffffff'
-                        }
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
                     },
-                    x: {
-                        grid: {
-                            color: 'rgba(255, 255, 255, 0.1)'
-                        },
-                        ticks: {
-                            color: '#ffffff'
-                        }
+                    ticks: {
+                        color: '#fff'
                     }
                 },
-                plugins: {
-                    legend: {
-                        labels: {
-                            color: '#ffffff'
-                        }
+                x: {
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    },
+                    ticks: {
+                        color: '#fff'
                     }
                 }
             }
-        });
-    }
+        }
+    });
 }
 
 // Initialize Activity Dashboard when the page loads
@@ -991,7 +991,7 @@ document.addEventListener('DOMContentLoaded', function() {
     loadActivityDashboard();
     
     // Initialize activity chart
-    updateActivityChart();
+    // updateActivityChart(); // <-- Remove or comment out this line to prevent error
 });
 
 // Comments Management Functions
@@ -1227,18 +1227,57 @@ function initializeProductForm() {
 }
 
 // Load data when switching to new sections
-const originalShowContent = showContent;
-showContent = function(section) {
-    originalShowContent(section);
-    if (section === 'purchase-dashboard-content') {
-        loadPurchaseDashboard();
-    } else if (section === 'activity-dashboard-content') {
-        loadActivityDashboard();
-    } else if (section === 'comments-content') {
-        loadComments();
-    } else if (section === 'ticket-content') {
-        loadTickets();
-    } else if (section === 'add-product-content') {
-        initializeProductForm();
+
+
+// Discord Login/Logout History Loader
+async function loadDiscordLoginHistory() {
+    const joinList = document.getElementById('discord-join-list');
+    const leaveList = document.getElementById('discord-leave-list');
+    if (joinList) joinList.innerHTML = '<div class="loading-spinner">Katılanlar yükleniyor...</div>';
+    if (leaveList) leaveList.innerHTML = '<div class="loading-spinner">Çıkanlar yükleniyor...</div>';
+    try {
+        // Fetch joiners
+        const joinRes = await fetch('/api/discordUsers/memberLog?action=join');
+        const joinData = await joinRes.json();
+        // Fetch leavers
+        const leaveRes = await fetch('/api/discordUsers/memberLog?action=leave');
+        const leaveData = await leaveRes.json();
+        // Render joiners as cards
+        if (joinList) {
+            if (joinData.success && joinData.logs.length > 0) {
+                joinList.innerHTML = joinData.logs.map(log => `
+                    <div class="user-card" onclick="window.open('https://discord.com/users/${log.user_id}', '_blank')" title="Discord profilini aç">
+                        <div class="user-avatar"><img src="${log.avatar_url}" alt="${log.username}"></div>
+                        <div class="user-info">
+                            <span class="user-name">${log.username}</span>
+                            <span class="user-id">${log.user_id}</span>
+                            <span class="user-time">${new Date(log.event_time).toLocaleString('tr-TR')}</span>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                joinList.innerHTML = '<div class="loading-spinner">Hiç giriş kaydı yok.</div>';
+            }
+        }
+        // Render leavers as cards
+        if (leaveList) {
+            if (leaveData.success && leaveData.logs.length > 0) {
+                leaveList.innerHTML = leaveData.logs.map(log => `
+                    <div class="user-card" onclick="window.open('https://discord.com/users/${log.user_id}', '_blank')" title="Discord profilini aç">
+                        <div class="user-avatar"><img src="${log.avatar_url}" alt="${log.username}"></div>
+                        <div class="user-info">
+                            <span class="user-name">${log.username}</span>
+                            <span class="user-id">${log.user_id}</span>
+                            <span class="user-time">${new Date(log.event_time).toLocaleString('tr-TR')}</span>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                leaveList.innerHTML = '<div class="loading-spinner">Hiç çıkış kaydı yok.</div>';
+            }
+        }
+    } catch (err) {
+        if (joinList) joinList.innerHTML = '<div class="loading-spinner">Giriş logu alınamadı.</div>';
+        if (leaveList) leaveList.innerHTML = '<div class="loading-spinner">Çıkış logu alınamadı.</div>';
     }
-};
+}

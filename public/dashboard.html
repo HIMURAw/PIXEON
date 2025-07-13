@@ -56,9 +56,7 @@
                                     Logout
                                     History</a>
                             </li>
-                            <li><a href="#purchase-history" class="log-subitem"><span class="submenu-dot"></span><i
-                                        class="fa-solid fa-wallet"></i> Purchase
-                                    History</a>
+                            <li><a href="#purchase-history" class="log-subitem"><span class="submenu-dot"></span><i class="fa-solid fa-right-to-bracket"></i>Login Log</a>
                             </li>
                             <li><a href="#activity-history" class="log-subitem"><span class="submenu-dot"></span><i
                                         class="fa-solid fa-chart-line"></i> Activity
@@ -1343,7 +1341,18 @@
 <div class="discord-login-history-content" id="discord-login-history" style="display: none;">
     <h2>Discord Login & Logout History</h2>
     <div class="history-list">
-        <div class="loading-spinner">Loading login history...</div>
+        <div class="login-section">
+            <h3>Sunucuya Katılanlar</h3>
+            <ul id="discord-join-list">
+                <div class="loading-spinner">Katılanlar yükleniyor...</div>
+            </ul>
+        </div>
+        <div class="logout-section" style="margin-top: 24px;">
+            <h3>Sunucudan Çıkanlar</h3>
+            <ul id="discord-leave-list">
+                <div class="loading-spinner">Çıkanlar yükleniyor...</div>
+            </ul>
+        </div>
     </div>
 </div>
 
