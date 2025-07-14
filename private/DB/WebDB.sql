@@ -281,6 +281,76 @@ CREATE TABLE IF NOT EXISTS `discord_server_log` (
   KEY `event_time` (`event_time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- Discord Activity History Log
+CREATE TABLE IF NOT EXISTS `discord_activity_history` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `activity_type` enum('message','voice','role','channel','emoji','invite','member') NOT NULL,
+  `user_id` varchar(32) DEFAULT NULL,
+  `username` varchar(64) DEFAULT NULL,
+  `avatar_url` text DEFAULT NULL,
+  `target_id` varchar(32) DEFAULT NULL,
+  `target_name` varchar(255) DEFAULT NULL,
+  `action` varchar(50) NOT NULL,
+  `details` json DEFAULT NULL,
+  `channel_id` varchar(32) DEFAULT NULL,
+  `channel_name` varchar(255) DEFAULT NULL,
+  `moderator_id` varchar(32) DEFAULT NULL,
+  `moderator_username` varchar(64) DEFAULT NULL,
+  `duration_seconds` int(11) DEFAULT NULL,
+  `event_time` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `activity_type` (`activity_type`),
+  KEY `user_id` (`user_id`),
+  KEY `action` (`action`),
+  KEY `channel_id` (`channel_id`),
+  KEY `moderator_id` (`moderator_id`),
+  KEY `event_time` (`event_time`),
+  KEY `idx_activity_time_type` (`event_time`, `activity_type`),
+  KEY `idx_user_activity` (`user_id`, `activity_type`, `event_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Discord Activity Statistics (Daily Aggregated)
+CREATE TABLE IF NOT EXISTS `discord_activity_stats` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `date` date NOT NULL,
+  `activity_type` enum('message','voice','role','channel','emoji','invite','member') NOT NULL,
+  `total_count` int(11) NOT NULL DEFAULT 0,
+  `unique_users` int(11) NOT NULL DEFAULT 0,
+  `channel_id` varchar(32) DEFAULT NULL,
+  `channel_name` varchar(255) DEFAULT NULL,
+  `action` varchar(50) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_daily_activity` (`date`, `activity_type`, `channel_id`, `action`),
+  KEY `date` (`date`),
+  KEY `activity_type` (`activity_type`),
+  KEY `channel_id` (`channel_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Discord User Activity Summary
+CREATE TABLE IF NOT EXISTS `discord_user_activity_summary` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` varchar(32) NOT NULL,
+  `username` varchar(64) NOT NULL,
+  `avatar_url` text DEFAULT NULL,
+  `total_messages` int(11) NOT NULL DEFAULT 0,
+  `total_voice_time` int(11) NOT NULL DEFAULT 0,
+  `total_voice_sessions` int(11) NOT NULL DEFAULT 0,
+  `last_message_time` datetime DEFAULT NULL,
+  `last_voice_time` datetime DEFAULT NULL,
+  `first_seen` datetime NOT NULL DEFAULT current_timestamp(),
+  `last_seen` datetime NOT NULL DEFAULT current_timestamp(),
+  `activity_score` decimal(5,2) NOT NULL DEFAULT 0.00,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_id` (`user_id`),
+  KEY `activity_score` (`activity_score`),
+  KEY `last_seen` (`last_seen`),
+  KEY `total_messages` (`total_messages`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 
 
 

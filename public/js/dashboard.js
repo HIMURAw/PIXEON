@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
     
     
     loadDiscordLoginHistory()
+    loadLoginHistory()
     
     
     
@@ -635,7 +636,7 @@ document.addEventListener('DOMContentLoaded', function () {
     loadAdminProfile();
 
     // Banlı oyuncu sayısını güncelle
-
+    updateActiveBansCount();
 });
 
 function updateActiveBansCount() {
@@ -1343,22 +1344,22 @@ async function loadDiscordLoginHistory() {
             
             switch(tabId) {
                 case 'messages-tab':
-                    endpoint = '/api/discordUsers/messageLog';
+                    endpoint = '/api/discord/log/message';
                     break;
                 case 'voice-tab':
-                    endpoint = '/api/discordUsers/voiceLog';
+                    endpoint = '/api/discord/log/voice';
                     break;
                 case 'roles-tab':
                     endpoint = '/api/discord/log/role';
                     break;
                 case 'channels-tab':
-                    endpoint = '/api/discordUsers/channelLog';
+                    endpoint = '/api/discord/log/channel';
                     break;
                 case 'emojis-tab':
-                    endpoint = '/api/discordUsers/emojiLog';
+                    endpoint = '/api/discord/log/emoji';
                     break;
                 case 'invites-tab':
-                    endpoint = '/api/discordUsers/inviteLog';
+                    endpoint = '/api/discord/log/invite';
                     break;
                 case 'server-settings-tab':
                     endpoint = '/api/discordUsers/serverLog';
@@ -1465,6 +1466,141 @@ async function loadDiscordLoginHistory() {
                 </div>
             `;
             }).join('');
+        } else if (tabId === 'messages-tab') {
+            container.innerHTML = data.map(item => {
+                const userAvatar = item.user?.avatar_url || `https://cdn.discordapp.com/embed/avatars/${parseInt(item.user?.id || '0') % 5}.png`;
+                
+                return `
+                <div class="log-item message-log-item">
+                    <div class="log-user-avatar">
+                        <img src="${userAvatar}" alt="${item.user?.username || 'Unknown'}" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'">
+                    </div>
+                    <div class="log-content">
+                        <div class="log-title">${getLogTitle(item, tabId)}</div>
+                        <div class="log-details">
+                            ${getLogDetails(item, tabId)}
+                        </div>
+                    </div>
+                    <div class="log-time">${new Date(item.event_time).toLocaleString('tr-TR')}</div>
+                    <span class="log-action ${item.action}">
+                        ${item.action === 'edit' ? '✏️ Düzenlendi' : item.action === 'delete' ? '🗑️ Silindi' : item.action === 'bulk_delete' ? '🗑️🗑️ Toplu Silindi' : '📝 Oluşturuldu'}
+                    </span>
+                </div>
+            `;
+            }).join('');
+        } else if (tabId === 'voice-tab') {
+            container.innerHTML = data.map(item => {
+                const userAvatar = item.user?.avatar_url || `https://cdn.discordapp.com/embed/avatars/${parseInt(item.user?.id || '0') % 5}.png`;
+                
+                return `
+                <div class="log-item voice-log-item">
+                    <div class="log-user-avatar">
+                        <img src="${userAvatar}" alt="${item.user?.username || 'Unknown'}" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'">
+                    </div>
+                    <div class="log-content">
+                        <div class="log-title">${getLogTitle(item, tabId)}</div>
+                        <div class="log-details">
+                            ${getLogDetails(item, tabId)}
+                        </div>
+                    </div>
+                    <div class="log-time">${new Date(item.event_time).toLocaleString('tr-TR')}</div>
+                    <span class="log-action ${item.action}">
+                        ${item.action === 'join' ? '🎧 Katıldı' : 
+                          item.action === 'leave' ? '🔇 Ayrıldı' : 
+                          item.action === 'move' ? '🔄 Değiştirdi' : 
+                          item.action === 'mute' ? '🔇 Sesi Kapalı' : 
+                          item.action === 'unmute' ? '🔊 Sesi Açık' : 
+                          item.action === 'deafen' ? '🔇 Kulaklık Kapalı' : 
+                          item.action === 'undeafen' ? '🔊 Kulaklık Açık' : 
+                          item.action}
+                    </span>
+                </div>
+            `;
+            }).join('');
+        } else if (tabId === 'channels-tab') {
+            container.innerHTML = data.map(item => {
+                const moderatorAvatar = item.moderator?.avatar_url || `https://cdn.discordapp.com/embed/avatars/${parseInt(item.moderator?.id || '0') % 5}.png`;
+                
+                return `
+                <div class="log-item channel-log-item">
+                    <div class="log-user-avatar">
+                        <img src="${moderatorAvatar}" alt="${item.moderator?.username || 'Unknown'}" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'">
+                    </div>
+                    <div class="log-content">
+                        <div class="log-title">${getLogTitle(item, tabId)}</div>
+                        <div class="log-details">
+                            ${getLogDetails(item, tabId)}
+                        </div>
+                    </div>
+                    <div class="log-time">${new Date(item.event_time).toLocaleString('tr-TR')}</div>
+                    <span class="log-action ${item.action}">
+                        ${item.action === 'create' ? '📝 Oluşturuldu' : 
+                          item.action === 'delete' ? '🗑️ Silindi' : 
+                          item.action === 'update' ? '✏️ Güncellendi' : 
+                          item.action === 'permission_update' ? '🔐 İzinler' : 
+                          item.action === 'overwrite_update' ? '🔒 Rol İzinleri' : 
+                          item.action}
+                    </span>
+                </div>
+            `;
+            }).join('');
+        } else if (tabId === 'emojis-tab') {
+            container.innerHTML = data.map(item => {
+                const moderatorAvatar = item.moderator?.avatar_url || item.user?.avatar_url || `https://cdn.discordapp.com/embed/avatars/${parseInt(item.moderator?.id || item.user?.id || '0') % 5}.png`;
+                const emojiUrl = item.emoji?.url || item.emoji_url || 'https://cdn.discordapp.com/embed/avatars/0.png';
+                
+                return `
+                <div class="log-item emoji-log-item">
+                    <div class="log-user-avatar">
+                        <img src="${moderatorAvatar}" alt="${item.moderator?.username || item.user?.username || 'Unknown'}" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'">
+                    </div>
+                    <div class="log-content">
+                        <div class="log-title">${getLogTitle(item, tabId)}</div>
+                        <div class="log-details">
+                            ${getLogDetails(item, tabId)}
+                        </div>
+                    </div>
+                    <div class="log-time">${new Date(item.event_time).toLocaleString('tr-TR')}</div>
+                    <div class="log-emoji-preview">
+                        <img src="${emojiUrl}" alt="${item.emoji?.name || item.emoji_name || 'emoji'}" style="width: 32px; height: 32px; border-radius: 4px;" onerror="this.style.display='none'">
+                    </div>
+                    <span class="log-action ${item.action}">
+                        ${item.action === 'create' ? '🟢 Oluşturuldu' : 
+                          item.action === 'delete' ? '🔴 Silindi' : 
+                          item.action === 'update' ? '🟡 Güncellendi' : 
+                          item.action}
+                    </span>
+                </div>
+            `;
+            }).join('');
+        } else if (tabId === 'invites-tab') {
+            container.innerHTML = data.map(item => {
+                const userAvatar = item.user?.avatar_url || `https://cdn.discordapp.com/embed/avatars/${parseInt(item.user?.id || '0') % 5}.png`;
+                
+                return `
+                <div class="log-item invite-log-item">
+                    <div class="log-user-avatar">
+                        <img src="${userAvatar}" alt="${item.user?.username || 'Unknown'}" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'">
+                    </div>
+                    <div class="log-content">
+                        <div class="log-title">${getLogTitle(item, tabId)}</div>
+                        <div class="log-details">
+                            ${getLogDetails(item, tabId)}
+                        </div>
+                    </div>
+                    <div class="log-time">${new Date(item.event_time).toLocaleString('tr-TR')}</div>
+                    <div class="log-invite-code">
+                        <span class="invite-code-badge">${item.invite?.code || 'Unknown'}</span>
+                    </div>
+                    <span class="log-action ${item.action}">
+                        ${item.action === 'create' ? '🟢 Oluşturuldu' : 
+                          item.action === 'delete' ? '🔴 Silindi' : 
+                          item.action === 'use' ? '🟡 Kullanıldı' : 
+                          item.action}
+                    </span>
+                </div>
+            `;
+            }).join('');
         } else {
             container.innerHTML = data.map(item => `
                 <div class="log-item">
@@ -1487,9 +1623,23 @@ async function loadDiscordLoginHistory() {
     function getLogTitle(item, tabId) {
         switch(tabId) {
             case 'messages-tab':
-                return `${item.username} ${item.action === 'create' ? 'sent' : item.action === 'edit' ? 'edited' : 'deleted'} a message`;
+                const username = item.user?.username || item.username || 'Bilinmeyen Kullanıcı';
+                const actionText = item.action === 'edit' ? 'mesajını düzenledi' : 
+                                  item.action === 'delete' ? 'mesajını sildi' : 
+                                  item.action === 'bulk_delete' ? 'mesajı toplu silindi' : 
+                                  'mesaj gönderdi';
+                return `${username} ${actionText}`;
             case 'voice-tab':
-                return `${item.username} ${item.action} voice channel`;
+                const voiceUsername = item.user?.username || item.username || 'Bilinmeyen Kullanıcı';
+                const voiceActionText = item.action === 'join' ? 'ses kanalına katıldı' : 
+                                       item.action === 'leave' ? 'ses kanalından ayrıldı' : 
+                                       item.action === 'move' ? 'ses kanalı değiştirdi' : 
+                                       item.action === 'mute' ? 'sesini kapattı' : 
+                                       item.action === 'unmute' ? 'sesini açtı' : 
+                                       item.action === 'deafen' ? 'kulaklığını kapattı' : 
+                                       item.action === 'undeafen' ? 'kulaklığını açtı' : 
+                                       'ses durumu değiştirdi';
+                return `${voiceUsername} ${voiceActionText}`;
             case 'roles-tab':
                 if (item.user && item.role) {
                     const actionText = item.action === 'add' ? 'verildi' : item.action === 'remove' ? 'alındı' : 'güncellendi';
@@ -1497,11 +1647,30 @@ async function loadDiscordLoginHistory() {
                 }
                 return `${item.username} ${item.action} ${item.role_name} role`;
             case 'channels-tab':
-                return `${item.moderator_username} ${item.action} channel ${item.channel_name}`;
+                const channelModerator = item.moderator?.username || item.moderator_username || 'Sistem';
+                const channelActionText = item.action === 'create' ? 'kanal oluşturdu' : 
+                                         item.action === 'delete' ? 'kanal sildi' : 
+                                         item.action === 'update' ? 'kanal güncelledi' : 
+                                         item.action === 'permission_update' ? 'kanal izinlerini güncelledi' : 
+                                         item.action === 'overwrite_update' ? 'rol izinlerini güncelledi' : 
+                                         'kanal işlemi yaptı';
+                return `${channelModerator} ${channelActionText}`;
             case 'emojis-tab':
-                return `${item.moderator_username} ${item.action} emoji ${item.emoji_name}`;
+                const emojiModerator = item.moderator?.username || item.user?.username || 'Sistem';
+                const emojiActionText = item.action === 'create' ? 'emoji oluşturdu' : 
+                                       item.action === 'delete' ? 'emoji sildi' : 
+                                       item.action === 'update' ? 'emoji güncelledi' : 
+                                       'emoji işlemi yaptı';
+                const emojiName = item.emoji?.name || item.emoji_name || 'Bilinmeyen Emoji';
+                return `${emojiModerator} ${emojiActionText}: ${emojiName}`;
             case 'invites-tab':
-                return `${item.creator_username} ${item.action} invite ${item.invite_code}`;
+                const inviteUser = item.user?.username || item.moderator?.username || 'Sistem';
+                const inviteActionText = item.action === 'create' ? 'davet oluşturdu' : 
+                                        item.action === 'delete' ? 'davet sildi' : 
+                                        item.action === 'use' ? 'davet kullandı' : 
+                                        'davet işlemi yaptı';
+                const inviteCode = item.invite?.code || 'Bilinmeyen Davet';
+                return `${inviteUser} ${inviteActionText}: ${inviteCode}`;
             case 'server-settings-tab':
                 return `${item.moderator_username} ${item.action} ${item.setting_name}`;
             default:
@@ -1514,11 +1683,26 @@ async function loadDiscordLoginHistory() {
         
         switch(tabId) {
             case 'messages-tab':
-                if (item.content) details.push(`Content: ${item.content.substring(0, 50)}${item.content.length > 50 ? '...' : ''}`);
-                if (item.channel_name) details.push(`Channel: ${item.channel_name}`);
+                if (item.content) details.push(`İçerik: ${item.content.substring(0, 100)}${item.content.length > 100 ? '...' : ''}`);
+                if (item.channel?.name || item.channel_name) details.push(`Kanal: ${item.channel?.name || item.channel_name}`);
+                if (item.attachments_count > 0) details.push(`Ekler: ${item.attachments_count} dosya`);
+                if (item.mentions_count > 0) details.push(`Etiketler: ${item.mentions_count} kullanıcı`);
+                if (item.message_id) details.push(`Mesaj ID: ${item.message_id}`);
                 break;
             case 'voice-tab':
-                if (item.channel_name) details.push(`Channel: ${item.channel_name}`);
+                if (item.channel?.name || item.channel_name) details.push(`Kanal: ${item.channel?.name || item.channel_name}`);
+                if (item.duration && item.action === 'leave') {
+                    const hours = Math.floor(item.duration / 3600);
+                    const minutes = Math.floor((item.duration % 3600) / 60);
+                    const seconds = item.duration % 60;
+                    
+                    let durationText = '';
+                    if (hours > 0) durationText += `${hours} saat `;
+                    if (minutes > 0) durationText += `${minutes} dakika `;
+                    if (seconds > 0) durationText += `${seconds} saniye`;
+                    
+                    details.push(`Süre: ${durationText.trim()}`);
+                }
                 break;
             case 'roles-tab':
                 if (item.user) details.push(`Kullanıcı: ${item.user.username} (${item.user.id})`);
@@ -1527,10 +1711,46 @@ async function loadDiscordLoginHistory() {
                 if (item.reason) details.push(`Sebep: ${item.reason}`);
                 break;
             case 'channels-tab':
-                if (item.channel_type) details.push(`Type: ${item.channel_type}`);
+                if (item.channel?.name || item.channel_name) details.push(`Kanal: ${item.channel?.name || item.channel_name}`);
+                if (item.channel?.type || item.channel_type) {
+                    const channelTypes = {
+                        0: 'Metin Kanalı',
+                        2: 'Ses Kanalı',
+                        4: 'Kategori',
+                        5: 'Duyuru Kanalı',
+                        13: 'Sahne Kanalı',
+                        15: 'Forum Kanalı',
+                        16: 'Medya Kanalı'
+                    };
+                    const typeText = channelTypes[item.channel?.type || item.channel_type] || 'Bilinmeyen';
+                    details.push(`Tür: ${typeText}`);
+                }
+                if (item.changes?.oldName && item.changes?.newName) {
+                    details.push(`İsim: ${item.changes.oldName} → ${item.changes.newName}`);
+                }
+                if (item.reason) {
+                    details.push(`Sebep: ${item.reason}`);
+                }
+                break;
+            case 'emojis-tab':
+                if (item.emoji?.name || item.emoji_name) details.push(`Emoji: ${item.emoji?.name || item.emoji_name}`);
+                if (item.emoji?.id || item.emoji_id) details.push(`ID: ${item.emoji?.id || item.emoji_id}`);
+                if (item.moderator?.username || item.user?.username) details.push(`Kullanıcı: ${item.moderator?.username || item.user?.username}`);
+                if (item.reason) details.push(`Sebep: ${item.reason}`);
                 break;
             case 'invites-tab':
-                if (item.channel_name) details.push(`Channel: ${item.channel_name}`);
+                if (item.invite?.code || item.invite_code) details.push(`Davet: ${item.invite?.code || item.invite_code}`);
+                if (item.invite?.channel_name || item.channel_name) details.push(`Kanal: ${item.invite?.channel_name || item.channel_name}`);
+                if (item.invite?.uses !== undefined) {
+                    const usesText = item.invite.max_uses ? `${item.invite.uses}/${item.invite.max_uses}` : `${item.invite.uses}`;
+                    details.push(`Kullanım: ${usesText}`);
+                }
+                if (item.invite?.expires_at) {
+                    const expiresDate = new Date(item.invite.expires_at).toLocaleString('tr-TR');
+                    details.push(`Bitiş: ${expiresDate}`);
+                }
+                if (item.moderator?.username || item.user?.username) details.push(`Kullanıcı: ${item.moderator?.username || item.user?.username}`);
+                if (item.reason) details.push(`Sebep: ${item.reason}`);
                 break;
             case 'server-settings-tab':
                 if (item.old_value && item.new_value) {
@@ -1543,23 +1763,531 @@ async function loadDiscordLoginHistory() {
         return details.map(detail => `<span>${detail}</span>`).join('');
     }
     
-    // Update showContent to include comprehensive logs
-    // const originalShowContent = showContent; // This line is removed as showContent is now global
-    // showContent = function(section) { // This block is removed as showContent is now global
-    //     originalShowContent(section);
-    //     if (section === 'purchase-dashboard-content') {
-    //         loadPurchaseDashboard();
-    //     } else if (section === 'activity-dashboard-content') {
-    //         loadActivityDashboard();
-    //     } else if (section === 'comments-content') {
-    //         loadComments();
-    //     } else if (section === 'ticket-content') {
-    //         loadTickets();
-    //     } else if (section === 'add-product-content') {
-    //         initializeProductForm();
-    //     } else if (section === 'discord-login-history') {
-    //         loadDiscordLoginHistory();
-    //     } else if (section === 'comprehensive-logs') {
-    //         initializeComprehensiveLogs();
-    //     }
-    // };
+
+
+    // Add search on Enter key
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('userSearch');
+        if (searchInput) {
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchUsers();
+                }
+            });
+        }
+    });
+
+    // Load login history when purchase-history section is shown
+    const originalShowContent = showContent;
+    showContent = function(section) {
+        originalShowContent(section);
+        if (section === 'purchase-history') {
+            loadLoginHistory();
+        }
+    };
+
+// Global Login History Functions
+let currentPage = 1;
+let totalPages = 1;
+let currentSearchQuery = '';
+
+async function loadLoginHistory() {
+    const usersGrid = document.getElementById('usersGrid');
+    const limit = document.getElementById('userLimit').value;
+    
+    if (usersGrid) {
+        usersGrid.innerHTML = '<div class="loading-spinner">Loading users...</div>';
+    }
+
+    try {
+        // Load stats first
+        await loadLoginStats();
+        
+        // Build API URL
+        let url = `/api/loginLog/logindb?limit=${limit}&page=${currentPage}`;
+        if (currentSearchQuery) {
+            url += `&search=${encodeURIComponent(currentSearchQuery)}`;
+        }
+
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.success) {
+            renderUsers(data.users);
+            updatePagination(data.page, data.totalPages, data.total);
+        } else {
+            showError('Failed to load users');
+        }
+    } catch (error) {
+        console.error('Error loading login history:', error);
+        showError('Error loading users');
+    }
+}
+
+async function loadLoginStats() {
+    try {
+        const response = await fetch('/api/loginLog/stats/overview');
+        const data = await response.json();
+
+        if (data.success) {
+            document.getElementById('totalUsers').textContent = data.stats.total;
+            document.getElementById('todayUsers').textContent = data.stats.today;
+            document.getElementById('weekUsers').textContent = data.stats.thisWeek;
+            document.getElementById('monthUsers').textContent = data.stats.thisMonth;
+        }
+    } catch (error) {
+        console.error('Error loading stats:', error);
+    }
+}
+
+function renderUsers(users) {
+    const usersGrid = document.getElementById('usersGrid');
+    
+    if (!users || users.length === 0) {
+        usersGrid.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-users"></i>
+                <h4>No users found</h4>
+                <p>No users match your current search criteria.</p>
+            </div>
+        `;
+        return;
+    }
+
+    usersGrid.innerHTML = users.map(user => `
+        <div class="user-card" onclick="viewUserDetails('${user.discord_id}')" title="Click to view details" style="background: linear-gradient(135deg, rgba(0,123,255,0.08), rgba(0,212,255,0.05)); box-shadow: 0 6px 32px rgba(0,0,0,0.10); position: relative;">
+            <div class="user-card-header" style="display: flex; align-items: center; gap: 1.2rem; margin-bottom: 1.5rem;">
+                <div class="user-avatar" style="box-shadow: 0 2px 12px rgba(0,123,255,0.10); flex-shrink: 0;">
+                    <img src="${user.avatar_url}" alt="${user.username}" onerror="this.src='https://cdn.discordapp.com/embed/avatars/${parseInt(user.discord_id) % 5}.png'">
+                </div>
+                <div class="user-info-main" style="flex: 1; min-width: 0;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.3rem;">
+                        <span class="user-name" style="font-size: 1.4rem; font-weight: 700;">${user.username}</span>
+                        <span class="badge" style="background: #7289da; color: #fff; font-size: 0.75rem; border-radius: 6px; padding: 2px 8px;"><i class="fab fa-discord"></i></span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.3rem;">
+                        <span class="user-discord-id" style="color: #888; font-size: 0.95rem;"><i class="fas fa-id-badge"></i> ${user.discord_id}</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span class="user-email" style="color: #00d4ff; font-size: 0.9rem;"><i class="fas fa-envelope"></i> ${user.email || 'Not provided'}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="user-card-footer" style="border-top: 1.5px solid var(--border-color); padding-top: 1.2rem; display: flex; justify-content: space-between; align-items: center;">
+                <div class="user-timestamps" style="display: flex; flex-direction: column; gap: 0.3rem;">
+                    <div class="timestamp" style="font-size: 0.85rem; color: #888;">
+                        <span class="timestamp-label" style="color: #fff; font-weight: 500;"><i class="fas fa-calendar-plus"></i> Created:</span> ${user.formatted_created}
+                    </div>
+                    <div class="timestamp" style="font-size: 0.85rem; color: #888;">
+                        <span class="timestamp-label" style="color: #fff; font-weight: 500;"><i class="fas fa-calendar-check"></i> Updated:</span> ${user.formatted_updated}
+                    </div>
+                </div>
+                <div class="user-actions" style="display: flex; gap: 0.5rem;">
+                    <button class="user-action-btn" onclick="event.stopPropagation(); openDiscordProfile('${user.discord_id}')" title="Open Discord Profile" style="background: #7289da; border-color: #7289da;"><i class="fab fa-discord"></i></button>
+                    <button class="user-action-btn" onclick="event.stopPropagation(); editUser('${user.discord_id}')" title="Edit User" style="background: #28a745; border-color: #28a745;"><i class="fas fa-edit"></i></button>
+                    <button class="user-action-btn danger" onclick="event.stopPropagation(); deleteUser('${user.discord_id}')" title="Delete User" style="background: #dc3545; border-color: #dc3545;"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>
+            <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 6px; background: linear-gradient(90deg, #007bff, #00d4ff); border-radius: 0 0 12px 12px;"></div>
+        </div>
+    `).join('');
+}
+
+function updatePagination(currentPageNum, totalPagesNum, totalUsers) {
+    const pagination = document.getElementById('pagination');
+    const pageInfo = document.getElementById('pageInfo');
+    const prevBtn = document.getElementById('prevPage');
+    const nextBtn = document.getElementById('nextPage');
+
+    currentPage = currentPageNum;
+    totalPages = totalPagesNum;
+
+    if (totalPages <= 1) {
+        pagination.style.display = 'none';
+        return;
+    }
+
+    pagination.style.display = 'flex';
+    pageInfo.textContent = `Page ${currentPage} of ${totalPages} (${totalUsers} total users)`;
+    
+    prevBtn.disabled = currentPage <= 1;
+    nextBtn.disabled = currentPage >= totalPages;
+}
+
+function changePage(direction) {
+    const newPage = currentPage + direction;
+    if (newPage >= 1 && newPage <= totalPages) {
+        currentPage = newPage;
+        loadLoginHistory();
+    }
+}
+
+function searchUsers() {
+    const searchInput = document.getElementById('userSearch');
+    currentSearchQuery = searchInput.value.trim();
+    currentPage = 1; // Reset to first page
+    loadLoginHistory();
+}
+
+function viewUserDetails(discordId) {
+    // Open user details in a new window or modal
+    window.open(`https://discord.com/users/${discordId}`, '_blank');
+}
+
+function openDiscordProfile(discordId) {
+    window.open(`https://discord.com/users/${discordId}`, '_blank');
+}
+
+function editUser(discordId) {
+    // Implement edit user functionality
+    alert(`Edit user ${discordId} - This feature will be implemented soon.`);
+}
+
+function deleteUser(discordId) {
+    if (confirm(`Are you sure you want to delete user ${discordId}?`)) {
+        // Implement delete user functionality
+        alert(`Delete user ${discordId} - This feature will be implemented soon.`);
+    }
+}
+
+function showError(message) {
+    const usersGrid = document.getElementById('usersGrid');
+    if (usersGrid) {
+        usersGrid.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h4>Error</h4>
+                <p>${message}</p>
+                <button onclick="loadLoginHistory()" class="user-action-btn" style="margin-top: 1rem;">
+                    <i class="fas fa-redo"></i> Retry
+                </button>
+            </div>
+        `;
+    }
+}
+
+// Add search on Enter key
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('userSearch');
+    if (searchInput) {
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchUsers();
+            }
+        });
+    }
+});
+
+// Activity History Functions
+let activityCharts = {};
+
+function initializeActivityHistory() {
+    loadActivityStats();
+    initializeActivityCharts();
+    loadRecentActivityFeed();
+}
+
+async function loadActivityStats() {
+    try {
+        const response = await fetch('/api/activity-history/stats');
+        const data = await response.json();
+        
+        if (data.success) {
+            const stats = data.stats;
+            document.getElementById('totalMessages').textContent = stats.totalMessages.toLocaleString();
+            document.getElementById('voiceActivity').textContent = stats.voiceActivity + '%';
+            document.getElementById('activeUsers').textContent = stats.activeUsers.toLocaleString();
+            document.getElementById('avgSession').textContent = stats.avgSession + ' min';
+        } else {
+            console.error('Activity stats yüklenirken hata:', data.error);
+        }
+    } catch (error) {
+        console.error('Activity stats API hatası:', error);
+    }
+}
+
+async function initializeActivityCharts() {
+    // Main Activity Chart
+    const activityCtx = document.getElementById('activityChart');
+    if (activityCtx) {
+        try {
+            const response = await fetch('/api/activity-history/chart/overview?period=7d');
+            const data = await response.json();
+            
+            if (data.success) {
+                activityCharts.activity = new Chart(activityCtx, {
+                    type: 'line',
+                    data: data.data,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    color: '#fff',
+                                    font: {
+                                        size: 12
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                },
+                                ticks: {
+                                    color: '#fff'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                },
+                                ticks: {
+                                    color: '#fff'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        } catch (error) {
+            console.error('Activity chart yüklenirken hata:', error);
+        }
+    }
+
+    // Channel Activity Chart
+    const channelCtx = document.getElementById('channelChart');
+    if (channelCtx) {
+        try {
+            const response = await fetch('/api/activity-history/chart/channels?type=messages');
+            const data = await response.json();
+            
+            if (data.success) {
+                activityCharts.channel = new Chart(channelCtx, {
+                    type: 'bar',
+                    data: data.data,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                },
+                                ticks: {
+                                    color: '#fff'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                },
+                                ticks: {
+                                    color: '#fff'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        } catch (error) {
+            console.error('Channel chart yüklenirken hata:', error);
+        }
+    }
+
+    // Hourly Activity Chart
+    const hourlyCtx = document.getElementById('hourlyChart');
+    if (hourlyCtx) {
+        try {
+            const response = await fetch('/api/activity-history/chart/hourly');
+            const data = await response.json();
+            
+            if (data.success) {
+                activityCharts.hourly = new Chart(hourlyCtx, {
+                    type: 'line',
+                    data: data.data,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                },
+                                ticks: {
+                                    color: '#fff'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                },
+                                ticks: {
+                                    color: '#fff'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        } catch (error) {
+            console.error('Hourly chart yüklenirken hata:', error);
+        }
+    }
+
+    // User Distribution Chart
+    const userDistCtx = document.getElementById('userDistributionChart');
+    if (userDistCtx) {
+        try {
+            const response = await fetch('/api/activity-history/chart/user-distribution');
+            const data = await response.json();
+            
+            if (data.success) {
+                activityCharts.userDistribution = new Chart(userDistCtx, {
+                    type: 'doughnut',
+                    data: data.data,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    color: '#fff',
+                                    font: {
+                                        size: 12
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        } catch (error) {
+            console.error('User distribution chart yüklenirken hata:', error);
+        }
+    }
+
+    // Add chart control event listeners
+    addChartControls();
+}
+
+function addChartControls() {
+    // Period controls for main activity chart
+    document.querySelectorAll('[data-period]').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('[data-period]').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            updateActivityChart(this.dataset.period);
+        });
+    });
+
+    // Type controls for channel chart
+    document.querySelectorAll('[data-type]').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('[data-type]').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            updateChannelChart(this.dataset.type);
+        });
+    });
+}
+
+async function updateActivityChart(period) {
+    try {
+        const response = await fetch(`/api/activity-history/chart/overview?period=${period}`);
+        const data = await response.json();
+        
+        if (data.success && activityCharts.activity) {
+            activityCharts.activity.data = data.data;
+            activityCharts.activity.update();
+        }
+    } catch (error) {
+        console.error('Activity chart güncellenirken hata:', error);
+    }
+}
+
+async function updateChannelChart(type) {
+    try {
+        const response = await fetch(`/api/activity-history/chart/channels?type=${type}`);
+        const data = await response.json();
+        
+        if (data.success && activityCharts.channel) {
+            activityCharts.channel.data = data.data;
+            activityCharts.channel.update();
+        }
+    } catch (error) {
+        console.error('Channel chart güncellenirken hata:', error);
+    }
+}
+
+async function loadRecentActivityFeed() {
+    const activityFeed = document.getElementById('activityFeed');
+    if (!activityFeed) return;
+
+    try {
+        const response = await fetch('/api/activity-history/recent-activities?limit=10');
+        const data = await response.json();
+        
+        if (data.success) {
+            activityFeed.innerHTML = data.activities.map(activity => `
+                <div class="activity-feed-item" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 8px; margin-bottom: 0.5rem; transition: all 0.3s ease;">
+                    <div class="activity-icon" style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #007bff, #00d4ff); display: flex; align-items: center; justify-content: center; color: white; font-size: 1rem;">
+                        <i class="${activity.icon}"></i>
+                    </div>
+                    <div class="activity-content" style="flex: 1;">
+                        <div class="activity-text" style="color: #fff; font-weight: 500; margin-bottom: 0.25rem;">
+                            <span style="color: #00d4ff; font-weight: 600;">${activity.user}</span> ${activity.content}
+                        </div>
+                        <div class="activity-time" style="color: #888; font-size: 0.85rem;">
+                            ${activity.time}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        } else {
+            activityFeed.innerHTML = '<div class="no-activities" style="text-align: center; color: #888; padding: 2rem;">No recent activities found</div>';
+        }
+    } catch (error) {
+        console.error('Recent activities yüklenirken hata:', error);
+        activityFeed.innerHTML = '<div class="no-activities" style="text-align: center; color: #888; padding: 2rem;">Error loading activities</div>';
+    }
+}
+
+function refreshActivityFeed() {
+    const btn = event.target.closest('.refresh-btn');
+    const icon = btn.querySelector('i');
+    icon.style.animation = 'spin 1s linear';
+    
+    setTimeout(() => {
+        loadRecentActivityFeed();
+        icon.style.animation = '';
+        showNotification('Activity feed refreshed', 'success');
+    }, 1000);
+}
+
+// Initialize activity history when the section is shown
+const originalShowContentActivity = showContent;
+showContent = function(section) {
+    originalShowContentActivity(section);
+    if (section === 'activity-history') {
+        setTimeout(() => {
+            initializeActivityHistory();
+        }, 100);
+    }
+};

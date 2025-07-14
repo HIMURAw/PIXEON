@@ -9,8 +9,6 @@ const { Events } = require('discord.js');
 // Mesaj log kaydetme fonksiyonu
 async function logMessageEvent(messageData) {
     try {
-        console.log('logMessageEvent çağrıldı:', messageData.action, messageData.messageId);
-        
         // SQL'e kaydet
         const [result] = await db.pool.query(
             'INSERT INTO discord_message_log (message_id, channel_id, channel_name, user_id, username, avatar_url, content, action, attachments_count, mentions_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
@@ -28,25 +26,21 @@ async function logMessageEvent(messageData) {
             ]
         );
 
-        console.log('Veritabanına kaydedildi, ID:', result.insertId);
-
         // Webhook'a embed gönder
         const actionEmojis = {
-            'create': '📝',
             'edit': '✏️',
             'delete': '🗑️',
             'bulk_delete': '🗑️🗑️'
         };
 
         const actionColors = {
-            'create': 0x00FF00,
             'edit': 0xFFFF00,
             'delete': 0xFF0000,
             'bulk_delete': 0xFF6600
         };
 
         const embed = {
-            title: `${actionEmojis[messageData.action]} Mesaj ${messageData.action === 'create' ? 'Oluşturuldu' : messageData.action === 'edit' ? 'Düzenlendi' : messageData.action === 'delete' ? 'Silindi' : 'Toplu Silindi'}`,
+            title: `${actionEmojis[messageData.action]} Mesaj ${messageData.action === 'edit' ? 'Düzenlendi' : messageData.action === 'delete' ? 'Silindi' : 'Toplu Silindi'}`,
             description: `**Kullanıcı:** ${messageData.username} (${messageData.userId})\n**Kanal:** ${messageData.channelName} (${messageData.channelId})`,
             color: actionColors[messageData.action],
             thumbnail: {
@@ -98,44 +92,23 @@ async function logMessageEvent(messageData) {
             embeds: [embed]
         };
 
-        console.log('Webhook gönderiliyor...');
         await axios.post(Config.discord.log.MessageWebhookURL, webhookData);
         console.log(`Mesaj logu kaydedildi: ${messageData.action} - ${messageData.username} - ${messageData.channelName}`);
 
     } catch (error) {
         console.error('Mesaj logu kaydedilirken hata:', error);
-        console.error('Hata detayı:', error.message);
-        if (error.response) {
-            console.error('Webhook response:', error.response.data);
-        }
     }
 }
 
 // Discord mesaj event listeners
-client.on(Events.MessageCreate, async (message) => {
-    try {
-        if (message.author.bot) return;
-        await logMessageEvent({
-            messageId: message.id,
-            channelId: message.channel.id,
-            channelName: message.channel.name,
-            userId: message.author.id,
-            username: message.author.username,
-            avatarUrl: message.author.displayAvatarURL({ dynamic: true }),
-            content: message.content,
-            action: 'create',
-            attachmentsCount: message.attachments.size,
-            mentionsCount: message.mentions.users.size
-        });
-    } catch (error) {
-        console.error('MessageCreate event hatası:', error);
-    }
-});
-
 client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
     try {
+        // Bot mesajlarını loglama
         if (newMessage.author.bot) return;
+
+        // Sadece içerik değişikliklerini logla
         if (oldMessage.content === newMessage.content) return;
+
         await logMessageEvent({
             messageId: newMessage.id,
             channelId: newMessage.channel.id,
@@ -143,11 +116,12 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
             userId: newMessage.author.id,
             username: newMessage.author.username,
             avatarUrl: newMessage.author.displayAvatarURL({ dynamic: true }),
-            content: `**Eski:** ${oldMessage.content}\n**Yeni:** ${newMessage.content}`,
+            content: newMessage.content,
             action: 'edit',
             attachmentsCount: newMessage.attachments.size,
             mentionsCount: newMessage.mentions.users.size
         });
+
     } catch (error) {
         console.error('MessageUpdate event hatası:', error);
     }
@@ -155,32 +129,22 @@ client.on(Events.MessageUpdate, async (oldMessage, newMessage) => {
 
 client.on(Events.MessageDelete, async (message) => {
     try {
-        console.log('MessageDelete event tetiklendi:', message.id);
-        
         // Bot mesajlarını loglama
-        if (message.author?.bot) {
-            console.log('Bot mesajı silindi, loglanmıyor');
-            return;
-        }
+        if (message.author?.bot) return;
 
-        // Mesaj verilerini hazırla
-        const messageData = {
+        await logMessageEvent({
             messageId: message.id,
             channelId: message.channel.id,
             channelName: message.channel.name,
-            userId: message.author?.id || 'Bilinmeyen',
+            userId: message.author?.id || 'Bilinmeyen ID',
             username: message.author?.username || 'Bilinmeyen Kullanıcı',
             avatarUrl: message.author?.displayAvatarURL({ dynamic: true }) || 'https://cdn.discordapp.com/embed/avatars/0.png',
-            content: message.content || 'İçerik bulunamadı',
+            content: message.content,
             action: 'delete',
             attachmentsCount: message.attachments?.size || 0,
             mentionsCount: message.mentions?.users?.size || 0
-        };
+        });
 
-        console.log('Mesaj silme verileri:', messageData);
-        await logMessageEvent(messageData);
-        console.log('Mesaj silme logu başarıyla kaydedildi');
-        
     } catch (error) {
         console.error('MessageDelete event hatası:', error);
     }
@@ -189,24 +153,30 @@ client.on(Events.MessageDelete, async (message) => {
 client.on(Events.MessageBulkDelete, async (messages) => {
     try {
         for (const [messageId, message] of messages) {
+            // Bot mesajlarını loglama
             if (message.author?.bot) continue;
+
             await logMessageEvent({
                 messageId: message.id,
                 channelId: message.channel.id,
                 channelName: message.channel.name,
-                userId: message.author?.id || 'Bilinmeyen',
+                userId: message.author?.id || 'Bilinmeyen ID',
                 username: message.author?.username || 'Bilinmeyen Kullanıcı',
                 avatarUrl: message.author?.displayAvatarURL({ dynamic: true }) || 'https://cdn.discordapp.com/embed/avatars/0.png',
-                content: message.content || 'İçerik bulunamadı',
+                content: message.content,
                 action: 'bulk_delete',
                 attachmentsCount: message.attachments?.size || 0,
                 mentionsCount: message.mentions?.users?.size || 0
             });
         }
+
     } catch (error) {
         console.error('MessageBulkDelete event hatası:', error);
     }
 });
+
+// logMessageEvent fonksiyonunu export et
+module.exports = { logMessageEvent };
 
 // API endpoint - Mesaj loglarını getir
 router.get('/', async (req, res) => {
@@ -214,7 +184,7 @@ router.get('/', async (req, res) => {
         const { action, user_id, channel_id, limit = 100 } = req.query;
         let sql = 'SELECT * FROM discord_message_log WHERE 1=1';
         const params = [];
-        if (action && ['create', 'edit', 'delete', 'bulk_delete'].includes(action)) {
+        if (action && ['edit', 'delete', 'bulk_delete'].includes(action)) {
             sql += ' AND action = ?';
             params.push(action);
         }
