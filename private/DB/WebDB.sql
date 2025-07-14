@@ -351,7 +351,17 @@ CREATE TABLE IF NOT EXISTS `discord_user_activity_summary` (
   KEY `total_messages` (`total_messages`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-
+-- License Table
+CREATE TABLE IF NOT EXISTS `licenses` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `server_name` VARCHAR(255) NOT NULL,
+  `server_ip` VARCHAR(64) NOT NULL,
+  `added_by` VARCHAR(100) DEFAULT NULL,
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+  `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `server_ip` (`server_ip`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;

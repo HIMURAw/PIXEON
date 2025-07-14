@@ -2511,6 +2511,7 @@ body {
     border-radius: var(--border-radius);
     border-left: 4px solid var(--accent-color);
     transition: all var(--transition-speed);
+    min-height: 90px;
 }
 
 .log-item:hover {
@@ -4700,5 +4701,143 @@ body {
     
     .chart-content {
         height: 200px;
+    }
+}
+
+/* License Content Section Styles - Full Page, Animated */
+.license-content-section {
+    background: linear-gradient(120deg, #232526 0%, #414345 100%);
+    border-radius: 0;
+    box-shadow: none;
+    padding: 3.5rem 2vw 3rem 2vw;
+    margin: 0 auto 2.5rem auto;
+    border: none;
+    max-width: 100vw;
+    min-height: 70vh;
+    width: 100vw;
+    animation: fadeInLicense 0.7s cubic-bezier(0.4,0,0.2,1);
+    position: relative;
+    z-index: 1;
+}
+@keyframes fadeInLicense {
+    from { opacity: 0; transform: translateY(40px) scale(0.98); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.license-content-section h2 {
+    color: #00d4ff;
+    font-size: 2.7rem;
+    font-weight: 800;
+    margin-bottom: 2.2rem;
+    text-align: center;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 16px #0008;
+    animation: fadeInLicense 1s 0.1s backwards;
+}
+.license-content-section h3 {
+    color: #fff;
+    font-size: 1.4rem;
+    margin: 2.5rem 0 1.2rem 0;
+    font-weight: 700;
+    border-bottom: 2px solid #00d4ff44;
+    padding-bottom: 0.7rem;
+    text-align: left;
+    letter-spacing: 0.5px;
+    animation: fadeInLicense 1s 0.2s backwards;
+}
+#licenseAddForm {
+    display: flex;
+    flex-direction: row;
+    gap: 2vw;
+    margin-bottom: 2.2rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-end;
+    animation: fadeInLicense 1s 0.15s backwards;
+}
+#licenseAddForm label {
+    color: #b3e5fc;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+    font-size: 1.1rem;
+}
+#licenseAddForm input[type="text"] {
+    padding: 1.1rem 1.3rem;
+    border-radius: 12px;
+    border: 2px solid #00d4ff44;
+    background: #232526;
+    color: #fff;
+    font-size: 1.1rem;
+    margin-right: 0.7vw;
+    margin-bottom: 0.2rem;
+    transition: border-color 0.25s, box-shadow 0.25s;
+    box-shadow: 0 2px 12px #00d4ff11;
+}
+#licenseAddForm input[type="text"]:focus {
+    outline: none;
+    border-color: #00d4ff;
+    box-shadow: 0 4px 24px #00d4ff33;
+}
+#licenseAddForm button[type="submit"] {
+    background: linear-gradient(90deg, #00d4ff, #0056b3);
+    color: #fff;
+    font-weight: 800;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 12px;
+    padding: 1.1rem 2.5rem;
+    margin-top: 0.2rem;
+    cursor: pointer;
+    box-shadow: 0 2px 16px #00d4ff33;
+    transition: background 0.25s, transform 0.18s, box-shadow 0.18s;
+    animation: fadeInLicense 1s 0.2s backwards;
+}
+#licenseAddForm button[type="submit"]:hover {
+    background: linear-gradient(90deg, #0056b3, #00d4ff);
+    transform: scale(1.06) translateY(-2px);
+    box-shadow: 0 6px 32px #00d4ff55;
+}
+#licenseList, #licenseLogsList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    animation: fadeInLicense 1s 0.25s backwards;
+}
+#licenseList li, #licenseLogsList li {
+    background: linear-gradient(90deg, #232526 60%, #00d4ff11 100%);
+    border-radius: 14px;
+    padding: 1.3rem 2rem;
+    margin-bottom: 1.1rem;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 16px #00d4ff11;
+    border: 2px solid #00d4ff22;
+    font-size: 1.08rem;
+    font-weight: 500;
+    transition: background 0.25s, box-shadow 0.25s, transform 0.18s;
+    animation: fadeInLicense 0.7s cubic-bezier(0.4,0,0.2,1);
+}
+#licenseList li:hover, #licenseLogsList li:hover {
+    background: linear-gradient(90deg, #00d4ff 0%, #0056b3 100%);
+    color: #fff;
+    box-shadow: 0 8px 32px #00d4ff33;
+    transform: scale(1.03) translateY(-2px);
+    border-color: #00d4ff;
+}
+@media (max-width: 900px) {
+    .license-content-section {
+        padding: 1.2rem 0.5rem;
+        min-height: 60vh;
+    }
+    #licenseAddForm {
+        flex-direction: column;
+        gap: 1.2rem;
+        align-items: stretch;
+    }
+    #licenseList li, #licenseLogsList li {
+        padding: 1rem 0.7rem;
+        font-size: 1rem;
     }
 }
