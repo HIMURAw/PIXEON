@@ -238,6 +238,7 @@ const looginLog = require('./private/routers/loginLog.js')
 const CommentRouter = require('./private/routers/Comment.js');
 const indexAPIRouter = require('./private/routers/indexAPI.js');
 const activityHistoryRouter = require('./private/routers/activityHistory.js');
+const licensesRouter = require('./private/routers/licenses');
 
 app.use('/api/auth', loginRouter);
 app.use('/api/discordUsers', discordUsersRouter);
@@ -255,6 +256,7 @@ app.use('/api/discordChannel', discordChannelRouter);
 app.use('/api/config', ConfigRouter);
 app.use('/api', indexAPIRouter);
 app.use('/auth/discord', discordLoginRouter);
+app.use('/api/licenses', licensesRouter);
 
 app.get('/api/discord/oauth-config', (req, res) => {
     res.json({

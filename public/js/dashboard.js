@@ -1,19 +1,17 @@
 function showContent(section) {
-    // Tüm content section'ları gizle
-    const allContentSections = document.querySelectorAll('.dashboard-content, .purchase-dashboard-content, .activity-dashboard-content, .discord-login-history-content, .purchase-history-content, .activity-history-content, .settings-content, .comments-content, .ticket-content, .add-product-content, .comprehensive-logs-content');
-    allContentSections.forEach(content => {
-        content.style.display = 'none';
-    });
-    // Seçili olanı göster
+    // Tüm dashboard içeriklerini gizle
+    document.querySelectorAll('.dashboard-content, .purchase-dashboard-content, .activity-dashboard-content, .discord-login-history-content, .purchase-history-content, .activity-history-content, .settings-content, .comments-content, .ticket-content, .add-product-content, .comprehensive-logs-content, .license-dashboard-content')
+        .forEach(content => {
+            content.style.display = 'none';
+        });
+    // Sadece seçili olanı göster
     const targetSection = document.getElementById(section);
     if (targetSection) {
-        targetSection.style.display = 'block';
-        // Eğer comprehensive-logs ise tab fonksiyonunu çağır
-        if (section === 'comprehensive-logs') {
-            initializeComprehensiveLogs();
+        if (targetSection.classList.contains('license-dashboard-content')) {
+            targetSection.style.display = 'flex';
+        } else {
+            targetSection.style.display = 'block';
         }
-    } else {
-        // console.error('Section not found:', section);
     }
 }
 
@@ -177,6 +175,39 @@ document.addEventListener('DOMContentLoaded', function () {
             webManagerMenu.classList.add('open');
             webManagerSubmenu.style.display = 'block';
         }
+    });
+
+    // License menu açılır/kapanır
+    const licenseMenu = document.getElementById('licenseMenu');
+    const licenseToggle = licenseMenu.querySelector('.sidebar-parent-toggle');
+    const licenseSubmenu = licenseMenu.querySelector('.sidebar-submenu');
+
+    licenseToggle.addEventListener('click', function (e) {
+        e.preventDefault();
+        const isOpen = licenseMenu.classList.contains('open');
+        if (isOpen) {
+            licenseMenu.classList.add('closing');
+            setTimeout(() => {
+                licenseMenu.classList.remove('open', 'closing');
+                licenseSubmenu.style.display = 'none';
+            }, 300);
+        } else {
+            licenseMenu.classList.add('open');
+            licenseSubmenu.style.display = 'block';
+        }
+    });
+
+    // Lisans menü item'ları için click event'leri (audit menu ile aynı mantık)
+    const licenseMenuItems = licenseMenu.querySelectorAll('.webmanager-subitem');
+    licenseMenuItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            const section = item.getAttribute('href').substring(1);
+            showContent(section);
+            // Aktif menü öğesini güncelle
+            licenseMenuItems.forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+        });
     });
 
     // Alt menü itemleri için içerik gösterme
@@ -637,6 +668,78 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Banlı oyuncu sayısını güncelle
     updateActiveBansCount();
+
+    // Lisans ekleme ve listeleme
+    const licenseAddForm = document.getElementById('licenseAddForm');
+    const licenseList = document.getElementById('licenseList');
+    if (licenseAddForm) {
+        licenseAddForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const serverName = document.getElementById('serverName').value.trim();
+            const serverIP = document.getElementById('serverIP').value.trim();
+
+            // Kullanıcı adını cookie'den al
+            function getCookie(name) {
+                const nameEQ = name + "=";
+                const ca = document.cookie.split(';');
+                for (let i = 0; i < ca.length; i++) {
+                    let c = ca[i];
+                    while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+                    if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+                }
+                return null;
+            }
+            let addedBy = '';
+            try {
+                const token = getCookie('auth_token');
+                if (token) {
+                    let decoded = decodeURIComponent(token);
+                    if (decoded.includes('%')) decoded = decodeURIComponent(decoded);
+                    const userData = JSON.parse(decoded);
+                    addedBy = userData.username || '';
+                }
+            } catch (err) {}
+
+            // API'ya gönder
+            const res = await fetch('/api/licenses/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ serverName, serverIP, addedBy })
+            });
+            const data = await res.json();
+            if (data.success) {
+                showNotification('Lisans başarıyla eklendi!', 'success');
+                licenseAddForm.reset();
+                loadLicenses();
+            } else {
+                showNotification('Hata: ' + (data.message || 'Lisans eklenemedi.'), 'error');
+            }
+        });
+    }
+
+    async function loadLicenses() {
+        if (!licenseList) return;
+        licenseList.innerHTML = '<li>Yükleniyor...</li>';
+        try {
+            const res = await fetch('/api/licenses/list');
+            const data = await res.json();
+            if (data.success && data.licenses.length > 0) {
+                licenseList.innerHTML = data.licenses.map(l => `
+                    <li>
+                        <span><b>${l.server_name}</b> <span style="color:#00d4ff">[${l.server_ip}]</span></span>
+                        <span style="font-size:0.95em;color:#b3e5fc;">Ekleyen: ${l.added_by || '-'} | ${new Date(l.created_at).toLocaleString('tr-TR')}</span>
+                    </li>
+                `).join('');
+            } else {
+                licenseList.innerHTML = '<li>Henüz lisans eklenmemiş.</li>';
+            }
+        } catch (err) {
+            licenseList.innerHTML = '<li>Liste alınamadı.</li>';
+        }
+    }
+
+    // Sayfa yüklenince lisansları getir
+    loadLicenses();
 });
 
 function updateActiveBansCount() {

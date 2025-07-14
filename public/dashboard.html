@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     <meta name="referrer" content="strict-origin-when-cross-origin">
+    <link rel="icon" href="logo.png">
     <title>PXGun - Dashboard</title>
     <link rel="stylesheet" href="css/dashboard.css">
     <link rel="stylesheet" href="css/dashboard/history.css">
@@ -94,6 +95,18 @@
                             <li><a href="#add-product-content" class="webmanager-subitem"><span class="submenu-dot"></span><i
                                         class="fa-solid fa-plus"></i> Add product</a>
                             </li>
+                        </ul>
+                    </li>
+
+                    <li class="sidebar-parent" id="licenseMenu">
+                        <a href="#" class="sidebar-parent-toggle">
+                            <i class="fa-solid fa-globe"></i>
+                            <span>License</span>
+                            <i class="fas fa-chevron-down sidebar-arrow"></i>
+                        </a>
+                        <ul class="sidebar-submenu" style="display: none;">
+                            <li><a href="#license-add-content" class="webmanager-subitem"><span class="submenu-dot"></span><i class="fa-solid fa-plus"></i> Lisans Ekle</a></li>
+                            <li><a href="#license-logs-content" class="webmanager-subitem"><span class="submenu-dot"></span><i class="fa-solid fa-list"></i> Lisans Logları</a></li>
                         </ul>
                     </li>
 
@@ -1469,21 +1482,110 @@
                 </div>
             </div>
 
+            <!-- License Dashboard Content -->
+            <div class="license-dashboard-content" id="license-add-content" style="display: none;">
+                <div class="license-header-section">
+                    <div class="license-header-content">
+                        <div class="license-title">
+                            <h1><i class="fas fa-key"></i> Lisans Yönetim Sistemi</h1>
+                            <p>Sunucu lisanslarınızı güvenli bir şekilde yönetin</p>
+                        </div>
+                        <div class="license-stats">
+                            <div class="stat-item">
+                                <i class="fas fa-server"></i>
+                                <span id="totalLicenses">0</span>
+                                <label>Toplam Lisans</label>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-clock"></i>
+                                <span id="activeLicenses">0</span>
+                                <label>Aktif Lisans</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
+                <div class="license-main-content">
+                    <div class="license-left-panel">
+                        <div class="license-form-card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-plus-circle"></i> Yeni Lisans Ekle</h3>
+                                <p>Yeni bir sunucu lisansı ekleyin</p>
+                            </div>
+                            <div class="card-content">
+                                <form id="licenseAddForm" class="license-form">
+                                    <div class="form-group">
+                                        <label for="serverName">
+                                            <i class="fas fa-server"></i> Sunucu İsmi
+                                        </label>
+                                        <input type="text" id="serverName" name="serverName" placeholder="Örn: HIMURA Server" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="serverIP">
+                                            <i class="fas fa-network-wired"></i> Sunucu IP Adresi
+                                        </label>
+                                        <div class="input-with-help">
+                                            <input type="text" id="serverIP" name="serverIP" placeholder="192.168.1.1" required>
+                                            <button type="button" class="btn-help" onclick="licenseManager.showIPHelp()" title="IP Adresi Yardımı">
+                                                <i class="fas fa-question-circle"></i>
+                                            </button>
+                                        </div>
+                                        <small class="form-help">
+                                            <i class="fas fa-info-circle"></i> Her IP adresi sadece bir kez kullanılabilir
+                                        </small>
+                                    </div>
+                                    <div class="form-actions">
+                                        <button type="submit" class="btn-submit">
+                                            <i class="fas fa-plus"></i> Lisans Ekle
+                                        </button>
+                                        <button type="reset" class="btn-reset">
+                                            <i class="fas fa-undo"></i> Temizle
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
 
+                    <div class="license-right-panel">
+                        <div class="license-list-card">
+                            <div class="card-header">
+                                <div class="header-left">
+                                    <h3><i class="fas fa-list-alt"></i> Lisans Listesi</h3>
+                                    <p>Mevcut tüm lisanslarınız</p>
+                                </div>
+                                <div class="card-actions">
+                                    <button class="btn-refresh" title="Yenile" onclick="licenseManager.loadLicenses()">
+                                        <i class="fas fa-sync-alt"></i>
+                                    </button>
+                                    <button class="btn-export" title="Dışa Aktar" onclick="licenseManager.exportLicenses()">
+                                        <i class="fas fa-download"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-content">
+                                <div class="license-list-container">
+                                    <ul id="licenseList">
+                                        <!-- Ekli lisanslar burada listelenecek -->
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            
-
-
-
-            </main>
+            <!-- License Logs Content -->
+            <div class="license-dashboard-content" id="license-logs-content" style="display: none;">
+                <h2>Lisans Logları</h2>
+                <ul id="licenseLogsList">
+                    <!-- Lisans logları burada listelenecek -->
+                </ul>
             </div>
 
-
-
-
-
+        </div>
+    </main>
+</div>
 
 
 
@@ -1536,7 +1638,9 @@
     <!-- Scripts -->
     <script src="/js/dashboard.js"></script>
     <script src="/js/dashboard/discord.js"></script>
+    <script src="/js/dashboard/licance.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+
 </body>
 
 </html>
