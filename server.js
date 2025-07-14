@@ -34,6 +34,7 @@ const client = new Client({
         GatewayIntentBits.GuildVoiceStates,
         GatewayIntentBits.GuildPresences,
         GatewayIntentBits.GuildBans,
+        GatewayIntentBits.GuildInvites,
     ]
 });
 
@@ -229,8 +230,14 @@ const ConfigRouter = require('./private/routers/configAPI.js');
 const discordLoginRouter = require('./private/routers/discordLogin');
 const discordLog = require('./private/routers/discordLog.js')
 const discordMessageLog = require('./private/routers/discordMessage.js')
+const discordVoiceLog = require('./private/routers/discordVoice.js')
+const discordChannelLog = require('./private/routers/discordChannelLog.js')
+const discordEmojiLog = require('./private/routers/discordEmojiLog.js')
+const discordInviteLog = require('./private/routers/discordInviteLog.js')
+const looginLog = require('./private/routers/loginLog.js')
 const CommentRouter = require('./private/routers/Comment.js');
 const indexAPIRouter = require('./private/routers/indexAPI.js');
+const activityHistoryRouter = require('./private/routers/activityHistory.js');
 
 app.use('/api/auth', loginRouter);
 app.use('/api/discordUsers', discordUsersRouter);
@@ -238,6 +245,12 @@ app.use('/api/discordServer', discordServerRouter);
 app.use('/api/comment', CommentRouter);
 app.use('/api/discord/log', discordLog)
 app.use('/api/discord/log/message', discordMessageLog)
+app.use('/api/discord/log/voice', discordVoiceLog)
+app.use('/api/discord/log/channel', discordChannelLog)
+app.use('/api/loginLog', looginLog)
+app.use('/api/discord/log/emoji', discordEmojiLog)
+app.use('/api/discord/log/invite', discordInviteLog)
+app.use('/api/activity-history', activityHistoryRouter);
 app.use('/api/discordChannel', discordChannelRouter);
 app.use('/api/config', ConfigRouter);
 app.use('/api', indexAPIRouter);
