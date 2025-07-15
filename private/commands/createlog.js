@@ -33,7 +33,8 @@ module.exports = {
                 '⚫・channel-log',
                 '⚫・emoji-log',
                 '⚫・invite-log',
-                '⚫・server-log'
+                '⚫・server-log',
+                '⚫・licanse-log'
             ];
 
             const webhookInfoList = [];

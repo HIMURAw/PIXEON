@@ -9,6 +9,11 @@ function showContent(section) {
     if (targetSection) {
         if (targetSection.classList.contains('license-dashboard-content')) {
             targetSection.style.display = 'flex';
+        } else if (targetSection.classList.contains('comprehensive-logs-content')) {
+            targetSection.style.display = 'block';
+            if (typeof initializeComprehensiveLogs === 'function') {
+                initializeComprehensiveLogs();
+            }
         } else {
             targetSection.style.display = 'block';
         }

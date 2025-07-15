@@ -21,9 +21,9 @@ if (typeof globalThis.fetch === 'undefined') {
 // Discord Webhook fonksiyonu
 function sendToDiscord(message, ip, userAgent, host, status) {
     try {
-        const webhookUrl = Config.discord.log.serverWebhookURL;
+        const webhookUrl = Config.discord.log.LicenseLog;
         if (!webhookUrl) {
-            console.warn('Discord webhook URL bulunamadı!');
+            console.warn('Discord license webhook URL bulunamadı!');
             return;
         }
 
@@ -66,6 +66,47 @@ function sendToDiscord(message, ip, userAgent, host, status) {
         });
     } catch (error) {
         console.error('Discord webhook işleme hatası:', error);
+    }
+}
+
+// Lisans log kaydetme fonksiyonu
+async function saveLicenseLog(logData) {
+    try {
+        const {
+            ip_address,
+            host,
+            user_agent,
+            request_ip,
+            status,
+            server_name,
+            license_id,
+            added_by,
+            response_time,
+            error_message
+        } = logData;
+
+        const query = `
+            INSERT INTO license_logs 
+            (ip_address, host, user_agent, request_ip, status, server_name, license_id, added_by, response_time, error_message)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `;
+
+        await pool.query(query, [
+            ip_address,
+            host,
+            user_agent,
+            request_ip,
+            status,
+            server_name,
+            license_id,
+            added_by,
+            response_time,
+            error_message
+        ]);
+
+        console.log('✅ License log saved successfully');
+    } catch (error) {
+        console.error('❌ License log save error:', error);
     }
 }
 
@@ -328,6 +369,7 @@ app.get('/api/discord/oauth-config', (req, res) => {
 
 // IP Doğrulama API'si
 app.get("/check_ip", async (req, res) => {
+    const startTime = Date.now();
     const { ip, server_name, license_key } = req.query;
     const userAgent = req.headers['user-agent'];
     const host = req.headers.host;
@@ -344,7 +386,23 @@ app.get("/check_ip", async (req, res) => {
 
     // IP adresi kontrolü
     if (!ip) {
+        const responseTime = Date.now() - startTime;
         console.warn('❌ IP verification failed - missing IP parameter');
+        
+        // Log kaydet
+        await saveLicenseLog({
+            ip_address: null,
+            host: host,
+            user_agent: userAgent,
+            request_ip: requestIP,
+            status: 'ERROR',
+            server_name: null,
+            license_id: null,
+            added_by: null,
+            response_time: responseTime,
+            error_message: 'Missing IP parameter'
+        });
+        
         sendToDiscord("❌ IP could not be obtained or was sent incomplete.", null, null, null, "ERROR");
         return res.status(400).send("INVALID");
     }
@@ -352,7 +410,23 @@ app.get("/check_ip", async (req, res) => {
     // IP adresi format kontrolü
     const ipRegex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
     if (!ipRegex.test(ip)) {
+        const responseTime = Date.now() - startTime;
         console.warn('❌ IP verification failed - invalid IP format:', ip);
+        
+        // Log kaydet
+        await saveLicenseLog({
+            ip_address: ip,
+            host: host,
+            user_agent: userAgent,
+            request_ip: requestIP,
+            status: 'INVALID',
+            server_name: null,
+            license_id: null,
+            added_by: null,
+            response_time: responseTime,
+            error_message: 'Invalid IP format'
+        });
+        
         sendToDiscord(`❌ Invalid IP format: \`${ip}\``, ip, userAgent, host, "INVALID");
         return res.status(400).send("INVALID");
     }
@@ -360,6 +434,7 @@ app.get("/check_ip", async (req, res) => {
     try {
         // Pool kullanarak veritabanı sorgusu
         const [result] = await pool.query("SELECT * FROM licenses WHERE server_ip = ?", [ip]);
+        const responseTime = Date.now() - startTime;
         
         if (result.length > 0) {
             const license = result[0];
@@ -367,12 +442,27 @@ app.get("/check_ip", async (req, res) => {
                 requestedIP: ip,
                 serverName: license.server_name,
                 licenseId: license.id,
-                requestIP: requestIP
+                requestIP: requestIP,
+                responseTime: responseTime
+            });
+            
+            // Log kaydet
+            await saveLicenseLog({
+                ip_address: ip,
+                host: host,
+                user_agent: userAgent,
+                request_ip: requestIP,
+                status: 'VALID',
+                server_name: license.server_name,
+                license_id: license.id,
+                added_by: license.added_by,
+                response_time: responseTime,
+                error_message: null
             });
             
             // Başarılı doğrulama webhook'u
             sendToDiscord(
-                `✅ Licensed IP verified: \`${ip}\`\n📋 Server: ${license.server_name}\n👤 Added by: ${license.added_by || 'Unknown'}\n🕒 Created: ${new Date(license.created_at).toLocaleString('tr-TR')}`,
+                `✅ Licensed IP verified: \`${ip}\`\n📋 Server: ${license.server_name}\n👤 Added by: ${license.added_by || 'Unknown'}\n🕒 Created: ${new Date(license.created_at).toLocaleString('tr-TR')}\n⚡ Response Time: ${responseTime}ms`,
                 ip, 
                 userAgent, 
                 host, 
@@ -383,12 +473,27 @@ app.get("/check_ip", async (req, res) => {
         } else {
             console.warn('❌ IP verification failed - invalid license:', {
                 requestedIP: ip,
-                requestIP: requestIP
+                requestIP: requestIP,
+                responseTime: responseTime
+            });
+            
+            // Log kaydet
+            await saveLicenseLog({
+                ip_address: ip,
+                host: host,
+                user_agent: userAgent,
+                request_ip: requestIP,
+                status: 'INVALID',
+                server_name: null,
+                license_id: null,
+                added_by: null,
+                response_time: responseTime,
+                error_message: 'IP not found in license system'
             });
             
             // Geçersiz IP webhook'u
             sendToDiscord(
-                `❌ Invalid licensed IP attempt: \`${ip}\`\n🚫 This IP is not registered in our license system.\n🖥️ User Agent: ${userAgent || 'Unknown'}`,
+                `❌ Invalid licensed IP attempt: \`${ip}\`\n🚫 This IP is not registered in our license system.\n🖥️ User Agent: ${userAgent || 'Unknown'}\n⚡ Response Time: ${responseTime}ms`,
                 ip, 
                 userAgent, 
                 host, 
@@ -398,9 +503,25 @@ app.get("/check_ip", async (req, res) => {
             return res.send("INVALID");
         }
     } catch (err) {
+        const responseTime = Date.now() - startTime;
         console.error('⚠️ Database query error during IP verification:', err);
+        
+        // Log kaydet
+        await saveLicenseLog({
+            ip_address: ip,
+            host: host,
+            user_agent: userAgent,
+            request_ip: requestIP,
+            status: 'ERROR',
+            server_name: null,
+            license_id: null,
+            added_by: null,
+            response_time: responseTime,
+            error_message: err.message
+        });
+        
         sendToDiscord(
-            `⚠️ Database error during IP verification: ${err.message}\n🔍 IP: ${ip}\n🖥️ User Agent: ${userAgent || 'Unknown'}`,
+            `⚠️ Database error during IP verification: ${err.message}\n🔍 IP: ${ip}\n🖥️ User Agent: ${userAgent || 'Unknown'}\n⚡ Response Time: ${responseTime}ms`,
             ip, 
             userAgent, 
             host, 
@@ -446,6 +567,78 @@ app.get("/license_status", async (req, res) => {
         }
     } catch (err) {
         console.error('License status check error:', err);
+        return res.status(500).json({
+            status: "ERROR",
+            message: "Database error occurred"
+        });
+    }
+});
+
+// Lisans logları API'si
+app.get("/license_logs", async (req, res) => {
+    const { limit = 100, offset = 0, status, ip_address } = req.query;
+    
+    try {
+        let query = "SELECT * FROM license_logs";
+        let params = [];
+        let conditions = [];
+        
+        // Filtreler
+        if (status) {
+            conditions.push("status = ?");
+            params.push(status);
+        }
+        
+        if (ip_address) {
+            conditions.push("ip_address = ?");
+            params.push(ip_address);
+        }
+        
+        if (conditions.length > 0) {
+            query += " WHERE " + conditions.join(" AND ");
+        }
+        
+        query += " ORDER BY created_at DESC LIMIT ? OFFSET ?";
+        params.push(parseInt(limit), parseInt(offset));
+        
+        const [logs] = await pool.query(query, params);
+        
+        // Toplam sayıyı al
+        let countQuery = "SELECT COUNT(*) as total FROM license_logs";
+        if (conditions.length > 0) {
+            countQuery += " WHERE " + conditions.join(" AND ");
+        }
+        const [countResult] = await pool.query(countQuery, params.slice(0, -2));
+        
+        return res.json({
+            status: "SUCCESS",
+            logs: logs,
+            total: countResult[0].total,
+            limit: parseInt(limit),
+            offset: parseInt(offset)
+        });
+    } catch (err) {
+        console.error('License logs fetch error:', err);
+        return res.status(500).json({
+            status: "ERROR",
+            message: "Database error occurred"
+        });
+    }
+});
+
+// Lisans istatistikleri API'si
+app.get("/license_statistics", async (req, res) => {
+    try {
+        const [stats] = await pool.query("SELECT * FROM license_statistics");
+        const [recentLogs] = await pool.query("SELECT * FROM recent_license_logs LIMIT 10");
+        
+        return res.json({
+            status: "SUCCESS",
+            statistics: stats[0],
+            recent_logs: recentLogs
+        });
+    } catch (err) {
+        console.error('License statistics fetch error:', err);
         return res.status(500).json({
             status: "ERROR",
             message: "Database error occurred"
