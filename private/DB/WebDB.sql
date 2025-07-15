@@ -363,6 +363,51 @@ CREATE TABLE IF NOT EXISTS `licenses` (
   UNIQUE KEY `server_ip` (`server_ip`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- License Logs Table
+CREATE TABLE IF NOT EXISTS `license_logs` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `ip_address` varchar(45) NOT NULL,
+  `host` varchar(255) DEFAULT NULL,
+  `user_agent` text DEFAULT NULL,
+  `request_ip` varchar(45) DEFAULT NULL,
+  `status` enum('VALID','INVALID','ERROR') NOT NULL,
+  `server_name` varchar(255) DEFAULT NULL,
+  `license_id` int(11) DEFAULT NULL,
+  `added_by` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `response_time` int(11) DEFAULT NULL COMMENT 'Response time in milliseconds',
+  `error_message` text DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_ip_address` (`ip_address`),
+  KEY `idx_status` (`status`),
+  KEY `idx_created_at` (`created_at`),
+  KEY `idx_license_id` (`license_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- License Statistics View
+CREATE OR REPLACE VIEW `license_statistics` AS
+SELECT 
+    COUNT(*) as total_checks,
+    SUM(CASE WHEN status = 'VALID' THEN 1 ELSE 0 END) as valid_checks,
+    SUM(CASE WHEN status = 'INVALID' THEN 1 ELSE 0 END) as invalid_checks,
+    SUM(CASE WHEN status = 'ERROR' THEN 1 ELSE 0 END) as error_checks,
+    AVG(response_time) as avg_response_time,
+    MAX(created_at) as last_check
+FROM license_logs;
+
+-- Recent License Logs View (Last 24 Hours)
+CREATE OR REPLACE VIEW `recent_license_logs` AS
+SELECT 
+    ip_address,
+    host,
+    status,
+    server_name,
+    created_at,
+    response_time
+FROM license_logs 
+WHERE created_at >= DATE_SUB(NOW(), INTERVAL 24 HOUR)
+ORDER BY created_at DESC;
+
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

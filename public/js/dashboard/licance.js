@@ -227,6 +227,269 @@ class LicenseManager {
         }
     }
 
+    // Lisans logları için değişkenler
+    currentPage = 1;
+    logsPerPage = 20;
+    currentFilters = {};
+
+    // Lisans loglarını yükle
+    async loadLicenseLogs() {
+        const logsList = document.getElementById('licenseLogsList');
+        if (!logsList) return;
+        
+        try {
+            // Loading göster
+            logsList.innerHTML = `
+                <div class="loading-spinner">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <span>Loglar yükleniyor...</span>
+                </div>
+            `;
+            
+            // Filtreleri al
+            const statusFilter = document.getElementById('statusFilter')?.value || '';
+            const ipFilter = document.getElementById('ipFilter')?.value || '';
+            const dateFilter = document.getElementById('dateFilter')?.value || '';
+            
+            // API parametrelerini oluştur
+            const params = new URLSearchParams({
+                limit: this.logsPerPage,
+                offset: (this.currentPage - 1) * this.logsPerPage
+            });
+            
+            if (statusFilter) params.append('status', statusFilter);
+            if (ipFilter) params.append('ip_address', ipFilter);
+            if (dateFilter) params.append('date', dateFilter);
+            
+            const response = await fetch(`/license_logs?${params}`);
+            const result = await response.json();
+            
+            if (result.status === 'SUCCESS') {
+                this.renderLicenseLogs(result.logs, result.total);
+                this.updateLogStats();
+            } else {
+                logsList.innerHTML = `
+                    <div class="error-message">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>Loglar yüklenirken hata oluştu!</p>
+                        <button class="retry-btn" onclick="licenseManager.loadLicenseLogs()">
+                            <i class="fas fa-redo"></i> Tekrar Dene
+                        </button>
+                    </div>
+                `;
+            }
+        } catch (error) {
+            console.error('Log yükleme hatası:', error);
+            logsList.innerHTML = `
+                <div class="error-message">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>Sunucu hatası oluştu!</p>
+                    <button class="retry-btn" onclick="licenseManager.loadLicenseLogs()">
+                        <i class="fas fa-redo"></i> Tekrar Dene
+                    </button>
+                </div>
+            `;
+        }
+    }
+
+    // Lisans loglarını render et
+    renderLicenseLogs(logs, total) {
+        const logsList = document.getElementById('licenseLogsList');
+        if (!logsList) return;
+        
+        if (logs.length === 0) {
+            logsList.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-history"></i>
+                    <h4>Henüz log bulunamadı</h4>
+                    <p>Lisans kontrol işlemleri burada görünecek.</p>
+                </div>
+            `;
+            return;
+        }
+        
+        const logsHTML = logs.map(log => `
+            <div class="log-item ${log.status.toLowerCase()}" data-id="${log.id}">
+                <div class="log-header">
+                    <div class="log-status">
+                        <i class="fas ${this.getStatusIcon(log.status)}"></i>
+                        <span class="status-text">${this.getStatusText(log.status)}</span>
+                    </div>
+                    <div class="log-time">
+                        <i class="fas fa-clock"></i>
+                        ${this.formatDate(log.created_at)}
+                    </div>
+                </div>
+                <div class="log-content">
+                    <div class="log-ip">
+                        <i class="fas fa-network-wired"></i>
+                        <strong>IP:</strong> ${log.ip_address || 'N/A'}
+                    </div>
+                    ${log.server_name ? `
+                        <div class="log-server">
+                            <i class="fas fa-server"></i>
+                            <strong>Server:</strong> ${this.escapeHtml(log.server_name)}
+                        </div>
+                    ` : ''}
+                    ${log.host ? `
+                        <div class="log-host">
+                            <i class="fas fa-globe"></i>
+                            <strong>Host:</strong> ${this.escapeHtml(log.host)}
+                        </div>
+                    ` : ''}
+                    ${log.response_time ? `
+                        <div class="log-response-time">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <strong>Süre:</strong> ${log.response_time}ms
+                        </div>
+                    ` : ''}
+                    ${log.error_message ? `
+                        <div class="log-error">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <strong>Hata:</strong> ${this.escapeHtml(log.error_message)}
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+        `).join('');
+        
+        logsList.innerHTML = logsHTML;
+        
+        // Pagination güncelle
+        this.updatePagination(total);
+    }
+
+    // Log istatistiklerini güncelle
+    async updateLogStats() {
+        try {
+            const response = await fetch('/license_statistics');
+            const result = await response.json();
+            
+            if (result.status === 'SUCCESS') {
+                const stats = result.statistics;
+                
+                const totalValidLogs = document.getElementById('totalValidLogs');
+                const totalInvalidLogs = document.getElementById('totalInvalidLogs');
+                const totalErrorLogs = document.getElementById('totalErrorLogs');
+                const avgResponseTime = document.getElementById('avgResponseTime');
+                
+                if (totalValidLogs) totalValidLogs.textContent = stats.valid_checks || 0;
+                if (totalInvalidLogs) totalInvalidLogs.textContent = stats.invalid_checks || 0;
+                if (totalErrorLogs) totalErrorLogs.textContent = stats.error_checks || 0;
+                if (avgResponseTime) avgResponseTime.textContent = `${Math.round(stats.avg_response_time || 0)}ms`;
+            }
+        } catch (error) {
+            console.error('Log istatistikleri güncelleme hatası:', error);
+        }
+    }
+
+    // Filtreleri uygula
+    filterLogs() {
+        this.currentPage = 1;
+        this.loadLicenseLogs();
+    }
+
+    // Filtreleri temizle
+    clearFilters() {
+        document.getElementById('statusFilter').value = '';
+        document.getElementById('ipFilter').value = '';
+        document.getElementById('dateFilter').value = '';
+        this.currentPage = 1;
+        this.loadLicenseLogs();
+    }
+
+    // Önceki sayfa
+    previousPage() {
+        if (this.currentPage > 1) {
+            this.currentPage--;
+            this.loadLicenseLogs();
+        }
+    }
+
+    // Sonraki sayfa
+    nextPage() {
+        this.currentPage++;
+        this.loadLicenseLogs();
+    }
+
+    // Pagination güncelle
+    updatePagination(total) {
+        const totalPages = Math.ceil(total / this.logsPerPage);
+        const pageInfo = document.getElementById('pageInfo');
+        const prevBtn = document.getElementById('prevPage');
+        const nextBtn = document.getElementById('nextPage');
+        
+        if (pageInfo) {
+            pageInfo.textContent = `Sayfa ${this.currentPage} / ${totalPages} (Toplam: ${total})`;
+        }
+        
+        if (prevBtn) {
+            prevBtn.disabled = this.currentPage <= 1;
+        }
+        
+        if (nextBtn) {
+            nextBtn.disabled = this.currentPage >= totalPages;
+        }
+    }
+
+    // Logları dışa aktar
+    async exportLogs() {
+        try {
+            const response = await fetch('/license_logs?limit=1000');
+            const result = await response.json();
+            
+            if (result.status === 'SUCCESS' && result.logs.length > 0) {
+                const logs = result.logs.map(log => ({
+                    'IP Adresi': log.ip_address || 'N/A',
+                    'Durum': this.getStatusText(log.status),
+                    'Server': log.server_name || 'N/A',
+                    'Host': log.host || 'N/A',
+                    'Response Time': log.response_time ? `${log.response_time}ms` : 'N/A',
+                    'Hata': log.error_message || 'N/A',
+                    'Tarih': this.formatDate(log.created_at)
+                }));
+
+                const csvContent = this.convertToCSV(logs);
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', `lisans_loglari_${new Date().toISOString().split('T')[0]}.csv`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                this.showNotification('Loglar başarıyla dışa aktarıldı!', 'success');
+            } else {
+                this.showNotification('Dışa aktarılacak log bulunamadı!', 'warning');
+            }
+        } catch (error) {
+            console.error('Log dışa aktarma hatası:', error);
+            this.showNotification('Log dışa aktarma sırasında hata oluştu!', 'error');
+        }
+    }
+
+    // Status icon'u al
+    getStatusIcon(status) {
+        switch (status) {
+            case 'VALID': return 'fa-check-circle';
+            case 'INVALID': return 'fa-times-circle';
+            case 'ERROR': return 'fa-exclamation-triangle';
+            default: return 'fa-question-circle';
+        }
+    }
+
+    // Status text'i al
+    getStatusText(status) {
+        switch (status) {
+            case 'VALID': return 'Geçerli';
+            case 'INVALID': return 'Geçersiz';
+            case 'ERROR': return 'Hata';
+            default: return 'Bilinmiyor';
+        }
+    }
+
     // Lisansları dışa aktar
     exportLicenses() {
         try {

@@ -1580,46 +1580,104 @@
                 <div class="license-header-section">
                     <div class="license-header-content">
                         <div class="license-title">
-                            <h1><i class="fas fa-list-alt"></i> Lisans Logları</h1>
-                            <p>Tüm lisanslarınızı görüntüleyin ve yönetin</p>
+                            <h1><i class="fas fa-history"></i> Lisans Logları</h1>
+                            <p>Tüm lisans kontrol işlemlerini görüntüleyin</p>
                         </div>
                         <div class="license-stats">
                             <div class="stat-item">
-                                <i class="fas fa-server"></i>
-                                <span id="totalLicensesLogs">0</span>
-                                <label>Toplam Lisans</label>
+                                <i class="fas fa-check-circle"></i>
+                                <span id="totalValidLogs">0</span>
+                                <label>Geçerli</label>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-times-circle"></i>
+                                <span id="totalInvalidLogs">0</span>
+                                <label>Geçersiz</label>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <span id="totalErrorLogs">0</span>
+                                <label>Hata</label>
                             </div>
                             <div class="stat-item">
                                 <i class="fas fa-clock"></i>
-                                <span id="activeLicensesLogs">0</span>
-                                <label>Aktif Lisans</label>
+                                <span id="avgResponseTime">0ms</span>
+                                <label>Ort. Süre</label>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="license-main-content">
-                    <div class="license-right-panel" style="flex: 1;">
+                    <div class="license-left-panel">
+                        <div class="license-form-card">
+                            <div class="card-header">
+                                <h3><i class="fas fa-filter"></i> Filtreler</h3>
+                                <p>Logları filtreleyin</p>
+                            </div>
+                            <div class="card-content">
+                                <div class="filter-group">
+                                    <label for="statusFilter">
+                                        <i class="fas fa-tag"></i> Durum
+                                    </label>
+                                    <select id="statusFilter" onchange="licenseManager.filterLogs()">
+                                        <option value="">Tümü</option>
+                                        <option value="VALID">Geçerli</option>
+                                        <option value="INVALID">Geçersiz</option>
+                                        <option value="ERROR">Hata</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label for="ipFilter">
+                                        <i class="fas fa-network-wired"></i> IP Adresi
+                                    </label>
+                                    <input type="text" id="ipFilter" placeholder="IP adresi girin..." onchange="licenseManager.filterLogs()">
+                                </div>
+                                <div class="filter-group">
+                                    <label for="dateFilter">
+                                        <i class="fas fa-calendar"></i> Tarih
+                                    </label>
+                                    <input type="date" id="dateFilter" onchange="licenseManager.filterLogs()">
+                                </div>
+                                <div class="filter-actions">
+                                    <button class="btn-submit" onclick="licenseManager.clearFilters()">
+                                        <i class="fas fa-undo"></i> Filtreleri Temizle
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="license-right-panel">
                         <div class="license-list-card">
                             <div class="card-header">
                                 <div class="header-left">
-                                    <h3><i class="fas fa-list-alt"></i> Lisans Listesi</h3>
-                                    <p>Mevcut tüm lisanslarınız</p>
+                                    <h3><i class="fas fa-history"></i> Lisans Logları</h3>
+                                    <p>Lisans kontrol işlemleri</p>
                                 </div>
                                 <div class="card-actions">
-                                    <button class="btn-refresh" title="Yenile" onclick="licenseManager.loadLicenses()">
+                                    <button class="btn-refresh" title="Yenile" onclick="licenseManager.loadLicenseLogs()">
                                         <i class="fas fa-sync-alt"></i>
                                     </button>
-                                    <button class="btn-export" title="Dışa Aktar" onclick="licenseManager.exportLicenses()">
+                                    <button class="btn-export" title="Dışa Aktar" onclick="licenseManager.exportLogs()">
                                         <i class="fas fa-download"></i>
                                     </button>
                                 </div>
                             </div>
                             <div class="card-content">
                                 <div class="license-list-container">
-                                    <ul id="licenseList">
-                                        <!-- Ekli lisanslar burada listelenecek -->
-                                    </ul>
+                                    <div id="licenseLogsList">
+                                        <!-- Lisans logları burada listelenecek -->
+                                    </div>
+                                    <div class="pagination">
+                                        <button id="prevPage" onclick="licenseManager.previousPage()" disabled>
+                                            <i class="fas fa-chevron-left"></i> Önceki
+                                        </button>
+                                        <span id="pageInfo">Sayfa 1</span>
+                                        <button id="nextPage" onclick="licenseManager.nextPage()">
+                                            Sonraki <i class="fas fa-chevron-right"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
