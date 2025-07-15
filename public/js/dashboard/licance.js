@@ -205,6 +205,8 @@ class LicenseManager {
     updateStats(licenses) {
         const totalLicenses = document.getElementById('totalLicenses');
         const activeLicenses = document.getElementById('activeLicenses');
+        const totalLicensesLogs = document.getElementById('totalLicensesLogs');
+        const activeLicensesLogs = document.getElementById('activeLicensesLogs');
         
         if (totalLicenses) {
             totalLicenses.textContent = licenses.length;
@@ -213,6 +215,15 @@ class LicenseManager {
         if (activeLicenses) {
             // Aktif lisans sayısı (şimdilik toplam sayıya eşit)
             activeLicenses.textContent = licenses.length;
+        }
+        
+        if (totalLicensesLogs) {
+            totalLicensesLogs.textContent = licenses.length;
+        }
+        
+        if (activeLicensesLogs) {
+            // Aktif lisans sayısı (şimdilik toplam sayıya eşit)
+            activeLicensesLogs.textContent = licenses.length;
         }
     }
 

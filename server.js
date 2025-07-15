@@ -10,6 +10,65 @@ const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const { EmbedBuilder } = require('discord.js');
 
+// Node.js 18+ için fetch kullan, değilse node-fetch yükle
+let fetch;
+if (typeof globalThis.fetch === 'undefined') {
+    fetch = require('node-fetch');
+} else {
+    fetch = globalThis.fetch;
+}
+
+// Discord Webhook fonksiyonu
+function sendToDiscord(message, ip, userAgent, host, status) {
+    try {
+        const webhookUrl = Config.discord.log.serverWebhookURL;
+        if (!webhookUrl) {
+            console.warn('Discord webhook URL bulunamadı!');
+            return;
+        }
+
+        const embed = new EmbedBuilder()
+            .setColor(status === 'VALID' ? '#00ff00' : status === 'ERROR' ? '#ff0000' : '#ffa500')
+            .setTitle('🔐 Lisans Doğrulama Sistemi')
+            .setDescription(message)
+            .setTimestamp()
+            .setFooter({ 
+                text: 'PXDevelopment License System', 
+                iconURL: Config.discord.serverLogo 
+            });
+
+        if (ip) {
+            embed.addFields({ name: '🌐 IP Adresi', value: `\`${ip}\``, inline: true });
+        }
+        
+        if (userAgent) {
+            embed.addFields({ name: '🖥️ User Agent', value: `\`${userAgent.substring(0, 100)}${userAgent.length > 100 ? '...' : ''}\``, inline: false });
+        }
+        
+        if (host) {
+            embed.addFields({ name: '🏠 Host', value: `\`${host}\``, inline: true });
+        }
+
+        embed.addFields({ name: '📊 Durum', value: status, inline: true });
+
+        fetch(webhookUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                username: Config.discord.log.WebhookName,
+                avatar_url: Config.discord.log.WebhookLogoURL,
+                embeds: [embed.toJSON()]
+            })
+        }).catch(error => {
+            console.error('Discord webhook gönderme hatası:', error);
+        });
+    } catch (error) {
+        console.error('Discord webhook işleme hatası:', error);
+    }
+}
+
 const app = express();
 
 const port = Config.port || 3000;
@@ -265,6 +324,135 @@ app.get('/api/discord/oauth-config', (req, res) => {
         adminRoleId: Config.discord.adminRoleId
     });
 });
+
+
+// IP Doğrulama API'si
+app.get("/check_ip", async (req, res) => {
+    const { ip, server_name, license_key } = req.query;
+    const userAgent = req.headers['user-agent'];
+    const host = req.headers.host;
+    const requestIP = req.ip || req.connection.remoteAddress;
+
+    console.log('🔐 IP verification request received:', {
+        requestedIP: ip,
+        serverName: server_name,
+        licenseKey: license_key,
+        userAgent: userAgent,
+        host: host,
+        requestIP: requestIP
+    });
+
+    // IP adresi kontrolü
+    if (!ip) {
+        console.warn('❌ IP verification failed - missing IP parameter');
+        sendToDiscord("❌ IP could not be obtained or was sent incomplete.", null, null, null, "ERROR");
+        return res.status(400).send("INVALID");
+    }
+
+    // IP adresi format kontrolü
+    const ipRegex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+    if (!ipRegex.test(ip)) {
+        console.warn('❌ IP verification failed - invalid IP format:', ip);
+        sendToDiscord(`❌ Invalid IP format: \`${ip}\``, ip, userAgent, host, "INVALID");
+        return res.status(400).send("INVALID");
+    }
+
+    try {
+        // Pool kullanarak veritabanı sorgusu
+        const [result] = await pool.query("SELECT * FROM licenses WHERE server_ip = ?", [ip]);
+        
+        if (result.length > 0) {
+            const license = result[0];
+            console.log('✅ IP verification successful:', {
+                requestedIP: ip,
+                serverName: license.server_name,
+                licenseId: license.id,
+                requestIP: requestIP
+            });
+            
+            // Başarılı doğrulama webhook'u
+            sendToDiscord(
+                `✅ Licensed IP verified: \`${ip}\`\n📋 Server: ${license.server_name}\n👤 Added by: ${license.added_by || 'Unknown'}\n🕒 Created: ${new Date(license.created_at).toLocaleString('tr-TR')}`,
+                ip, 
+                userAgent, 
+                host, 
+                "VALID"
+            );
+            
+            return res.send("VALID");
+        } else {
+            console.warn('❌ IP verification failed - invalid license:', {
+                requestedIP: ip,
+                requestIP: requestIP
+            });
+            
+            // Geçersiz IP webhook'u
+            sendToDiscord(
+                `❌ Invalid licensed IP attempt: \`${ip}\`\n🚫 This IP is not registered in our license system.\n🖥️ User Agent: ${userAgent || 'Unknown'}`,
+                ip, 
+                userAgent, 
+                host, 
+                "INVALID"
+            );
+            
+            return res.send("INVALID");
+        }
+    } catch (err) {
+        console.error('⚠️ Database query error during IP verification:', err);
+        sendToDiscord(
+            `⚠️ Database error during IP verification: ${err.message}\n🔍 IP: ${ip}\n🖥️ User Agent: ${userAgent || 'Unknown'}`,
+            ip, 
+            userAgent, 
+            host, 
+            "ERROR"
+        );
+        return res.status(500).send("ERROR");
+    }
+});
+
+// Lisans durumu kontrolü API'si
+app.get("/license_status", async (req, res) => {
+    const { ip } = req.query;
+    
+    if (!ip) {
+        return res.status(400).json({
+            status: "ERROR",
+            message: "IP address is required"
+        });
+    }
+
+    try {
+        const [result] = await pool.query("SELECT * FROM licenses WHERE server_ip = ?", [ip]);
+        
+        if (result.length > 0) {
+            const license = result[0];
+            return res.json({
+                status: "SUCCESS",
+                licensed: true,
+                license: {
+                    id: license.id,
+                    server_name: license.server_name,
+                    server_ip: license.server_ip,
+                    added_by: license.added_by,
+                    created_at: license.created_at
+                }
+            });
+        } else {
+            return res.json({
+                status: "SUCCESS",
+                licensed: false,
+                message: "IP address is not licensed"
+            });
+        }
+    } catch (err) {
+        console.error('License status check error:', err);
+        return res.status(500).json({
+            status: "ERROR",
+            message: "Database error occurred"
+        });
+    }
+});
+
 
 createAdminsTable().catch(console.error);
 
