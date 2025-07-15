@@ -1,0 +1,13 @@
+name: PXDevelopment License
+version: 1.0.0
+main: com.pxdevelopment.license.LicensePlugin
+api-version: 1.13
+description: PXDevelopment License System for Minecraft Servers
+author: PXDevelopment
+website: https://pxdevelopment.com
+
+# Plugin'in yüklenmesi için gerekli izinler
+permissions:
+  pxdevelopment.license:
+    description: Allows access to license system
+    default: op 

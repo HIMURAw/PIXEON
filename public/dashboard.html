@@ -1577,10 +1577,54 @@
 
             <!-- License Logs Content -->
             <div class="license-dashboard-content" id="license-logs-content" style="display: none;">
-                <h2>Lisans Logları</h2>
-                <ul id="licenseLogsList">
-                    <!-- Lisans logları burada listelenecek -->
-                </ul>
+                <div class="license-header-section">
+                    <div class="license-header-content">
+                        <div class="license-title">
+                            <h1><i class="fas fa-list-alt"></i> Lisans Logları</h1>
+                            <p>Tüm lisanslarınızı görüntüleyin ve yönetin</p>
+                        </div>
+                        <div class="license-stats">
+                            <div class="stat-item">
+                                <i class="fas fa-server"></i>
+                                <span id="totalLicensesLogs">0</span>
+                                <label>Toplam Lisans</label>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-clock"></i>
+                                <span id="activeLicensesLogs">0</span>
+                                <label>Aktif Lisans</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="license-main-content">
+                    <div class="license-right-panel" style="flex: 1;">
+                        <div class="license-list-card">
+                            <div class="card-header">
+                                <div class="header-left">
+                                    <h3><i class="fas fa-list-alt"></i> Lisans Listesi</h3>
+                                    <p>Mevcut tüm lisanslarınız</p>
+                                </div>
+                                <div class="card-actions">
+                                    <button class="btn-refresh" title="Yenile" onclick="licenseManager.loadLicenses()">
+                                        <i class="fas fa-sync-alt"></i>
+                                    </button>
+                                    <button class="btn-export" title="Dışa Aktar" onclick="licenseManager.exportLicenses()">
+                                        <i class="fas fa-download"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-content">
+                                <div class="license-list-container">
+                                    <ul id="licenseList">
+                                        <!-- Ekli lisanslar burada listelenecek -->
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
         </div>
