@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { pool } = require('../DB/connect');
 const client = require('../../server.js');
-const Config = require('../../config.json');
+const Config = require('../../config.js');
 
 // Discord ürünlerinin ortalama yıldızını getir
 router.get('/discord/products/average-rating', async (req, res) => {
@@ -111,7 +111,7 @@ router.get('/discord/products', async (req, res) => {
 // Customer rolündeki kişilerin sayısını getir
 router.get('/discord/customer', async (req, res) => {
     try {
-        const Config = require('../../config.json');
+        const Config = require('../../config.js');
         const customerRoleId = Config.discord.shopBot.customerRoleId;
 
         if (!customerRoleId) {
@@ -184,7 +184,7 @@ router.get('/discord/customer', async (req, res) => {
 // Discord sunucusundaki toplam üye sayısını getir
 router.get('/discord/server', async (req, res) => {
     try {
-        const Config = require('../../config.json');
+        const Config = require('../../config.js');
 
         // Discord client'ı al
         const client = require('../../server.js');

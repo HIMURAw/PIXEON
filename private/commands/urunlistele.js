@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder, ChannelType } = require('discord.js');
 const { pool } = require('../DB/connect.js');
-const Config = require('../../config.json');
+const Config = require('../../config.js');
 
 module.exports = {
     data: new SlashCommandBuilder()

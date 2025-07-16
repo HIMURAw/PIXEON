@@ -78,7 +78,7 @@ API, tüm lisans doğrulama işlemlerini Discord webhook'larına gönderir:
 - ⚠️ **ERROR**: Veritabanı hatası
 
 ### Webhook Konfigürasyonu:
-`config.json` dosyasında aşağıdaki ayarları kullanır:
+`config.js` dosyasında aşağıdaki ayarları kullanır:
 ```json
 {
     "discord": {
@@ -118,10 +118,10 @@ npm install
 ```
 
 2. **Veritabanını yapılandırın:**
-`config.json` dosyasında veritabanı ayarlarını güncelleyin.
+`config.js` dosyasında veritabanı ayarlarını güncelleyin.
 
 3. **Discord webhook'larını ayarlayın:**
-`config.json` dosyasında webhook URL'lerini güncelleyin.
+`config.js` dosyasında webhook URL'lerini güncelleyin.
 
 4. **Sunucuyu başlatın:**
 ```bash
@@ -130,7 +130,7 @@ node server.js
 
 ## 🔧 Konfigürasyon
 
-`config.json` dosyasında aşağıdaki ayarları yapılandırın:
+`config.js` dosyasında aşağıdaki ayarları yapılandırın:
 
 ```json
 {

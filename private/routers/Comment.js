@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const client = require('../../server.js');
-const Config = require('../../config.json');
+const Config = require('../../config.js');
 
 // Duyuru kanalı mesajlarını getir
 router.get('/discord/comment', async (req, res) => {

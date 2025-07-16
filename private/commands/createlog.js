@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, ChannelType, PermissionFlagsBits } = require('discord.js');
-const Config = require('../../config.json');
+const Config = require('../../config.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -34,7 +34,8 @@ module.exports = {
                 '⚫・emoji-log',
                 '⚫・invite-log',
                 '⚫・server-log',
-                '⚫・licanse-log'
+                '⚫・licanse-log',
+                '⚫・ticket-log'
             ];
 
             const webhookInfoList = [];
