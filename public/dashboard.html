@@ -72,15 +72,12 @@
                     <li class="sidebar-parent" id="auditMenu">
                         <a href="#" class="sidebar-parent-toggle">
                             <i class="fa-solid fa-shield-alt"></i>
-                            <span>Audit Panel</span>
+                            <span>Ticket Panel</span>
                             <i class="fas fa-chevron-down sidebar-arrow"></i>
                         </a>
                         <ul class="sidebar-submenu" style="display: none;">
-                            <li><a href="#comments-content" class="audit-subitem"><span class="submenu-dot"></span><i
-                                        class="fa-solid fa-comments"></i> Comments</a>
-                            </li>
-                            <li><a href="#ticket-content" class="audit-subitem"><span class="submenu-dot"></span><i
-                                        class="fa-solid fa-ticket-alt"></i> Ticket</a>
+                            <li><a href="#ticket-log-content" class="audit-subitem"><span class="submenu-dot"></span><i
+                                        class="fa-solid fa-ticket-alt"></i> Ticket Log</a>
                             </li>
                         </ul>
                     </li>
@@ -1301,68 +1298,7 @@
             </div>
 
             <!-- Comments Content -->
-            <div class="comments-content" id="comments-content" style="display: none;">
-                <h2><i class="fa-solid fa-comments"></i> Comments Management</h2>
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                            <i class="fa-solid fa-comments"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3>Total Comments</h3>
-                            <p id="totalComments">0</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-                            <i class="fa-solid fa-clock"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3>Pending Review</h3>
-                            <p id="pendingComments">0</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
-                            <i class="fa-solid fa-check"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3>Approved</h3>
-                            <p id="approvedComments">0</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
-                            <i class="fa-solid fa-ban"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3>Rejected</h3>
-                            <p id="rejectedComments">0</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="discord-details">
-                    <div class="detail-card">
-                        <div class="card-header">
-                            <h3><i class="fas fa-list"></i> Recent Comments</h3>
-                            <div class="card-actions">
-                                <button class="btn-refresh" title="Refresh" onclick="refreshComments()">
-                                    <i class="fas fa-sync-alt"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="card-content">
-                            <div class="comments-list" id="commentsList">
-                                <div class="loading-spinner">
-                                    <i class="fas fa-spinner fa-spin"></i>
-                                    <span>Comments loading...</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+           
 
             <!-- Ticket Content -->
             <div class="ticket-content" id="ticket-content" style="display: none;">
@@ -1684,6 +1620,18 @@
                     </div>
                 </div>
             </div>
+            <!-- Ticket Log Content -->
+            <div class="ticket-log-content" id="ticket-log-content" style="display: none;">
+                <h2><i class="fa-solid fa-ticket-alt"></i> Ticket Log Dosyaları</h2>
+                <div class="ticket-log-list" id="ticketLogList">
+                    <div class="loading-spinner">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <span>Ticket log dosyaları yükleniyor...</span>
+                    </div>
+                </div>
+            </div>
+
+
 
         </div>
     </main>
