@@ -594,4 +594,28 @@ router.get('/product-feedback/user/:userId', async (req, res) => {
     }
 });
 
+// public/log klasöründeki dosya isimlerini listeleyen endpoint
+const fs = require('fs');
+const path = require('path');
+
+router.get('/log-files', async (req, res) => {
+    try {
+        const logDir = path.join(__dirname, '../../public/log');
+        const files = await fs.promises.readdir(logDir);
+        // Sadece dosya isimlerini döndür, klasörleri filtrele
+        const fileList = [];
+        for (const file of files) {
+            const filePath = path.join(logDir, file);
+            const stat = await fs.promises.stat(filePath);
+            if (stat.isFile()) {
+                fileList.push(file);
+            }
+        }
+        res.status(200).json({ success: true, files: fileList });
+    } catch (error) {
+        console.error('Log dosyaları listelenirken hata oluştu:', error);
+        res.status(500).json({ success: false, error: 'Log dosyaları listelenemedi.' });
+    }
+});
+
 module.exports = router;

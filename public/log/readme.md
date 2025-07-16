@@ -1,0 +1,1 @@
+bu dosya ticket loglarını barındırıyor

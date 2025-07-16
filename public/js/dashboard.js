@@ -1,6 +1,6 @@
 function showContent(section) {
     // Tüm dashboard içeriklerini gizle
-    document.querySelectorAll('.dashboard-content, .purchase-dashboard-content, .activity-dashboard-content, .discord-login-history-content, .purchase-history-content, .activity-history-content, .settings-content, .comments-content, .ticket-content, .add-product-content, .comprehensive-logs-content, .license-dashboard-content')
+    document.querySelectorAll('.dashboard-content, .purchase-dashboard-content, .activity-dashboard-content, .discord-login-history-content, .purchase-history-content, .activity-history-content, .settings-content, .comments-content, .ticket-content, .add-product-content, .comprehensive-logs-content, .license-dashboard-content, .ticket-log-content')
         .forEach(content => {
             content.style.display = 'none';
         });
@@ -238,6 +238,10 @@ document.addEventListener('DOMContentLoaded', function () {
             // Aktiflik vurgusu
             logSubitems.forEach(i => i.parentElement.classList.remove('active'));
             this.parentElement.classList.add('active');
+            // Ticket Log sayfası ise dosya listesini yükle
+            if (targetSection === 'ticket-log-content') {
+                loadTicketLogFiles();
+            }
         });
     });
 
@@ -251,6 +255,10 @@ document.addEventListener('DOMContentLoaded', function () {
             // Aktiflik vurgusu
             auditSubitems.forEach(i => i.parentElement.classList.remove('active'));
             this.parentElement.classList.add('active');
+            // Ticket Log sayfası ise dosya listesini yükle
+            if (targetSection === 'ticket-log-content') {
+                loadTicketLogFiles();
+            }
         });
     });
 
@@ -1444,54 +1452,69 @@ async function loadDiscordLoginHistory() {
     }
     
     async function loadTabData(tabId) {
-        const container = document.querySelector(`#${tabId} .loading-spinner`).parentElement;
-        
+        // Find the loading spinner inside the tab-pane
+        let spinner = document.querySelector(`#${tabId} .loading-spinner`);
+        let container;
+        if (!spinner) {
+            // Eğer spinner yoksa, otomatik ekle
+            const tabPane = document.getElementById(tabId);
+            if (tabPane) {
+                // Uygun bir kapsayıcı bul veya tabPane'in sonuna ekle
+                let targetList = tabPane.querySelector('div');
+                if (!targetList) {
+                    // Hiç div yoksa tabPane'e ekle
+                    targetList = tabPane;
+                }
+                spinner = document.createElement('div');
+                spinner.className = 'loading-spinner';
+                spinner.textContent = 'Loading...';
+                targetList.appendChild(spinner);
+                container = spinner.parentElement;
+            } else {
+                console.error('Tabda .loading-spinner bulunamadı ve tabPane de yok:', tabId);
+                return;
+            }
+        } else {
+            container = spinner.parentElement;
+        }
         try {
             let data = [];
             let endpoint = '';
-            
             switch(tabId) {
-                case 'messages-tab':
-                    endpoint = '/api/discord/log/message';
-                    break;
-                case 'voice-tab':
-                    endpoint = '/api/discord/log/voice';
-                    break;
-                case 'roles-tab':
-                    endpoint = '/api/discord/log/role';
-                    break;
-                case 'channels-tab':
-                    endpoint = '/api/discord/log/channel';
-                    break;
-                case 'emojis-tab':
-                    endpoint = '/api/discord/log/emoji';
-                    break;
-                case 'invites-tab':
-                    endpoint = '/api/discord/log/invite';
-                    break;
-                case 'server-settings-tab':
-                    endpoint = '/api/discordUsers/serverLog';
-                    break;
+                case 'messages-tab': endpoint = '/api/discord/log/message'; break;
+                case 'voice-tab': endpoint = '/api/discord/log/voice'; break;
+                case 'roles-tab': endpoint = '/api/discord/log/role'; break;
+                case 'channels-tab': endpoint = '/api/discord/log/channel'; break;
+                case 'emojis-tab': endpoint = '/api/discord/log/emoji'; break;
+                case 'invites-tab': endpoint = '/api/discord/log/invite'; break;
+                case 'server-settings-tab': endpoint = '/api/discordUsers/serverLog'; break;
             }
-            
             if (endpoint) {
                 const response = await fetch(endpoint);
-                const result = await response.json();
-                if (result.success) {
+                let result;
+                // Try to parse as JSON, but handle errors gracefully
+                try {
+                    result = await response.json();
+                } catch (jsonErr) {
+                    // If not JSON, show error and fallback to sample data
+                    console.error('API yanıtı JSON değil:', jsonErr);
+                    container.innerHTML = '<div class="loading-spinner">API yanıtı beklenmeyen formatta (JSON değil).</div>';
+                    data = generateSampleData(tabId);
+                    renderTabData(container, data, tabId);
+                    return;
+                }
+                if (result && result.success) {
                     data = result.logs || [];
                 }
             }
-            
             // For now, show sample data if no real data
             if (data.length === 0) {
                 data = generateSampleData(tabId);
             }
-            
             renderTabData(container, data, tabId);
-            
         } catch (error) {
             console.error('Error loading tab data:', error);
-            container.innerHTML = '<div class="loading-spinner">Error loading data</div>';
+            container.innerHTML = '<div class="loading-spinner">Veri yüklenirken hata oluştu.</div>';
         }
     }
     
@@ -2399,3 +2422,27 @@ showContent = function(section) {
         }, 100);
     }
 };
+
+// Ticket Log dosyalarını yükle ve kart olarak göster
+async function loadTicketLogFiles() {
+    const ticketLogList = document.getElementById('ticketLogList');
+    if (!ticketLogList) return;
+    ticketLogList.innerHTML = '<div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> <span>Ticket log dosyaları yükleniyor...</span></div>';
+    try {
+        const res = await fetch('/api/log-files');
+        const data = await res.json();
+        if (data.success && data.files.length > 0) {
+            ticketLogList.innerHTML = data.files.map(file => `
+                <div class="ticket-log-card" style="cursor:pointer;display:inline-block;margin:10px;padding:20px 30px;background:#181c24;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,0.10);transition:box-shadow .2s;min-width:220px;max-width:100%;text-align:center;vertical-align:top;"
+                    onclick="window.open('/log/${file}', '_blank')">
+                    <i class='fa-solid fa-file-alt' style='font-size:2rem;color:#00d4ff;'></i>
+                    <div style='margin-top:10px;font-weight:600;color:#fff;'>${file}</div>
+                </div>
+            `).join('');
+        } else {
+            ticketLogList.innerHTML = '<div class="empty-state"><i class="fa-solid fa-ticket-alt" style="font-size:2rem;color:#00d4ff;"></i><h4>Hiç ticket log dosyası bulunamadı</h4></div>';
+        }
+    } catch (err) {
+        ticketLogList.innerHTML = '<div class="empty-state"><i class="fa-solid fa-exclamation-triangle" style="font-size:2rem;color:#ff5252;"></i><h4>Ticket log dosyaları yüklenemedi</h4></div>';
+    }
+}
