@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const axios = require('axios');
-const Config = require('../../config.json');
+const Config = require('../../config.js');
 const { pool } = require('../DB/connect');
 
 
@@ -178,7 +178,7 @@ router.get('/api/user/check', (req, res) => {
     );
 });
 
-// Admin role ID'yi config.json'dan çek
+// Admin role ID'yi config.js'dan çek
 router.get('/admin-role-id', (req, res) => {
     try {
         const adminRoleId = Config.discord.adminRoleId;

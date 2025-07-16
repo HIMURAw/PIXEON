@@ -3,7 +3,7 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const { checkLogin } = require('./models/userModel');
 const { pool } = require('./connect');
-const Config = require('../../config.json');
+const Config = require('../../config.js');
 
 // JWT secret key - gerçek uygulamada bu değer environment variable olarak saklanmalı
 const JWT_SECRET = 'your-super-secret-key-here';

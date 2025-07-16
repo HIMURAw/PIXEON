@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../DB/connect.js');
 const client = require('../../server.js');
-const Config = require('../../config.json');
+const Config = require('../../config.js');
 
 // Activity Statistics - Genel istatistikler
 router.get('/stats', async (req, res) => {
@@ -46,7 +46,7 @@ router.get('/stats', async (req, res) => {
             // Fallback: Eski tablolardan istatistikler
             [messageCount] = await db.pool.query('SELECT COUNT(*) as total FROM discord_message_log');
             
-            [voiceActivity] = await db.pool.query(`
+            [voiceActivity] = await db.pool.query(`config.js
                 SELECT COUNT(DISTINCT user_id) as total 
                 FROM discord_voice_log 
                 WHERE action = 'join' 

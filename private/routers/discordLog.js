@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../DB/connect.js');
-const Config = require('../../config.json');
+const Config = require('../../config.js');
 const axios = require('axios');
 const { Events, AuditLogEvent } = require('discord.js');
 const client = require('../../server.js');

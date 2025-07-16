@@ -1,14 +1,16 @@
 const express = require('express');
 const path = require('path');
 const { Client, GatewayIntentBits, Events, Collection, REST, Routes } = require('discord.js');
-const Config = require('./config.json');
+const Config = require('./config.js');
 const { createAdminsTable } = require('./private/DB/models/userModel');
-const { joinVoiceChannel } = require('@discordjs/voice');
+const { joinVoiceChannel, getVoiceConnection } = require('@discordjs/voice');
 const fs = require('fs');
 const { pool, checkConnection } = require('./private/DB/connect');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const { EmbedBuilder } = require('discord.js');
+
+require('./private/TicketSystem/index.js')
 
 // Node.js 18+ için fetch kullan, değilse node-fetch yükle
 let fetch;
@@ -185,10 +187,10 @@ async function registerCommands() {
         console.log(`🔄 Started refreshing ${commands.length} application (/) commands.`);
 
         if (!Config.discord.clientId) {
-            throw new Error('Client ID is missing in config.json');
+            throw new Error('Client ID is missing in config.js');
         }
         if (!Config.discord.guidid) {
-            throw new Error('Guild ID (guidid) is missing in config.json');
+            throw new Error('Guild ID (guidid) is missing in config.js');
         }
 
         const rest = new REST().setToken(token);
@@ -656,20 +658,33 @@ ROUTERS END
 */
 
 
-// Discord botu başlat ve ses kanalına bağlan
-client.on('ready', () => {
+function joinVoice() {
     let channel = client.channels.cache.get(Config.discord.voicechannel);
-
-    const VoiceConnection = joinVoiceChannel({
+    if (!channel) return console.error('[Bot] Ses kanalı bulunamadı!');
+    // Zaten bağlıysa tekrar bağlanma
+    const existing = getVoiceConnection(channel.guild.id);
+    if (existing && existing.joinConfig.channelId === channel.id) return;
+    joinVoiceChannel({
         channelId: channel.id,
         guildId: channel.guild.id,
         adapterCreator: channel.guild.voiceAdapterCreator
     });
+    console.log('[Bot] Ses kanalına bağlandı:', channel.name);
+}
+
+client.on('ready', () => {
+    setTimeout(joinVoice, 2000); // Bot hazır olduğunda sese gir
 });
 
-
-
-
+client.on('voiceStateUpdate', (oldState, newState) => {
+    // Eğer bot sesten atıldıysa veya bağlantı koptuysa tekrar gir
+    const channelId = Config.discord.voicechannel;
+    if (newState.id === client.user.id) {
+        if (!newState.channelId || newState.channelId !== channelId) {
+            setTimeout(joinVoice, 2000);
+        }
+    }
+});
 
 
 app.listen(port, () => {

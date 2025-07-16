@@ -1,4 +1,4 @@
-const config = require('../../config.json');
+const config = require('../../config.js');
 const express = require('express');
 const path = require('path');
 const router = express.Router();

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Config = require('../../config.json');
+const Config = require('../../config.js');
 const client = require('../../server.js');
 const db = require('../DB/connect.js');
 const { addUserHistory, getUserHistory } = require('../DB/models/userModel');
