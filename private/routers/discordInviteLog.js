@@ -73,7 +73,7 @@ async function logInviteEvent(inviteData) {
         };
 
         await axios.post(Config.discord.log.inviteWebhookURL, webhookData);
-        console.log(`Invite logu kaydedildi: ${inviteData.action} - ${inviteData.inviteCode} - ${inviteData.username}`);
+        console.log(`\x1b[38;5;208m🔗 [PX-API]\x1b[0m Invite logu kaydedildi: ${inviteData.action} - ${inviteData.inviteCode} - ${inviteData.username}`);
 
     } catch (error) {
         console.error('Invite logu kaydedilirken hata:', error);
@@ -83,7 +83,7 @@ async function logInviteEvent(inviteData) {
 // Discord event listeners
 client.on(Events.InviteCreate, async (invite) => {
     try {
-        console.log('Davet oluşturuldu:', invite.code);
+        console.log('\x1b[38;5;208m🎟️ [PX-API]\x1b[0m Davet oluşturuldu:', invite.code);
 
         // Audit log'ları al
         const auditLogs = await invite.guild.fetchAuditLogs({
@@ -111,7 +111,7 @@ client.on(Events.InviteCreate, async (invite) => {
         });
 
     } catch (error) {
-        console.error('InviteCreate event hatası:', error);
+        console.error('\x1b[41m[PX-API] HATA\x1b[0m', error);
     }
 });
 
@@ -156,7 +156,7 @@ client.on(Events.GuildMemberAdd, async (member) => {
         
         // Bu kısım karmaşık olabilir çünkü Discord API'si hangi davetle geldiğini doğrudan vermez
         // Bu yüzden sadece üye katılımını loglayalım
-        console.log('Yeni üye katıldı:', member.user.username);
+        console.log('\x1b[38;5;208m🆕 [PX-API]\x1b[0m Yeni üye katıldı:', member.user.username);
 
         await logInviteEvent({
             userId: member.user.id,
@@ -175,7 +175,7 @@ client.on(Events.GuildMemberAdd, async (member) => {
         });
 
     } catch (error) {
-        console.error('GuildMemberAdd event hatası:', error);
+        console.error('\x1b[41m[PX-API] HATA\x1b[0m', error);
     }
 });
 

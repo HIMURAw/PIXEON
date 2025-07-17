@@ -110,7 +110,7 @@ async function logChannelEvent(channelData) {
         };
 
         await axios.post(Config.discord.log.ChannelWebhookURL, webhookData);
-        console.log(`Kanal logu kaydedildi: ${channelData.action} - ${channelData.channelName}`);
+        console.log(`\x1b[38;5;208m📺 [PX-API]\x1b[0m Kanal logu kaydedildi: ${channelData.action} - ${channelData.channelName}`);
 
     } catch (error) {
         console.error('Kanal logu kaydedilirken hata:', error);
@@ -214,7 +214,7 @@ client.on(Events.ChannelUpdate, async (oldChannel, newChannel) => {
 client.on(Events.ChannelPinsUpdate, async (channel, date) => {
     try {
         // Pin güncellemelerini logla (opsiyonel)
-        console.log(`Pin güncellendi: ${channel.name} - ${date}`);
+        console.log(`\x1b[38;5;208m📌 [PX-API]\x1b[0m Pin güncellendi: ${channel.name} - ${date}`);
     } catch (error) {
         console.error('ChannelPinsUpdate event hatası:', error);
     }

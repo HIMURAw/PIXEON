@@ -93,10 +93,10 @@ async function logMessageEvent(messageData) {
         };
 
         await axios.post(Config.discord.log.MessageWebhookURL, webhookData);
-        console.log(`Mesaj logu kaydedildi: ${messageData.action} - ${messageData.username} - ${messageData.channelName}`);
+        console.log(`\x1b[38;5;208m📨 [PX-API]\x1b[0m Mesaj logu kaydedildi: ${messageData.action} - ${messageData.username} - ${messageData.channelName}`);
 
     } catch (error) {
-        console.error('Mesaj logu kaydedilirken hata:', error);
+        console.error('\x1b[41m[PX-API] HATA\x1b[0m', error);
     }
 }
 

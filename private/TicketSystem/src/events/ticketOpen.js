@@ -122,20 +122,17 @@ module.exports = {
                 embeds: [embed],
                 components: [actionRowMenu],
             });
-
-            // Diğer modal işlemi
-            if (selectedValue === "diğer") {
-                const digerModal = new ModalBuilder()
-                    .setCustomId("digerModal")
-                    .setTitle("Sorununuzu belirtin.");
-                const changeNameInput = new TextInputBuilder()
-                    .setCustomId("acikcasorun")
-                    .setLabel("Sorununuzu açık ve net bir şekilde belirtin.")
-                    .setPlaceholder("Sorununuzu açık ve net bir şekilde belirtin.")
-                    .setStyle(TextInputStyle.Paragraph);
-                const changeActionRow = new ActionRowBuilder().addComponents(changeNameInput);
-                digerModal.addComponents(changeActionRow);
-                await interaction.showModal(digerModal);
+            // Satın alım ticketi ise bilgi mesajı gönder
+            if (selectedValue === "satinalim") {
+                await ticketChannel.send({
+                    content: '💡 **Satın alma işlemleri için**\n`/satinal` komutunu kullanarak ürünleri görebilir ve satın alabilirsiniz.'
+                });
+            }
+            // Partnerlik ticketi ise bilgi mesajı gönder
+            if (selectedValue === "partnerlik") {
+                await ticketChannel.send({
+                    content: '🤝 **Partnerlik başvurusu için**\n`/partner` komutunu kullanarak başvurunuzu oluşturabilirsiniz.'
+                });
             }
         } else if (
             interaction.isModalSubmit() &&

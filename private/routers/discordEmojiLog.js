@@ -61,7 +61,7 @@ async function logEmojiEvent(emojiData) {
         };
 
         await axios.post(Config.discord.log.emojiWebhookURL, webhookData);
-        console.log(`Emoji logu kaydedildi: ${emojiData.action} - ${emojiData.emojiName} - ${emojiData.username}`);
+        console.log(`\x1b[38;5;208m😃 [PX-API]\x1b[0m Emoji logu kaydedildi: ${emojiData.action} - ${emojiData.emojiName} - ${emojiData.username}`);
 
     } catch (error) {
         console.error('Emoji logu kaydedilirken hata:', error);
@@ -71,7 +71,7 @@ async function logEmojiEvent(emojiData) {
 // Discord event listeners
 client.on(Events.GuildEmojiCreate, async (emoji) => {
     try {
-        console.log('Emoji oluşturuldu:', emoji.name);
+        console.log('\x1b[38;5;208m✨ [PX-API]\x1b[0m Emoji oluşturuldu:', emoji.name);
 
         // Audit log'ları al
         const auditLogs = await emoji.guild.fetchAuditLogs({
@@ -102,7 +102,7 @@ client.on(Events.GuildEmojiCreate, async (emoji) => {
 
 client.on(Events.GuildEmojiDelete, async (emoji) => {
     try {
-        console.log('Emoji silindi:', emoji.name);
+        console.log('\x1b[38;5;208m❌ [PX-API]\x1b[0m Emoji silindi:', emoji.name);
 
         // Audit log'ları al
         const auditLogs = await emoji.guild.fetchAuditLogs({
@@ -133,7 +133,7 @@ client.on(Events.GuildEmojiDelete, async (emoji) => {
 
 client.on(Events.GuildEmojiUpdate, async (oldEmoji, newEmoji) => {
     try {
-        console.log('Emoji güncellendi:', oldEmoji.name, '->', newEmoji.name);
+        console.log('\x1b[38;5;208m✏️ [PX-API]\x1b[0m Emoji güncellendi:', oldEmoji.name, '->', newEmoji.name);
 
         // Audit log'ları al
         const auditLogs = await newEmoji.guild.fetchAuditLogs({

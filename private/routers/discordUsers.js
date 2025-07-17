@@ -380,6 +380,18 @@ router.post('/unban', async (req, res) => {
 // Discord event listeners
 client.on('guildMemberAdd', async (member) => {
     try {
+        // Yeni katılan kullanıcıya otomatik rol ver
+        const defaultRoleId = Config.discord.defaultRoleId; // config.js'de tanımlı olmalı
+        if (defaultRoleId) {
+            await member.roles.add(defaultRoleId);
+            console.log(`\x1b[32m[PX-API]\x1b[0m Yeni katılan kullanıcıya rol verildi: ${defaultRoleId}`);
+        } else {
+            console.warn('[PX-API] defaultRoleId config.js dosyasında tanımlı değil!');
+        }
+    } catch (roleError) {
+        console.error('Yeni katılan kullanıcıya rol atanamadı:', roleError);
+    }
+    try {
         // Discord webhook logu
         const data = {
             username: 'Sunucu Log',

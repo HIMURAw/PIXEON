@@ -23,12 +23,11 @@ const router = express.Router();
             }
         }
         const rest = new REST({ version: '10' }).setToken(token);
-        console.log('Started refreshing application (/) commands.');
         await rest.put(
             Routes.applicationGuildCommands(Config.discord.ticketBot.clientId, Config.discord.guidid),
             { body: commands },
         );
-        console.log('Successfully reloaded application (/) commands.');
+        console.log('\x1b[35m[PX-Ticket]\x1b[0m Başarılı bir şekilde slash komutları yüklendi.');
     } catch (error) {
         console.error(error);
     }
@@ -60,7 +59,7 @@ function joinVoice() {
         guildId: channel.guild.id,
         adapterCreator: channel.guild.voiceAdapterCreator
     });
-    console.log('[Bot] Ses kanalına bağlandı:', channel.name);
+    console.log('\x1b[32m[Bot]\x1b[0m Ses kanalına bağlandı:', channel.name);
 }
 
 ticketBot.on('ready', () => {
@@ -77,7 +76,7 @@ ticketBot.on('voiceStateUpdate', (oldState, newState) => {
     }
 });
 ticketBot.once('ready', () => {
-    console.log(`[TicketBot] Başarıyla giriş yaptı: ${ticketBot.user.tag}`);
+    console.log(`\x1b[35m[PX-Ticket]\x1b[0m Discord botuna ${ticketBot.user.displayName} olarak giriş sağlandı.`);
     setTimeout(joinVoice, 2000); // Bot hazır olduğunda sese gir
 });
 

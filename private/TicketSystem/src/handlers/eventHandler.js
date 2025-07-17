@@ -7,10 +7,10 @@ module.exports = (client) => {
     if (fs.existsSync(eventsPath)) {
         eventFiles = fs.readdirSync(eventsPath).filter((file) => file.endsWith(".js"));
         if (eventFiles.length === 0) {
-            console.warn('[PX Ticket] Event klasörü boş:', eventsPath);
+            console.warn('\x1b[35m[PX-Ticket]\x1b[0m Event klasörü boş:', eventsPath);
         }
     } else {
-        console.error('[PX Ticket] Event klasörü bulunamadı:', eventsPath);
+        console.error('\x1b[41m[PX-Ticket] HATA\x1b[0m', eventsPath);
         return;
     }
 

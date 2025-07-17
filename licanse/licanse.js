@@ -112,7 +112,7 @@ async function checkLicense() {
 }
 
 // Programı başlat
-console.log('🔐 Starting license check...');
+console.log('\x1b[34m[PX-Main]\x1b[0m 🔐 lisans kontrolü başladı...');
 checkLicense().catch(error => {
     console.error('Fatal error:', error);
     process.exit(1);

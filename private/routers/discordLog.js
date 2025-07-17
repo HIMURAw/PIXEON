@@ -62,7 +62,7 @@ async function logRoleEvent(roleData) {
         };
 
         await axios.post(Config.discord.log.RoleLogWebhookURL, webhookData);
-        console.log(`Rol logu kaydedildi: ${roleData.action} - ${roleData.username} - ${roleData.roleName}`);
+        console.log(`\x1b[38;5;208m🛡️ [PX-API]\x1b[0m Rol logu kaydedildi: ${roleData.action} - ${roleData.username} - ${roleData.roleName}`);
 
     } catch (error) {
         console.error('Rol logu kaydedilirken hata:', error);
