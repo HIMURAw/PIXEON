@@ -408,6 +408,70 @@ FROM license_logs
 WHERE created_at >= DATE_SUB(NOW(), INTERVAL 24 HOUR)
 ORDER BY created_at DESC;
 
+-- Satın Alma Talepleri Tablosu
+CREATE TABLE IF NOT EXISTS `discord_purchase_requests` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` varchar(32) NOT NULL,
+  `username` varchar(64) NOT NULL,
+  `product_id` int(11) NOT NULL,
+  `product_title` varchar(255) NOT NULL,
+  `quantity` int(11) NOT NULL DEFAULT 1,
+  `payment_method` varchar(32) DEFAULT NULL,
+  `payment_info` text DEFAULT NULL,
+  `status` enum('pending','approved','declined') NOT NULL DEFAULT 'pending',
+  `admin_id` varchar(32) DEFAULT NULL,
+  `admin_username` varchar(64) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  KEY `product_id` (`product_id`),
+  KEY `status` (`status`),
+  KEY `created_at` (`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Guard Sistemi Tablosu
+CREATE TABLE IF NOT EXISTS `discord_guard_users` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` varchar(32) NOT NULL,
+  `username` varchar(64) NOT NULL,
+  `avatar_url` text DEFAULT NULL,
+  `guard_level` enum('basic','moderator','admin','full') NOT NULL DEFAULT 'basic',
+  `permissions` json DEFAULT NULL,
+  `added_by` varchar(32) NOT NULL,
+  `added_by_username` varchar(64) NOT NULL,
+  `status` enum('active','inactive','banned') NOT NULL DEFAULT 'active',
+  `notes` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_id` (`user_id`),
+  KEY `guard_level` (`guard_level`),
+  KEY `status` (`status`),
+  KEY `added_by` (`added_by`),
+  KEY `created_at` (`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Guard İşlem Geçmişi Tablosu
+CREATE TABLE IF NOT EXISTS `discord_guard_logs` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` varchar(32) NOT NULL,
+  `username` varchar(64) NOT NULL,
+  `action` enum('add','remove','update','ban','unban') NOT NULL,
+  `old_level` enum('basic','moderator','admin','full') DEFAULT NULL,
+  `new_level` enum('basic','moderator','admin','full') DEFAULT NULL,
+  `permissions_changed` json DEFAULT NULL,
+  `moderator_id` varchar(32) NOT NULL,
+  `moderator_username` varchar(64) NOT NULL,
+  `reason` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  KEY `action` (`action`),
+  KEY `moderator_id` (`moderator_id`),
+  KEY `created_at` (`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

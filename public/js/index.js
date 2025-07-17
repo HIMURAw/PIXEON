@@ -118,11 +118,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Admin rol kontrolü
     async function checkAdminRole() {
         try {
-            console.log('=== Admin Role Check Başladı ===');
+            console.log('%c[PX-Main] === Admin Role Check Başladı ===', 'color: #2196f3; font-weight: bold; text-shadow: 1px 1px 2px #0003;');
 
             const encodedUserData = getCookie('auth_token');
             if (!encodedUserData) {
-                console.log('No auth token found');
+                console.log('%c[PX-Main] No auth token found', 'color: #2196f3; font-weight: bold;');
                 return false;
             }
 
@@ -133,68 +133,68 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const userData = JSON.parse(decodedUserData);
-            console.log('User data from cookie:', userData);
+            console.log('%c[PX-Main] User data from cookie:', 'color: #2196f3; font-weight: bold;', userData);
 
             if (!userData || !userData.username) {
-                console.log('No username in user data');
+                console.log('%c[PX-Main] No username in user data', 'color: #2196f3; font-weight: bold;');
                 return false;
             }
 
             // Admin role ID'yi config'den çek
-            console.log('Fetching admin role ID from config...');
+            console.log('%c[PX-Main] Fetching admin role ID from config...', 'color: #2196f3; font-weight: bold;');
             const configResponse = await fetch('/auth/discord/admin-role-id');
-            console.log('Config response status:', configResponse.status);
+            console.log('%c[PX-Main] Config response status:', 'color: #2196f3; font-weight: bold;', configResponse.status);
 
             if (!configResponse.ok) {
-                console.log('Config response not ok');
+                console.log('%c[PX-Main] Config response not ok', 'color: #2196f3; font-weight: bold;');
                 return false;
             }
 
             const configData = await configResponse.json();
             const adminRoleId = configData.adminRoleId;
-            console.log('Admin role ID from config:', adminRoleId);
+            console.log('%c[PX-Main] Admin role ID from config:', 'color: #2196f3; font-weight: bold;', adminRoleId);
 
             // Rolleri cookie'den kontrol et
             if (!userData.roles) {
-                console.log('No roles in user data');
+                console.log('%c[PX-Main] No roles in user data', 'color: #2196f3; font-weight: bold;');
                 return false;
             }
 
-            console.log('User roles from cookie:', userData.roles);
-            console.log('Admin role ID to check:', adminRoleId);
-            console.log('Roles includes admin role:', userData.roles.includes(adminRoleId));
+            console.log('%c[PX-Main] User roles from cookie:', 'color: #2196f3; font-weight: bold;', userData.roles);
+            console.log('%c[PX-Main] Admin role ID to check:', 'color: #2196f3; font-weight: bold;', adminRoleId);
+            console.log('%c[PX-Main] Roles includes admin role:', 'color: #2196f3; font-weight: bold;', userData.roles.includes(adminRoleId));
 
             const isAdmin = userData.roles.includes(adminRoleId);
-            console.log('Is admin:', isAdmin);
+            console.log('%c[PX-Main] Is admin:', 'color: #2196f3; font-weight: bold;', isAdmin);
 
             return isAdmin;
         } catch (error) {
-            console.error('Admin role check error:', error);
+            console.error('%c[PX-Main] Admin role check error:', 'color: #fff; background: #e53935; font-weight: bold; padding:2px 6px; border-radius:4px;', error);
             return false;
         }
     }
 
     // Admin login butonunu yönet
     async function manageAdminButton() {
-        console.log('=== Manage Admin Button Başladı ===');
+        console.log('%c[PX-Main] === Manage Admin Button Başladı ===', 'color: #2196f3; font-weight: bold;');
         const adminBtn = document.getElementById('adminLoginBtn');
-        console.log('Admin button element:', adminBtn);
+        console.log('%c[PX-Main] Admin button element:', 'color: #2196f3; font-weight: bold;', adminBtn);
         if (!adminBtn) {
-            console.warn('Admin button not found in DOM. Skipping admin button logic.');
+            console.warn('%c[PX-Main] Admin button not found in DOM. Skipping admin button logic.', 'color: #ff9800; font-weight: bold;');
             return;
         }
         const isAdmin = await checkAdminRole();
-        console.log('Is admin result:', isAdmin);
+        console.log('%c[PX-Main] Is admin result:', 'color: #2196f3; font-weight: bold;', isAdmin);
 
         if (isAdmin) {
-            console.log('Showing admin button');
+            console.log('%c[PX-Main] Showing admin button', 'color: #2196f3; font-weight: bold;');
             adminBtn.style.display = 'inline-block';
             adminBtn.addEventListener('click', () => {
-                console.log('Admin button clicked, redirecting to dashboard');
+                console.log('%c[PX-Main] Admin button clicked, redirecting to dashboard', 'color: #2196f3; font-weight: bold;');
                 window.location.href = '/dashboard';
             });
         } else {
-            console.log('Hiding admin button');
+            console.log('%c[PX-Main] Hiding admin button', 'color: #2196f3; font-weight: bold;');
             adminBtn.style.display = 'none';
         }
     }
@@ -798,7 +798,7 @@ async function loadReferences() {
         const response = await fetch('/api/product-feedback');
         const data = await response.json();
 
-        console.log('API feedback data:', data);
+        console.log('%c[PX-Main] API feedback data:', 'color: #2196f3; font-weight: bold;', data);
 
         if (!data.success || !data.data || !data.data.feedbacks || data.data.feedbacks.length === 0) {
             referencesList.innerHTML = '<div class="no-members">Henüz müşteri değerlendirmesi bulunmuyor.</div>';
@@ -807,7 +807,7 @@ async function loadReferences() {
         }
 
         allFeedbacks = data.data.feedbacks;
-        console.log('Feedbacks:', allFeedbacks);
+        console.log('%c[PX-Main] Feedbacks:', 'color: #2196f3; font-weight: bold;', allFeedbacks);
 
         // Sayfalama göster ve ilk sayfayı yükle
         if (allFeedbacks.length > itemsPerPage) {
@@ -821,7 +821,7 @@ async function loadReferences() {
     } catch (error) {
         referencesList.innerHTML = '<div class="error">Müşteri değerlendirmeleri yüklenirken hata oluştu.</div>';
         pagination.style.display = 'none';
-        console.error('Müşteri değerlendirmeleri yüklenirken hata:', error);
+        console.error('%c[PX-Main] Müşteri değerlendirmeleri yüklenirken hata:', 'color: #fff; background: #e53935; font-weight: bold; padding:2px 6px; border-radius:4px;', error);
     }
 }
 

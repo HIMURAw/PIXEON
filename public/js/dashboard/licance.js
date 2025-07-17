@@ -106,7 +106,7 @@ class LicenseManager {
                 }
             }
         } catch (error) {
-            console.error('Lisans ekleme hatası:', error);
+            console.error('%c[PX-Main] Lisans ekleme hatası:', 'color: #fff; background: #e53935; font-weight: bold; padding:2px 6px; border-radius:4px;', error);
             this.showNotification('Sunucu hatası oluştu!', 'error');
         }
     }
@@ -142,7 +142,7 @@ class LicenseManager {
                 `;
             }
         } catch (error) {
-            console.error('Lisans listeleme hatası:', error);
+            console.error('%c[PX-Main] Lisans listeleme hatası:', 'color: #fff; background: #e53935; font-weight: bold; padding:2px 6px; border-radius:4px;', error);
             licenseList.innerHTML = `
                 <div class="error-message">
                     <i class="fas fa-exclamation-triangle"></i>
@@ -279,7 +279,7 @@ class LicenseManager {
                 `;
             }
         } catch (error) {
-            console.error('Log yükleme hatası:', error);
+            console.error('%c[PX-Main] Log yükleme hatası:', 'color: #fff; background: #e53935; font-weight: bold; padding:2px 6px; border-radius:4px;', error);
             logsList.innerHTML = `
                 <div class="error-message">
                     <i class="fas fa-exclamation-triangle"></i>
@@ -379,7 +379,7 @@ class LicenseManager {
                 if (avgResponseTime) avgResponseTime.textContent = `${Math.round(stats.avg_response_time || 0)}ms`;
             }
         } catch (error) {
-            console.error('Log istatistikleri güncelleme hatası:', error);
+            console.error('%c[PX-Main] Log istatistikleri güncelleme hatası:', 'color: #fff; background: #e53935; font-weight: bold; padding:2px 6px; border-radius:4px;', error);
         }
     }
 
@@ -465,7 +465,7 @@ class LicenseManager {
                 this.showNotification('Dışa aktarılacak log bulunamadı!', 'warning');
             }
         } catch (error) {
-            console.error('Log dışa aktarma hatası:', error);
+            console.error('%c[PX-Main] Log dışa aktarma hatası:', 'color: #fff; background: #e53935; font-weight: bold; padding:2px 6px; border-radius:4px;', error);
             this.showNotification('Log dışa aktarma sırasında hata oluştu!', 'error');
         }
     }
@@ -533,7 +533,7 @@ class LicenseManager {
             
             this.showNotification('Lisanslar başarıyla dışa aktarıldı!', 'success');
         } catch (error) {
-            console.error('Dışa aktarma hatası:', error);
+            console.error('%c[PX-Main] Dışa aktarma hatası:', 'color: #fff; background: #e53935; font-weight: bold; padding:2px 6px; border-radius:4px;', error);
             this.showNotification('Dışa aktarma sırasında hata oluştu!', 'error');
         }
     }
@@ -568,7 +568,7 @@ class LicenseManager {
                 this.showNotification(result.message || 'Lisans silinirken hata oluştu!', 'error');
             }
         } catch (error) {
-            console.error('Lisans silme hatası:', error);
+            console.error('%c[PX-Main] Lisans silme hatası:', 'color: #fff; background: #e53935; font-weight: bold; padding:2px 6px; border-radius:4px;', error);
             this.showNotification('Sunucu hatası oluştu!', 'error');
         }
     }

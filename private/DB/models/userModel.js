@@ -12,7 +12,6 @@ async function createAdminsTable() {
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `);
-        console.log('Admins table created or already exists');
     } catch (error) {
         console.error('Error creating admins table:', error);
         throw error;
@@ -34,7 +33,6 @@ async function createUserHistoryTable() {
                 moderator_username VARCHAR(255) NOT NULL
             )
         `);
-        console.log('User History table created or already exists');
     } catch (error) {
         console.error('Error creating user history table:', error);
         throw error;

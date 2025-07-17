@@ -15,11 +15,11 @@ const pool = mysql.createPool({
 async function checkConnection() {
     try {
         const connection = await pool.getConnection();
-        console.log('Database connection successful');
+        console.log('\x1b[38;5;208m[PX-API]\x1b[0m Veri Tabanı Bağlantısı Başarılı bir şekilde sağlandı.');
         connection.release();
         return true;
     } catch (error) {
-        console.error('Database connection failed:', error);
+        console.error('[PX-API] Veri Tabanı Bağlantısı Başarısız.    HATA:', error);
         return false;
     }
 }

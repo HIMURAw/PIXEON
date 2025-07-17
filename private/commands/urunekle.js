@@ -4,35 +4,8 @@ const Config = require('../../config.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('urunekle')
-        .setDescription('Bir ürünü seçilen kanala embed olarak ekler.')
-        .addChannelOption(option =>
-            option.setName('kanal')
-                .setDescription('Ürünün gönderileceği kanal')
-                .setRequired(true)
-                .addChannelTypes(ChannelType.GuildText)
-        )
-        .addStringOption(option =>
-            option.setName('foto')
-                .setDescription('Ürün fotoğrafının URL adresi')
-                .setRequired(true)
-        )
-        .addStringOption(option =>
-            option.setName('fiyat')
-                .setDescription('Ürün fiyatı (TL)')
-                .setRequired(true)
-        )
-        .addStringOption(option =>
-            option.setName('bilgi')
-                .setDescription('Ürün başlığı veya kısa açıklaması')
-                .setRequired(true)
-        )
-        .addStringOption(option =>
-            option.setName('detaylar')
-                .setDescription('Ekstra detaylar (isteğe bağlı)')
-                .setRequired(false)
-        )
-        .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages),
+        .setName('urun-ekle')
+        .setDescription('Bir ürünü seçilen kanala embed olarak ekler.'),
 
     async execute(interaction) {
         const channel = interaction.options.getChannel('kanal');

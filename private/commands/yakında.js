@@ -3,15 +3,8 @@ const Config = require('../../config.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('yakında')
-        .setDescription('Yakında satışa çıkacak ürün için embed duyurusu gönderir.')
-        .addChannelOption(option =>
-            option.setName('kanal')
-                .setDescription('Embed mesajının gönderileceği kanal')
-                .setRequired(true)
-                .addChannelTypes(ChannelType.GuildText)
-        )
-        .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages),
+        .setName('yakinda')
+        .setDescription('Yakında satışa çıkacak ürün için embed duyurusu gönderir.'),
     async execute(interaction) {
         const channel = interaction.options.getChannel('kanal');
         await interaction.deferReply({ flags: 64 });

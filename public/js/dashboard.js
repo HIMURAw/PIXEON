@@ -1497,7 +1497,7 @@ async function loadDiscordLoginHistory() {
                     result = await response.json();
                 } catch (jsonErr) {
                     // If not JSON, show error and fallback to sample data
-                    console.error('API yanıtı JSON değil:', jsonErr);
+                    console.error('%c[PX-Main] API yanıtı JSON değil:', 'color: #fff; background: #e53935; font-weight: bold; padding:2px 6px; border-radius:4px;', jsonErr);
                     container.innerHTML = '<div class="loading-spinner">API yanıtı beklenmeyen formatta (JSON değil).</div>';
                     data = generateSampleData(tabId);
                     renderTabData(container, data, tabId);
@@ -1513,7 +1513,7 @@ async function loadDiscordLoginHistory() {
             }
             renderTabData(container, data, tabId);
         } catch (error) {
-            console.error('Error loading tab data:', error);
+            console.error('%c[PX-Main] Error loading tab data:', 'color: #fff; background: #e53935; font-weight: bold; padding:2px 6px; border-radius:4px;', error);
             container.innerHTML = '<div class="loading-spinner">Veri yüklenirken hata oluştu.</div>';
         }
     }
@@ -1950,7 +1950,7 @@ async function loadLoginHistory() {
             showError('Failed to load users');
         }
     } catch (error) {
-        console.error('Error loading login history:', error);
+        console.error('%c[PX-Main] Error loading login history:', 'color: #fff; background: #e53935; font-weight: bold; padding:2px 6px; border-radius:4px;', error);
         showError('Error loading users');
     }
 }

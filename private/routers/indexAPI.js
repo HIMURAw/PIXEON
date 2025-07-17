@@ -18,7 +18,7 @@ router.get('/discord/products/average-rating', async (req, res) => {
 
         const result = rows[0];
 
-        console.log('Database result:', result); // Debug için
+        console.log('\x1b[90m🐞 [PX-API] Database result:\x1b[0m', result); // Debug için
 
         // Eğer hiç feedback yoksa varsayılan değer döndür
         if (result.totalFeedbacks === 0 || result.averageRating === null) {

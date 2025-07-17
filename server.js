@@ -1,16 +1,17 @@
 const express = require('express');
 const path = require('path');
-const { Client, GatewayIntentBits, Events, Collection, REST, Routes } = require('discord.js');
+const { Client, GatewayIntentBits, Events, EmbedBuilder } = require('discord.js');
 const Config = require('./config.js');
 const { createAdminsTable } = require('./private/DB/models/userModel');
-const { joinVoiceChannel, getVoiceConnection } = require('@discordjs/voice');
-const fs = require('fs');
-const { pool, checkConnection } = require('./private/DB/connect');
+const { pool } = require('./private/DB/connect');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
-const { EmbedBuilder } = require('discord.js');
+const util = require('util');
+const { loadCommands } = require('./private/handlers/commands');
+const { loadEvents } = require('./private/handlers/events');
 
 require('./private/TicketSystem/index.js')
+require('./private/GuardSystem/index.js')
 
 // Node.js 18+ için fetch kullan, değilse node-fetch yükle
 let fetch;
@@ -106,7 +107,7 @@ async function saveLicenseLog(logData) {
             error_message
         ]);
 
-        console.log('✅ License log saved successfully');
+        console.log('\x1b[32m✅ [PX-API]\x1b[0m License log saved successfully');
     } catch (error) {
         console.error('❌ License log save error:', error);
     }
@@ -143,143 +144,17 @@ const client = new Client({
 // Client'ı hemen export et
 module.exports = client;
 
-// Discord bot token
+// Komutları yükle
+console.log('\x1b[36m[PX-API]\x1b[0m Komut Yükleme Başladı ===');
+const commands = loadCommands(client);
+console.log('\x1b[38;5;208m[PX-API]\x1b[0m Komut yükleme başlatıldı...');
+console.log('\x1b[38;5;208m[PX-API]\x1b[0m\n=== Komut Yükleme Tamamlandı ===');
+
+loadEvents(client);
+
+
 const token = Config.discord.token;
 
-// Komutları yükle
-console.log('\n=== Komut Yükleme Başladı ===');
-client.commands = new Collection();
-const commandsPath = path.join(__dirname, 'private', 'commands');
-const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
-
-console.log('🔄 Starting command registration process...');
-
-const commands = [];
-
-for (const file of commandFiles) {
-    const filePath = path.join(commandsPath, file);
-    console.log(`\nYükleniyor: ${file}`);
-
-    try {
-        const command = require(filePath);
-        if ('data' in command && 'execute' in command) {
-            client.commands.set(command.data.name, command);
-            commands.push(command.data.toJSON());
-            console.log(`✅ ${command.data.name} komutu başarıyla yüklendi`);
-            console.log(`   Açıklama: ${command.data.description}`);
-        } else {
-            console.log(`❌ ${file} dosyasında gerekli özellikler eksik`);
-            console.log('   Gerekli özellikler: data ve execute');
-        }
-    } catch (error) {
-        console.error(`❌ ${file} yüklenirken hata oluştu:`);
-        console.error(error);
-    }
-}
-
-console.log('\n=== Komut Yükleme Tamamlandı ===');
-console.log(`Toplam yüklenen komut: ${client.commands.size}`);
-console.log('Yüklenen komutlar:', Array.from(client.commands.keys()).join(', '));
-
-// Komutları Discord API'ye kaydet
-async function registerCommands() {
-    try {
-        console.log(`🔄 Started refreshing ${commands.length} application (/) commands.`);
-
-        if (!Config.discord.clientId) {
-            throw new Error('Client ID is missing in config.js');
-        }
-        if (!Config.discord.guidid) {
-            throw new Error('Guild ID (guidid) is missing in config.js');
-        }
-
-        const rest = new REST().setToken(token);
-        // Komutları sadece belirli bir sunucuya kaydet
-        const data = await rest.put(
-            Routes.applicationGuildCommands(Config.discord.clientId, Config.discord.guidid),
-            { body: commands },
-        );
-
-        console.log(`✅ Successfully reloaded ${data.length} guild application (/) commands.`);
-        console.log('📝 Registered commands:');
-        data.forEach(cmd => {
-            console.log(`   - /${cmd.name}: ${cmd.description}`);
-        });
-    } catch (error) {
-        console.error('❌ Error during command registration:', error);
-        if (error.code === 50001) {
-            console.error('Missing Access: The bot does not have the "applications.commands" scope');
-        } else if (error.code === 50013) {
-            console.error('Missing Permissions: The bot does not have the required permissions');
-        }
-    }
-}
-
-// Discord bot event handlers
-client.once(Events.ClientReady, async () => {
-    console.log(`Discord bot logged in as ${client.user.tag}`);
-    await registerCommands();
-});
-
-
-client.on(Events.InteractionCreate, async interaction => {
-    // Slash command handler
-    if (interaction.isChatInputCommand()) {
-        const command = client.commands.get(interaction.commandName);
-
-        if (!command) {
-            console.error(`No command matching ${interaction.commandName} was found.`);
-            return;
-        }
-
-        try {
-            await command.execute(interaction);
-        } catch (error) {
-            console.error(error);
-            if (interaction.replied || interaction.deferred) {
-                await interaction.followUp({ content: 'There was an error while executing this command!', flags: 64 });
-            } else {
-                await interaction.reply({ content: 'There was an error while executing this command!', flags: 64 });
-            }
-        }
-    }
-    
-    // Modal submit handler
-    if (interaction.isModalSubmit()) {
-        // Duyuru modal handler
-        if (interaction.customId.startsWith('sendMessageModal-')) {
-            const [modalId, channelId] = interaction.customId.split('-');
-            const message = interaction.fields.getTextInputValue('messageInput');
-
-            const channel = interaction.guild.channels.cache.get(channelId);
-            if (!channel) {
-                return interaction.reply({ content: '❌ Kanal bulunamadı.', flags: 64 });
-            }
-
-            const embed = new EmbedBuilder()
-                .setColor('#3498db')
-                .setTitle('📢 Yeni Duyuru')
-                .setDescription(message)
-                .setFooter({ text: `Gönderen: ${interaction.user.tag}` })
-                .setTimestamp();
-
-            // Önce embed'i gönder, sonra everyone mention'ı ekle
-            await channel.send({ content: '@everyone | @Here', embeds: [embed] });
-
-            await interaction.reply({ content: `✅ Duyuru başarıyla ${channel} kanalına gönderildi!`, flags: 64 });
-        }
-        
-        // Dümdüz mesaj modal handler
-        if (interaction.customId === 'sendPlainMessageModal') {
-            const message = interaction.fields.getTextInputValue('plainMessageInput');
-            
-            // Bot'un kullandığı kanala gönder
-            await interaction.channel.send(message);
-            
-            await interaction.reply({ content: '✅ Mesaj başarıyla gönderildi!', flags: 64 });
-        }
-    }
-});
 
 client.on(Events.Error, error => {
     console.error('Discord bot error:', error);
@@ -377,14 +252,14 @@ app.get("/check_ip", async (req, res) => {
     const host = req.headers.host;
     const requestIP = req.ip || req.connection.remoteAddress;
 
-    console.log('🔐 IP verification request received:', {
+    console.log('\x1b[36m[PX-API]\x1b[0m IP verification request received:', util.inspect({
         requestedIP: ip,
         serverName: server_name,
         licenseKey: license_key,
         userAgent: userAgent,
         host: host,
         requestIP: requestIP
-    });
+    }, { colors: true, depth: 2 }));
 
     // IP adresi kontrolü
     if (!ip) {
@@ -440,13 +315,13 @@ app.get("/check_ip", async (req, res) => {
         
         if (result.length > 0) {
             const license = result[0];
-            console.log('✅ IP verification successful:', {
+            console.log('\x1b[32m✅ [PX-API]\x1b[0m IP verification successful:', util.inspect({
                 requestedIP: ip,
                 serverName: license.server_name,
                 licenseId: license.id,
                 requestIP: requestIP,
                 responseTime: responseTime
-            });
+            }, { colors: true, depth: 2 }));
             
             // Log kaydet
             await saveLicenseLog({
@@ -658,41 +533,15 @@ ROUTERS END
 */
 
 
-function joinVoice() {
-    let channel = client.channels.cache.get(Config.discord.voicechannel);
-    if (!channel) return console.error('[Bot] Ses kanalı bulunamadı!');
-    // Zaten bağlıysa tekrar bağlanma
-    const existing = getVoiceConnection(channel.guild.id);
-    if (existing && existing.joinConfig.channelId === channel.id) return;
-    joinVoiceChannel({
-        channelId: channel.id,
-        guildId: channel.guild.id,
-        adapterCreator: channel.guild.voiceAdapterCreator
-    });
-    console.log('[Bot] Ses kanalına bağlandı:', channel.name);
-}
-
-client.on('ready', () => {
-    setTimeout(joinVoice, 2000); // Bot hazır olduğunda sese gir
-});
-
-client.on('voiceStateUpdate', (oldState, newState) => {
-    // Eğer bot sesten atıldıysa veya bağlantı koptuysa tekrar gir
-    const channelId = Config.discord.voicechannel;
-    if (newState.id === client.user.id) {
-        if (!newState.channelId || newState.channelId !== channelId) {
-            setTimeout(joinVoice, 2000);
-        }
-    }
-});
-
+// (joinVoice fonksiyonu ve client.on('ready'), client.on('voiceStateUpdate') eventleri kaldırıldı)
 
 app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
+    console.log(`\x1b[38;5;208m[PX-API]\x1b[0m http://${Config.dev.domain}:${port}`);
 
     client.login(Config.discord.token).then(() => {
-        console.log('Discord bot başarıyla bağlandı');
+        console.log('\x1b[38;5;208m[PX-API]\x1b[0m Discord bot API başarıyla bağlandı');
     }).catch(error => {
-        console.error('Discord bot login error:', error);
+        console.error('\x1b[41m[PX-API] HATA\x1b[0m', error);
     });
 });
+

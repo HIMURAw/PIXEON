@@ -8,9 +8,10 @@ module.exports = {
     async execute(interaction) {
         const papara = Config.discord.shopBot.papara;
         const iban = Config.discord.shopBot.iban;
+        const ibanName = Config.discord.shopBot.ibanName;
 
         if (!papara && !iban) {
-            return interaction.reply({ content: 'Ödeme bilgileri ayarlanmamış.', ephemeral: true });
+            return interaction.reply({ content: 'Ödeme bilgileri ayarlanmamış.', flags: 64 });
         }
 
         const embed = new EmbedBuilder()
@@ -19,7 +20,7 @@ module.exports = {
             .setDescription('Aşağıdaki yöntemlerle ödeme yapabilirsiniz:')
             .addFields(
                 papara ? { name: 'Papara', value: `\`${papara}\`` } : null,
-                iban ? { name: 'IBAN', value: `\`${iban}\`` } : null
+                iban ? { name: 'IBAN', value: `\`${iban}\`\nİsim Soyisim: **${ibanName || '-'}**` } : null
             )
             .setFooter({ text: Config.discord.serverName })
             .setTimestamp();

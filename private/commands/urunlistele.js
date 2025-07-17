@@ -4,13 +4,8 @@ const Config = require('../../config.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('urunlistele')
-        .setDescription('Ürün kategorilerindeki kanalları ve ortalama yıldız puanlarını listeler.')
-        .addBooleanOption(option =>
-            option.setName('sadece_puanli')
-                .setDescription('Sadece puanı olan ürünleri göster')
-                .setRequired(false)
-        ),
+        .setName('urun-listele')
+        .setDescription('Ürün kategorilerindeki kanalları ve ortalama yıldız puanlarını listeler.'),
 
     async execute(interaction) {
         const onlyRated = interaction.options.getBoolean('sadece_puanli') || false;

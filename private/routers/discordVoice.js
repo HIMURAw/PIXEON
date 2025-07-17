@@ -97,7 +97,7 @@ async function logVoiceEvent(voiceData) {
         };
 
         await axios.post(Config.discord.log.VoiceWebhookURL, webhookData);
-        console.log(`Ses logu kaydedildi: ${voiceData.action} - ${voiceData.username} - ${voiceData.channelName}`);
+        console.log(`\x1b[38;5;208m🔊 [PX-API]\x1b[0m Ses logu kaydedildi: ${voiceData.action} - ${voiceData.username} - ${voiceData.channelName}`);
 
     } catch (error) {
         console.error('Ses logu kaydedilirken hata:', error);

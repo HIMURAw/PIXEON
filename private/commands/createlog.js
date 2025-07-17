@@ -3,9 +3,8 @@ const Config = require('../../config.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('create-log')
-        .setDescription('Gizli bir kategori, log kanalları ve webhooklar oluşturur.')
-        .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
+        .setName('log-olustur')
+        .setDescription('Gizli bir kategori, log kanalları ve webhooklar oluşturur.'),
     async execute(interaction) {
         await interaction.reply({ content: 'Log kategorisi, kanalları ve webhooklar oluşturuluyor...', flags: 64 });
 
@@ -35,7 +34,9 @@ module.exports = {
                 '⚫・invite-log',
                 '⚫・server-log',
                 '⚫・licanse-log',
-                '⚫・ticket-log'
+                '⚫・ticket-log',
+                '⚫・partner-log',
+                '⚫・guard-log'
             ];
 
             const webhookInfoList = [];
@@ -77,7 +78,7 @@ module.exports = {
             });
 
         } catch (err) {
-            console.error('Hata:', err);
+            console.error('\x1b[41m[PX-Ticket] HATA\x1b[0m', err);
             await interaction.editReply({ content: '❌ Bir hata oluştu. Konsolu kontrol et.' });
         }
     }
