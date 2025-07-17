@@ -472,6 +472,23 @@ CREATE TABLE IF NOT EXISTS `discord_guard_logs` (
   KEY `created_at` (`created_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- Guard Botu Olay Logları Tablosu
+CREATE TABLE IF NOT EXISTS `discord_guard_action_log` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `event_type` varchar(64) NOT NULL,
+  `action` varchar(32) NOT NULL,
+  `user_id` varchar(32) NOT NULL,
+  `username` varchar(64) NOT NULL,
+  `target_id` varchar(64) DEFAULT NULL,
+  `target_name` varchar(255) DEFAULT NULL,
+  `details` json DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `event_type` (`event_type`),
+  KEY `user_id` (`user_id`),
+  KEY `created_at` (`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
