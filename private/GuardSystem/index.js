@@ -26,10 +26,10 @@ client.events = new Collection();
 // Bot ready event
 client.once('ready', () => {
     console.log(`\x1b[32m[PX-Guard]\x1b[0m ${client.user.displayName} olarak giriş yapıldı!`);
-    
+
     // Set bot status
     client.user.setActivity('PX Development', { type: 'WATCHING' });
-    
+
     // Register commands after bot is ready
     registerCommands(client);
 });
@@ -67,10 +67,10 @@ process.on('SIGTERM', () => {
         // Load commands and events
         loadCommands(client);
         loadEvents(client);
-        
+
         // Setup interaction handler
         handleInteraction(client);
-        
+
         // Login to Discord
         await client.login(token);
     } catch (error) {
