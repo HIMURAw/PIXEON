@@ -39,8 +39,7 @@
                                     Dashboard</a>
                             </li>
                             <li><a href="#activity-dashboard-content" class="dashboard-subitem"><span
-                                        class="submenu-dot"></span><i class="fa-solid fa-chart-line"></i> Activity
-                                    Dashboard</a>
+                                        class="submenu-dot"></span><i class="fa-solid fa-shield"></i> Guard Dashboard</a>
                             </li>
                         </ul>
                     </li>
@@ -48,7 +47,7 @@
                     <li class="sidebar-parent" id="logMenu">
                         <a href="#" class="sidebar-parent-toggle">
                             <i class="fa-solid fa-clock"></i>
-                            <span>Log</span>
+                            <span>System Log</span>
                             <i class="fas fa-chevron-down sidebar-arrow"></i>
                         </a>
                         <ul class="sidebar-submenu" style="display: none;">
@@ -66,6 +65,18 @@
                                         class="fa-solid fa-chart-line"></i> Activity
                                     History</a>
                             </li>
+                        </ul>
+                    </li>
+                    <!-- GUARD LOG MENU BAŞLANGIÇ -->
+                    <li class="sidebar-parent" id="guardLogMenu">
+                        <a href="#" class="sidebar-parent-toggle">
+                            <i class="fa-solid fa-shield-alt"></i>
+                            <span>Guard Log</span>
+                            <i class="fas fa-chevron-down sidebar-arrow"></i>
+                        </a>
+                        <ul class="sidebar-submenu" style="display: none;">
+                            <li><a href="#guard-actions-log" class="guard-log-subitem"><span class="submenu-dot"></span><i class="fa-solid fa-shield"></i> Guard Actions Log</a></li>
+                            <li><a href="#guard-user-log" class="guard-log-subitem"><span class="submenu-dot"></span><i class="fa-solid fa-user-shield"></i> Guard User Log</a></li>
                         </ul>
                     </li>
 
@@ -673,341 +684,163 @@
 
             <!-- Activity Dashboard Content -->
             <div class="activity-dashboard-content" id="activity-dashboard-content">
-                <!-- Aktivite İstatistikleri -->
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                            <i class="fa-solid fa-chart-line"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3>Günlük Aktivite</h3>
-                            <p id="dailyActivity">0</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-                            <i class="fa-solid fa-clock"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3>Pik Saatler</h3>
-                            <p id="peakHours">14:00-16:00</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
-                            <i class="fa-solid fa-calendar"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3>Haftalık Trend</h3>
-                            <p id="weeklyTrend">+15%</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
-                            <i class="fa-solid fa-trophy"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3>En Aktif Kullanıcı</h3>
-                            <p id="topPerformer">-</p>
-                        </div>
+    <!-- Guard İstatistikleri -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <i class="fa-solid fa-shield-alt"></i>
+            </div>
+            <div class="stat-info">
+                <h3>Toplam Guard Log</h3>
+                <p id="totalGuardLogs">0</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                <i class="fa-solid fa-user-shield"></i>
+            </div>
+            <div class="stat-info">
+                <h3>Aktif Guard Kullanıcı</h3>
+                <p id="activeGuardUsers">0</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                <i class="fa-solid fa-ban"></i>
+            </div>
+            <div class="stat-info">
+                <h3>Engellenen Olay</h3>
+                <p id="blockedEvents">0</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                <i class="fa-solid fa-user-lock"></i>
+            </div>
+            <div class="stat-info">
+                <h3>Banlanan Kullanıcı</h3>
+                <p id="bannedGuardUsers">0</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Guard Log Özeti -->
+    <div class="sales-summary">
+        <h2>Guard Log Özeti</h2>
+        <p class="last-updated">Son güncelleme: <span id="guardLastUpdated">-</span></p>
+    </div>
+
+    <!-- Guard Detayları -->
+    <div class="discord-details">
+        <!-- Son Guard Logları -->
+        <div class="detail-card">
+            <div class="card-header">
+                <h3><i class="fa-solid fa-shield"></i> Son Guard Logları</h3>
+                <div class="card-actions">
+                    <button class="btn-refresh" title="Yenile" onclick="fetchGuardActionsLog()">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-content">
+                <div id="guardActionsLogTableContainer">
+                    <div class="loading-spinner" id="guardActionsLogLoading"><i class="fas fa-spinner fa-spin"></i> Yükleniyor...</div>
+                    <table class="guard-log-table" id="guardActionsLogTable" style="display:none;">
+                        <thead>
+                            <tr>
+                                <th>Tarih</th>
+                                <th>Event</th>
+                                <th>Aksiyon</th>
+                                <th>Kullanıcı</th>
+                                <th>Hedef</th>
+                                <th>Detaylar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- JS ile doldurulacak -->
+                        </tbody>
+                    </table>
+                    <div class="empty-state" id="guardActionsLogEmpty" style="display:none;">
+                        <i class="fa-solid fa-shield"></i>
+                        <h4>Kayıt bulunamadı</h4>
+                        <p>Son guard aksiyon kaydı bulunamadı.</p>
                     </div>
                 </div>
+            </div>
+        </div>
 
-                <!-- Ek Aktivite İstatistikleri -->
-                <div class="stats-grid" style="margin-top: 20px;">
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
-                            <i class="fa-solid fa-users"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3>Aktif Kullanıcılar</h3>
-                            <p id="activeUsers">0</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
-                            <i class="fa-solid fa-comments"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3>Günlük Mesaj</h3>
-                            <p id="dailyMessages">0</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);">
-                            <i class="fa-solid fa-headset"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3>Ses Kanalı Kullanımı</h3>
-                            <p id="voiceUsage">0%</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);">
-                            <i class="fa-solid fa-calendar-day"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3>Bu Ay Aktivite</h3>
-                            <p id="monthlyActivity">0</p>
-                        </div>
+        <!-- Aktif Guard Kullanıcılar -->
+        <div class="detail-card">
+            <div class="card-header">
+                <h3><i class="fa-solid fa-user-shield"></i> Aktif Guard Kullanıcılar</h3>
+                <div class="card-actions">
+                    <button class="btn-refresh" title="Yenile" onclick="fetchGuardUserLog()">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-content">
+                <div id="guardUserLogTableContainer">
+                    <div class="loading-spinner" id="guardUserLogLoading"><i class="fas fa-spinner fa-spin"></i> Yükleniyor...</div>
+                    <table class="guard-log-table" id="guardUserLogTable" style="display:none;">
+                        <thead>
+                            <tr>
+                                <th>Tarih</th>
+                                <th>Kullanıcı</th>
+                                <th>Aksiyon</th>
+                                <th>Eski Seviye</th>
+                                <th>Yeni Seviye</th>
+                                <th>Yetki Değişimi</th>
+                                <th>Moderatör</th>
+                                <th>Sebep</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- JS ile doldurulacak -->
+                        </tbody>
+                    </table>
+                    <div class="empty-state" id="guardUserLogEmpty" style="display:none;">
+                        <i class="fa-solid fa-user-shield"></i>
+                        <h4>Kayıt bulunamadı</h4>
+                        <p>Son guard kullanıcı log kaydı bulunamadı.</p>
                     </div>
                 </div>
-
-                <!-- Aktivite Özeti -->
-                <div class="sales-summary">
-                    <h2>Aktivite Özeti</h2>
-                    <p class="last-updated">Son güncelleme: <span id="activityLastUpdated">-</span></p>
+            </div>
+        </div>
+        <!-- Guarda Kayıtlı Kullanıcılar Tablosu -->
+        <div class="detail-card">
+            <div class="card-header">
+                <h3><i class="fa-solid fa-users"></i> Guarda Kayıtlı Kullanıcılar</h3>
+                <div class="card-actions">
+                    <button class="btn-refresh" title="Yenile" onclick="fetchGuardRegisteredUsers()">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
                 </div>
-
-                <!-- Aktivite Detayları -->
-                <div class="discord-details">
-                    <!-- Gerçek Zamanlı Aktivite -->
-                    <div class="detail-card">
-                        <div class="card-header">
-                            <h3><i class="fas fa-broadcast-tower"></i> Gerçek Zamanlı Aktivite</h3>
-                            <div class="card-actions">
-                                <button class="btn-refresh" title="Yenile" onclick="refreshRealTimeActivity()">
-                                    <i class="fas fa-sync-alt"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="card-content">
-                            <div class="real-time-activity" id="realTimeActivity">
-                                <div class="activity-stream">
-                                    <div class="activity-item">
-                                        <div class="activity-icon">
-                                            <i class="fas fa-user-plus"></i>
-                                        </div>
-                                        <div class="activity-content">
-                                            <span class="activity-user">Yeni kullanıcı katıldı</span>
-                                            <span class="activity-time">2 dakika önce</span>
-                                        </div>
-                                    </div>
-                                    <div class="activity-item">
-                                        <div class="activity-icon">
-                                            <i class="fas fa-comment"></i>
-                                        </div>
-                                        <div class="activity-content">
-                                            <span class="activity-user">Mesaj gönderildi</span>
-                                            <span class="activity-time">5 dakika önce</span>
-                                        </div>
-                                    </div>
-                                    <div class="activity-item">
-                                        <div class="activity-icon">
-                                            <i class="fas fa-headset"></i>
-                                        </div>
-                                        <div class="activity-content">
-                                            <span class="activity-user">Ses kanalına katıldı</span>
-                                            <span class="activity-time">8 dakika önce</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Aktivite Grafiği -->
-                    <div class="detail-card">
-                        <div class="card-header">
-                            <h3><i class="fas fa-chart-area"></i> Aktivite Grafiği</h3>
-                            <div class="card-actions">
-                                <select id="activityChartPeriod" onchange="updateActivityChart()">
-                                    <option value="24">Son 24 Saat</option>
-                                    <option value="7">Son 7 Gün</option>
-                                    <option value="30">Son 30 Gün</option>
-                                </select>
-                                <button class="btn-refresh" title="Yenile" onclick="refreshActivityChart()">
-                                    <i class="fas fa-sync-alt"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="card-content">
-                            <div class="activity-chart">
-                                <canvas id="activityChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- En Aktif Kullanıcılar -->
-                    <div class="detail-card">
-                        <div class="card-header">
-                            <h3><i class="fas fa-trophy"></i> En Aktif Kullanıcılar</h3>
-                            <div class="card-actions">
-                                <button class="btn-refresh" title="Yenile" onclick="refreshTopUsers()">
-                                    <i class="fas fa-sync-alt"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="card-content">
-                            <div class="top-users-list" id="topUsersList">
-                                <div class="user-item">
-                                    <div class="user-rank">1</div>
-                                    <div class="user-avatar">
-                                        <img src="https://cdn.discordapp.com/embed/avatars/0.png" alt="User">
-                                    </div>
-                                    <div class="user-info">
-                                        <div class="user-name">Kullanıcı 1</div>
-                                        <div class="user-activity">Aktivite: 95%</div>
-                                    </div>
-                                    <div class="user-score">95</div>
-                                </div>
-                                <div class="user-item">
-                                    <div class="user-rank">2</div>
-                                    <div class="user-avatar">
-                                        <img src="https://cdn.discordapp.com/embed/avatars/1.png" alt="User">
-                                    </div>
-                                    <div class="user-info">
-                                        <div class="user-name">Kullanıcı 2</div>
-                                        <div class="user-activity">Aktivite: 87%</div>
-                                    </div>
-                                    <div class="user-score">87</div>
-                                </div>
-                                <div class="user-item">
-                                    <div class="user-rank">3</div>
-                                    <div class="user-avatar">
-                                        <img src="https://cdn.discordapp.com/embed/avatars/2.png" alt="User">
-                                    </div>
-                                    <div class="user-info">
-                                        <div class="user-name">Kullanıcı 3</div>
-                                        <div class="user-activity">Aktivite: 82%</div>
-                                    </div>
-                                    <div class="user-score">82</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Kanal Aktivitesi -->
-                    <div class="detail-card">
-                        <div class="card-header">
-                            <h3><i class="fas fa-hashtag"></i> Kanal Aktivitesi</h3>
-                            <div class="card-actions">
-                                <button class="btn-refresh" title="Yenile" onclick="refreshChannelActivity()">
-                                    <i class="fas fa-sync-alt"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="card-content">
-                            <div class="channel-activity">
-                                <div class="channel-item">
-                                    <div class="channel-icon">
-                                        <i class="fas fa-hashtag"></i>
-                                    </div>
-                                    <div class="channel-info">
-                                        <div class="channel-name">genel</div>
-                                        <div class="channel-stats">
-                                            <span>Mesaj: 1,234</span>
-                                            <span>Kullanıcı: 45</span>
-                                        </div>
-                                    </div>
-                                    <div class="channel-activity-bar">
-                                        <div class="activity-fill" style="width: 85%"></div>
-                                    </div>
-                                </div>
-                                <div class="channel-item">
-                                    <div class="channel-icon">
-                                        <i class="fas fa-hashtag"></i>
-                                    </div>
-                                    <div class="channel-info">
-                                        <div class="channel-name">sohbet</div>
-                                        <div class="channel-stats">
-                                            <span>Mesaj: 856</span>
-                                            <span>Kullanıcı: 32</span>
-                                        </div>
-                                    </div>
-                                    <div class="channel-activity-bar">
-                                        <div class="activity-fill" style="width: 65%"></div>
-                                    </div>
-                                </div>
-                                <div class="channel-item">
-                                    <div class="channel-icon">
-                                        <i class="fas fa-headset"></i>
-                                    </div>
-                                    <div class="channel-info">
-                                        <div class="channel-name">Ses Kanalı</div>
-                                        <div class="channel-stats">
-                                            <span>Kullanıcı: 12</span>
-                                            <span>Süre: 2h 30m</span>
-                                        </div>
-                                    </div>
-                                    <div class="channel-activity-bar">
-                                        <div class="activity-fill" style="width: 45%"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Zaman Analizi -->
-                    <div class="detail-card">
-                        <div class="card-header">
-                            <h3><i class="fas fa-clock"></i> Zaman Analizi</h3>
-                            <div class="card-actions">
-                                <button class="btn-refresh" title="Yenile" onclick="refreshTimeAnalysis()">
-                                    <i class="fas fa-sync-alt"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="card-content">
-                            <div class="time-analysis">
-                                <div class="time-chart">
-                                    <canvas id="timeChart"></canvas>
-                                </div>
-                                <div class="time-metrics">
-                                    <div class="time-metric">
-                                        <span class="metric-label">En Aktif Saat</span>
-                                        <span class="metric-value" id="peakHour">14:00</span>
-                                    </div>
-                                    <div class="time-metric">
-                                        <span class="metric-label">En Aktif Gün</span>
-                                        <span class="metric-value" id="peakDay">Cumartesi</span>
-                                    </div>
-                                    <div class="time-metric">
-                                        <span class="metric-label">Ortalama Oturum</span>
-                                        <span class="metric-value" id="avgSession">2h 15m</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Aktivite Performansı -->
-                    <div class="detail-card">
-                        <div class="card-header">
-                            <h3><i class="fas fa-tachometer-alt"></i> Aktivite Performansı</h3>
-                            <div class="card-actions">
-                                <button class="btn-refresh" title="Yenile" onclick="refreshActivityPerformance()">
-                                    <i class="fas fa-sync-alt"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="card-content">
-                            <div class="activity-performance">
-                                <div class="performance-item">
-                                    <div class="performance-label">Kullanıcı Katılımı</div>
-                                    <div class="performance-value" id="userEngagement">78%</div>
-                                    <div class="performance-bar">
-                                        <div class="performance-fill" id="engagementBar" style="width: 78%"></div>
-                                    </div>
-                                </div>
-                                <div class="performance-item">
-                                    <div class="performance-label">Mesaj Aktivitesi</div>
-                                    <div class="performance-value" id="messageActivity">65%</div>
-                                    <div class="performance-bar">
-                                        <div class="performance-fill" id="messageBar" style="width: 65%"></div>
-                                    </div>
-                                </div>
-                                <div class="performance-item">
-                                    <div class="performance-label">Ses Kanalı Kullanımı</div>
-                                    <div class="performance-value" id="voiceActivity">45%</div>
-                                    <div class="performance-bar">
-                                        <div class="performance-fill" id="voiceBar" style="width: 45%"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+            </div>
+            <div class="card-content">
+                <div id="guardRegisteredUsersContainer">
+                    <div class="loading-spinner" id="guardRegisteredUsersLoading"><i class="fas fa-spinner fa-spin"></i> Yükleniyor...</div>
+                    <table class="guard-log-table" id="guardRegisteredUsersTable" style="display:none;">
+                        <thead>
+                            <tr>
+                                <th>Kullanıcı</th>
+                                <th>Son Seviye</th>
+                                <th>Son İşlem Tarihi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- JS ile doldurulacak -->
+                        </tbody>
+                    </table>
+                    <div class="empty-state" id="guardRegisteredUsersEmpty" style="display:none;">
+                        <i class="fa-solid fa-users"></i>
+                        <h4>Kayıtlı kullanıcı bulunamadı</h4>
+                        <p>Guarda kayıtlı kullanıcı yok.</p>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
             </div>
 
             <!-- Activity History Content -->
@@ -1622,7 +1455,7 @@
             </div>
             <!-- Ticket Log Content -->
             <div class="ticket-log-content" id="ticket-log-content" style="display: none;">
-                <h2><i class="fa-solid fa-ticket-alt"></i> Ticket Log Dosyaları</h2>
+                <h2><i class="fa-solid fa-ticket-alt"></i> Ticket Log Dosyalar675ı</h2>
                 <div class="ticket-log-list" id="ticketLogList">
                     <div class="loading-spinner">
                         <i class="fas fa-spinner fa-spin"></i>
@@ -1631,7 +1464,88 @@
                 </div>
             </div>
 
-
+            <!-- GUARD ACTIONS LOG CONTENT -->
+            <div class="dashboard-content" id="guard-actions-log" style="display:none;">
+                <div class="detail-card">
+                    <div class="card-header">
+                        <h3><i class="fa-solid fa-shield"></i> Guard Actions Log</h3>
+                        <div class="card-actions">
+                            <button class="btn-refresh" id="refreshGuardActionsLog" title="Yenile"><i class="fas fa-sync-alt"></i></button>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div class="search-bar" style="margin-bottom: 1rem;">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="searchGuardActionsLog" placeholder="Kullanıcı, event veya aksiyon ara...">
+                        </div>
+                        <div id="guardActionsLogTableContainer">
+                            <div class="loading-spinner" id="guardActionsLogLoading"><i class="fas fa-spinner fa-spin"></i> Yükleniyor...</div>
+                            <table class="guard-log-table" id="guardActionsLogTable" style="display:none;">
+                                <thead>
+                                    <tr>
+                                        <th>Tarih</th>
+                                        <th>Event</th>
+                                        <th>Aksiyon</th>
+                                        <th>Kullanıcı</th>
+                                        <th>Hedef</th>
+                                        <th>Detaylar</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- JS ile doldurulacak -->
+                                </tbody>
+                            </table>
+                            <div class="empty-state" id="guardActionsLogEmpty" style="display:none;">
+                                <i class="fa-solid fa-shield"></i>
+                                <h4>Kayıt bulunamadı</h4>
+                                <p>Son guard aksiyon kaydı bulunamadı.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- GUARD USER LOG CONTENT -->
+            <div class="dashboard-content" id="guard-user-log" style="display:none;">
+                <div class="detail-card">
+                    <div class="card-header">
+                        <h3><i class="fa-solid fa-user-shield"></i> Guard User Log</h3>
+                        <div class="card-actions">
+                            <button class="btn-refresh" id="refreshGuardUserLog" title="Yenile"><i class="fas fa-sync-alt"></i></button>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div class="search-bar" style="margin-bottom: 1rem;">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="searchGuardUserLog" placeholder="Kullanıcı, aksiyon veya seviye ara...">
+                        </div>
+                        <div id="guardUserLogTableContainer">
+                            <div class="loading-spinner" id="guardUserLogLoading"><i class="fas fa-spinner fa-spin"></i> Yükleniyor...</div>
+                            <table class="guard-log-table" id="guardUserLogTable" style="display:none;">
+                                <thead>
+                                    <tr>
+                                        <th>Tarih</th>
+                                        <th>Kullanıcı</th>
+                                        <th>Aksiyon</th>
+                                        <th>Eski Seviye</th>
+                                        <th>Yeni Seviye</th>
+                                        <th>Yetki Değişimi</th>
+                                        <th>Moderatör</th>
+                                        <th>Sebep</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- JS ile doldurulacak -->
+                                </tbody>
+                            </table>
+                            <div class="empty-state" id="guardUserLogEmpty" style="display:none;">
+                                <i class="fa-solid fa-user-shield"></i>
+                                <h4>Kayıt bulunamadı</h4>
+                                <p>Son guard kullanıcı log kaydı bulunamadı.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
         </div>
     </main>

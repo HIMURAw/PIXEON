@@ -753,6 +753,39 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Sayfa yüklenince lisansları getir
     loadLicenses();
+
+    // Collapsible sidebar menu for Guard Log
+    const guardLogMenu = document.getElementById('guardLogMenu');
+    const guardLogToggle = guardLogMenu.querySelector('.sidebar-parent-toggle');
+    const guardLogSubmenu = guardLogMenu.querySelector('.sidebar-submenu');
+
+    guardLogToggle.addEventListener('click', function (e) {
+        e.preventDefault();
+        const isOpen = guardLogMenu.classList.contains('open');
+        if (isOpen) {
+            guardLogMenu.classList.add('closing');
+            setTimeout(() => {
+                guardLogMenu.classList.remove('open', 'closing');
+                guardLogSubmenu.style.display = 'none';
+            }, 300);
+        } else {
+            guardLogMenu.classList.add('open');
+            guardLogSubmenu.style.display = 'block';
+        }
+    });
+
+    // Guard Log alt menü itemleri için içerik gösterme
+    const guardLogSubitems = document.querySelectorAll('.guard-log-subitem');
+    guardLogSubitems.forEach(item => {
+        item.addEventListener('click', function (e) {
+            e.preventDefault();
+            const targetSection = this.getAttribute('href').replace('#', '');
+            showContent(targetSection);
+            // Aktiflik vurgusu
+            guardLogSubitems.forEach(i => i.parentElement.classList.remove('active'));
+            this.parentElement.classList.add('active');
+        });
+    });
 });
 
 function updateActiveBansCount() {
@@ -2446,3 +2479,370 @@ async function loadTicketLogFiles() {
         ticketLogList.innerHTML = '<div class="empty-state"><i class="fa-solid fa-exclamation-triangle" style="font-size:2rem;color:#ff5252;"></i><h4>Ticket log dosyaları yüklenemedi</h4></div>';
     }
 }
+
+// GUARD LOGS: İçerik gösterme, veri çekme ve tablo doldurma
+function showGuardLogContent(sectionId) {
+    // Tüm dashboard içeriklerini gizle
+    document.querySelectorAll('.dashboard-content').forEach(content => {
+        content.style.display = 'none';
+    });
+    // Sadece seçili olanı göster
+    const targetSection = document.getElementById(sectionId);
+    if (targetSection) {
+        targetSection.style.display = 'block';
+    }
+}
+
+// Menüde Guard Log altındaki itemlara tıklama
+const guardLogMenu = document.getElementById('guardLogMenu');
+if (guardLogMenu) {
+    guardLogMenu.querySelectorAll('.guard-log-subitem').forEach(item => {
+        item.addEventListener('click', function (e) {
+            e.preventDefault();
+            const href = this.getAttribute('href').substring(1);
+            showGuardLogContent(href);
+            // Aktiflik güncelle
+            guardLogMenu.querySelectorAll('li').forEach(li => li.classList.remove('active'));
+            this.parentElement.classList.add('active');
+        });
+    });
+}
+
+
+function renderGuardActionsLog(data) {
+    const table = document.getElementById('guardActionsLogTable');
+    const tbody = table.querySelector('tbody');
+    tbody.innerHTML = '';
+    if (!data || data.length === 0) {
+        table.style.display = 'none';
+        document.getElementById('guardActionsLogEmpty').style.display = 'block';
+        return;
+    }
+    document.getElementById('guardActionsLogEmpty').style.display = 'none';
+    table.style.display = '';
+    data.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${item.created_at}</td>
+            <td>${item.event_type}</td>
+            <td>${item.action}</td>
+            <td>${item.username}</td>
+            <td>${item.target_name || '-'}</td>
+            <td><pre style="white-space:pre-wrap;max-width:200px;">${item.details}</pre></td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+function renderGuardUserLog(data) {
+    const table = document.getElementById('guardUserLogTable');
+    const tbody = table.querySelector('tbody');
+    tbody.innerHTML = '';
+    if (!data || data.length === 0) {
+        table.style.display = 'none';
+        document.getElementById('guardUserLogEmpty').style.display = 'block';
+        return;
+    }
+    document.getElementById('guardUserLogEmpty').style.display = 'none';
+    table.style.display = '';
+    data.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${item.created_at}</td>
+            <td>${item.username}</td>
+            <td>${item.action}</td>
+            <td>${item.old_level || '-'}</td>
+            <td>${item.new_level || '-'}</td>
+            <td><pre style="white-space:pre-wrap;max-width:200px;">${item.permissions_changed}</pre></td>
+            <td>${item.moderator_username}</td>
+            <td>${item.reason || '-'}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+// Arama fonksiyonları
+function filterGuardActionsLog(query) {
+    const filtered = exampleGuardActionsLog.filter(item =>
+        item.username.toLowerCase().includes(query) ||
+        item.event_type.toLowerCase().includes(query) ||
+        item.action.toLowerCase().includes(query) ||
+        (item.target_name && item.target_name.toLowerCase().includes(query))
+    );
+    renderGuardActionsLog(filtered);
+}
+function filterGuardUserLog(query) {
+    const filtered = exampleGuardUserLog.filter(item =>
+        item.username.toLowerCase().includes(query) ||
+        item.action.toLowerCase().includes(query) ||
+        (item.old_level && item.old_level.toLowerCase().includes(query)) ||
+        (item.new_level && item.new_level.toLowerCase().includes(query))
+    );
+    renderGuardUserLog(filtered);
+}
+
+// Yenile butonları (örnek veriyle çalışıyor)
+document.getElementById('refreshGuardActionsLog')?.addEventListener('click', function() {
+    document.getElementById('guardActionsLogLoading').style.display = 'flex';
+    setTimeout(() => {
+        document.getElementById('guardActionsLogLoading').style.display = 'none';
+        renderGuardActionsLog(exampleGuardActionsLog);
+    }, 500);
+});
+document.getElementById('refreshGuardUserLog')?.addEventListener('click', function() {
+    document.getElementById('guardUserLogLoading').style.display = 'flex';
+    setTimeout(() => {
+        document.getElementById('guardUserLogLoading').style.display = 'none';
+        renderGuardUserLog(exampleGuardUserLog);
+    }, 500);
+});
+
+document.getElementById('searchGuardActionsLog')?.addEventListener('input', function() {
+    filterGuardActionsLog(this.value.toLowerCase());
+});
+document.getElementById('searchGuardUserLog')?.addEventListener('input', function() {
+    filterGuardUserLog(this.value.toLowerCase());
+});
+
+// İlk yüklemede logları göster (örnek veriyle)
+window.addEventListener('DOMContentLoaded', function() {
+    if (document.getElementById('guardActionsLogLoading')) {
+        setTimeout(() => {
+            document.getElementById('guardActionsLogLoading').style.display = 'none';
+            renderGuardActionsLog(exampleGuardActionsLog);
+        }, 500);
+    }
+    if (document.getElementById('guardUserLogLoading')) {
+        setTimeout(() => {
+            document.getElementById('guardUserLogLoading').style.display = 'none';
+            renderGuardUserLog(exampleGuardUserLog);
+        }, 500);
+    }
+});
+
+// ... existing code ...
+// GUARD LOGS: İçerik gösterme, veri çekme ve tablo doldurma
+let guardActionsLogData = [];
+let guardUserLogData = [];
+
+async function fetchGuardActionsLog() {
+    document.getElementById('guardActionsLogLoading').style.display = 'flex';
+    try {
+        const res = await fetch('/api/guard/guard-actions-log');
+        if (!res.ok) throw new Error('API hatası');
+        guardActionsLogData = await res.json();
+        renderGuardActionsLog(guardActionsLogData);
+    } catch (err) {
+        document.getElementById('guardActionsLogTable').style.display = 'none';
+        document.getElementById('guardActionsLogEmpty').style.display = 'block';
+        document.getElementById('guardActionsLogEmpty').querySelector('h4').textContent = 'Veri alınamadı';
+        document.getElementById('guardActionsLogEmpty').querySelector('p').textContent = 'Guard Actions Log verisi alınırken hata oluştu.';
+    } finally {
+        document.getElementById('guardActionsLogLoading').style.display = 'none';
+    }
+}
+
+async function fetchGuardUserLog() {
+    document.getElementById('guardUserLogLoading').style.display = 'flex';
+    try {
+        const res = await fetch('/api/guard/guard-user-log');
+        if (!res.ok) throw new Error('API hatası');
+        guardUserLogData = await res.json();
+        renderGuardUserLog(guardUserLogData);
+    } catch (err) {
+        document.getElementById('guardUserLogTable').style.display = 'none';
+        document.getElementById('guardUserLogEmpty').style.display = 'block';
+        document.getElementById('guardUserLogEmpty').querySelector('h4').textContent = 'Veri alınamadı';
+        document.getElementById('guardUserLogEmpty').querySelector('p').textContent = 'Guard User Log verisi alınırken hata oluştu.';
+    } finally {
+        document.getElementById('guardUserLogLoading').style.display = 'none';
+    }
+}
+
+function renderGuardActionsLog(data) {
+    const table = document.getElementById('guardActionsLogTable');
+    const tbody = table.querySelector('tbody');
+    tbody.innerHTML = '';
+    if (!data || data.length === 0) {
+        table.style.display = 'none';
+        document.getElementById('guardActionsLogEmpty').style.display = 'block';
+        return;
+    }
+    document.getElementById('guardActionsLogEmpty').style.display = 'none';
+    table.style.display = '';
+    data.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${item.created_at}</td>
+            <td>${item.event_type}</td>
+            <td>${item.action}</td>
+            <td>${item.username}</td>
+            <td>${item.target_name || '-'}</td>
+            <td><pre style="white-space:pre-wrap;max-width:200px;">${item.details}</pre></td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+function renderGuardUserLog(data) {
+    const table = document.getElementById('guardUserLogTable');
+    const tbody = table.querySelector('tbody');
+    tbody.innerHTML = '';
+    if (!data || data.length === 0) {
+        table.style.display = 'none';
+        document.getElementById('guardUserLogEmpty').style.display = 'block';
+        return;
+    }
+    document.getElementById('guardUserLogEmpty').style.display = 'none';
+    table.style.display = '';
+    data.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${item.created_at}</td>
+            <td>${item.username}</td>
+            <td>${item.action}</td>
+            <td>${item.old_level || '-'}</td>
+            <td>${item.new_level || '-'}</td>
+            <td><pre style="white-space:pre-wrap;max-width:200px;">${item.permissions_changed}</pre></td>
+            <td>${item.moderator_username}</td>
+            <td>${item.reason || '-'}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+// Arama fonksiyonları
+function filterGuardActionsLog(query) {
+    const filtered = guardActionsLogData.filter(item =>
+        (item.username && item.username.toLowerCase().includes(query)) ||
+        (item.event_type && item.event_type.toLowerCase().includes(query)) ||
+        (item.action && item.action.toLowerCase().includes(query)) ||
+        (item.target_name && item.target_name.toLowerCase().includes(query))
+    );
+    renderGuardActionsLog(filtered);
+}
+function filterGuardUserLog(query) {
+    const filtered = guardUserLogData.filter(item =>
+        (item.username && item.username.toLowerCase().includes(query)) ||
+        (item.action && item.action.toLowerCase().includes(query)) ||
+        (item.old_level && item.old_level.toLowerCase().includes(query)) ||
+        (item.new_level && item.new_level.toLowerCase().includes(query))
+    );
+    renderGuardUserLog(filtered);
+}
+
+// Yenile butonları
+if (document.getElementById('refreshGuardActionsLog')) {
+    document.getElementById('refreshGuardActionsLog').addEventListener('click', fetchGuardActionsLog);
+}
+if (document.getElementById('refreshGuardUserLog')) {
+    document.getElementById('refreshGuardUserLog').addEventListener('click', fetchGuardUserLog);
+}
+
+document.getElementById('searchGuardActionsLog')?.addEventListener('input', function() {
+    filterGuardActionsLog(this.value.toLowerCase());
+});
+document.getElementById('searchGuardUserLog')?.addEventListener('input', function() {
+    filterGuardUserLog(this.value.toLowerCase());
+});
+
+// İlk yüklemede logları göster (API'den)
+window.addEventListener('DOMContentLoaded', function() {
+    if (document.getElementById('guardActionsLogLoading')) {
+        fetchGuardActionsLog();
+    }
+    if (document.getElementById('guardUserLogLoading')) {
+        fetchGuardUserLog();
+    }
+});
+// ... existing code ...
+
+// GUARD DASHBOARD İSTATİSTİKLERİ
+async function loadGuardDashboardStats() {
+    try {
+        // Guard Actions Log
+        const actionsRes = await fetch('/api/guard/guard-actions-log');
+        const actionsData = await actionsRes.json();
+        document.getElementById('totalGuardLogs').textContent = actionsData.length;
+        // Engellenen olay sayısı (örnek: action === 'block')
+        const blockedCount = actionsData.filter(item => item.action === 'block').length;
+        document.getElementById('blockedEvents').textContent = blockedCount;
+        // Banlanan kullanıcı sayısı (örnek: event_type veya action === 'ban')
+        const bannedCount = actionsData.filter(item => item.action === 'ban').length;
+        document.getElementById('bannedGuardUsers').textContent = bannedCount;
+        // Guard User Log
+        const usersRes = await fetch('/api/guard/guard-user-log');
+        const usersData = await usersRes.json();
+        // Aktif guard kullanıcı (örnek: unique username veya status aktif olanlar)
+        const uniqueUsers = new Set(usersData.map(item => item.username));
+        document.getElementById('activeGuardUsers').textContent = uniqueUsers.size;
+        // Son güncelleme
+        document.getElementById('guardLastUpdated').textContent = new Date().toLocaleString('tr-TR');
+    } catch (err) {
+        document.getElementById('totalGuardLogs').textContent = '!';
+        document.getElementById('activeGuardUsers').textContent = '!';
+        document.getElementById('blockedEvents').textContent = '!';
+        document.getElementById('bannedGuardUsers').textContent = '!';
+        document.getElementById('guardLastUpdated').textContent = '-';
+    }
+}
+
+// Guard dashboard yüklendiğinde istatistikleri getir
+window.addEventListener('DOMContentLoaded', function() {
+    if (document.getElementById('totalGuardLogs')) {
+        loadGuardDashboardStats();
+    }
+});
+
+async function fetchGuardRegisteredUsers() {
+    const loading = document.getElementById('guardRegisteredUsersLoading');
+    const table = document.getElementById('guardRegisteredUsersTable');
+    const empty = document.getElementById('guardRegisteredUsersEmpty');
+    const tbody = table.querySelector('tbody');
+    loading.style.display = 'flex';
+    table.style.display = 'none';
+    empty.style.display = 'none';
+    try {
+        const res = await fetch('/api/guard/guard-user-log');
+        const data = await res.json();
+        // Unique kullanıcıları son işlem tarihine göre bul
+        const userMap = new Map();
+        data.forEach(item => {
+            if (!userMap.has(item.username) || new Date(item.created_at) > new Date(userMap.get(item.username).created_at)) {
+                userMap.set(item.username, item);
+            }
+        });
+        const users = Array.from(userMap.values());
+        tbody.innerHTML = '';
+        if (users.length === 0) {
+            empty.style.display = 'block';
+            table.style.display = 'none';
+            loading.style.display = 'none';
+            return;
+        }
+        users.forEach(user => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${user.username}</td>
+                <td>${user.new_level || '-'}</td>
+                <td>${new Date(user.created_at).toLocaleString('tr-TR')}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+        table.style.display = '';
+        empty.style.display = 'none';
+    } catch (err) {
+        tbody.innerHTML = '';
+        empty.style.display = 'block';
+        table.style.display = 'none';
+    } finally {
+        loading.style.display = 'none';
+    }
+}
+
+// Sayfa yüklendiğinde guarda kayıtlı kullanıcıları da getir
+window.addEventListener('DOMContentLoaded', function() {
+    if (document.getElementById('guardRegisteredUsersTable')) {
+        fetchGuardRegisteredUsers();
+    }
+});

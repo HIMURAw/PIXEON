@@ -31,7 +31,7 @@ client.once('ready', () => {
     client.user.setActivity('PX Development', { type: 'WATCHING' });
 
     // Register commands after bot is ready
-    registerCommands(client);
+    registerCommands(client, guildId);
 });
 
 // Error handling

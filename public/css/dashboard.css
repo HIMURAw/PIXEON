@@ -368,7 +368,7 @@ body {
     display: flex;
     flex-direction: column;
     padding: 20px;
-    max-height: 400px;
+    max-height: 800px;
     overflow-y: auto;
 }
 
@@ -5614,4 +5614,117 @@ body {
   font-size: 1.15rem;
   font-weight: 600;
   color: #fff;
+}
+
+/* GUARD LOG TABLES */
+.guard-log-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--card-bg);
+    color: var(--text-color);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    margin-bottom: 1rem;
+    font-size: 0.97rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+}
+.guard-log-table th, .guard-log-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border-color);
+    text-align: left;
+}
+.guard-log-table th {
+    background: var(--secondary-color);
+    color: var(--accent-color);
+    font-weight: 600;
+    font-size: 1rem;
+}
+.guard-log-table tr:last-child td {
+    border-bottom: none;
+}
+.guard-log-table tbody tr:hover {
+    background: #232a3a;
+    transition: background 0.2s;
+}
+@media (max-width: 900px) {
+    .guard-log-table th, .guard-log-table td {
+        padding: 8px 6px;
+        font-size: 0.92rem;
+    }
+}
+
+/* Guard Log Empty State */
+#guardActionsLogEmpty, #guardUserLogEmpty {
+    text-align: center;
+    color: var(--text-secondary);
+    margin: 2rem 0;
+}
+#guardActionsLogEmpty i, #guardUserLogEmpty i {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    color: var(--accent-color);
+}
+
+/* Guard Log Loading Spinner */
+#guardActionsLogLoading, #guardUserLogLoading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent-color);
+    font-size: 1.1rem;
+    margin: 2rem 0;
+}
+#guardActionsLogLoading i, #guardUserLogLoading i {
+    margin-right: 0.5rem;
+}
+
+/* Responsive Guard Log Card */
+#guard-actions-log .detail-card, #guard-user-log .detail-card {
+    background: var(--card-bg);
+    border-radius: var(--border-radius);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+    margin: 2rem auto;
+    max-width: 1200px;
+    padding: 1.5rem 2rem;
+}
+#guard-actions-log .card-header, #guard-user-log .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 1.2rem;
+}
+#guard-actions-log .card-header h3, #guard-user-log .card-header h3 {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    font-size: 1.3rem;
+    color: var(--accent-color);
+}
+#guard-actions-log .card-actions, #guard-user-log .card-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+#guard-actions-log .btn-refresh, #guard-user-log .btn-refresh {
+    background: var(--secondary-color);
+    color: var(--accent-color);
+    border: none;
+    border-radius: 6px;
+    padding: 7px 12px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.2s, color 0.2s;
+}
+#guard-actions-log .btn-refresh:hover, #guard-user-log .btn-refresh:hover {
+    background: var(--accent-color);
+    color: #fff;
+}
+@media (max-width: 700px) {
+    #guard-actions-log .detail-card, #guard-user-log .detail-card {
+        padding: 1rem 0.5rem;
+    }
+    .guard-log-table th, .guard-log-table td {
+        font-size: 0.85rem;
+    }
 }

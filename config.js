@@ -19,9 +19,9 @@ module.exports = {
     user: "root",            // MySQL kullanıcı adı
     password: "",            // MySQL şifresi
     database: "fivemwebpanel" // Kullanılacak veritabanı adı
-    },
+  },
   // Discord bot ve sunucu ayarları
-discord: {
+  discord: {
     token: "MTIzODI2ODU2MjE3MTIzNjM4NA.GxHzP7.2p7U9PZmEBhvy2JVXGVCUltY1UHtQc2SsSdLv8", // Ana Discord bot token'ı
     clientSecret: "qRcEVZsH2j4esmz0P14jNFVuLA8NBnCH", // Discord OAuth2 client secret
     clientId: "1238268562171236384", // Discord uygulama (bot) client ID'si
@@ -62,28 +62,28 @@ discord: {
       dolar: 40.17, // Dolar kuru (TL)
       euro: 46.97, // Euro kuru (TL)
       productCategoryIds: [ // Ürün kategorilerinin Discord kanal ID'leri
-            "1271181568077201560",
-            "1392450251843174430",
-            "1392450503710998588"
-        ]
+        "1271181568077201560",
+        "1392450251843174430",
+        "1392450503710998588"
+      ]
     },
     // Ticket botu ayarları
     ticketBot: {
-        ticket_bot_token: "MTMxMDk1NDM1NTg4NDY5MTQ4OA.GPQkOQ.KDdjELXNJkp7ZdvuoIwAeFeycz7M4o6uE9Nhsk", // Ticket sistemi için ayrı bot token'ı
-        clientId: "1310954355884691488",
-        catagory: "1269435075913846857",
-        trascriptChannelID: "1394989578015867040"
+      ticket_bot_token: "MTMxMDk1NDM1NTg4NDY5MTQ4OA.GvqDnG.81bGzbI350WeT5Zmm2DdOr6pZ0vosUOJ5CkUA4", // Ticket sistemi için ayrı bot token'ı
+      clientId: "1310954355884691488",
+      catagory: "1269435075913846857",
+      trascriptChannelID: "1394989578015867040"
     },
     partnerBot: {
       logChannel: '1395077219461759119',    // Başvuruların gideceği kanal
       categoryId: '1393597381630758973'  // Onaylanınca kanalın açılacağı kategori
     },
     guardBot: {
-      guard_bot_token: "MTI0NzMyNTY3OTMyNjk4NjI1MA.Gcb4rT.DaG50qGieo4OnV4O-vo6e4C6ZcEulxEASK547k",
+      guard_bot_token: "MTI0NzMyNTY3OTMyNjk4NjI1MA.GYfk5R.Sqhccp8RgabiVmT74ByzGa0i_SfnPzJBxSgLI0",
       guard_client_id: "1247325679326986250",
       guard_owner_id: "768372430631731210",
     }
-},
+  },
   // Web arayüzüyle ilgili ayarlar (şu an boş)
-    web: {}
+  web: {}
 }; 
