@@ -82,16 +82,16 @@ function handleInteraction(client) {
 /**
  * Register Commands - Slash komutları Discord'a kaydeder
  * @param {Client} client - Discord client instance
+ * @param {string} guildId - Discord sunucu (guild) ID'si
  */
-async function registerCommands(client) {
+async function registerCommands(client, guildId) {
     const commands = [];
     for (const command of client.commands.values()) {
         commands.push(command.data.toJSON());
     }
-    
     try {
-        await client.application.commands.set(commands);
-        console.log(`\x1b[32m[PX-Guard]\x1b[0m ${commands.length} komut başarıyla kaydedildi`);
+        await client.application.commands.set(commands, guildId); // Sadece bu sunucuya özel kaydet
+        console.log(`\x1b[32m[PX-Guard]\x1b[0m ${commands.length} komut sunucuya özel olarak kaydedildi (guildId: ${guildId})`);
     } catch (error) {
         console.error('\x1b[31m[PX-Guard]\x1b[0m Komut kaydetme hatası:', error);
     }

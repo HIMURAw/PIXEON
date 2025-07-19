@@ -4,7 +4,7 @@ const webhookLogger = require('../utils/webhookLogger');
 
 // Basit küfür listesi (isteğe göre genişletilebilir)
 const kufurler = [
-  'amk', 'aq', 'orospu', 'sik', 'piç', 'yarrak', 'ananı', 'anan', 'sikerim', 'sikik', 'salak', 'gerizekalı', 'mal', 'aptal', 'göt', 'pezevenk', 'kahpe', 'amına', 'amcık', 'amk', 'aq', 'mk', 'amq', 'amına koyim', 'amına koyayım'
+  'aq', 'orospu', 'sik', 'piç', 'yarrak', 'ananı', 'anan', 'sikerim', 'sikik', 'salak', 'gerizekalı', 'mal', 'aptal', 'göt', 'pezevenk', 'kahpe', 'amına', 'amcık', 'amk', 'aq', 'mk', 'amq', 'amına koyim', 'amına koyayım'
 ];
 
 // Link tespit regex'i

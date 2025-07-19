@@ -24,7 +24,12 @@ module.exports = {
       const deleted = await interaction.channel.bulkDelete(sayi, true);
       await interaction.reply({ content: `${deleted.size} mesaj başarıyla silindi.`, ephemeral: true });
     } catch (err) {
-      await interaction.reply({ content: 'Mesajlar silinirken bir hata oluştu. (14 günden eski mesajlar silinemez)', ephemeral: true });
+      if (!interaction.replied && !interaction.deferred) {
+        await interaction.reply({ content: 'Mesajlar silinirken bir hata oluştu. (14 günden eski mesajlar silinemez)', ephemeral: true });
+      } else {
+        // interaction zaten yanıtlandıysa tekrar yanıt verme, sadece logla
+        console.log('Mesaj silme hatası:', err);
+      }
     }
   }
 };
