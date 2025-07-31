@@ -1,0 +1,21 @@
+{
+  "name": "db",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "generate": "drizzle-kit generate:mysql",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.13.1",
+  "dependencies": {
+    "drizzle-orm": "^0.44.4",
+    "mysql2": "^3.14.3"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.31.4"
+  }
+}
