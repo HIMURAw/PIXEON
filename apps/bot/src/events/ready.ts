@@ -4,6 +4,6 @@ export default {
     name: 'ready',
     once: true,
     execute(client: Client) {
-        console.log(`🤖 Bot hazır! ${client.user?.tag} olarak giriş yaptı.`)
+        console.log(`🤖 Bot hazır! ${client.user?.displayName} olarak giriş yaptı.`)
     }
 }
