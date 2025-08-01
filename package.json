@@ -4,7 +4,8 @@
     "scripts": {
         "dev:bot": "ts-node-dev apps/bot/index.ts",
         "dev:web": "ts-node-dev apps/web/index.ts",
-        "dev:panel": "cd apps/panel && pnpm dev"
+        "dev:ui": "cd apps/UI && npm start",
+        "dev:db": "pnpm --filter \"db\" -- "
     },
     "devDependencies": {
         "ts-node-dev": "^2.0.0",
