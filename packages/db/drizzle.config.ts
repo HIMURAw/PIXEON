@@ -1,5 +1,3 @@
-// drizzle.config.ts
-// drizzle.config.ts
 import type { Config } from 'drizzle-kit';
 
 export default {
@@ -7,6 +5,6 @@ export default {
     out: './drizzle',
     driver: 'mysql2',
     dbCredentials: {
-        uri: 'mysql://root@localhost:3306/pxdevwebsitev3',
+        uri: "mysql://root@localhost:3306/pxdevwebsitev3",
     },
 } satisfies Config;
