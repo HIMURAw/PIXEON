@@ -5,8 +5,8 @@ const PORT = process.env.PORT || 3001;
 
 app.use(express.json());
 
-app.get('/api/ping', (req, res) => {
-    res.json({ message: 'pong' });
+app.get('/', (req, res) => {
+    res.send('PXWebsite API started');
 });
 
 app.listen(PORT, () => {
