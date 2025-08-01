@@ -12,10 +12,11 @@
   "license": "ISC",
   "packageManager": "pnpm@10.13.1",
   "dependencies": {
-    "drizzle-orm": "^0.44.4",
-    "mysql2": "^3.14.3"
+    "dotenv": "^17.2.1",
+    "drizzle-orm": "^0.30.10",
+    "mysql2": "^3.10.0"
   },
   "devDependencies": {
-    "drizzle-kit": "^0.31.4"
+    "drizzle-kit": "^0.20.13"
   }
 }
