@@ -1,10 +1,23 @@
-import { Client, GatewayIntentBits } from 'discord.js';
-const Config = require('config.ts');
+import { Client, GatewayIntentBits, Collection } from 'discord.js'
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const Config = require('./config.ts')
 
-client.once('ready', () => {
-    console.log(`Bot çalıştı: ${client.user?.tag}`);
-});
+import { loadCommands } from './src/handlers/commandHandler'
+import { loadEvents } from './src/handlers/eventHandler'
 
-client.login(Config.discord.TOKEN);
+const client = new Client({
+    intents: [
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.MessageContent
+    ]
+})
+
+client.commands = new Collection()
+
+loadCommands(client)
+loadEvents(client)
+
+export default client
+
+client.login(Config.discord.token)

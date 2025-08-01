@@ -1,5 +1,6 @@
 module.exports = {
     discord: {
-        TOKEN: ""
+        token: 'xxxxxxxxxxxxxxxxxxxxxxxxxx',
+        clientId: '1310954355884691488'
     }
 }
