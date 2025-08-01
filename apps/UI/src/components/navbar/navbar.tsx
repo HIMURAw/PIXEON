@@ -1,18 +1,58 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './navbar.scss';
 
 const Navbar: React.FC = () => {
+    const [isLoaded, setIsLoaded] = useState(false);
+
+    useEffect(() => {
+        
+        const timer = setTimeout(() => {
+            setIsLoaded(true);
+        }, 100);
+
+        return () => clearTimeout(timer);
+    }, []);
+
     return (
-        <div className="navbar">
-            <div className="logo">PXDev.Com.tr</div>
-            <ul className="navLinks">
-                <li><a href="#Home">Anasayfa</a></li>
-                <li><a href="#about">Hakkımızda</a></li>
-                <li><a href="#products">Ürünler</a></li>
-                <li><a href="#services">Hizmetlerimiz</a></li>
-                <li><a href="#contact">İletişim</a></li>
-            </ul>
-        </div>
+        <nav className={`navbar ${isLoaded ? 'navbar-loaded' : ''}`}>
+            <div className="navbar-container">
+                <div className="logo">
+                    <span className="logo-text">PXDev.com.tr</span>
+                </div>
+                <ul className="navLinks">
+                    <li className="nav-item">
+                        <a href="#Home" className="nav-link">
+                            <span className="link-text">Anasayfa</span>
+                            <span className="link-glow"></span>
+                        </a>
+                    </li>
+                    <li className="nav-item">
+                        <a href="#about" className="nav-link">
+                            <span className="link-text">Hakkımızda</span>
+                            <span className="link-glow"></span>
+                        </a>
+                    </li>
+                    <li className="nav-item">
+                        <a href="#products" className="nav-link">
+                            <span className="link-text">Ürünler</span>
+                            <span className="link-glow"></span>
+                        </a>
+                    </li>
+                    <li className="nav-item">
+                        <a href="#services" className="nav-link">
+                            <span className="link-text">Partnerlerimiz</span>
+                            <span className="link-glow"></span>
+                        </a>
+                    </li>
+                    <li className="nav-item">
+                        <a href="#contact" className="nav-link">
+                            <span className="link-text">İletişim</span>
+                            <span className="link-glow"></span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
     );
 };
 
