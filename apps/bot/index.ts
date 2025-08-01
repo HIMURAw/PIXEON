@@ -1,4 +1,5 @@
 import { Client, GatewayIntentBits, Collection } from 'discord.js'
+import { CustomClient } from './src/types'
 
 const Config = require('./config.ts')
 
@@ -11,7 +12,7 @@ const client = new Client({
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.MessageContent
     ]
-})
+}) as CustomClient;
 
 client.commands = new Collection()
 

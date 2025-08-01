@@ -1,14 +1,10 @@
 import { Events, Interaction, ChatInputCommandInteraction } from 'discord.js';
-
-type Command = {
-    data: any;
-    execute: (interaction: ChatInputCommandInteraction) => Promise<void>;
-};
+import { CustomClient, Command } from '../types';
 
 export default {
     name: Events.InteractionCreate,
     once: false,
-    async execute(interaction: Interaction) {
+    async execute(interaction: Interaction & { client: CustomClient }) {
         if (!interaction.isChatInputCommand()) return;
 
         const command = interaction.client.commands.get(interaction.commandName) as Command | undefined;

@@ -1,15 +1,12 @@
-import { Client, REST, Routes, Collection, SlashCommandBuilder, ChatInputCommandInteraction } from 'discord.js'
+import { REST, Routes, Collection } from 'discord.js'
 import fs from 'fs'
 import path from 'path'
 const Config = require('../../config')
 
-// Command tipi (isteğe bağlı ama önerilir)
-interface Command {
-    data: SlashCommandBuilder
-    execute: (interaction: ChatInputCommandInteraction) => Promise<void>
-}
+// Import types
+import { Command, CustomClient } from '../types'
 
-export async function loadCommands(client: Client & { commands: Collection<string, Command> }) {
+export async function loadCommands(client: CustomClient) {
     const commands: any[] = []
     const commandsPath = path.join(__dirname, '../commands')
 
