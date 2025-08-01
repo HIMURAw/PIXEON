@@ -7,6 +7,6 @@ export default {
     out: './drizzle',
     driver: 'mysql2',
     dbCredentials: {
-        connectionString: 'mysql://root@localhost:3306/pxdevwebsitev3',
+        uri: 'mysql://root@localhost:3306/pxdevwebsitev3',
     },
 } satisfies Config;
