@@ -1,7 +1,8 @@
 import express from 'express';
+const Config = require('./config.ts')
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = Config.port || 3001;
 
 app.use(express.json());
 
