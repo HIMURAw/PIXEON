@@ -23,31 +23,26 @@ const Navbar: React.FC = () => {
                     <li className="nav-item">
                         <a href="#Home" className="nav-link">
                             <span className="link-text">Anasayfa</span>
-                            <span className="link-glow"></span>
                         </a>
                     </li>
                     <li className="nav-item">
                         <a href="#about" className="nav-link">
                             <span className="link-text">Hakkımızda</span>
-                            <span className="link-glow"></span>
                         </a>
                     </li>
                     <li className="nav-item">
                         <a href="#products" className="nav-link">
                             <span className="link-text">Ürünler</span>
-                            <span className="link-glow"></span>
                         </a>
                     </li>
                     <li className="nav-item">
                         <a href="#services" className="nav-link">
                             <span className="link-text">Partnerlerimiz</span>
-                            <span className="link-glow"></span>
                         </a>
                     </li>
                     <li className="nav-item">
                         <a href="#contact" className="nav-link">
                             <span className="link-text">İletişim</span>
-                            <span className="link-glow"></span>
                         </a>
                     </li>
                 </ul>
