@@ -46,6 +46,10 @@ const Navbar: React.FC = () => {
                         </a>
                     </li>
                 </ul>
+                {/* <div className="profile">
+                    <img src="https://cdn.discordapp.com/attachments/1392486533696720918/1393597767409995806/pxdev-photoaidcom-cropped.png?ex=688ec74f&is=688d75cf&hm=9a6faffcdb12e8f103a5eb7a808015dd609e30e969beeece80839c771b355baa&" alt="Profile-image" />
+                    <p>HIMURA</p>
+                </div> */}
             </div>
         </nav>
     );
