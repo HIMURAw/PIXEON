@@ -133,7 +133,6 @@
     }
 
     .nav-item {
-        animation: fadeInUp 0.8s ease-out both;
 
         &:nth-child(1) {
             animation-delay: 0.4s;
@@ -178,10 +177,6 @@
             transform: scale(1.05);
         }
 
-        .link-glow {
-            opacity: 1;
-            transform: scale(1.2);
-        }
     }
 
     &:active {
@@ -195,19 +190,6 @@
     transition: transform 0.3s ease;
 }
 
-.link-glow {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(circle, rgba(0, 188, 212, 0.3) 0%, transparent 70%);
-    border-radius: 8px;
-    transform: translate(-50%, -50%) scale(0);
-    opacity: 0;
-    transition: all 0.3s ease;
-    z-index: 1;
-}
 
 @media (max-width: 768px) {
     .navbar-container {
@@ -233,7 +215,9 @@
 }
 
 .nav-link:hover {
-    animation: glow 2s ease-in-out infinite;
+    text-shadow: 0 0 20px rgba(0, 188, 212, 0.6);
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
 }
 
 html {
