@@ -1,6 +1,7 @@
 import express from 'express';
 import cookieParser from "cookie-parser";
-const Config = require('./config.ts')
+import Config from './config';
+import authRoute from './routes/auth';
 
 const app = express();
 const PORT = Config.port || 3001;
@@ -8,11 +9,8 @@ const PORT = Config.port || 3001;
 app.use(cookieParser());
 app.use(express.json());
 
-
 // ROUTERS 
-const authRoute = require('./routes/auth')
-
-app.use('/auth', authRoute)
+app.use('/auth', authRoute);
 
 
 
