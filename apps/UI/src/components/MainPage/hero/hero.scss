@@ -40,10 +40,8 @@
             stroke-dasharray: 1000;
             stroke-dashoffset: 1000;
             animation: drawOval 3s ease-in-out forwards;
-            filter: 
-                drop-shadow(0 0 8px rgba(0, 188, 212, 0.6))
-                drop-shadow(0 0 15px rgba(0, 188, 212, 0.4))
-                drop-shadow(0 0 25px rgba(0, 188, 212, 0.2));
+            filter:
+                drop-shadow(0 0 8px rgba(0, 188, 212, 0.6)) drop-shadow(0 0 15px rgba(0, 188, 212, 0.4)) drop-shadow(0 0 25px rgba(0, 188, 212, 0.2));
         }
     }
 
@@ -75,6 +73,7 @@
 
             .title-line {
                 font-size: clamp(3rem, 8vw, 6rem);
+                margin-top: 30px;
                 font-weight: 800;
                 background: linear-gradient(135deg, #00bcd4 0%, #ffffff 50%, #00bcd4 100%);
                 background-size: 200% 200%;
@@ -85,7 +84,7 @@
                 text-shadow: 0 0 30px rgba(0, 188, 212, 0.5);
                 letter-spacing: 2px;
                 position: relative;
-                
+
                 &::before {
                     content: attr(data-text);
                     position: absolute;
@@ -126,6 +125,11 @@
             opacity: 0;
             transform: translateY(20px);
             animation: fadeInUp 1s ease-out 0.8s forwards;
+
+            span {
+                font-size: 21px;
+                font-weight: bold;
+            }
         }
 
         .hero-buttons {
