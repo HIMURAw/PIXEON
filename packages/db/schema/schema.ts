@@ -3,6 +3,8 @@ import { mysqlTable, varchar, int } from 'drizzle-orm/mysql-core';
 
 export const users = mysqlTable('users', {
     id: int('id').primaryKey().autoincrement(),
-    name: varchar('name', { length: 255 }),
+    discordId: varchar('discord_id', { length: 255 }).notNull().unique(),
+    username: varchar('username', { length: 255 }),
     email: varchar('email', { length: 255 }),
+    avatar: varchar('avatar', { length: 255 }),
 });
