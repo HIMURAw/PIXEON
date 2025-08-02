@@ -17,17 +17,17 @@ const Hero: React.FC = () => {
         <section className={`hero ${isLoaded ? 'hero-loaded' : ''}`}>
             {/* Oval Çizgi Animasyonu */}
             <div className="oval-line">
-                <svg 
-                    viewBox="0 0 100 100" 
+                <svg
+                    viewBox="0 0 100 100"
                     preserveAspectRatio="none"
                     className="oval-svg"
                 >
-                    <path 
-                        d="M0,0 Q50,50 100,0 L100,100 Q50,50 0,100 Z" 
+                    <path
+                        d="M0,0 Q50,50 100,0 L100,100 Q50,50 0,100 Z"
                         className="oval-path"
                         fill="none"
                         stroke="url(#gradient)"
-                        strokeWidth="2"
+                        strokeWidth="1"
                     />
                     <defs>
                         <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -43,12 +43,11 @@ const Hero: React.FC = () => {
             <div className="hero-content">
                 <div className="hero-text">
                     <h1 className="hero-title">
-                        <span className="title-line">PXDev</span>
-                        <span className="title-subtitle">Teknoloji Çözümleri</span>
+                        <span className="title-line" data-text="PXDevelopment">PXDevelopment</span>
+                        <span className="title-subtitle">Development Hizmeti</span>
                     </h1>
                     <p className="hero-description">
-                        Modern web teknolojileri ile geleceği şekillendiriyoruz. 
-                        Yenilikçi çözümler, güvenilir hizmet.
+                        2023'den beri +329 müşteri ve +333 Sunucu Üyesi ile hizmet vermekteyiz. Discord botları ve FiveM ürünleri satıyoruz.
                     </p>
                     <div className="hero-buttons">
                         <button className="hero-btn primary">
@@ -59,7 +58,7 @@ const Hero: React.FC = () => {
                         </button>
                     </div>
                 </div>
-                
+
                 <div className="hero-visual">
                     <div className="floating-elements">
                         <div className="floating-circle circle-1"></div>

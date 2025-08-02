@@ -41,7 +41,7 @@ const Navbar: React.FC = () => {
         <nav className={`navbar ${isLoaded ? 'navbar-loaded' : ''}`}>
             <div className="navbar-container">
                 <div className="logo">
-                    <span className="logo-text">PXDev.com.tr</span>
+                    <span className="logo-text" data-text="PXDev.com.tr">PXDev.com.tr</span>
                 </div>
 
                 {/* Desktop Navigation */}
