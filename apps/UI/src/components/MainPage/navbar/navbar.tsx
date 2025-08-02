@@ -43,7 +43,7 @@ const Navbar: React.FC = () => {
                 <div className="logo">
                     <span className="logo-text">PXDev.com.tr</span>
                 </div>
-                
+
                 {/* Desktop Navigation */}
                 <ul className="navLinks desktop-nav">
                     <li className="nav-item">
@@ -77,7 +77,7 @@ const Navbar: React.FC = () => {
                 <div className="desktop-auth">
                     {!isLoggedIn ? (
                         <div className="loginBtn" onClick={handleLogin}>
-                            <a href="#Login">Login</a>
+                            <a href="#Login">Giriş yap</a>
                         </div>
                     ) : (
                         <div className="profile">
@@ -131,12 +131,12 @@ const Navbar: React.FC = () => {
                         </a>
                     </li>
                 </ul>
-                
+
                 {/* Mobile Login/Profile */}
                 <div className="mobile-auth">
                     {!isLoggedIn ? (
                         <div className="mobile-login-btn" onClick={() => { handleLogin(); closeMobileMenu(); }}>
-                            <span>Login</span>
+                            <span>Giriş yap</span>
                         </div>
                     ) : (
                         <div className="mobile-profile">
