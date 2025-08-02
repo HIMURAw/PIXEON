@@ -10,7 +10,7 @@ export async function execute(interaction: ChatInputCommandInteraction) {
         .setDescription('Yeni özellikler üzerinde çalışıyoruz. Çok yakında sizinle olacak!')
         .setColor(0xffcc00)
         .setTimestamp()
-        .setFooter({ text: 'PX-Guard | Pixel Development' });
+        .setFooter({ text: 'PX-Web | Pixel Development' });
 
     await interaction.reply({ embeds: [embed], ephemeral: false });
 }
