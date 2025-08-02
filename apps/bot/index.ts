@@ -1,7 +1,6 @@
 import { Client, GatewayIntentBits, Collection } from 'discord.js'
 import { CustomClient } from './src/types'
-
-const Config = require('./config.ts')
+import Config from './config'
 
 import { loadCommands } from './src/handlers/commandHandler'
 import { loadEvents } from './src/handlers/eventHandler'

@@ -1,7 +1,7 @@
 import { REST, Routes, Collection } from 'discord.js'
 import fs from 'fs'
 import path from 'path'
-const Config = require('../../config')
+import Config from '../../config'
 
 // Import types
 import { Command, CustomClient } from '../types'

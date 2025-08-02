@@ -25,21 +25,27 @@ router.get("/discord", (req, res) => {
 router.get("/discord/callback", async (req, res) => {
     const code = req.query.code as string;
 
-    const tokenRes = await axios.post(
-        "https://discord.com/api/oauth2/token",
-        qs.stringify({
-            client_id: discordConfig.discord.clientId,
-            client_secret: discordConfig.discord.clientSecret,
-            grant_type: "authorization_code",
-            code,
-            redirect_uri: discordConfig.discord.redirectUri,
-        }),
-        {
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-            },
-        }
-    );
+    try {
+        console.log('[PX-API] Discord OAuth callback başlatıldı');
+        console.log('[PX-API] Code:', code);
+        console.log('[PX-API] Client ID:', discordConfig.discord.clientId);
+        console.log('[PX-API] Redirect URI:', discordConfig.discord.redirectUri);
+
+        const tokenRes = await axios.post(
+            "https://discord.com/api/oauth2/token",
+            qs.stringify({
+                client_id: discordConfig.discord.clientId,
+                client_secret: discordConfig.discord.clientSecret,
+                grant_type: "authorization_code",
+                code,
+                redirect_uri: discordConfig.discord.redirectUri,
+            }),
+            {
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+            }
+        );
 
     const accessToken = tokenRes.data.access_token;
 
@@ -80,7 +86,15 @@ router.get("/discord/callback", async (req, res) => {
         maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    res.redirect("http://localhost:5173/dashboard");
+        res.redirect("http://localhost:5173/dashboard");
+    } catch (error) {
+        console.error('[PX-API] Discord OAuth hatası:', error);
+        if (axios.isAxiosError(error)) {
+            console.error('[PX-API] Response data:', error.response?.data);
+            console.error('[PX-API] Response status:', error.response?.status);
+        }
+        res.status(500).json({ error: 'Discord authentication failed' });
+    }
 });
 
 export default router;
