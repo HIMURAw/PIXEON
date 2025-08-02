@@ -158,11 +158,26 @@
 
 .profile {
     display: flex;
+    padding: 5px;
     gap: 10px;
+    border: 2px solid #00bcd4;
+    border-radius: 30px;
+
+    &:hover {
+        box-shadow: 0 0 20px rgba(0, 188, 212, 0.6);
+        transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+    }
 
     img {
         width: 50px;
         height: auto;
+        margin-left: 10px;
+    }
+
+    p {
+        font-weight: bold;
+        margin-right: 10px;
     }
 }
 
