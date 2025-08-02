@@ -156,6 +156,16 @@
     }
 }
 
+.profile {
+    display: flex;
+    gap: 10px;
+
+    img {
+        width: 50px;
+        height: auto;
+    }
+}
+
 .nav-link {
     position: relative;
     display: flex;
