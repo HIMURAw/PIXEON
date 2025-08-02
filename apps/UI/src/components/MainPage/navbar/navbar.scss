@@ -52,6 +52,7 @@
     left: 0;
     right: 0;
     z-index: 1000;
+    user-select: none;
     transform: translateY(-100%);
     opacity: 0;
     transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
@@ -98,10 +99,10 @@
         display: flex;
         flex-direction: row;
 
-
         &:hover {
-            animation: logoGlow 2s ease-in-out infinite;
-            transform: scale(1.05);
+            text-shadow: 0 0 20px rgba(0, 188, 212, 0.6);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
         }
 
         &::after {
@@ -112,7 +113,6 @@
             width: 0;
             height: 2px;
             background: linear-gradient(90deg, #00bcd4, #ffffff);
-            transition: width 0.3s ease;
         }
 
         &:hover::after {
