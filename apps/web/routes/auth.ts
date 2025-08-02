@@ -1,8 +1,8 @@
 import express from "express";
 import axios from "axios";
 import jwt from "jsonwebtoken";
-import { db } from "../drizzle/client";
-import { users } from "../drizzle/schema";
+import { db } from "../../../packages/db/index";
+import { users } from "../../../packages/db/schema/schema";
 import { eq } from "drizzle-orm";
 import qs from "querystring";
 
