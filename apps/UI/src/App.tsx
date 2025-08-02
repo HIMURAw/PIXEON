@@ -1,11 +1,9 @@
 import React from 'react';
 import Navbar from './components/MainPage/navbar/navbar';
 
-
-
 function App() {
   return (
-    <div style={{ backgroundColor: '#00ffddff' }}>
+    <div>
       <Navbar />
     </div>
   );
