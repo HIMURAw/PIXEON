@@ -47,7 +47,7 @@ const Hero: React.FC = () => {
                         <span className="title-subtitle">Development Hizmeti</span>
                     </h1>
                     <p className="hero-description">
-                        2023'den beri +329 müşteri ve +333 Sunucu Üyesi ile hizmet vermekteyiz. Discord botları ve FiveM ürünleri satıyoruz.
+                        2023'den beri <span>+329</span> müşteri ve <span>+333</span> Sunucu Üyesi ile hizmet vermekteyiz. Discord botları ve FiveM ürünleri satıyoruz.
                     </p>
                     <div className="hero-buttons">
                         <button className="hero-btn primary">
