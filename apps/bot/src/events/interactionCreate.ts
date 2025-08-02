@@ -1,10 +1,35 @@
-import { Events, Interaction, ChatInputCommandInteraction } from 'discord.js';
+import { Events, Interaction, ChatInputCommandInteraction, ModalSubmitInteraction } from 'discord.js';
 import { CustomClient, Command } from '../types';
 
 export default {
     name: Events.InteractionCreate,
     once: false,
     async execute(interaction: Interaction & { client: CustomClient }) {
+        // Modal submit ise
+        if (interaction.isModalSubmit()) {
+            if (interaction.customId === 'yaz_modal') {
+                const mesaj = interaction.fields.getTextInputValue('mesaj_input');
+                const kanal = interaction.channel;
+
+                if (
+                    kanal?.isTextBased() &&
+                    ('send' in kanal) &&
+                    typeof kanal.send === 'function'
+                ) {
+                    await kanal.send(`${mesaj}`);
+                }
+
+
+                await interaction.reply({
+                    content: '✅ Mesaj başarıyla gönderildi!',
+                    ephemeral: true,
+                });
+            }
+
+            return; // Modal submit işlemi yapıldıysa diğer komutlara geçme
+        }
+
+        // Slash komutu değilse çık
         if (!interaction.isChatInputCommand()) return;
 
         const command = interaction.client.commands.get(interaction.commandName) as Command | undefined;
