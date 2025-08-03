@@ -2,7 +2,6 @@ import express from "express";
 import axios from "axios";
 import { db, schema, eq } from "../../../packages/db/index";
 import qs from "querystring";
-import discordConfig from '../../../apps/bot/config';
 import Config from '../config';
 
 const { users } = schema;
@@ -13,8 +12,8 @@ router.get("/discord", (req: express.Request, res: express.Response) => {
     const state = Math.random().toString(36).substring(7);
 
     const params = qs.stringify({
-        client_id: discordConfig.discord.clientId,
-        redirect_uri: discordConfig.discord.redirectUri,
+        client_id: Config.discord.clientId,
+        redirect_uri: Config.discord.redirectUri,
         response_type: "code",
         scope: "identify email guilds guilds.members.read",
         state: state
@@ -40,14 +39,13 @@ router.get("/discord/callback", async (req: express.Request, res: express.Respon
         console.log('[PX-API] Discord OAuth callback başlatıldı');
         console.log('[PX-API] Code:', code);
 
-        // 1. Discord'dan access token al
         const tokenRes = await axios.post('https://discord.com/api/oauth2/token',
             qs.stringify({
-                client_id: discordConfig.discord.clientId,
-                client_secret: discordConfig.discord.clientSecret,
+                client_id: Config.discord.clientId,
+                client_secret: Config.discord.clientSecret,
                 grant_type: 'authorization_code',
                 code,
-                redirect_uri: discordConfig.discord.redirectUri,
+                redirect_uri: Config.discord.redirectUri,
                 scope: 'identify email guilds guilds.members.read'
             }), {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
@@ -56,17 +54,15 @@ router.get("/discord/callback", async (req: express.Request, res: express.Respon
 
         const accessToken = tokenRes.data.access_token;
 
-        // 2. Discord'dan kullanıcı bilgilerini çek
         const userRes = await axios.get('https://discord.com/api/users/@me', {
             headers: { Authorization: `Bearer ${accessToken}` }
         });
         const user = userRes.data;
 
-        // 3. Kullanıcının Discord sunucusundaki rollerini çek
         let roles: string[] = [];
         try {
             const memberRes = await axios.get(
-                `https://discord.com/api/users/@me/guilds/${discordConfig.discord.GuiId}/member`,
+                `https://discord.com/api/users/@me/guilds/${Config.discord.guildId}/member`,
                 { headers: { Authorization: `Bearer ${accessToken}` } }
             );
             if (memberRes.data && Array.isArray(memberRes.data.roles)) {
@@ -79,13 +75,11 @@ router.get("/discord/callback", async (req: express.Request, res: express.Respon
             roles = [];
         }
 
-        // 4. Kullanıcı bilgilerini Drizzle ile veritabanına kaydet
         const username = user.username + '#' + user.discriminator;
         const avatarUrl = user.avatar
             ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
             : 'https://cdn.discordapp.com/embed/avatars/0.png';
 
-        // Mevcut kullanıcıyı kontrol et
         const existing = await db
             .select()
             .from(users)
@@ -130,8 +124,8 @@ router.get("/discord/callback", async (req: express.Request, res: express.Respon
             sameSite: 'lax'
         });
 
-        // Başarılı girişten sonra ana sayfaya yönlendir
-        res.redirect('/');
+        // Başarılı girişten sonra UI'a yönlendir
+        res.redirect(Config.frontendUrl);
 
     } catch (error) {
         console.error('[PX-API] Discord login error:', error);
@@ -227,7 +221,7 @@ router.get('/api/user/check', async (req: express.Request, res: express.Response
 router.get('/admin-role-id', (req: express.Request, res: express.Response) => {
     try {
         // Config'de adminRoleId yoksa null döndür
-        const adminRoleId = (discordConfig.discord as any).adminRoleId || null;
+        const adminRoleId = (Config.discord as any).adminRoleId || null;
         res.json({ adminRoleId: adminRoleId });
     } catch (error) {
         console.error('[PX-API] Error getting admin role ID:', error);

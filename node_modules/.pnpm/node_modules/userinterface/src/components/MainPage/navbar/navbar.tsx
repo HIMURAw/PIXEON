@@ -1,28 +1,71 @@
 import React, { useEffect, useState } from 'react';
 import './navbar.scss';
 
+interface UserData {
+    discordId: string;
+    username: string;
+    avatar: string;
+    email: string;
+    roles: string[];
+}
+
 const Navbar: React.FC = () => {
     const [isLoaded, setIsLoaded] = useState(false);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [userData, setUserData] = useState<UserData | null>(null);
 
     useEffect(() => {
         const timer = setTimeout(() => {
             setIsLoaded(true);
         }, 100);
 
+        // Sayfa yüklendiğinde kullanıcı durumunu kontrol et
+        checkUserStatus();
+
         return () => clearTimeout(timer);
     }, []);
 
-    // Login işlemi için fonksiyon
+    // Kullanıcı durumunu kontrol eden fonksiyon
+    const checkUserStatus = async () => {
+        try {
+            // Environment'dan API URL'ini al (production'da domain olacak)
+            const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+            const response = await fetch(`${apiUrl}/auth/api/user/check`, {
+                credentials: 'include' // Cookie'leri gönder
+            });
+
+            if (response.ok) {
+                const user = await response.json();
+                setUserData(user);
+                setIsLoggedIn(true);
+                console.log('[PX-Main] Kullanıcı oturumu bulundu:', user);
+            } else {
+                setIsLoggedIn(false);
+                setUserData(null);
+                console.log('[PX-Main] Kullanıcı oturumu bulunamadı');
+            }
+        } catch (error) {
+            console.error('[PX-Main] Kullanıcı durumu kontrol hatası:', error);
+            setIsLoggedIn(false);
+            setUserData(null);
+        }
+    };
+
+    // Discord OAuth ile giriş yapma fonksiyonu
     const handleLogin = () => {
-        setIsLoggedIn(true);
-        console.log('[PX-Main] Kullanıcı giriş yaptı');
+        console.log('[PX-Main] Discord OAuth başlatılıyor...');
+        // Environment'dan API URL'ini al (production'da domain olacak)
+        const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+        window.location.href = `${apiUrl}/auth/discord`;
     };
 
     // Logout işlemi için fonksiyon
     const handleLogout = () => {
+        // Cookie'yi temizle
+        document.cookie = 'auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
         setIsLoggedIn(false);
+        setUserData(null);
         console.log('[PX-Main] Kullanıcı çıkış yaptı');
     };
 
@@ -77,13 +120,16 @@ const Navbar: React.FC = () => {
                 <div className="desktop-auth">
                     {!isLoggedIn ? (
                         <div className="loginBtn" onClick={handleLogin}>
-                            <a href="#Login">Giriş yap</a>
+                            <span>Discord ile Giriş</span>
                         </div>
                     ) : (
                         <div className="profile">
-                            <img src="https://cdn.discordapp.com/attachments/1392486533696720918/1393597767409995806/pxdev-photoaidcom-cropped.png?ex=688ec74f&is=688d75cf&hm=9a6faffcdb12e8f103a5eb7a808015dd609e30e969beeece80839c771b355baa&" alt="Profile-image" />
+                            <img
+                                src={userData?.avatar || "https://cdn.discordapp.com/embed/avatars/0.png"}
+                                alt="Profile-image"
+                            />
                             <div className="profile-info">
-                                <p>HIMURA</p>
+                                <p>{userData?.username || 'Kullanıcı'}</p>
                                 <button className="logout-btn" onClick={handleLogout}>
                                     Çıkış Yap
                                 </button>
@@ -136,13 +182,16 @@ const Navbar: React.FC = () => {
                 <div className="mobile-auth">
                     {!isLoggedIn ? (
                         <div className="mobile-login-btn" onClick={() => { handleLogin(); closeMobileMenu(); }}>
-                            <span>Giriş yap</span>
+                            <span>Discord ile Giriş</span>
                         </div>
                     ) : (
                         <div className="mobile-profile">
-                            <img src="https://cdn.discordapp.com/attachments/1392486533696720918/1393597767409995806/pxdev-photoaidcom-cropped.png?ex=688ec74f&is=688d75cf&hm=9a6faffcdb12e8f103a5eb7a808015dd609e30e969beeece80839c771b355baa&" alt="Profile-image" />
+                            <img
+                                src={userData?.avatar || "https://cdn.discordapp.com/embed/avatars/0.png"}
+                                alt="Profile-image"
+                            />
                             <div className="mobile-profile-info">
-                                <p>HIMURA</p>
+                                <p>{userData?.username || 'Kullanıcı'}</p>
                                 <button className="mobile-logout-btn" onClick={() => { handleLogout(); closeMobileMenu(); }}>
                                     Çıkış Yap
                                 </button>
@@ -155,4 +204,4 @@ const Navbar: React.FC = () => {
     );
 };
 
-export default Navbar;
+export default
