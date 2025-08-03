@@ -116,11 +116,9 @@ router.get("/discord/callback", async (req: express.Request, res: express.Respon
             roles: roles
         };
 
-        // JSON'u string'e çevir ve tek seferde encode et
-        const userDataString = JSON.stringify(userData);
-        console.log('[PX-API] User data to encode:', userDataString);
-
-        res.cookie('auth_token', userDataString, {
+        const encodedUserData = encodeURIComponent(JSON.stringify(userData));
+        console.log('Token', encodedUserData)
+        res.cookie('auth_token', encodedUserData, {
             maxAge: 30 * 24 * 60 * 60 * 1000, // 30 gün
             httpOnly: false, // JavaScript'ten erişilebilir olsun
             secure: false, // HTTPS kullanıyorsan true yap
@@ -195,8 +193,8 @@ router.get('/api/user/check', async (req: express.Request, res: express.Response
     }
 
     try {
-        // JSON parse et (artık encode edilmemiş)
-        const userData = JSON.parse(authToken);
+        // URL-decode yap ve JSON parse et
+        const userData = JSON.parse(decodeURIComponent(authToken));
         console.log('[PX-API] User data from cookie:', userData);
 
         // Drizzle ile kullanıcıyı çek

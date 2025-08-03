@@ -20,54 +20,16 @@ const Navbar: React.FC = () => {
             setIsLoaded(true);
         }, 100);
 
-        // Önce eski cookie'yi temizle (test için)
-        document.cookie = 'auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-        document.cookie = 'auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/auth;';
-
         // Sayfa yüklendiğinde kullanıcı durumunu kontrol et
         checkUserStatus();
 
         return () => clearTimeout(timer);
     }, []);
 
-    // Cookie'den kullanıcı bilgilerini çeken fonksiyon
-    const getUserFromCookie = () => {
-        try {
-            const cookies = document.cookie.split(';');
-            const authCookie = cookies.find(cookie => cookie.trim().startsWith('auth_token='));
-
-            if (authCookie) {
-                const tokenValue = authCookie.split('=')[1];
-                console.log('[PX-Main] Raw cookie value:', tokenValue);
-
-                // JSON parse et (artık encode edilmemiş)
-                const userData = JSON.parse(tokenValue);
-                console.log('[PX-Main] Cookie\'den kullanıcı bilgileri alındı:', userData);
-                return userData;
-            } else {
-                console.log('[PX-Main] auth_token cookie bulunamadı');
-            }
-        } catch (error) {
-            console.error('[PX-Main] Cookie parse hatası:', error);
-            console.log('[PX-Main] Mevcut cookie\'ler:', document.cookie);
-        }
-        return null;
-    };
-
     // Kullanıcı durumunu kontrol eden fonksiyon
     const checkUserStatus = async () => {
         try {
-            // Önce cookie'den kontrol et
-            const cookieUser = getUserFromCookie();
-
-            if (cookieUser) {
-                setUserData(cookieUser);
-                setIsLoggedIn(true);
-                console.log('[PX-Main] Cookie\'den kullanıcı oturumu bulundu:', cookieUser);
-                return;
-            }
-
-            // Cookie'de yoksa API'den kontrol et
+            // Environment'dan API URL'ini al (production'da domain olacak)
             const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3001';
             const response = await fetch(`${apiUrl}/auth/api/user/check`, {
                 credentials: 'include' // Cookie'leri gönder
@@ -77,7 +39,7 @@ const Navbar: React.FC = () => {
                 const user = await response.json();
                 setUserData(user);
                 setIsLoggedIn(true);
-                console.log('[PX-Main] API\'den kullanıcı oturumu bulundu:', user);
+                console.log('[PX-Main] Kullanıcı oturumu bulundu:', user);
             } else {
                 setIsLoggedIn(false);
                 setUserData(null);
@@ -100,13 +62,11 @@ const Navbar: React.FC = () => {
 
     // Logout işlemi için fonksiyon
     const handleLogout = () => {
-        // Cookie'yi temizle (tüm path'ler için)
+        // Cookie'yi temizle
         document.cookie = 'auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-        document.cookie = 'auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/auth;';
-
         setIsLoggedIn(false);
         setUserData(null);
-        console.log('[PX-Main] Kullanıcı çıkış yaptı ve cookie temizlendi');
+        console.log('[PX-Main] Kullanıcı çıkış yaptı');
     };
 
     // Mobile menü toggle fonksiyonu
@@ -160,7 +120,7 @@ const Navbar: React.FC = () => {
                 <div className="desktop-auth">
                     {!isLoggedIn ? (
                         <div className="loginBtn" onClick={handleLogin}>
-                            <span>Giriş Yap</span>
+                            <span>Discord ile Giriş</span>
                         </div>
                     ) : (
                         <div className="profile">
@@ -244,4 +204,4 @@ const Navbar: React.FC = () => {
     );
 };
 
-export default Navbar;
+export default Navbar
