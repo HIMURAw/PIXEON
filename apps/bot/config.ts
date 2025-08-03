@@ -1,9 +1,9 @@
 export default {
     discord: {
-        token: 'MTMxMDk1NDM1NTg4NDY5MTQ4OA.GKkUf9.TmLZ-8Gn5DbsLLtKGLuj-O4XWPB68JBW3OpyBw',
-        clientId: '1310954355884691488',
+        token: 'MTIzODI2ODU2MjE3MTIzNjM4NA.G9yZQu.t-I_wliv2EdcieoHbfGbugYV78ua2xz-DUTTmw',
+        clientId: '1238268562171236384',
         GuiId: '1269430268402335867',
         redirectUri: 'http://localhost:3001/auth/discord/callback',
-        clientSecret: 'jJVJw74-NfIh7BOHcRBEFO-NCB5hcqXA'
+        clientSecret: 'ix1HuTiiXWisx3LzbJVD2xgeHRRzK3Ca'
     }
 }

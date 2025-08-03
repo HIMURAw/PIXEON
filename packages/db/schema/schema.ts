@@ -1,5 +1,5 @@
 // db/schema.ts
-import { mysqlTable, varchar, int } from 'drizzle-orm/mysql-core';
+import { mysqlTable, varchar, int, text } from 'drizzle-orm/mysql-core';
 
 export const users = mysqlTable('users', {
     id: int('id').primaryKey().autoincrement(),
@@ -7,4 +7,5 @@ export const users = mysqlTable('users', {
     username: varchar('username', { length: 255 }),
     email: varchar('email', { length: 255 }),
     avatar: varchar('avatar', { length: 255 }),
+    roles: text('roles'),
 });
