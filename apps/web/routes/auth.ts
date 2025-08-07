@@ -32,7 +32,7 @@ router.get("/discord/callback", async (req: express.Request, res: express.Respon
 
     if (!code) {
         console.error('[PX-API] Code parametresi boş!');
-        return res.status(400).json({ error: 'Authorization code is missing' });
+        return res.status(400).json({ error: 'Authorization code is missing' });2
     }
 
     try {
@@ -181,7 +181,6 @@ router.get('/add-user', async (req: express.Request, res: express.Response) => {
 
 // Kullanıcı kontrol endpoint'i
 router.get('/api/user/check', async (req: express.Request, res: express.Response) => {
-    console.log('[PX-API] === /user/check endpoint called ===');
     console.log('[PX-API] Request cookies:', req.cookies);
 
     const authToken = req.cookies.auth_token;
