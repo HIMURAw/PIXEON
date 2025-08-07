@@ -29,11 +29,12 @@ const Navbar: React.FC = () => {
     // Kullanıcı durumunu kontrol eden fonksiyon
     const checkUserStatus = async () => {
         try {
-            // Environment'dan API URL'ini al (production'da domain olacak)
             const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3001';
-            const response = await fetch(`${apiUrl}/auth/api/user/check`, {
-                credentials: 'include' // Cookie'leri gönder
+            const response = await fetch(`http://localhost:3001/auth/api/user/check`, {
+                method: 'GET',
+                credentials: 'include'
             });
+            console.log("Olamayan  value: ", response)
 
             if (response.ok) {
                 const user = await response.json();
