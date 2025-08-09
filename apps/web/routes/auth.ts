@@ -32,7 +32,7 @@ router.get("/discord/callback", async (req: express.Request, res: express.Respon
 
     if (!code) {
         console.error('[PX-API] Code parametresi boş!');
-        return res.status(400).json({ error: 'Authorization code is missing' });2
+        return res.status(400).json({ error: 'Authorization code is missing' }); 2
     }
 
     try {
