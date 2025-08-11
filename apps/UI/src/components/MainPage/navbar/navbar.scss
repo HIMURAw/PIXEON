@@ -98,38 +98,11 @@
         text-decoration: none;
         display: flex;
         flex-direction: row;
-        letter-spacing: 1px;
-
-        // Blur efekti için pseudo-element
-        &::before {
-            content: attr(data-text);
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #ffffff 0%, #00bcd4 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            filter: blur(4px);
-            opacity: 0.6;
-            z-index: -1;
-            transform: translateX(-6px);
-            transition: all 0.3s ease;
-        }
 
         &:hover {
             text-shadow: 0 0 20px rgba(0, 188, 212, 0.6);
             transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
-            transform: scale(1.05);
-
-            &::before {
-                filter: blur(6px);
-                opacity: 0.8;
-                transform: translateX(-8px);
-            }
         }
 
         &::after {
@@ -140,7 +113,6 @@
             width: 0;
             height: 2px;
             background: linear-gradient(90deg, #00bcd4, #ffffff);
-            transition: width 0.3s ease;
         }
 
         &:hover::after {
@@ -214,8 +186,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: bold;
-    color: #ffffff;
     padding: 12px 24px;
     background: linear-gradient(135deg, rgba(0, 188, 212, 0.1) 0%, rgba(0, 188, 212, 0.05) 100%);
     border: 2px solid #00bcd4;
@@ -580,107 +550,6 @@
                         color: #ff4757;
                         border-color: #ff4757;
                     }
-                }
-            }
-        }
-    }
-}
-
-/* Desktop Auth Styles */
-.desktop-auth {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-
-    .loginBtn {
-        background: linear-gradient(135deg, rgba(0, 188, 212, 0.1) 0%, rgba(0, 188, 212, 0.05) 100%);
-        border: 2px solid #00bcd4;
-        border-radius: 50px;
-        padding: 0.8rem 1.5rem;
-        color: #00bcd4;
-        font-weight: 600;
-        font-size: 1rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        text-align: center;
-        min-width: 120px;
-
-        &:hover {
-            background: linear-gradient(135deg, rgba(0, 188, 212, 0.2) 0%, rgba(0, 188, 212, 0.1) 100%);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 188, 212, 0.3);
-        }
-
-        span {
-            display: block;
-        }
-    }
-
-    .profile {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        padding: 0.8rem 1.2rem;
-        background: linear-gradient(135deg, rgba(0, 188, 212, 0.1) 0%, rgba(0, 188, 212, 0.05) 100%);
-        border: 2px solid #00bcd4;
-        border-radius: 25px;
-        backdrop-filter: blur(10px);
-        transition: all 0.3s ease;
-
-        &:hover {
-            background: linear-gradient(135deg, rgba(0, 188, 212, 0.15) 0%, rgba(0, 188, 212, 0.08) 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 188, 212, 0.2);
-        }
-
-        img {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid rgba(0, 188, 212, 0.3);
-            transition: all 0.3s ease;
-
-            &:hover {
-                border-color: #00bcd4;
-                transform: scale(1.05);
-            }
-        }
-
-        .profile-info {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 0.3rem;
-
-            p {
-                color: #00bcd4;
-                font-weight: 600;
-                font-size: 0.9rem;
-                margin: 0;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                max-width: 120px;
-            }
-
-            .logout-btn {
-                background: none;
-                border: 1px solid #ff6b6b;
-                color: #ff6b6b;
-                padding: 0.3rem 0.8rem;
-                border-radius: 15px;
-                font-size: 0.8rem;
-                cursor: pointer;
-                transition: all 0.3s ease;
-                font-weight: 500;
-
-                &:hover {
-                    background: rgba(255, 107, 107, 0.1);
-                    color: #ff4757;
-                    border-color: #ff4757;
-                    transform: scale(1.05);
                 }
             }
         }
