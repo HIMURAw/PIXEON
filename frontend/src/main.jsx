@@ -1,9 +1,9 @@
-import { StrictMode } from 'react'
+import React, { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import index from './page/index'
+import Index from './page/index.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <index />
-  </StrictMode>,
+    <Index />
+  </StrictMode>
 )

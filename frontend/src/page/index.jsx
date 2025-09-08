@@ -1,10 +1,15 @@
 import React from 'react';
 
-function index() {
+
+// imports
+import NavBar from '../components/NavBar/NavBar';
+
+
+function Index() {
 
     return (
-        <h1>index page</h1>
+        <NavBar />
     )
 }
 
-export default index;
+export default Index;
