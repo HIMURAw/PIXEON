@@ -1,0 +1,1 @@
+print('[^5PXDevWeb^7] Site installed')
