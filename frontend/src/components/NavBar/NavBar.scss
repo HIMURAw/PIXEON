@@ -1,8 +1,14 @@
 .navbar {
+    margin-top: 30px;
+    margin-bottom: 5px;
+    margin-left: 40px;
+    margin-right: 40px;
+    border-radius: 40px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #3c94e6;
+    background: linear-gradient(90deg, #00a2ff44, #00eeff62);
+    filter: blur(0.5px);
     padding: 15px 30px;
 
 
