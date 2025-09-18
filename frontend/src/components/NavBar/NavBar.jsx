@@ -4,7 +4,7 @@ import './NavBar.scss';
 function NavBar() {
     return (
         <div className="navbar">
-            <div className="nav-logo">AgeV</div>
+            <a className="nav-logo" href=""><div>AgeV</div></a>
             <ul className="nav-links">
                 <li><a href="#">AnaSayfa</a></li>
                 <li><a href="#">Yetkililer</a></li>

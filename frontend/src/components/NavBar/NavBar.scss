@@ -11,11 +11,14 @@
     filter: blur(0.5px);
     padding: 15px 30px;
 
-
     .nav-logo {
-        color: #5a5a5a;
-        font-size: 22px;
+        font-size: 30px;
+        margin-left: 40px;
         font-weight: bold;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: white;
+        text-decoration: none;
+        text-shadow: 1 1 20px rgba(0, 255, 200, 0.7);
     }
 
     .nav-links {
