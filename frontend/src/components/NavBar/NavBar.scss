@@ -1,42 +1,205 @@
+// Variables
+$primary-color: #2563eb;
+$secondary-color: #3b82f6;
+$text-color: #ffffff;
+$background: rgba(37, 99, 235, 0.9);
+$background-scrolled: rgba(15, 23, 42, 0.95);
+$transition: all 0.3s ease;
+$box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+
 .navbar {
-    margin-top: 30px;
-    margin-bottom: 5px;
-    margin-left: 40px;
-    margin-right: 40px;
-    border-radius: 40px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: linear-gradient(90deg, #00a2ff44, #00eeff62);
-    filter: blur(0.5px);
-    padding: 15px 30px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    transition: $transition;
+    padding: 1rem 2rem;
+    background: transparent;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+
+    &.scrolled {
+        background: $background-scrolled;
+        box-shadow: $box-shadow;
+        padding: 0.5rem 2rem;
+    }
+
+    .navbar-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+    }
 
     .nav-logo {
-        font-size: 30px;
-        margin-left: 40px;
-        font-weight: bold;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        color: white;
+        color: $text-color;
         text-decoration: none;
-        text-shadow: 1 1 20px rgba(0, 255, 200, 0.7);
-    }
-
-    .nav-links {
-        list-style: none;
+        font-size: 1.8rem;
+        font-weight: 700;
         display: flex;
-        gap: 20px;
-    }
-
-    li {
-        a {
-            text-decoration: none;
-            color: white;
-            font-size: 16px;
-            transition: color 0.3s;
+        align-items: center;
+        transition: $transition;
+        padding: 0.5rem 0;
+        position: relative;
+        z-index: 1001;
+        font-family: 'Poppins', sans-serif;
+        
+        span {
+            background: linear-gradient(90deg, #3b82f6, #60a5fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-fill-color: transparent;
+            transition: $transition;
         }
 
         &:hover {
-            color: aqua;
+            transform: translateY(-2px);
+            
+            span {
+                text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+            }
+        }
+    }
+
+    .menu-icon {
+        display: none;
+        color: $text-color;
+        font-size: 1.8rem;
+        cursor: pointer;
+        z-index: 1001;
+        transition: $transition;
+
+        &:hover {
+            color: $secondary-color;
+            transform: scale(1.1);
+        }
+
+        @media screen and (max-width: 768px) {
+            display: block;
+        }
+    }
+
+    .nav-menu {
+        display: flex;
+        align-items: center;
+        list-style: none;
+        gap: 2rem;
+        margin: 0;
+        padding: 0;
+
+        @media screen and (max-width: 768px) {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 80%;
+            max-width: 300px;
+            height: 100vh;
+            background: $background-scrolled;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: $transition;
+            z-index: 1000;
+            padding: 2rem 0;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+
+            &.active {
+                right: 0;
+            }
+        }
+    }
+
+    .nav-item {
+        position: relative;
+
+        &::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background: linear-gradient(90deg, $primary-color, $secondary-color);
+            transition: $transition;
+        }
+
+        &:hover::after {
+            width: 100%;
+        }
+    }
+
+    .nav-link {
+        color: $text-color;
+        text-decoration: none;
+        font-size: 1rem;
+        font-weight: 500;
+        padding: 0.5rem 1rem;
+        transition: $transition;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-family: 'Inter', sans-serif;
+
+        &:hover {
+            color: $secondary-color;
+        }
+
+        @media screen and (max-width: 768px) {
+            font-size: 1.2rem;
+            padding: 1rem 2rem;
+        }
+    }
+
+    .discord-link {
+        background: linear-gradient(90deg, #5865F2, #7289DA);
+        padding: 0.5rem 1.2rem !important;
+        border-radius: 50px;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(88, 101, 242, 0.2);
+
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(88, 101, 242, 0.3);
+            color: white !important;
+            background: linear-gradient(90deg, #7289DA, #5865F2);
+        }
+
+        .discord-icon {
+            font-size: 1.2rem;
+        }
+    }
+
+    // Responsive adjustments
+    @media screen and (max-width: 992px) {
+        padding: 0.8rem 1.5rem;
+        
+        .nav-menu {
+            gap: 1.2rem;
+        }
+        
+        .nav-link {
+            font-size: 0.95rem;
+            padding: 0.4rem 0.8rem;
+        }
+    }
+
+    @media screen and (max-width: 768px) {
+        padding: 0.8rem 1.2rem;
+        
+        .nav-logo {
+            font-size: 1.6rem;
+        }
+        
+        .discord-link {
+            padding: 0.8rem 1.5rem !important;
+            margin-top: 1rem;
         }
     }
 }
