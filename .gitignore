@@ -1,0 +1,4 @@
+/node_module/
+/backend/node_modules/
+/frontend/node_modules/
+/backend/bot/node_modules/
