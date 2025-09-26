@@ -4,7 +4,8 @@
   "description": "Fivem server webiste",
   "main": "index.js",
   "scripts": {
-    "ui": "cd frontend && npm run dev"
+    "ui": "cd frontend && npm run dev",
+    "bot": "cd backend/bot && npm run bot"
   },
   "repository": {
     "type": "git",
