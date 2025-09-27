@@ -2,6 +2,7 @@ import express from 'express';
 import { query, queryOne, insert, update, remove } from '../config/database.js';
 import { authenticate, authorize } from '../middleware/auth.js';
 import { getStaffMembers } from '../config/discord.js';
+import { staffConfig } from '../config/config.js';
 
 const router = express.Router();
 
@@ -136,7 +137,7 @@ router.get('/:id', async (req, res, next) => {
 });
 
 // Refresh staff data from Discord
-router.post('/refresh', authenticate, authorize('admin'), async (req, res, next) => {
+router.post('/refresh', authenticate, async (req, res, next) => {
   try {
     const staffMembers = await getStaffMembers();
 
@@ -191,7 +192,7 @@ router.post('/refresh', authenticate, authorize('admin'), async (req, res, next)
 });
 
 // Update staff role
-router.put('/:id/role', authenticate, authorize('admin'), async (req, res, next) => {
+router.put('/:id/role', authenticate, async (req, res, next) => {
   try {
     const { id } = req.params;
     const { role_name, role_color, is_active } = req.body;
@@ -233,7 +234,7 @@ router.put('/:id/role', authenticate, authorize('admin'), async (req, res, next)
 });
 
 // Remove staff member
-router.delete('/:id', authenticate, authorize('admin'), async (req, res, next) => {
+router.delete('/:id', authenticate, async (req, res, next) => {
   try {
     const { id } = req.params;
 

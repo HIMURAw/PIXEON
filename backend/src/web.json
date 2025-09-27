@@ -1,0 +1,53 @@
+{
+  "server": {
+    "port": 3001,
+    "nodeEnv": "development",
+    "corsOrigin": "http://localhost:3000"
+  },
+  "database": {
+    "host": "localhost",
+    "port": 3306,
+    "name": "pxdev_discord",
+    "user": "root",
+    "password": "",
+    "connectionLimit": 10,
+    "queueLimit": 0,
+    "acquireTimeout": 60000,
+    "timeout": 60000,
+    "reconnect": true
+  },
+  "discord": {
+    "token": "MTIzODI2ODU2MjE3MTIzNjM4NA.Gf2D-_.uQgt-g9kaT8NwATii-UAaayTLjRnPCvodCB6jQ",
+    "clientId": "1238268562171236384",
+    "clientSecret": "V3C4ER9GmbaWwBzaqWirbiGS7sy6ozxi",
+    "guildId": "1257703414821945358",
+    "apiBaseUrl": "https://discord.com/api/v10"
+  },
+  "jwt": {
+    "secret": "rascalagevhimuratestsecretkey123",
+    "expiresIn": "24h"
+  },
+  "api": {
+    "rateLimitWindow": 15,
+    "rateLimitMax": 100
+  },
+  "staff": {
+    "roleNames": [
+      "Administrator",
+      "Admin",
+      "Moderator",
+      "Mod",
+      "Developer",
+      "Dev",
+      "Support",
+      "Helper",
+      "Event Manager",
+      "Community Manager",
+      "Security",
+      "Content Creator",
+      "Technical Support",
+      "Translator",
+      "VIP"
+    ]
+  }
+}

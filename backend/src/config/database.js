@@ -1,21 +1,19 @@
 import mysql from 'mysql2/promise';
-import dotenv from 'dotenv';
-
-dotenv.config();
+import { databaseConfig } from './config.js';
 
 // Database configuration
 const dbConfig = {
-  host: process.env.DB_HOST || 'localhost',
-  port: process.env.DB_PORT || 3306,
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_NAME || 'pxdev_discord',
+  host: databaseConfig.host || 'localhost',
+  port: databaseConfig.port || 3306,
+  user: databaseConfig.user || 'root',
+  password: databaseConfig.password || '',
+  database: databaseConfig.name || 'pxdev_discord',
   waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
-  acquireTimeout: 60000,
-  timeout: 60000,
-  reconnect: true
+  connectionLimit: databaseConfig.connectionLimit || 10,
+  queueLimit: databaseConfig.queueLimit || 0,
+  acquireTimeout: databaseConfig.acquireTimeout || 60000,
+  timeout: databaseConfig.timeout || 60000,
+  reconnect: databaseConfig.reconnect !== false
 };
 
 // Create connection pool
@@ -46,6 +44,7 @@ export const initializeDatabase = async () => {
         display_name VARCHAR(255),
         avatar_url TEXT,
         email VARCHAR(255),
+        password VARCHAR(255),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
       )
@@ -89,10 +88,10 @@ export const initializeDatabase = async () => {
         display_name VARCHAR(255),
         avatar_url TEXT,
         roles JSON,
-        joined_at TIMESTAMP,
-        premium_since TIMESTAMP,
+        joined_at TIMESTAMP NULL,
+        premium_since TIMESTAMP NULL,
         is_bot BOOLEAN DEFAULT FALSE,
-        last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
       )
     `);

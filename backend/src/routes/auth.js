@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { query, queryOne, insert } from '../config/database.js';
 import { authenticate } from '../middleware/auth.js';
+import { jwtConfig } from '../config/config.js';
 
 const router = express.Router();
 
@@ -38,8 +39,8 @@ router.post('/register', async (req, res, next) => {
     // Generate JWT
     const token = jwt.sign(
       { id: userId, discord_id, username },
-      process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN || '24h' }
+      jwtConfig.secret,
+      { expiresIn: jwtConfig.expiresIn || '24h' }
     );
 
     res.status(201).json({
@@ -89,8 +90,8 @@ router.post('/login', async (req, res, next) => {
     // Generate JWT
     const token = jwt.sign(
       { id: user.id, discord_id: user.discord_id, username: user.username },
-      process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN || '24h' }
+      jwtConfig.secret,
+      { expiresIn: jwtConfig.expiresIn || '24h' }
     );
 
     res.json({

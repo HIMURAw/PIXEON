@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "ui": "cd frontend && npm run dev",
-    "bot": "cd backend/bot && npm run bot"
+    "bot": "cd backend/bot && npm run bot",
+    "back": "cd backend && npm run dev"
   },
   "repository": {
     "type": "git",
