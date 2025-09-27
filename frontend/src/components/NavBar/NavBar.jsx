@@ -29,11 +29,11 @@ function NavBar() {
                 <a href="/" className="nav-logo">
                     <span>AgeV</span>
                 </a>
-                
+
                 <div className="menu-icon" onClick={toggleMenu}>
                     {isMenuOpen ? <FaTimes /> : <FaBars />}
                 </div>
-                
+
                 <ul className={`nav-menu ${isMenuOpen ? 'active' : ''}`}>
                     <li className="nav-item">
                         <a href="#" className="nav-link" onClick={() => setIsMenuOpen(false)}>Ana Sayfa</a>
@@ -45,15 +45,15 @@ function NavBar() {
                         <a href="#hakkimizda" className="nav-link" onClick={() => setIsMenuOpen(false)}>Hakkımızda</a>
                     </li>
                     <li className="nav-item">
-                        <a 
-                            href="https://discord.gg/agev" 
-                            className="nav-link discord-link" 
-                            target="_blank" 
+                        <a
+                            href="https://discord.gg/"
+                            className="nav-link discord-link"
+                            target="_blank"
                             rel="noopener noreferrer"
                             onClick={() => setIsMenuOpen(false)}
                         >
                             <FaDiscord className="discord-icon" />
-                            Discord
+                            Giriş Yap
                         </a>
                     </li>
                 </ul>

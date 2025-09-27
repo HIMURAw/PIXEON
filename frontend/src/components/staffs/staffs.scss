@@ -1,0 +1,304 @@
+.staffs-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+    .staffs-header {
+        text-align: center;
+        margin-bottom: 3rem;
+
+        h2 {
+            font-size: 2.5rem;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        p {
+            font-size: 1.1rem;
+            color: #7f8c8d;
+            margin: 0;
+        }
+    }
+
+    .loading-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 4rem 2rem;
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        p {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+    }
+
+    .staffs-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-bottom: 2rem;
+
+        @media (max-width: 768px) {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+    }
+
+    .staff-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 20px;
+        padding: 1.5rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+
+        &::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            border-radius: 20px;
+        }
+
+        &:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .staff-avatar-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+
+            .staff-avatar {
+                width: 80px;
+                height: 80px;
+                border-radius: 50%;
+                border: 4px solid rgba(255, 255, 255, 0.3);
+                transition: all 0.3s ease;
+
+                &:hover {
+                    transform: scale(1.1);
+                    border-color: rgba(255, 255, 255, 0.6);
+                }
+            }
+
+            .status-indicator {
+                position: absolute;
+                bottom: 5px;
+                right: calc(50% - 45px);
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                border: 3px solid white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 8px;
+
+                &.online {
+                    background-color: #2ecc71;
+                }
+
+                &.idle {
+                    background-color: #f39c12;
+                }
+
+                &.dnd {
+                    background-color: #e74c3c;
+                }
+
+                &.offline {
+                    background-color: #95a5a6;
+                }
+            }
+        }
+
+        .staff-info {
+            text-align: center;
+            color: white;
+            position: relative;
+            z-index: 1;
+
+            .staff-name {
+                margin-bottom: 1rem;
+
+                h3 {
+                    font-size: 1.5rem;
+                    margin: 0 0 0.5rem 0;
+                    font-weight: 600;
+                    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+                }
+
+                .staff-role {
+                    display: inline-block;
+                    padding: 0.3rem 0.8rem;
+                    background-color: rgba(255, 255, 255, 0.2);
+                    border-radius: 15px;
+                    font-size: 0.9rem;
+                    font-weight: 500;
+                    backdrop-filter: blur(10px);
+                    border: 1px solid rgba(255, 255, 255, 0.3);
+                }
+            }
+
+            .staff-details {
+                .staff-description {
+                    font-size: 1rem;
+                    margin-bottom: 1rem;
+                    opacity: 0.9;
+                    line-height: 1.4;
+                }
+
+                .staff-meta {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0.5rem;
+
+                    .meta-item {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        padding: 0.5rem 0;
+                        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+                        &:last-child {
+                            border-bottom: none;
+                        }
+
+                        .meta-label {
+                            font-weight: 500;
+                            opacity: 0.8;
+                        }
+
+                        .meta-value {
+                            font-weight: 600;
+                            opacity: 1;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .no-staffs {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: #7f8c8d;
+        font-size: 1.1rem;
+    }
+}
+
+// Animasyonlar
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+// Responsive tasarım
+@media (max-width: 768px) {
+    .staffs-container {
+        padding: 1rem;
+
+        .staffs-header {
+            margin-bottom: 2rem;
+
+            h2 {
+                font-size: 2rem;
+            }
+
+            p {
+                font-size: 1rem;
+            }
+        }
+
+        .staff-card {
+            padding: 1rem;
+
+            .staff-avatar-container {
+                .staff-avatar {
+                    width: 60px;
+                    height: 60px;
+                }
+
+                .status-indicator {
+                    right: calc(50% - 35px);
+                    width: 16px;
+                    height: 16px;
+                    font-size: 6px;
+                }
+            }
+
+            .staff-info {
+                .staff-name {
+                    h3 {
+                        font-size: 1.3rem;
+                    }
+
+                    .staff-role {
+                        font-size: 0.8rem;
+                        padding: 0.2rem 0.6rem;
+                    }
+                }
+
+                .staff-details {
+                    .staff-description {
+                        font-size: 0.9rem;
+                    }
+
+                    .staff-meta {
+                        .meta-item {
+                            font-size: 0.9rem;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Dark mode desteği
+@media (prefers-color-scheme: dark) {
+    .staffs-container {
+        .staffs-header {
+            h2 {
+                color: #ecf0f1;
+            }
+
+            p {
+                color: #bdc3c7;
+            }
+        }
+
+        .loading-container p {
+            color: #bdc3c7;
+        }
+
+        .no-staffs {
+            color: #bdc3c7;
+        }
+    }
+}
