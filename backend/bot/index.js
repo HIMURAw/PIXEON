@@ -1,5 +1,5 @@
 const { Client, GatewayIntentBits } = require('discord.js');
-const Config = require('../../config.js')
+const Config = require('./bot.json')
 
 const Bot = new Client({
     intents: [
@@ -9,5 +9,5 @@ const Bot = new Client({
     ]
 })
 
-Bot.login(Config.discord.token)
+Bot.login(Config.token)
     .then(() => console.log(`[ BOT ] Logged in successfully ${Bot.user.tag}`))
