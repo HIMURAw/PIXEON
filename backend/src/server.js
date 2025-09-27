@@ -4,11 +4,14 @@ import helmet from 'helmet';
 import compression from 'compression';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
-import dotenv from 'dotenv';
+
+// Import configuration
+import config, { serverConfig, apiConfig } from './config/config.js';
 
 // Import routes
 import authRoutes from './routes/auth.js';
 import discordRoutes from './routes/discord.js';
+import discordAuthRoutes from './routes/discordAuth.js';
 import staffRoutes from './routes/staff.js';
 import userRoutes from './routes/user.js';
 
@@ -19,16 +22,13 @@ import { notFound } from './middleware/notFound.js';
 // Import database
 import './config/database.js';
 
-// Load environment variables
-dotenv.config();
-
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = serverConfig.port || 3001;
 
 // Rate limiting
 const limiter = rateLimit({
-  windowMs: (process.env.API_RATE_LIMIT_WINDOW || 15) * 60 * 1000, // 15 minutes
-  max: process.env.API_RATE_LIMIT_MAX || 100, // limit each IP to 100 requests per windowMs
+  windowMs: (apiConfig.rateLimitWindow || 15) * 60 * 1000, // 15 minutes
+  max: apiConfig.rateLimitMax || 100, // limit each IP to 100 requests per windowMs
   message: {
     error: 'Too many requests from this IP, please try again later.',
   },
@@ -42,7 +42,7 @@ app.use(compression());
 app.use(morgan('combined'));
 app.use(limiter);
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+  origin: serverConfig.corsOrigin || 'http://localhost:3000',
   credentials: true
 }));
 app.use(express.json({ limit: '10mb' }));
@@ -54,12 +54,13 @@ app.get('/health', (req, res) => {
     status: 'OK',
     message: 'PX Development Backend API is running',
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development'
+    environment: serverConfig.nodeEnv || 'development'
   });
 });
 
 // API Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/auth/discord', discordAuthRoutes);
 app.use('/api/discord', discordRoutes);
 app.use('/api/staff', staffRoutes);
 app.use('/api/user', userRoutes);
@@ -75,7 +76,7 @@ app.listen(PORT, () => {
   console.log(`
 🚀 PX Development Backend Server Started!
 📍 Port: ${PORT}
-🌍 Environment: ${process.env.NODE_ENV || 'development'}
+🌍 Environment: ${serverConfig.nodeEnv || 'development'}
 🔗 Health Check: http://localhost:${PORT}/health
 📚 API Base URL: http://localhost:${PORT}/api
   `);

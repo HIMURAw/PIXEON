@@ -1,7 +1,5 @@
 import { Client, GatewayIntentBits, REST, Routes } from 'discord.js';
-import dotenv from 'dotenv';
-
-dotenv.config();
+import { discordConfig, staffConfig } from './config.js';
 
 // Discord client configuration
 const client = new Client({
@@ -15,16 +13,7 @@ const client = new Client({
 });
 
 // Discord REST API for direct API calls
-const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
-
-// Discord API configuration
-export const discordConfig = {
-  token: process.env.DISCORD_TOKEN,
-  clientId: process.env.DISCORD_CLIENT_ID,
-  clientSecret: process.env.DISCORD_CLIENT_SECRET,
-  guildId: process.env.DISCORD_GUILD_ID,
-  apiBaseUrl: 'https://discord.com/api/v10'
-};
+const rest = new REST({ version: '10' }).setToken(discordConfig.token);
 
 // Discord API helper functions
 export const discordAPI = {
@@ -106,8 +95,8 @@ export const getStaffMembers = async () => {
     const members = await discordAPI.getGuildMembers();
     const roles = await discordAPI.getGuildRoles();
     
-    // Define staff role names (customize as needed)
-    const staffRoleNames = [
+    // Get staff role names from config
+    const staffRoleNames = staffConfig.roleNames || [
       'Administrator',
       'Admin',
       'Moderator',
@@ -181,10 +170,12 @@ client.on('error', (error) => {
 });
 
 // Login to Discord
-if (discordConfig.token) {
+if (discordConfig.token && discordConfig.token !== 'your_discord_bot_token') {
   client.login(discordConfig.token).catch(error => {
     console.error('Failed to login to Discord:', error.message);
   });
+} else {
+  console.warn('⚠️  Discord token not configured in web.json');
 }
 
 export default client;

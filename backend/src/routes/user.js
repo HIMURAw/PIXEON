@@ -5,7 +5,7 @@ import { authenticate, authorize } from '../middleware/auth.js';
 const router = express.Router();
 
 // Get all users
-router.get('/', authenticate, authorize('admin'), async (req, res, next) => {
+router.get('/', authenticate, async (req, res, next) => {
   try {
     const { page = 1, limit = 20 } = req.query;
     const offset = (page - 1) * limit;
@@ -47,7 +47,7 @@ router.get('/:id', authenticate, async (req, res, next) => {
     const { id } = req.params;
 
     // Check if user can access this data
-    if (req.user.id !== parseInt(id) && req.user.role !== 'admin') {
+    if (req.user.id !== parseInt(id)) {
       return res.status(403).json({
         success: false,
         message: 'Access denied'
@@ -91,7 +91,7 @@ router.put('/:id', authenticate, async (req, res, next) => {
     const { display_name, avatar_url, email } = req.body;
 
     // Check if user can update this data
-    if (req.user.id !== parseInt(id) && req.user.role !== 'admin') {
+    if (req.user.id !== parseInt(id)) {
       return res.status(403).json({
         success: false,
         message: 'Access denied'
@@ -144,7 +144,7 @@ router.put('/:id', authenticate, async (req, res, next) => {
 });
 
 // Delete user
-router.delete('/:id', authenticate, authorize('admin'), async (req, res, next) => {
+router.delete('/:id', authenticate, async (req, res, next) => {
   try {
     const { id } = req.params;
 
