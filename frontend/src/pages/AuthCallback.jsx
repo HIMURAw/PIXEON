@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { useAuth } from '../context/AuthContext.jsx';
 
 const AuthCallback = () => {
   const [status, setStatus] = useState('loading');
   const [error, setError] = useState(null);
-  const { handleDiscordCallback } = useAuth();
 
   useEffect(() => {
     const handleCallback = async () => {
@@ -27,16 +25,52 @@ const AuthCallback = () => {
 
         setStatus('processing');
         
-        const result = await handleDiscordCallback(code);
+        console.log('🔄 Sending code to backend:', code);
         
-        if (result.success) {
+        // Backend'den kullanıcı bilgilerini al
+        const response = await fetch('http://localhost:8080/api/auth/discord/callback', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ code })
+        });
+
+        console.log('📡 Backend response status:', response.status);
+        const data = await response.json();
+        console.log('📡 Backend response data:', data);
+        
+        if (data.success) {
+          // Kullanıcı bilgilerini cookie'ye kaydet
+          const userData = {
+            id: data.user.id,
+            discord_id: data.user.discord_id,
+            username: data.user.username,
+            display_name: data.user.display_name,
+            avatar: data.user.avatar,
+            email: data.user.email,
+            discriminator: data.user.discriminator
+          };
+          
+          // Cookie'ye kaydet
+          const expiresAt = new Date();
+          expiresAt.setTime(expiresAt.getTime() + (7 * 24 * 60 * 60 * 1000)); // 7 days
+          
+          const tokenData = {
+            ...userData,
+            expiresAt: expiresAt.toISOString()
+          };
+          
+          const encryptedToken = btoa(JSON.stringify(tokenData));
+          document.cookie = `auth_token=${encryptedToken};expires=${expiresAt.toUTCString()};path=/;samesite=strict`;
+          
           setStatus('success');
           // Redirect to home page after successful authentication
           setTimeout(() => {
             window.location.href = '/';
           }, 2000);
         } else {
-          setError(result.error || 'Authentication failed');
+          setError(data.message || 'Authentication failed');
           setStatus('error');
         }
       } catch (error) {
@@ -47,7 +81,7 @@ const AuthCallback = () => {
     };
 
     handleCallback();
-  }, [handleDiscordCallback]);
+  }, []);
 
   return (
     <div style={{

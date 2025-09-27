@@ -39,7 +39,7 @@ export const authUtils = {
   // Discord OAuth URL generation
   getDiscordAuthUrl: async () => {
     try {
-      const response = await fetch('/api/auth/discord/url');
+      const response = await fetch('http://localhost:8080/api/auth/discord/url');
       const data = await response.json();
       
       if (data.success) {
@@ -51,7 +51,7 @@ export const authUtils = {
       console.error('Error getting Discord auth URL:', error);
       // Fallback URL
       const clientId = '1238268562171236384';
-      const redirectUri = encodeURIComponent(`${window.location.origin}/auth/callback`);
+      const redirectUri = encodeURIComponent('http://localhost:8080/api/auth/discord/callback');
       const scope = encodeURIComponent('identify email');
       const responseType = 'code';
       
@@ -108,7 +108,7 @@ export const authUtils = {
   // Handle Discord OAuth callback
   handleDiscordCallback: async (code) => {
     try {
-      const response = await fetch('/api/auth/discord/callback', {
+      const response = await fetch('http://localhost:8080/api/auth/discord/callback', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

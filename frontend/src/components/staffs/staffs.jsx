@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import './staffs.scss';
 
 const Staffs = () => {
-  const [staffs, setStaffs] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(6);
+    const [staffs, setStaffs] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(6);
 
     // Mock data - gerçek uygulamada Discord API'den gelecek
     const mockStaffs = [
@@ -289,13 +289,13 @@ const Staffs = () => {
                 <div className="pagination">
                     <div className="pagination-info">
                         <span>
-                            Sayfa {currentPage} / {totalPages} 
+                            Sayfa {currentPage} / {totalPages}
                             ({startIndex + 1}-{Math.min(endIndex, staffs.length)} / {staffs.length} staff)
                         </span>
                     </div>
-                    
+
                     <div className="pagination-controls">
-                        <button 
+                        <button
                             className="pagination-btn prev-btn"
                             onClick={goToPrevPage}
                             disabled={currentPage === 1}
@@ -316,7 +316,7 @@ const Staffs = () => {
                             ))}
                         </div>
 
-                        <button 
+                        <button
                             className="pagination-btn next-btn"
                             onClick={goToNextPage}
                             disabled={currentPage === totalPages}
