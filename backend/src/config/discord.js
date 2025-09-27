@@ -161,7 +161,7 @@ export const getStaffMembers = async () => {
 };
 
 // Client event handlers
-client.once('ready', () => {
+client.once('clientReady', () => {
   console.log(`🤖 Discord bot logged in as ${client.user.tag}!`);
 });
 

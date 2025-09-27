@@ -1,8 +1,8 @@
 {
   "server": {
-    "port": 3001,
+    "port": 8080,
     "nodeEnv": "development",
-    "corsOrigin": "http://localhost:3000"
+    "corsOrigin": "http://localhost:5173"
   },
   "database": {
     "host": "localhost",
