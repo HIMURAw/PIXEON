@@ -9,7 +9,7 @@ import Hero from '../components/Hero/Hero';
 function Index() {
 
     return (
-        <div>
+        <div style={{ userSelect: 'none' }}>
             <NavBar />
             <Hero />
         </div>
