@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import './NavBar.scss';
-import { FaDiscord, FaBars, FaTimes, FaUser, FaSignOutAlt } from 'react-icons/fa';
+import { FaSitemap, FaBars, FaTimes, FaUser, FaSignOutAlt } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext.jsx';
 
 function NavBar() {
@@ -116,7 +116,7 @@ function NavBar() {
                                 className="nav-link discord-link"
                                 onClick={handleDiscordLogin}
                             >
-                                <FaDiscord className="discord-icon" />
+                                <FaSitemap className="discord-icon" />
                                 Giriş Yap
                             </button>
                         )}
