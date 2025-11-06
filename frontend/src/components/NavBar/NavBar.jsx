@@ -47,7 +47,7 @@ function NavBar() {
         <nav className={`navbar ${isScrolled ? 'scrolled' : ''}`}>
             <div className="navbar-container">
                 <a href="/" className="nav-logo">
-                    <span>AgeV</span>
+                    <span>PXDevelopment</span>
                 </a>
 
                 <div className="menu-icon" onClick={toggleMenu}>
@@ -72,11 +72,11 @@ function NavBar() {
                             </div>
                         ) : isAuthenticated && user ? (
                             <div className="user-menu-container">
-                                <button 
+                                <button
                                     className="nav-link user-link"
                                     onClick={toggleUserMenu}
                                 >
-                                    <img 
+                                    <img
                                         src={user.avatar || `https://cdn.discordapp.com/embed/avatars/${user.discriminator % 5}.png`}
                                         alt={user.username}
                                         className="user-avatar"
@@ -84,12 +84,12 @@ function NavBar() {
                                     <span className="user-name">{user.username}</span>
                                     <FaUser className="user-icon" />
                                 </button>
-                                
+
                                 {showUserMenu && (
                                     <div className="user-dropdown">
                                         <div className="user-info">
                                             <div className="user-details">
-                                                <img 
+                                                <img
                                                     src={user.avatar || `https://cdn.discordapp.com/embed/avatars/${user.discriminator % 5}.png`}
                                                     alt={user.username}
                                                     className="dropdown-avatar"
@@ -101,7 +101,7 @@ function NavBar() {
                                             </div>
                                         </div>
                                         <div className="dropdown-divider"></div>
-                                        <button 
+                                        <button
                                             className="dropdown-item logout-item"
                                             onClick={handleLogout}
                                         >
@@ -112,7 +112,7 @@ function NavBar() {
                                 )}
                             </div>
                         ) : (
-                            <button 
+                            <button
                                 className="nav-link discord-link"
                                 onClick={handleDiscordLogin}
                             >
