@@ -1,4 +1,4 @@
-const config = {
+const Config = {
     db: {
         host: 'localhost',
         user: 'root',
@@ -6,3 +6,5 @@ const config = {
         database: 'PXDevWebSiteV3'
     }
 }
+
+module.exports = Config;
