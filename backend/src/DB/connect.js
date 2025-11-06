@@ -11,6 +11,12 @@ const pool = mysql.createPool({
     queueLimit: 0
 });
 
+const authOptions = {
+    adapter: MySQLAdapter(pool),
+    providers: [Google({ ...})],
+    secret: Config.auth.AUTH_SECRET,
+};
+
 async function checkConnection() {
     try {
         const connection = await pool.getConnection();
@@ -37,6 +43,7 @@ async function checkLogin(username, password) {
 }
 
 checkConnection();
+
 
 module.exports = {
     pool,
