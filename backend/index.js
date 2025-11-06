@@ -1,7 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const ExpressAuth = require('@auth/express');
-const Google = require('@auth/express/providers/google');
+const { Google } = require("@auth/express/providers/google");
+const { getSession } = require("@auth/express");
 
 const DB = require('./src/DB/connect.js');
 const Config = require('./config.js');
@@ -33,13 +34,13 @@ app.get('/', (req, res) => {
 });
 app.use("/auth", ExpressAuth(authOptions));
 
-import { getSession } from "@auth/express";
 
 app.get("/api/profile", async (req, res) => {
     const session = await getSession(req, authOptions);
     if (!session) return res.status(401).json({ error: "Unauthenticated" });
     res.json({ user: session.user });
 });
+
 
 app.listen(port, () => {
     console.log(`[BACKEND] Backend server running at http://localhost:${port}`);
