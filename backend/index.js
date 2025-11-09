@@ -21,6 +21,8 @@ const authOptions = {
         }),
     ],
     secret: Config.auth.AUTH_SECRET,
+    baseURL: Config.auth.AUTH_BASE_URL,
+    trustHost: true,
 };
 
 app.use(express.json());
@@ -40,3 +42,4 @@ app.get("/api/profile", async (req, res) => {
 app.listen(port, () => {
     console.log(`[BACKEND] Running at http://localhost:${port}`);
 });
+
