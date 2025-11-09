@@ -15,26 +15,54 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const BACKEND_BASE_URL = 'http://localhost:3000';
 
   // Check authentication status on mount
   useEffect(() => {
     const checkAuth = () => {
       try {
-        const isAuth = authUtils.isAuthenticated();
-        setIsAuthenticated(isAuth);
-        
-        if (isAuth) {
-          const userData = authUtils.getCurrentUser();
-          setUser(userData);
-        } else {
-          setUser(null);
-        }
+        // First, try to get session from backend (@auth/express)
+        fetch(`${BACKEND_BASE_URL}/api/profile`, {
+          method: 'GET',
+          credentials: 'include'
+        })
+          .then(async (res) => {
+            if (res.ok) {
+              const data = await res.json();
+              setUser(data.user);
+              setIsAuthenticated(true);
+            } else if (res.status === 401) {
+              // Fallback to existing cookie-based (Discord) auth if present
+              const isAuth = authUtils.isAuthenticated();
+              setIsAuthenticated(isAuth);
+              if (isAuth) {
+                const userData = authUtils.getCurrentUser();
+                setUser(userData);
+              } else {
+                setUser(null);
+              }
+            } else {
+              setIsAuthenticated(false);
+              setUser(null);
+            }
+          })
+          .catch(() => {
+            // Network error: fallback to cookie-based auth
+            const isAuth = authUtils.isAuthenticated();
+            setIsAuthenticated(isAuth);
+            if (isAuth) {
+              const userData = authUtils.getCurrentUser();
+              setUser(userData);
+            } else {
+              setUser(null);
+            }
+          })
+          .finally(() => setLoading(false));
+        return;
       } catch (error) {
         console.error('Auth check failed:', error);
         setIsAuthenticated(false);
         setUser(null);
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -56,6 +84,13 @@ export const AuthProvider = ({ children }) => {
   // Logout function
   const logout = () => {
     try {
+      // Sign out from backend session if exists
+      fetch(`${BACKEND_BASE_URL}/auth/signout`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'content-type': 'application/x-www-form-urlencoded' }
+      }).catch(() => {});
+      // Also clear any local cookie-based auth and redirect
       authUtils.logout();
       setUser(null);
       setIsAuthenticated(false);
@@ -95,6 +130,17 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Google OAuth login via backend (@auth/express)
+  const googleLogin = () => {
+    try {
+      const callbackUrl = window.location.origin; // return to frontend root after login
+      const url = `${BACKEND_BASE_URL}/auth/signin/google?callbackUrl=${encodeURIComponent(callbackUrl)}`;
+      window.location.href = url;
+    } catch (error) {
+      console.error('Google login failed:', error);
+    }
+  };
+
   // Update user data
   const updateUser = (userData) => {
     try {
@@ -114,6 +160,7 @@ export const AuthProvider = ({ children }) => {
     logout,
     discordLogin,
     handleDiscordCallback,
+    googleLogin,
     updateUser
   };
 

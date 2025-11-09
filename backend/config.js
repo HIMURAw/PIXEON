@@ -6,9 +6,9 @@ const Config = {
         database: 'PXDevWebSiteV3'
     },
     auth: {
-        AUTH_GOOGLE_ID: 'your-google-client-id',
-        AUTH_GOOGLE_SECRET: 'your-google-client-secret',
-        AUTH_SECRET: 'your-auth-secret',
+        AUTH_GOOGLE_ID: '739866522880-gj3uhtvprraomg9bjdo8ng9ldbj1m4ok.apps.googleusercontent.com',
+        AUTH_GOOGLE_SECRET: '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',
+        AUTH_SECRET: 'kereminpipisi',
         AUTH_BASE_URL: 'http://localhost:3000'
     }
 }
