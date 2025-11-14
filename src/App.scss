@@ -36,19 +36,35 @@ body {
     .part2{
       .countryDrop {
         width: 150px;
-        height: 80px;
+        height: 60px;
         min-width: 150px;
+        color: black !important;
+        border: 1px solid rgba(0, 0, 0, 0.2) !important;
+        border-radius: 7px !important;
+        padding: 10px 20px !important;
+        text-align: left;
+        justify-content: flex-start !important;
 
         .label{
           font-size: 12px !important;
           text-transform: capitalize !important;
-          color: rgba(0, 0, 0, 0.7) !important;
+          color: rgba(0, 0, 0, 0.4) !important;
+          line-height: 16px !important;
         }
+        .name{
+          font-size: 14px !important;
+          text-transform: capitalize !important;
+          color: #233a95 !important;
+          font-weight: 700 !important;
+          line-height: 16px !important;
+        }
+        span.ml-auto svg{
+          opacity: 0.7;
+        }
+
       }
     }
   }
-
-
 }
 
 .logoWrapper{
