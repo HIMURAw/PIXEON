@@ -12,3 +12,19 @@
 body {
   font-family: var(--primary-font);
 }
+
+.bg-blue {
+  background-color: #233a95;
+}
+
+.headerWrapper{
+  .top-strip {
+    padding: 8px 0px;
+    
+      p{
+        color: white;
+        font-size:12px;
+        font-weight:500;
+      }
+  }
+}
