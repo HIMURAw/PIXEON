@@ -1,8 +1,14 @@
 import { Link } from 'react-router-dom';
 import Logo from '../../assets/logo.png';
-import CountryDropDown from '../CountryDropDown';
-import { IoIosSearch } from "react-icons/io";
+// materials
 import Button from '@mui/material/Button';
+
+// Icons
+import { IoIosSearch } from "react-icons/io";
+import { FiUser } from "react-icons/fi";
+
+// components
+import CountryDropDown from '../CountryDropDown';
 
 const Header = () => {
     return (
@@ -34,6 +40,11 @@ const Header = () => {
                                         <Button><IoIosSearch /></Button>
                                     </div>
                                     {/* Header Search En d Here */}
+
+
+                                    <div className='part3 d-flex align-items-center ml-auto'>
+                                        <Button className='circle'><FiUser /></Button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
