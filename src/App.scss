@@ -13,6 +13,10 @@ body {
   font-family: var(--primary-font);
 }
 
+.container{
+  max-width: 90%;
+}
+
 .bg-blue {
   background-color: #233a95;
 }
@@ -88,7 +92,7 @@ body {
     background: #f3f4f7;
     padding: 10px;
     position: relative;
-    border-radius: 10px;
+    border-radius: 5px;
     border: 1px solid rgba(0, 0, 0, 0.2);
 
     input {
@@ -123,5 +127,31 @@ body {
 .logoWrapper{
   img{
     width: 100%;
+  }
+}
+
+.cartTab{
+  button{
+    background-color: #fff1ee !important;
+
+    svg{
+      color: #ea2b0f !important;
+    }
+  }
+
+  .price{
+    font-size: 18px;
+    color: rgba(0, 0, 0, 0.8);
+  }
+
+  .count{
+    position: absolute;
+    top: -6px;
+    right: -4px;
+    background: #ea2b0f;
+    border-radius: 50%;
+    color: #fff;
+    width: 18px;
+    height: 18px;
   }
 }
