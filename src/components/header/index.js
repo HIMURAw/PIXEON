@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import Logo from '../../assets/logo.png';
 import CountryDropDown from '../CountryDropDown';
-import {IoSearch} from 'react-icons/io5';
+import { IoIosSearch } from "react-icons/io";
 import Button from '@mui/material/Button';
 
 const Header = () => {
@@ -29,11 +29,11 @@ const Header = () => {
 
 
                                     {/* Header Search Bar Here */}
-                                    <div className='headerSearch'>
-                                        <input type='text' />
-                                        <Button><IoSearch /></Button>
+                                    <div className='headerSearch ml-3 mr-3 '>
+                                        <input type='text' placeholder='Search for products...' />
+                                        <Button><IoIosSearch /></Button>
                                     </div>
-                                    {/* Header Search End Here */}
+                                    {/* Header Search En d Here */}
                                 </div>
                             </div>
                         </div>
