@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
-import Button from '@mui/material/Button';
 import Logo from '../../assets/logo.png';
+import CountryDropDown from '../CountryDropDown';
+import {IoSearch} from 'react-icons/io5';
+import Button from '@mui/material/Button';
 
 const Header = () => {
     return (
@@ -21,14 +23,17 @@ const Header = () => {
                                 </Link>
                             </div>
 
-                            <div className='col-sm-10 d-flex align-itemn-center part2'>
-                                <div className='d-flex justify-content-end w-100 align-items-center h-100'>
-                                    <Button className='countryDrop'>
-                                        <div className='info d-flex flex-column'>
-                                            <span>Your Location</span>
-                                            <span>India</span>
-                                        </div>
-                                    </Button>
+                            <div className='col-sm-10 d-flex align-items-center part2'>
+                                <div className='d-flex justify-content-start w-100 align-items-center h-100'>
+                                    <CountryDropDown />
+
+
+                                    {/* Header Search Bar Here */}
+                                    <div className='headerSearch'>
+                                        <input type='text' />
+                                        <Button><IoSearch /></Button>
+                                    </div>
+                                    {/* Header Search End Here */}
                                 </div>
                             </div>
                         </div>
