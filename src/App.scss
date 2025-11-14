@@ -20,11 +20,39 @@ body {
 .headerWrapper{
   .top-strip {
     padding: 8px 0px;
-    
+
       p{
         color: white;
         font-size:12px;
         font-weight:500;
       }
+  }
+
+  .header{
+    width: 100%;
+    height: auto;
+    padding: 15px 0px;
+
+    .part2{
+      .countryDrop {
+        width: 150px;
+        height: 80px;
+        min-width: 150px;
+
+        .label{
+          font-size: 12px !important;
+          text-transform: capitalize !important;
+          color: rgba(0, 0, 0, 0.7) !important;
+        }
+      }
+    }
+  }
+
+
+}
+
+.logoWrapper{
+  img{
+    width: 100%;
   }
 }
