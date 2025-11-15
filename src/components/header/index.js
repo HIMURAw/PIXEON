@@ -32,8 +32,8 @@ const Header = () => {
 
                             <div className='col-sm-10 d-flex align-items-center part2'>
                                 <div className='d-flex justify-content-start w-100 align-items-center h-100'>
-                                    <CountryDropDown />
 
+                                    <CountryDropDown />
 
                                     {/* Header Search Bar Here */}
                                     <div className='headerSearch ml-3 mr-3 '>
