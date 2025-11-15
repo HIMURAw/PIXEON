@@ -1,15 +1,16 @@
 import { Link } from 'react-router-dom';
-import Logo from '../../assets/logo.png';
+import Logo from '../../assets/Logo_Header.png';
 // materials
 import Button from '@mui/material/Button';
 
 // Icons
-import { IoIosSearch } from "react-icons/io";
 import { FiUser } from "react-icons/fi";
 import { IoBagOutline } from "react-icons/io5";
 
 // components
 import CountryDropDown from '../CountryDropDown';
+import SearchBox from './SearchBox';
+import Navigation from './Navigation';
 
 const Header = () => {
     return (
@@ -34,14 +35,7 @@ const Header = () => {
                                 <div className='d-flex justify-content-start w-100 align-items-center h-100'>
 
                                     <CountryDropDown />
-
-                                    {/* Header Search Bar Here */}
-                                    <div className='headerSearch ml-3 mr-3 '>
-                                        <input type='text' placeholder='Search for products...' />
-                                        <Button><IoIosSearch /></Button>
-                                    </div>
-                                    {/* Header Search En d Here */}
-
+                                    <SearchBox />
 
                                     <div className='part3 d-flex align-items-center ml-auto'>
                                         <Button className='circle mr-3'><FiUser /></Button>
@@ -58,6 +52,9 @@ const Header = () => {
                         </div>
                     </div>
                 </div>
+
+                <Navigation />
+
             </div>
         </>
     );
