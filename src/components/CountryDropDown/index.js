@@ -5,6 +5,7 @@ import { FaAngleDown } from 'react-icons/fa6';
 import Dialog from '@mui/material/Dialog';
 import { IoIosSearch } from "react-icons/io";
 import { MdClose } from "react-icons/md";
+import { FilterList } from '@mui/icons-material';
 
 const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -14,6 +15,7 @@ const CountryDrop = () => {
     const [isOpenModal, setIsOpenModal] = useState(false);
     const [countriesData, setCountriesData] = useState([]);
     const [selectedTab, setSelectedTab] = useState(null);
+    const [isFiltering, setIsFiltering] = useState(false);
 
     useEffect(() => {
         fetch('https://countriesnow.space/api/v0.1/countries')
@@ -29,6 +31,22 @@ const CountryDrop = () => {
         setSelectedTab(index);
         setIsOpenModal(false);
     }
+
+    const FilterList = (e) => {
+        const searchTerm = e.target.value.toLowerCase();
+        setIsFiltering(true);
+        fetch('https://countriesnow.space/api/v0.1/countries')
+            .then((res) => res.json())
+            .then((json) => {
+                const list = Array.isArray(json?.data) ? json.data.map((c) => c.country).filter(Boolean) : [];
+                const filteredList = list.filter((country) =>
+                    country.toLowerCase().includes(searchTerm)
+                );
+                setCountriesData(filteredList);
+            })
+            .catch(() => setCountriesData([]))
+            .finally(() => setIsFiltering(false));
+    };
 
     return (
  <>
@@ -46,12 +64,13 @@ const CountryDrop = () => {
 
                 <Button className='close-btn' onClick={() => setIsOpenModal(false)}><MdClose /></Button>
 
-                <div className='headerSearch w-100'>
-                    <input type='text' placeholder='Search for area...' />
+                <div className='headerSearch w-100 d-flex align-items-center'>
+                    <input type='text' placeholder='Search for area...' onChange={FilterList} />
                     <Button><IoIosSearch /></Button>
+                    {isFiltering && <span className='list-loader ml-2' aria-label='loading' />}
                 </div>
 
-                <ul className='countryList mt-3'>
+                <ul className={`countryList mt-3 ${isFiltering ? 'filtering' : ''}`}>
                     {countriesData.map((country, index) => (
                         <li key={index}>
                             <Button onClick={() => selectCountry(index)} 
