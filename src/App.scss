@@ -327,7 +327,7 @@ nav {
           text-transform: uppercase;
           display: flex;
           align-items: center;
-          padding: 10px 20px;
+          padding: 10px 30px;
           transition: all 0.2s ease-in-out;
           border-radius: 25px;
 
@@ -338,9 +338,16 @@ nav {
 
           svg{
             font-size: 20px;
+            margin-right: 8px;
           }
         }
       }
     }
+  }
+}
+
+.locationModal{
+  .MuiPaper-elevation{
+    padding: 25px;
   }
 }
