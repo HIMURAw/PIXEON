@@ -7,6 +7,7 @@ import Button from '@mui/material/Button';
 import { FiUser } from "react-icons/fi";
 import { IoBagOutline } from "react-icons/io5";
 import { TbHandStop } from "react-icons/tb";
+import { FaAngleDown } from 'react-icons/fa6';
 
 // components
 import CountryDropDown from '../CountryDropDown';
@@ -33,7 +34,12 @@ const Header = () => {
                     </ul>
 
                     <span className='mid-text'><TbHandStop /> 100% Safe delivery and instant support</span>
-                    <span className='mid-text2'>Need help? Contact Us: help.pixeon.com</span>
+                    <span className='mid-text2'>Need help? Contact Us: <span className='clr-blue'>help.pixeon.com</span></span>
+
+                    <div className='mid-actions'>
+                        <Button className='btn-outline' disableRipple>English <FaAngleDown /></Button>
+                        <Button className='btn-primary' disableRipple>USD <FaAngleDown /></Button>
+                    </div>
                 </div>
 
                 <div className="header">

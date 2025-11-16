@@ -20,6 +20,9 @@ body {
 .bg-blue {
   background-color: #233a95;
 }
+.clr-blue {
+  color: #2bbef9;
+}
 
 @media(max-width: 1200px) {
   .container{
@@ -51,6 +54,7 @@ body {
     width: 100%;
     height: auto;
     position: relative;
+    color: rgba(0, 0, 0, 0.7);
     border-bottom: 1px solid rgba(0, 0, 0, 0.7);
 
     ul{
@@ -99,6 +103,59 @@ body {
       font-weight: 700;
       color: rgba(0, 0, 0, 0.8);
       white-space: nowrap;
+      border-right: 1px solid rgba(0, 0, 0, 0.7);
+      height: 20px;
+      padding-right: 50px;
+    }
+
+    .mid-actions{
+      position: absolute;
+      right: 150px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      gap: 10px;
+
+      .btn-outline{
+        min-width: 90px !important;
+        height: 36px !important;
+        color: rgba(0, 0, 0, 0.7) !important;
+        padding: 0 14px !important;
+        text-transform: none !important;
+        font-weight: 700 !important;
+
+        &:hover{
+          background-color: transparent !important;
+          color: rgba(0, 0, 0, 0.8) !important;
+        }
+
+        &:active,
+        &:focus,
+        &:focus-visible{
+          background-color: transparent !important;
+          color: rgba(0, 0, 0, 0.8) !important;
+          box-shadow: none !important;
+          outline: none !important;
+        }
+      }
+
+      .btn-primary{
+        min-width: 100px !important;
+        height: 36px !important;
+        padding: 0 16px !important;
+        color: rgba(0, 0, 0, 0.7) !important;
+        text-transform: none !important;
+        font-weight: 700 !important;
+
+        &:hover{
+          background-color: transparent !important;
+          color: rgba(0, 0, 0, 0.8) !important;
+        }
+      }
+
+      svg{
+        margin-left: 6px;
+      }
     }
   }
 
