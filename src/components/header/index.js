@@ -6,6 +6,7 @@ import Button from '@mui/material/Button';
 // Icons
 import { FiUser } from "react-icons/fi";
 import { IoBagOutline } from "react-icons/io5";
+import { TbHandStop } from "react-icons/tb";
 
 // components
 import CountryDropDown from '../CountryDropDown';
@@ -16,10 +17,23 @@ const Header = () => {
     return (
         <>
             <div className="headerWrapper">
+                
                 <div className="top-strip bg-blue">
                     <div className="container">
                         <p className="mb-0 mt-0 text-center">Sitemizde <b>"HOSGELDIN12"</b> kodu ile %10 kar edebilirsiniz</p>
                     </div>
+                </div>
+
+                <div className="mid-strip">
+                    <ul className='ml-auto'>
+                        <li className='list-inline-item'><Link to="/">About Us</Link></li>
+                        <li className='list-inline-item'><Link to="/">My account</Link></li>
+                        <li className='list-inline-item'><Link to="/">Wishlist</Link></li>
+                        <li className='list-inline-item'><Link to="/">Order Tracking</Link></li>
+                    </ul>
+
+                    <span className='mid-text'><TbHandStop /> 100% Safe delivery and instant support</span>
+                    <span className='mid-text2'>Need help? Contact Us: help.pixeon.com</span>
                 </div>
 
                 <div className="header">
