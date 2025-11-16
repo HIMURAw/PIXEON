@@ -213,7 +213,9 @@ body {
       } 
     }
   }
-  .headerSearch{
+}
+
+.headerSearch{
     width: 60%;
     height: 60px;
     background: #f3f4f7;
@@ -246,10 +248,10 @@ body {
 
       svg{
         font-size: 20px;
+        opacity: 0.7;
       }
     }
   }
-}
 
 .logoWrapper{
   img{
