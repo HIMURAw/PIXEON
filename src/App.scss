@@ -51,6 +51,21 @@ body {
       }
     }
   }
+
+  .list-loader{
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(0,0,0,0.2);
+    border-top-color: rgba(0,0,0,0.6);
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+  }
+}
+
+@keyframes spin{
+  from{ transform: rotate(0deg); }
+  to{ transform: rotate(360deg); }
 }
 
 .headerWrapper{
@@ -388,6 +403,11 @@ nav {
   }
 
   .countryList{
+   transition: opacity 0.2s ease-in-out;
+   &.filtering{
+    opacity: 0.5;
+    pointer-events: none;
+   }
    margin-bottom: 0px;
    max-height: 400px;
    overflow-x: hidden;
