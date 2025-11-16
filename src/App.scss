@@ -364,6 +364,8 @@ nav {
 }
 
 .locationModal{
+  user-select: none;
+  
   .MuiPaper-elevation{
     padding: 25px;
     position: relative;
