@@ -46,6 +46,62 @@ body {
       }
   }
 
+  .mid-strip{
+    padding: 15px 0px;
+    width: 100%;
+    height: auto;
+    position: relative;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.7);
+
+    ul{
+      margin-bottom: 0px;
+      padding-left: 95px;
+    
+      li{
+        margin-left: 20px;
+
+        a{
+          font-size: 14px;
+          color: rgba(0, 0, 0, 0.7);
+          text-decoration: none;
+
+          &:hover{
+            color: #233a95;
+          }
+        }
+      }
+    }
+    .mid-text{
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 14px;
+      color: rgba(0, 0, 0, 0.8);
+      font-weight: 700;
+      border-right: 1px solid rgba(0, 0, 0, 0.7);
+      height: 20px;
+      padding-right: 50px;
+
+      svg{
+        font-size: 19px;
+        margin-right: 6px;
+        vertical-align: middle;
+      }
+    }
+
+    .mid-text2{
+      position: absolute;
+      top: 50%;
+      left: calc(50% + 80px + 140px);
+      transform: translateY(-50%);
+      font-size: 14px;
+      font-weight: 700;
+      color: rgba(0, 0, 0, 0.8);
+      white-space: nowrap;
+    }
+  }
+
   .header{
     width: 100%;
     height: auto;
