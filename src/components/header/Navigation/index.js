@@ -6,7 +6,6 @@ import { IoIosMenu } from "react-icons/io";
 import { IoMdHome } from "react-icons/io";
 import { VscJersey } from "react-icons/vsc";
 import { GiHanger } from "react-icons/gi";
-import { FiCpu } from "react-icons/fi";
 import { GiPerfumeBottle } from "react-icons/gi";
 import { GiNecklace } from "react-icons/gi";
 import { GiRunningShoe } from "react-icons/gi";
@@ -28,7 +27,6 @@ const Navigation = () => {
                             <li className='list-inline-item'><Link to="/"><IoMdHome /> Home</Link></li>
                             <li className='list-inline-item'><Link to="/"><GiHanger/> Fashion</Link></li>
                             <li className='list-inline-item'><Link to="/"><VscJersey /> Clothing</Link></li>
-                            <li className='list-inline-item'><Link to="/"><FiCpu /> Electronic</Link></li>
                             <li className='list-inline-item'><Link to="/"><GiPerfumeBottle /> Beauty</Link></li>
                             <li className='list-inline-item'><Link to="/"><GiNecklace /> accessory</Link></li>
                             <li className='list-inline-item'><Link to="/"><GiRunningShoe /> Shoes</Link></li>
