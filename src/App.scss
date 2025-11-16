@@ -13,6 +13,21 @@ body {
   font-family: var(--primary-font);
 }
 
+::-webkit-scrollbar{
+  width: 8px !important;
+  height: 8px !important;
+}
+
+::-webkit-scrollbar-thumb{
+  background: #fff !important;
+  border-radius: 4px !important;
+}
+
+::-webkit-scrollbar-track{
+  background: transparent !important;
+  border-radius: 4px !important;
+}
+
 .container{
   max-width: 90%;
 }
@@ -351,5 +366,47 @@ nav {
 .locationModal{
   .MuiPaper-elevation{
     padding: 25px;
+    position: relative;
+  }
+
+  .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: #000 !important;
+    min-width: 40px !important;
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 50% !important;
+
+    svg{
+      font-size: 20px;
+      opacity: 0.7;
+    }
+  }
+
+  .countryList{
+   margin-bottom: 0px;
+   max-height: 400px;
+   overflow-x: hidden;
+   overflow-y: scroll;
+
+   li{
+    width: 100%;
+    list-style: none;
+
+    button{
+      width: 100%;
+      text-transform: capitalize !important;
+      color: #000 !important;
+      justify-content: flex-start !important;
+      padding: 10px 20px !important;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;
+
+      &:hover{
+        background: #f3f4f7;
+      }
+    }
+   }
   }
 }

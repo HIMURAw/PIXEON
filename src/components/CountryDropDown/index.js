@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import Button from '@mui/material/Button';
 import { FaAngleDown } from 'react-icons/fa6';
 import Dialog from '@mui/material/Dialog';
 import { IoIosSearch } from "react-icons/io";
+import { MdClose } from "react-icons/md";
 
 const countries = [
   "Afghanistan",
@@ -202,10 +204,13 @@ const countries = [
 ];
 
 
-const countryDrop=() => {
+const CountryDrop = () => {
+
+    const [isOpenModal, setIsOpenModal] = useState(false);
+
     return (
  <>
-            <Button className='countryDrop'>
+            <Button className='countryDrop' onClick={() => setIsOpenModal(true)}>
                 <div className='info d-flex flex-column'>
                     <span className='label'>Your Location</span>
                     <span className='name'>Turkey</span>
@@ -213,16 +218,18 @@ const countryDrop=() => {
                 <span className='ml-auto'><FaAngleDown /></span>
             </Button>
 
-            <Dialog open={true} className='locationModal'>
-                <h4>Choose your Delivery Location</h4>
+            <Dialog open={isOpenModal} onClose={() => setIsOpenModal(false)} className='locationModal'>
+                <h4 className='mb-0'>Choose your Delivery Location</h4>
                 <p>Enter your adress and we will specify the offer for your area.</p>
+
+                <Button className='close-btn' onClick={() => setIsOpenModal(false)}><MdClose /></Button>
 
                 <div className='headerSearch w-100'>
                     <input type='text' placeholder='Search for area...' />
                     <Button><IoIosSearch /></Button>
                 </div>
 
-                <ul className='countyList'>
+                <ul className='countryList mt-3'>
                     {countries.map((country, index) => (
                         <li key={index}>
                             <Button>{country}</Button>
@@ -234,4 +241,4 @@ const countryDrop=() => {
     );
 }
 
-export default countryDrop;
+export default CountryDrop;
