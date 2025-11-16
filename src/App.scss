@@ -365,7 +365,7 @@ nav {
 
 .locationModal{
   user-select: none;
-  
+
   .MuiPaper-elevation{
     padding: 25px;
     position: relative;
@@ -393,6 +393,8 @@ nav {
    overflow-x: hidden;
    overflow-y: scroll;
 
+
+
    li{
     width: 100%;
     list-style: none;
@@ -409,6 +411,11 @@ nav {
         background: #f3f4f7;
       }
     }
+
+    button.active{
+    background: #e2e2e2 !important;
+    font-weight: 700 !important;
+   }
    }
   }
 }

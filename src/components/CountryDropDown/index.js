@@ -13,6 +13,7 @@ const Transition = forwardRef(function Transition(props, ref) {
 const CountryDrop = () => {
     const [isOpenModal, setIsOpenModal] = useState(false);
     const [countriesData, setCountriesData] = useState([]);
+    const [selectedTab, setSelectedTab] = useState(null);
 
     useEffect(() => {
         fetch('https://countriesnow.space/api/v0.1/countries')
@@ -23,6 +24,11 @@ const CountryDrop = () => {
             })
             .catch(() => setCountriesData([]));
     }, []);
+
+    const selectCountry = (index) => {
+        setSelectedTab(index);
+        setIsOpenModal(false);
+    }
 
     return (
  <>
@@ -48,7 +54,9 @@ const CountryDrop = () => {
                 <ul className='countryList mt-3'>
                     {countriesData.map((country, index) => (
                         <li key={index}>
-                            <Button onClick={() => setIsOpenModal(false)}>{country}</Button>
+                            <Button onClick={() => selectCountry(index)} 
+                            className={`${selectedTab === index ? 'active' : ''}`}
+                            >{country}</Button>
                         </li>
                     ))}
                 </ul>
