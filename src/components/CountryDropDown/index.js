@@ -15,6 +15,7 @@ const CountryDrop = () => {
     const [isOpenModal, setIsOpenModal] = useState(false);
     const [countriesData, setCountriesData] = useState([]);
     const [selectedTab, setSelectedTab] = useState(null);
+    const [selectedCountry, setSelectedCountry] = useState('Turkey');
     const [isFiltering, setIsFiltering] = useState(false);
 
     useEffect(() => {
@@ -29,6 +30,8 @@ const CountryDrop = () => {
 
     const selectCountry = (index) => {
         setSelectedTab(index);
+        const name = countriesData[index];
+        if (name) setSelectedCountry(name);
         setIsOpenModal(false);
     }
 
@@ -53,7 +56,7 @@ const CountryDrop = () => {
             <Button className='countryDrop' onClick={() => setIsOpenModal(true)}>
                 <div className='info d-flex flex-column'>
                     <span className='label'>Your Location</span>
-                    <span className='name'>Turkey</span>
+                    <span className='name'>{selectedCountry}</span>
                 </div>
                 <span className='ml-auto'><FaAngleDown /></span>
             </Button>
