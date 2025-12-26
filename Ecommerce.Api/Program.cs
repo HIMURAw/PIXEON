@@ -5,8 +5,8 @@ builder.Services.AddCors(opt =>
 {
     opt.AddPolicy("frontend", p =>
         p.WithOrigins("http://localhost:3000")
-         .AllowAnyHeader()
-         .AllowAnyMethod());
+        .AllowAnyHeader()
+        .AllowAnyMethod());
 });
 
 app.UseCors("frontend");
