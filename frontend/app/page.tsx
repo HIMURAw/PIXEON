@@ -1,5 +1,6 @@
 import MainBar from "@/components/header/MainBar";
 import TopBar from "@/components/header/TopBar";
+import Head from "@/components/header/Head";
 
 
 export default function Home() {
@@ -7,6 +8,7 @@ export default function Home() {
         <>
             <TopBar />
             <MainBar />
+            <Head />
         </>
     );
 }
