@@ -12,12 +12,12 @@ export default function MainBar() {
 
                 <div className="hidden md:flex items-center gap-2 text-gray-400">
                     <span>🔒</span>
-                    <span>100% Secure delivery without contacting the courier</span>
+                    <span>Kuryeyle iletişime geçmeden %100 güvenli teslimat.</span>
                 </div>
 
                 <div className="flex items-center gap-4">
                     <span className="text-cyan-400 font-semibold">
-                        Need help? Call Us: +0020 500
+                        <a className="" href="#">Need help?</a> Call Us: +0020 500
                     </span>
 
                     <select className="bg-black border border-gray-600 text-white text-sm px-2 py-1">
