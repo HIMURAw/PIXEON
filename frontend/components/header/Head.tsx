@@ -4,14 +4,34 @@ import {
     ChevronDown,
     Search,
     ShoppingCart,
-    User
+    User,
+    X
 } from "lucide-react";
+
+import BurgerMenu from "./mobile/burgerMenu";
 
 export default function Head() {
     return (
         <header className="w-full border-b border-gray-200">
             <div className="max-w-7xl mx-auto px-6">
-                <div className="flex items-center justify-between py-4">
+                <div className="flex md:hidden items-center justify-between py-3">
+
+                    <BurgerMenu />
+
+                    <Image
+                        src="/logo.png"
+                        alt="Logo"
+                        width={48}
+                        height={48}
+                    />
+
+                    <div className="flex items-center gap-3">
+                        <ShoppingCart size={20} />
+                        <User size={20} />
+                    </div>
+                </div>
+
+                <div className="hidden md:flex items-center justify-between py-4">
                     <div className="flex flex-col items-center gap-1">
                         <Image
                             className="object-contain"
@@ -25,18 +45,15 @@ export default function Head() {
                         </span>
                     </div>
 
-                    <button className="hidden h-15 md:flex items-center border border-gray-600 rounded-lg pl-6 pr-4 py-2 gap-4 ml-9">
-                        {/* TEXT */}
+                    <button className="h-15 flex items-center border border-gray-600 rounded-lg pl-6 pr-4 py-2 gap-4 ml-9">
                         <div className="flex flex-col items-start leading-tight">
                             <span className="text-gray-400 text-xs">Your Location</span>
                             <span className="font-medium text-[#7dd7fb]">Select a Location</span>
                         </div>
-
-                        {/* ICON */}
                         <ChevronDown size={16} className="ml-auto" />
                     </button>
 
-                    <div className="flex-1 mx-6 hidden md:block ml-10">
+                    <div className="flex-1 mx-6 ml-10">
                         <div className="relative">
                             <input
                                 type="text"
@@ -58,43 +75,41 @@ export default function Head() {
                             <span className="font-medium">$0.00</span>
                         </div>
 
-
                         <div className="flex items-center gap-2">
                             <div className="w-10 h-10 bg-orange-100 flex items-center justify-center border border-gray-600 rounded-full">
                                 <ShoppingCart color="black" size={16} />
                             </div>
                             <span className="font-medium">0</span>
                         </div>
-
                     </div>
                 </div>
 
-                <nav className="flex items-center gap-6 py-3 text-sm font-bold">
+                <nav className="hidden md:flex items-center gap-6 py-3 text-sm font-bold">
                     <button className="flex items-center gap-2 bg-sky-400 text-white px-5 py-3 rounded-full">
                         ALL CATEGORIES
                         <ChevronDown size={16} />
                     </button>
 
                     <div className="ml-50 flex gap-6">
-                        <Link href="#" className="px-3 py-2 rounded hover:bg-gray-800 transition rounded-xl">
+                        <Link href="#" className="px-3 py-2 hover:bg-gray-800 transition rounded-xl">
                             HOME
                         </Link>
-                        <Link href="#" className="flex items-center gap-1 px-3 py-2 rounded hover:bg-gray-800 transition rounded-xl">
+                        <Link href="#" className="flex items-center gap-1 px-3 py-2 hover:bg-gray-800 transition rounded-xl">
                             SHOP <ChevronDown size={14} />
                         </Link>
-                        <Link href="#" className="px-3 py-2 rounded hover:bg-gray-800 transition rounded-xl">
+                        <Link href="#" className="px-3 py-2 hover:bg-gray-800 transition rounded-xl">
                             MEATS & SEAFOOD
-                        </Link> 
-                        <Link href="#" className="px-3 py-2 rounded hover:bg-gray-800 transition rounded-xl">
+                        </Link>
+                        <Link href="#" className="px-3 py-2 hover:bg-gray-800 transition rounded-xl">
                             BAKERY
                         </Link>
-                        <Link href="#" className="px-3 py-2 rounded hover:bg-gray-800 transition rounded-xl">
+                        <Link href="#" className="px-3 py-2 hover:bg-gray-800 transition rounded-xl">
                             BEVERAGES
                         </Link>
-                        <Link href="#" className="px-3 py-2 rounded hover:bg-gray-800 transition rounded-xl">
+                        <Link href="#" className="px-3 py-2 hover:bg-gray-800 transition rounded-xl">
                             BLOG
                         </Link>
-                        <Link href="#" className="px-3 py-2 rounded hover:bg-gray-800 transition rounded-xl">
+                        <Link href="#" className="px-3 py-2 hover:bg-gray-800 transition rounded-xl">
                             CONTACT
                         </Link>
                     </div>
