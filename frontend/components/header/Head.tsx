@@ -1,7 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import {
-    Hand,
     ChevronDown,
     Search,
     ShoppingCart,
@@ -70,7 +69,7 @@ export default function Head() {
                     </div>
                 </div>
 
-                <nav className="flex items-center gap-6 py-3 text-sm font-medium">
+                <nav className="flex items-center gap-6 py-3 text-sm font-bold">
                     <button className="flex items-center gap-2 bg-sky-400 text-white px-5 py-3 rounded-full">
                         ALL CATEGORIES
                         <ChevronDown size={16} />

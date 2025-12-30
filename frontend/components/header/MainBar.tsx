@@ -23,20 +23,20 @@ export default function MainBar() {
                     </span>
 
                     <div className="relative group inline-block">
-                    <div className="bg-black flex items-center text-white font-bold text-sm px-3 py-2 cursor-pointer">
-                      <span>English</span>
-                      <ChevronDown size={14} className="ml-2" />
-                    </div>
+                        <div className="bg-black flex items-center text-white font-bold text-sm px-3 py-2 cursor-pointer">
+                          <span>English</span>
+                          <ChevronDown size={14} className="ml-2" />
+                        </div>
                         
-                      <div className="absolute left-0 mt-1 w-full bg-black border border-gray-700 
-                                      opacity-0 invisible group-hover:opacity-100 
-                                      group-hover:visible transition">
-                        <div className="px-3 py-2 hover:bg-[#7dd7fb] hover:text-black cursor-pointer">
-                          English
-                        </div>
-                        <div className="px-3 py-2 hover:bg-[#7dd7fb] hover:text-black cursor-pointer">
-                          Türkçe
-                        </div>
+                        <div className="absolute left-0 mt-1 w-full bg-black border border-gray-700 
+                                        opacity-0 invisible group-hover:opacity-100 
+                                        group-hover:visible transition">
+                            <div className="px-3 py-2 hover:bg-[#7dd7fb] hover:text-black cursor-pointer">
+                                English
+                            </div>
+                            <div className="px-3 py-2 hover:bg-[#7dd7fb] hover:text-black cursor-pointer">
+                                Türkçe
+                            </div>
                       </div>
                     </div>
 
