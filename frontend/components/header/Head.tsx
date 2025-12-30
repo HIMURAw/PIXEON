@@ -85,7 +85,7 @@ export default function Head() {
                         </Link>
                         <Link href="#" className="px-3 py-2 rounded hover:bg-gray-800 transition rounded-xl">
                             MEATS & SEAFOOD
-                        </Link>
+                        </Link> 
                         <Link href="#" className="px-3 py-2 rounded hover:bg-gray-800 transition rounded-xl">
                             BAKERY
                         </Link>
