@@ -21,6 +21,30 @@ export default function LocationButton() {
         return localStorage.getItem("city");
     });
 
+    async function detectLocation() {
+        if (!navigator.geolocation) return;
+
+        navigator.geolocation.getCurrentPosition(async (pos) => {
+            const { latitude, longitude } = pos.coords;
+
+            const res = await fetch(
+                `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
+            );
+
+            const data = await res.json();
+
+            const detectedCity =
+                data.address.city ||
+                data.address.town ||
+                data.address.state;
+
+            if (detectedCity) {
+                setCity(detectedCity);
+                localStorage.setItem("city", detectedCity);
+            }
+        });
+    }
+
 
     function selectCity(name: string) {
         setCity(name);
@@ -57,6 +81,8 @@ export default function LocationButton() {
                         </div>
 
                         <div className="overflow-y-auto max-h-[60vh]">
+                            <div onClick={detectLocation} className="px-4 py-3 text-gray-300 hover:bg-[#7dd7fb] hover:text-black cursor-pointer">Konumumu Otomatik Algıla
+                            </div>
                             {CITIES.map((c) => (
                                 <div
                                     key={c}
