@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 
 import BurgerMenu from "./mobile/burgerMenu";
+import LocationButton from "./locationButton/locationButton";
 
 export default function Head() {
     return (
@@ -45,13 +46,8 @@ export default function Head() {
                         </span>
                     </div>
 
-                    <button className="h-15 flex items-center border border-gray-600 rounded-lg pl-6 pr-4 py-2 gap-4 ml-9">
-                        <div className="flex flex-col items-start leading-tight">
-                            <span className="text-gray-400 text-xs">Your Location</span>
-                            <span className="font-medium text-[#7dd7fb]">Select a Location</span>
-                        </div>
-                        <ChevronDown size={16} className="ml-auto" />
-                    </button>
+
+                    <LocationButton />
 
                     <div className="flex-1 mx-6 ml-10">
                         <div className="relative">
