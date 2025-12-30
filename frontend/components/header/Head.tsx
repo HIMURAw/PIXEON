@@ -83,7 +83,7 @@ export default function Head() {
                 <nav className="hidden md:flex items-center gap-6 py-3 text-sm font-extrabold">
                     <CategoriesButton />
 
-                    <div className="ml-38 flex gap-4">
+                    <div className="ml-60 flex gap-4">
                         <Link
                             href="#"
                             className="px-4 h-[44px] flex items-center justify-center rounded-xl hover:bg-gray-800 transition"
@@ -96,13 +96,6 @@ export default function Head() {
                             className="px-4 h-[44px] flex items-center justify-center gap-1 rounded-xl hover:bg-gray-800 transition"
                         >
                             SHOP <ChevronDown size={14} />
-                        </Link>
-
-                        <Link
-                            href="#"
-                            className="px-4 h-[44px] flex items-center justify-center rounded-xl hover:bg-gray-800 transition"
-                        >
-                            MEATS & SEAFOOD
                         </Link>
 
                         <Link
