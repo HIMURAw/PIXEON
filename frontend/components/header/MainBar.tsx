@@ -2,17 +2,14 @@ import {
     Hand
 } from "lucide-react";
 
+import Navbar from './navbar/Navbar'
+
 export default function MainBar() {
     return (
         <div className="bg-black text-gray-300 text-sm border-b border-gray-600">
             <div className="max-w-7xl mx-auto flex items-center justify-between px-4 py-3">
 
-                <div className="flex gap-4">
-                    <a href="#" className="hover:text-[#7dd7fb] text-[#696e7f]">About Us</a>
-                    <a href="#" className="hover:text-[#7dd7fb] text-[#696e7f]">My Account</a>
-                    <a href="#" className="hover:text-[#7dd7fb] text-[#696e7f]">Wishlist</a>
-                    <a href="#" className="hover:text-[#7dd7fb] text-[#696e7f]">Order Tracking</a>
-                </div>
+                <Navbar />
 
                 <div className="hidden md:flex items-center gap-2 text-gray-400 border-r border-gray-600 pr-4">
                     <Hand />

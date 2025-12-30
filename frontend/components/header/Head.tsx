@@ -76,15 +76,29 @@ export default function Head() {
                         <ChevronDown size={16} />
                     </button>
 
-                    <Link href="#">HOME</Link>
-                    <Link href="#" className="flex items-center gap-1">
-                        SHOP <ChevronDown size={14} />
-                    </Link>
-                    <Link href="#">MEATS & SEAFOOD</Link>
-                    <Link href="#">BAKERY</Link>
-                    <Link href="#">BEVERAGES</Link>
-                    <Link href="#">BLOG</Link>
-                    <Link href="#">CONTACT</Link>
+                    <div className="ml-50 flex gap-6">
+                        <Link href="#" className="px-3 py-2 rounded hover:bg-gray-800 transition rounded-xl">
+                            HOME
+                        </Link>
+                        <Link href="#" className="flex items-center gap-1 px-3 py-2 rounded hover:bg-gray-800 transition rounded-xl">
+                            SHOP <ChevronDown size={14} />
+                        </Link>
+                        <Link href="#" className="px-3 py-2 rounded hover:bg-gray-800 transition rounded-xl">
+                            MEATS & SEAFOOD
+                        </Link>
+                        <Link href="#" className="px-3 py-2 rounded hover:bg-gray-800 transition rounded-xl">
+                            BAKERY
+                        </Link>
+                        <Link href="#" className="px-3 py-2 rounded hover:bg-gray-800 transition rounded-xl">
+                            BEVERAGES
+                        </Link>
+                        <Link href="#" className="px-3 py-2 rounded hover:bg-gray-800 transition rounded-xl">
+                            BLOG
+                        </Link>
+                        <Link href="#" className="px-3 py-2 rounded hover:bg-gray-800 transition rounded-xl">
+                            CONTACT
+                        </Link>
+                    </div>
                 </nav>
             </div>
         </header>
