@@ -56,7 +56,7 @@ export default function LocationButton() {
         <>
             <button
                 onClick={() => setOpen(true)}
-                className="hidden md:flex items-center border border-gray-600 rounded-lg pl-6 pr-4 py-2 gap-4"
+                className="hidden md:flex items-center border border-gray-600 rounded-lg pl-6 pr-4 py-2 gap-4 ml-5 cursor-pointer hover:hover:bg-[#2b373b]"
             >
                 <div className="flex flex-col items-start">
                     <span className="text-xs text-gray-400">Your Location</span>
@@ -68,7 +68,7 @@ export default function LocationButton() {
             </button>
 
             {open && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center">
+                <div className="fixed inset-0 z-50 flex items-center justify-center user-select-none">
                     <div
                         className="absolute inset-0 bg-black/50"
                         onClick={() => setOpen(false)}
