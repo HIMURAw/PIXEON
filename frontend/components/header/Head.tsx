@@ -9,7 +9,7 @@ import {
 
 import BurgerMenu from "./mobile/burgerMenu";
 import LocationButton from "./locationButton/locationButton";
-import CategoriesButton from "./categoriesButton/categoriesButton";
+import CategoriesSection from "../categories/CategoriesSection";
 
 export default function Head() {
     return (
@@ -81,7 +81,7 @@ export default function Head() {
                 </div>
 
                 <nav className="hidden md:flex items-center gap-6 py-3 text-sm font-extrabold">
-                    <CategoriesButton />
+                    <CategoriesSection />
 
                     <div className="ml-60 flex gap-4">
                         <Link
@@ -127,7 +127,7 @@ export default function Head() {
                         </Link>
                     </div>
                 </nav>
-
+                
 
             </div>
         </header>
