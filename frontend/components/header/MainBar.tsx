@@ -1,5 +1,6 @@
 import {
-    Hand
+    Hand,
+    ChevronDown 
 } from "lucide-react";
 
 import Navbar from './navbar/Navbar'
@@ -21,17 +22,42 @@ export default function MainBar() {
                         <a className="hover:text-[#7dd7fb]" href="#">Need help?</a> Call Us: <span className="text-cyan-400"> +90 552 833 08 83</span>
                     </span>
 
-                    <select className="bg-black border-none font-bold text-white text-sm px-2 py-1">
-                        <option>English</option>
-                        <option>Türkçe</option>
-                    </select>
+                    <div className="relative group inline-block">
+                    <div className="bg-black flex items-center text-white font-bold text-sm px-3 py-2 cursor-pointer">
+                      <span>English</span>
+                      <ChevronDown size={14} className="ml-2" />
+                    </div>
+                        
+                      <div className="absolute left-0 mt-1 w-full bg-black border border-gray-700 
+                                      opacity-0 invisible group-hover:opacity-100 
+                                      group-hover:visible transition">
+                        <div className="px-3 py-2 hover:bg-[#7dd7fb] hover:text-black cursor-pointer">
+                          English
+                        </div>
+                        <div className="px-3 py-2 hover:bg-[#7dd7fb] hover:text-black cursor-pointer">
+                          Türkçe
+                        </div>
+                      </div>
+                    </div>
 
-                    <select className="bg-black  border border-none font-bold text-white text-sm px-2 py-1">
-                        <option>USD</option>
-                        <option>TRY</option>
-                    </select>
+                    <div className="relative group inline-block">
+                    <div className="bg-black flex items-center text-white font-bold text-sm px-3 py-2 cursor-pointer">
+                      <span>USD</span>
+                      <ChevronDown size={14} className="ml-2" />
+                    </div>
+                        
+                      <div className="absolute left-0 mt-1 w-full bg-black border border-gray-700 
+                                      opacity-0 invisible group-hover:opacity-100 
+                                      group-hover:visible transition">
+                        <div className="px-3 py-2 hover:bg-[#7dd7fb] hover:text-black cursor-pointer">
+                          USD
+                        </div>
+                        <div className="px-3 py-2 hover:bg-[#7dd7fb] hover:text-black cursor-pointer">
+                          TRY
+                        </div>
+                      </div>
+                    </div>
                 </div>
-
             </div>
         </div>
     );
