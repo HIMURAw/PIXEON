@@ -79,7 +79,7 @@ export default function HeroCarousel() {
     };
 
     return (
-        <div className="user-select-none relative ml-20 w-full max-w-5xl h-[480px] bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl overflow-hidden group">
+        <div className="user-select-none relative ml-40 w-full max-w-5xl h-[480px] bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl overflow-hidden group">
             <div className="relative w-full h-full">
                 {slides.map((slide, index) => (
                     <div

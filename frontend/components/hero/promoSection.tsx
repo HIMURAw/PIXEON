@@ -1,15 +1,24 @@
 export default function PromoSection() {
   return (
-    <div className="max-w-7xl mx-auto px-4 py-3 mt-4 rounded-lg overflow-hidden shadow-md cursor-pointer hover:shadow-lg transition-shadow duration-300 relative">
+    <div className="w-85 h-100 px-2 py-1 mt-3 rounded-md overflow-hidden shadow cursor-pointer hover:shadow-md transition-shadow relative">
       <img
         src="/ads/ads.png"
         alt="Reklam Banner"
-        className="w-full h-20 object-cover rounded-md"
+        className="w-full h-full object-cover rounded-md"
       />
-      {/* Overlay: fiyat ve açıklama */}
-      <div className="absolute inset-0 bg-black bg-opacity-40 flex flex-col justify-center px-4 rounded-md">
-        <span className="text-white font-bold text-lg">$9.99</span>
-        <p className="text-white text-sm">Limited time offer! Don’t miss out.</p>
+
+      <div className="absolute inset-0 bg-black/45 flex flex-col justify-end p-3 rounded-md">
+        <span className="text-xs uppercase tracking-wide text-white/80">
+          Special Offer
+        </span>
+
+        <span className="text-white font-bold text-lg leading-tight">
+          Only $9.99
+        </span>
+
+        <p className="text-white/90 text-xs">
+          Limited time deal. Don’t miss it.
+        </p>
       </div>
     </div>
   );

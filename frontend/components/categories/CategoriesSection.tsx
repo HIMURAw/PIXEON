@@ -14,6 +14,7 @@ export default function CategoriesSection() {
                 onToggle={() => setOpen(v => !v)}
             />
             <CategoriesMenu isOpen={open} />
+
         </div>
     );
 }
