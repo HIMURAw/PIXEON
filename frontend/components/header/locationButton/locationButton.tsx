@@ -4,14 +4,14 @@ import { useState } from "react";
 import { ChevronDown, MapPin } from "lucide-react";
 
 const CITIES = [
-    "Adana", "Adıyaman", "Afyonkarahisar", "Ağrı", "Amasya", "Ankara", "Antalya", "Artvin",
-    "Aydın", "Balıkesir", "Bilecik", "Bingöl", "Bitlis", "Bolu", "Burdur", "Bursa", "Çanakkale",
-    "Çankırı", "Çorum", "Denizli", "Diyarbakır", "Edirne", "Elazığ", "Erzincan", "Erzurum",
-    "Eskişehir", "Gaziantep", "Giresun", "Gümüşhane", "Hakkari", "Hatay", "Isparta", "Mersin",
-    "İstanbul", "İzmir", "Kars", "Kastamonu", "Kayseri", "Kırklareli", "Kırşehir", "Kocaeli",
-    "Konya", "Kütahya", "Malatya", "Manisa", "Kahramanmaraş", "Mardin", "Muğla", "Muş",
-    "Nevşehir", "Niğde", "Ordu", "Rize", "Sakarya", "Samsun", "Siirt", "Sinop", "Sivas",
-    "Tekirdağ", "Tokat", "Trabzon", "Tunceli", "Şanlıurfa", "Uşak", "Van", "Yozgat", "Zonguldak"
+    "Adana","Adıyaman","Afyonkarahisar","Ağrı","Amasya","Ankara","Antalya","Artvin",
+    "Aydın","Balıkesir","Bilecik","Bingöl","Bitlis","Bolu","Burdur","Bursa","Çanakkale",
+    "Çankırı","Çorum","Denizli","Diyarbakır","Edirne","Elazığ","Erzincan","Erzurum",
+    "Eskişehir","Gaziantep","Giresun","Gümüşhane","Hakkari","Hatay","Isparta","Mersin",
+    "İstanbul","İzmir","Kars","Kastamonu","Kayseri","Kırklareli","Kırşehir","Kocaeli",
+    "Konya","Kütahya","Malatya","Manisa","Kahramanmaraş","Mardin","Muğla","Muş",
+    "Nevşehir","Niğde","Ordu","Rize","Sakarya","Samsun","Siirt","Sinop","Sivas",
+    "Tekirdağ","Tokat","Trabzon","Tunceli","Şanlıurfa","Uşak","Van","Yozgat","Zonguldak"
 ];
 
 export default function LocationButton() {
@@ -30,7 +30,6 @@ export default function LocationButton() {
             const res = await fetch(
                 `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
             );
-
             const data = await res.json();
 
             const detectedCity =
@@ -45,7 +44,6 @@ export default function LocationButton() {
         });
     }
 
-
     function selectCity(name: string) {
         setCity(name);
         localStorage.setItem("city", name);
@@ -54,40 +52,60 @@ export default function LocationButton() {
 
     return (
         <>
+            {/* BUTTON */}
             <button
                 onClick={() => setOpen(true)}
-                className="hidden md:flex items-center border border-gray-600 rounded-lg pl-6 pr-4 py-2 gap-4 ml-5 cursor-pointer hover:hover:bg-[#2b373b]"
+                className="hidden md:flex items-center gap-4 ml-5 px-6 py-2.5
+                bg-slate-900 border border-slate-700 rounded-xl
+                hover:border-sky-500 hover:bg-slate-800 transition"
             >
-                <div className="flex flex-col items-start">
-                    <span className="text-xs text-gray-400">Your Location</span>
-                    <span className="font-medium text-[#7dd7fb]">
+                <div className="flex flex-col items-start leading-tight">
+                    <span className="text-xs text-slate-400">Your Location</span>
+                    <span className="font-semibold text-sky-400">
                         {city ?? "Select a Location"}
                     </span>
                 </div>
-                <ChevronDown size={16} />
+                <ChevronDown size={16} className="text-slate-300" />
             </button>
 
+            {/* MODAL */}
             {open && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center user-select-none">
+                <div className="fixed inset-0 z-1000 flex items-center justify-center scroll-smooth">
+                    {/* Overlay */}
                     <div
-                        className="absolute inset-0 bg-black/50"
+                        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
                         onClick={() => setOpen(false)}
                     />
 
-                    <div className="relative bg-black w-full max-w-md max-h-[70vh] rounded-xl overflow-hidden">
-                        <div className="flex items-center gap-2 p-4 border-b border-gray-700 text-white font-bold">
-                            <MapPin size={16} />
-                            Konum Seç
+                    {/* Card */}
+                    <div className="relative bg-slate-900 w-full max-w-md rounded-2xl
+                        border border-slate-700 shadow-xl overflow-hidden">
+
+                        {/* Header */}
+                        <div className="flex items-center gap-2 px-5 py-4
+                            border-b border-slate-700 text-slate-200 font-semibold">
+                            <MapPin size={16} className="text-sky-400" />
+                            Select Location
                         </div>
 
-                        <div className="overflow-y-auto max-h-[60vh]">
-                            <div onClick={detectLocation} className="px-4 py-3 text-gray-300 hover:bg-[#7dd7fb] hover:text-black cursor-pointer">Konumumu Otomatik Algıla
+                        {/* List */}
+                        <div className="overflow-y-auto max-h-[60vh] scrollbar-thin scrollbar-thumb-slate-700">
+                            <div
+                                onClick={detectLocation}
+                                className="px-5 py-3 text-slate-300
+                                        hover:bg-sky-500 hover:text-slate-900
+                                        font-medium cursor-pointer transition"
+                            >
+                                📍 Detect Automatically
                             </div>
+
                             {CITIES.map((c) => (
                                 <div
                                     key={c}
                                     onClick={() => selectCity(c)}
-                                    className="px-4 py-3 text-gray-300 hover:bg-[#7dd7fb] hover:text-black cursor-pointer"
+                                    className="px-5 py-3 text-slate-300
+                                    hover:bg-slate-800 hover:text-sky-400
+                                    cursor-pointer transition"
                                 >
                                     {c}
                                 </div>

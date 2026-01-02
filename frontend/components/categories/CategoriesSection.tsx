@@ -4,7 +4,7 @@ import CategoriesButton from "../header/categoriesButton/categoriesButton";
 import CategoriesMenu from "./CategoriesMenu";
 
 export default function CategoriesSection() {
-    const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState(true);
 
     return (
         <div className="relative">
