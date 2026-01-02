@@ -45,7 +45,7 @@ export const products: Product[] = [
 
 export default function BestSellers() {
     return (
-        <section className="space-y-6">
+        <section className="ml-20 space-y-6">
             <div className="flex items-center justify-between">
                 <div>
                     <h2 className="text-xl font-semibold text-white">
