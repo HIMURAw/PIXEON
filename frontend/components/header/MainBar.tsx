@@ -15,7 +15,7 @@ export default function MainBar() {
 
           <div className="flex items-center gap-2 text-slate-400 border-r border-slate-700 pr-4">
             <Hand />
-            <span>Kuryeyle iletişime geçmeden %100 güvenli teslimat.</span>
+            <span>100% secure delivery without contacting the courier.</span>
           </div>
 
           <div className="flex items-center gap-4">
