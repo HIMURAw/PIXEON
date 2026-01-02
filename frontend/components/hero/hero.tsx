@@ -19,7 +19,7 @@ const slides: Slide[] = [
     {
         id: 1,
         badge: "-20% OFF",
-        badgeColor: "bg-green-400",
+        badgeColor: "bg-green-500",
         title: "Specialist in the grocery store",
         subtitle: "Only this week. Don't miss...",
         price: "$7.99",
@@ -30,7 +30,7 @@ const slides: Slide[] = [
     {
         id: 2,
         badge: "-30% OFF",
-        badgeColor: "bg-red-400",
+        badgeColor: "bg-red-500",
         title: "Fresh Organic Products",
         subtitle: "Best deals of the season...",
         price: "$5.99",
@@ -41,7 +41,7 @@ const slides: Slide[] = [
     {
         id: 3,
         badge: "-15% OFF",
-        badgeColor: "bg-blue-400",
+        badgeColor: "bg-sky-400",
         title: "Quality Guaranteed",
         subtitle: "Premium products for you...",
         price: "$9.99",
@@ -79,7 +79,7 @@ export default function HeroCarousel() {
     };
 
     return (
-        <div className="user-select-none relative ml-50 w-full max-w-5xl h-[480px] bg-gradient-to-br from-gray-700 to-gray-200 rounded-2xl overflow-hidden group">
+        <div className="user-select-none relative ml-50 w-full max-w-5xl h-[480px] bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl overflow-hidden group">
             <div className="relative w-full h-full">
                 {slides.map((slide, index) => (
                     <div
@@ -94,7 +94,7 @@ export default function HeroCarousel() {
                         <div className="flex items-center h-full px-6 lg:px-10">
                             <div className="w-1/2 space-y-3 pr-4">
                                 <div className="inline-block">
-                                    <span className="text-[9px] font-bold text-gray-600 bg-white px-2 py-0.5 rounded-full mr-1">
+                                    <span className="text-[9px] font-bold text-gray-300 bg-gray-700 px-2 py-0.5 rounded-full mr-1">
                                         EXCLUSIVE OFFER
                                     </span>
                                     <span className={`text-[9px] font-bold text-white ${slide.badgeColor} px-2 py-0.5 rounded-full`}>
@@ -102,22 +102,22 @@ export default function HeroCarousel() {
                                     </span>
                                 </div>
 
-                                <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 leading-tight">
+                                <h1 className="text-2xl lg:text-3xl font-bold text-white leading-tight">
                                     {slide.title}
                                 </h1>
 
-                                <p className="text-xs text-gray-600">
+                                <p className="text-xs text-gray-300">
                                     {slide.subtitle}
                                 </p>
 
                                 <div className="flex items-center gap-1.5">
-                                    <span className="text-[10px] text-gray-600">from</span>
-                                    <span className="text-2xl font-bold text-red-500">
+                                    <span className="text-[10px] text-gray-300">from</span>
+                                    <span className="text-2xl font-bold text-red-400">
                                         {slide.price}
                                     </span>
                                 </div>
 
-                                <button className="bg-cyan-400 hover:bg-cyan-500 text-white font-bold px-5 py-2 rounded-full transition-all duration-300 flex items-center gap-1.5 text-xs">
+                                <button className="bg-sky-400 hover:bg-sky-500 text-white font-bold px-5 py-2 rounded-full transition-all duration-300 flex items-center gap-1.5 text-xs">
                                     {slide.buttonText}
                                     <span className="group-hover/btn:translate-x-1 transition-transform">→</span>
                                 </button>
@@ -139,16 +139,16 @@ export default function HeroCarousel() {
 
             <button
                 onClick={prevSlide}
-                className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 hover:bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/20 hover:bg-white/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
             >
-                <ChevronLeft className="w-4 h-4 text-gray-800" />
+                <ChevronLeft className="w-4 h-4 text-white" />
             </button>
 
             <button
                 onClick={nextSlide}
-                className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 hover:bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/20 hover:bg-white/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
             >
-                <ChevronRight className="w-4 h-4 text-gray-800" />
+                <ChevronRight className="w-4 h-4 text-white" />
             </button>
 
             <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
@@ -157,8 +157,8 @@ export default function HeroCarousel() {
                         key={index}
                         onClick={() => goToSlide(index)}
                         className={`transition-all duration-300 rounded-full ${index === currentSlide
-                            ? "w-5 h-2 bg-gray-800"
-                            : "w-2 h-2 bg-gray-400 hover:bg-gray-600"
+                            ? "w-5 h-2 bg-sky-400"
+                            : "w-2 h-2 bg-gray-600 hover:bg-sky-400"
                             }`}
                     />
                 ))}
