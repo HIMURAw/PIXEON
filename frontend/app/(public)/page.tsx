@@ -3,7 +3,7 @@ import TopBar from "@/components/header/TopBar";
 import Head from "@/components/header/Head";
 import HeroCarousel from "@/components/hero/hero";
 import PromoSection from "@/components/hero/promoSection";
-// import BestSellers from "@/components/products/BestSellers";
+import BestSellers from "@/components/sellersCard/bestSellers/bestSeller";
 
 export default function Home() {
     return (
@@ -34,7 +34,7 @@ export default function Home() {
 
                     {/* EN ÇOK SATANLAR */}
                     <main className="flex-1">
-                        {/* <BestSellers /> */}
+                        <BestSellers />
                     </main>
                 </div>
 

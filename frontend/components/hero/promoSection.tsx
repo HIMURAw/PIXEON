@@ -1,6 +1,6 @@
 export default function PromoSection() {
   return (
-    <div className="w-85 h-100 px-2 py-1 mt-3 rounded-md overflow-hidden shadow cursor-pointer hover:shadow-md transition-shadow relative">
+    <div className="w-85 h-115 px-2 py-1 mt-3 rounded-md overflow-hidden shadow cursor-pointer hover:shadow-md transition-shadow relative">
       <img
         src="/ads/ads.png"
         alt="Reklam Banner"
