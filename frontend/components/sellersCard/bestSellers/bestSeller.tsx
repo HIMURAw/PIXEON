@@ -15,7 +15,7 @@ export const products: Product[] = [
     {
         id: 1,
         name: "Angie's Boomchickapop Sweet & Salty Kettle Corn",
-        image: "/products/popcorn.png",
+        image: "/products/product-1.jpg",
         price: "7.99",
         discount: null,
         organic: false,
@@ -24,7 +24,7 @@ export const products: Product[] = [
     {
         id: 2,
         name: "Blue Diamond Almonds Lightly Salted",
-        image: "/products/almonds.png",
+        image: "/products/product-2.png",
         oldPrice: "11.68",
         price: "10.58",
         discount: "10%",
@@ -34,13 +34,14 @@ export const products: Product[] = [
     {
         id: 3,
         name: "USDA Choice Angus Beef Stew Meat",
-        image: "/products/beef.png",
+        image: "/products/product-1.jpg",
         oldPrice: "79.99",
         price: "49.99",
         discount: "38%",
         organic: false,
         select: false,
     },
+
 ];
 
 export default function BestSellers() {
