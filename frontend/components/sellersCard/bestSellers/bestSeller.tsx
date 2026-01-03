@@ -41,6 +41,15 @@ export const products: Product[] = [
         organic: false,
         select: false,
     },
+    {
+        id: 4,
+        name: "Angie's Boomchickapop Sweet & Salty Kettle Corn",
+        image: "/products/product-1.jpg",
+        price: "7.99",
+        discount: null,
+        organic: false,
+        select: true,
+    },
 
 ];
 
