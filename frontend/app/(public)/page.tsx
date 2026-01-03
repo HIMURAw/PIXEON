@@ -2,8 +2,12 @@ import MainBar from "@/components/header/MainBar";
 import TopBar from "@/components/header/TopBar";
 import Head from "@/components/header/Head";
 import HeroCarousel from "@/components/hero/hero";
-import PromoSection from "@/components/hero/promoSection";
+import PromoSection from "@/components/promo/promoSection";
 import BestSellers from "@/components/sellersCard/bestSellers/bestSeller";
+import InfoBanner from "@/components/hero/InfoBanner";
+import HotDeal from "@/components/sellersCard/hotDeals/HotDeal";
+import PromoVertical from "@/components/promo/PromoVertical";
+import PromoVerticalSmall from "@/components/promo/PromoVerticalSmall";
 
 export default function Home() {
     return (
@@ -25,17 +29,23 @@ export default function Home() {
                     </main>
                 </div>
 
-                {/* ALT SECTION */}
-                <div className="flex gap-6">
-                    {/* SOL REKLAM */}
-                    <aside className="w-72 ml-30">
+                {/* ALT CONTENT */}
+                <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6">
+
+                    {/* SOL TARAF */}
+                    <aside className="space-y-6">
                         <PromoSection />
+                        <PromoVertical />
+                        <PromoVerticalSmall />
                     </aside>
 
-                    {/* EN ÇOK SATANLAR */}
-                    <main className="flex-1">
+                    {/* SAĞ TARAF */}
+                    <main className="space-y-10">
                         <BestSellers />
+                        <InfoBanner />
+                        <HotDeal />
                     </main>
+
                 </div>
 
             </div>
