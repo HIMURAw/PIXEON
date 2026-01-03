@@ -16,7 +16,7 @@ export default function HotDeal() {
                     <span className="absolute -top-2 -left-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
                         19%
                     </span>
-                    <img src="/products/yogurt.png" className="w-28" />
+                    <img src="/products/laura-chouette-4sKdeIMiFEI-unsplash.jpg" className="w-28 h-28" />
                 </div>
 
                 <div className="flex-1 space-y-2">
