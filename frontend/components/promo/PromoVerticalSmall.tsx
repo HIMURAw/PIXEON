@@ -1,6 +1,6 @@
 export default function PromoVerticalSmall() {
     return (
-        <div className="bg-white rounded-xl overflow-hidden shadow-sm border">
+        <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-xl overflow-hidden shadow-sm">
             <div className="p-4">
                 <span className="text-xs text-gray-500">
                     Best Bakery Products
@@ -22,7 +22,7 @@ export default function PromoVerticalSmall() {
 
             <div className="relative">
                 <img
-                    src="/ads/bread.jpg"
+                    src="/products/pngtree-luxurious-blue-perfume-bottle-against-a-transparent-background-png-image_16492004.png"
                     alt="Bakery"
                     className="w-full h-40 object-cover"
                 />
