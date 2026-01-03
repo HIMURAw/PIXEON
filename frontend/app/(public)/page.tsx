@@ -30,7 +30,7 @@ export default function Home() {
                 </div>
 
                 {/* ALT CONTENT */}
-                <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6 ml-32">
 
                     {/* SOL TARAF */}
                     <aside className="space-y-6">
