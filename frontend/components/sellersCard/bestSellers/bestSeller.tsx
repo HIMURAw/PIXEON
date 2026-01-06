@@ -66,7 +66,7 @@ export default function BestSellers() {
                     </p>
                 </div>
 
-                <button className="flex items-center gap-2 text-sm text-blue-400 border border-blue-400/40 px-4 py-1.5 rounded-full hover:bg-blue-400/10 transition">
+                <button className="cursor-pointer flex items-center gap-2 text-sm text-blue-400 border border-blue-400/40 px-4 py-1.5 rounded-full hover:bg-blue-400/10 transition">
                     View All →
                 </button>
             </div>

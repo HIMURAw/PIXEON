@@ -27,7 +27,7 @@ export default function PromoVerticalSmall() {
                     className="w-full h-40 object-cover"
                 />
 
-                <button className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-blue-500 text-white text-sm px-4 py-1.5 rounded-full hover:bg-blue-600 transition">
+                <button className="cursor-pointer absolute bottom-3 left-1/2 -translate-x-1/2 bg-blue-500 text-white text-sm px-4 py-1.5 rounded-full hover:bg-blue-600 transition">
                     Shop Now
                 </button>
             </div>

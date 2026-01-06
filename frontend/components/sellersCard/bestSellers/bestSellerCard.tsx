@@ -53,7 +53,7 @@ export default function BestSellerCard({ product }: BestSellerCardProps) {
                 </span>
             </div>
 
-            <button className="w-full border border-blue-400 text-blue-400 py-1.5 rounded-full text-sm hover:bg-blue-400 hover:text-white transition">
+            <button className="cursor-pointer w-full border border-blue-400 text-blue-400 py-1.5 rounded-full text-sm hover:bg-blue-400 hover:text-white transition">
                 {product.select ? "Select options" : "Add to cart"}
             </button>
         </div>
