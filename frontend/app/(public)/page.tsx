@@ -9,6 +9,7 @@ import HotDeal from "@/components/sellersCard/hotDeals/HotDeal";
 import PromoVertical from "@/components/promo/PromoVertical";
 import PromoVerticalSmall from "@/components/promo/PromoVerticalSmall";
 import PromoBanner from "@/components/promo/PromoBanner";
+import Products from "@/components/products/newProducts/newProducts"
 
 export default function Home() {
     return (
@@ -43,6 +44,7 @@ export default function Home() {
                         <InfoBanner />
                         <HotDeal />
                         <PromoBanner />
+                        <Products />
                     </main>
                 </div>
             </div>
