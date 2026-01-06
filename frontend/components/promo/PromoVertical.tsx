@@ -32,7 +32,7 @@ export default function PromoVertical() {
                 {/* boşluk */}
                 <div className="flex-1" />
 
-                <button className="self-start bg-blue-500 hover:bg-blue-600 transition px-4 py-1.5 rounded-full text-sm">
+                <button className="cursor-pointer self-start bg-blue-500 hover:bg-blue-600 transition px-4 py-1.5 rounded-full text-sm">
                     Shop Now
                 </button>
             </div>
