@@ -88,6 +88,15 @@ export const products: Product[] = [
         organic: false,
         select: true,
     },
+    {
+        id: 8,
+        name: "Himura'nın Özel Pembe ***** Tadında Kokusu",
+        image: "/products/product-1.jpg",
+        price: "FREE",
+        discount: null,
+        organic: false,
+        select: true,
+    },
 
 ];
 
