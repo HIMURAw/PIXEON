@@ -117,7 +117,7 @@ export default function HeroCarousel() {
                                     </span>
                                 </div>
 
-                                <button className="bg-sky-400 hover:bg-sky-500 text-white font-bold px-5 py-2 rounded-full transition-all duration-300 flex items-center gap-1.5 text-xs">
+                                <button className="cursor-pointer bg-sky-400 hover:bg-sky-500 text-white font-bold px-5 py-2 rounded-full transition-all duration-300 flex items-center gap-1.5 text-xs">
                                     {slide.buttonText}
                                     <span className="group-hover/btn:translate-x-1 transition-transform">→</span>
                                 </button>
