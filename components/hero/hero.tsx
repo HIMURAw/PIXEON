@@ -18,34 +18,34 @@ interface Slide {
 const slides: Slide[] = [
     {
         id: 1,
-        badge: "-20% OFF",
+        badge: "-20% İNDİRİM",
         badgeColor: "bg-green-500",
-        title: "Specialist in the grocery store",
-        subtitle: "Only this week. Don't miss...",
-        price: "$7.99",
-        buttonText: "Shop Now",
+        title: "Market Alışverişinde Uzman",
+        subtitle: "Sadece bu hafta. Kaçırmayın...",
+        price: "249.99 ₺",
+        buttonText: "Şimdi Al",
         buttonLink: "/shop",
         image: "/slider/hero-1.png"
     },
     {
         id: 2,
-        badge: "-30% OFF",
+        badge: "-30% İNDİRİM",
         badgeColor: "bg-red-500",
-        title: "Fresh Organic Products",
-        subtitle: "Best deals of the season...",
-        price: "$5.99",
-        buttonText: "Shop Now",
+        title: "Taze Organik Ürünler",
+        subtitle: "Sezonun en iyi fırsatları...",
+        price: "189.99 ₺",
+        buttonText: "Şimdi Al",
         buttonLink: "/shop",
         image: "/slider/hero-2.png"
     },
     {
         id: 3,
-        badge: "-15% OFF",
+        badge: "-15% İNDİRİM",
         badgeColor: "bg-sky-400",
-        title: "Quality Guaranteed",
-        subtitle: "Premium products for you...",
-        price: "$9.99",
-        buttonText: "Shop Now",
+        title: "Kalite Garantili",
+        subtitle: "Sizin için en iyi ürünler...",
+        price: "299.99 ₺",
+        buttonText: "Şimdi Al",
         buttonLink: "/shop",
         image: "/slider/hero-3.png"
     }
@@ -95,7 +95,7 @@ export default function HeroCarousel() {
                             <div className="w-1/2 space-y-6 pr-4">
                                 <div className="inline-block">
                                     <span className="text-[9px] font-bold text-gray-300 bg-gray-700 px-2 py-0.5 rounded-full mr-1">
-                                        EXCLUSIVE OFFER
+                                        ÖZEL TEKLİF
                                     </span>
                                     <span className={`text-[9px] font-bold text-white ${slide.badgeColor} px-2 py-0.5 rounded-full`}>
                                         {slide.badge}
@@ -111,7 +111,7 @@ export default function HeroCarousel() {
                                 </p>
 
                                 <div className="flex items-center gap-1.5">
-                                    <span className="text-[10px] text-gray-300">from</span>
+                                    <span className="text-[10px] text-gray-300">'dan itibaren</span>
                                     <span className="text-2xl font-bold text-red-400">
                                         {slide.price}
                                     </span>

@@ -9,16 +9,16 @@ export default function PromoSection() {
 
       <div className="absolute inset-0 bg-black/45 flex flex-col justify-end p-3 rounded-md">
         <span className="text-xs uppercase tracking-wider text-white/80">
-          Limited Offer
+          Sınırlı Teklif
         </span>
 
         <span className="text-white font-bold text-lg leading-tight">
-          Grab it for $9.99
+          9.99 ₺'ye Hemen Al
         </span>
 
         <p className="text-white/90 text-xs leading-snug">
-          Fresh picks at an unbeatable price.
-          While stocks last.
+          Eşsiz fiyatlarla taze ürünler.
+          Stoklarla sınırlıdır.
         </p>
       </div>
     </div>

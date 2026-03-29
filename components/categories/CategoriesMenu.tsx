@@ -26,19 +26,19 @@ export default function CategoriesMenu({ isOpen }: CategoriesMenuProps) {
         >
             {/* Categories */}
             <div className="py-2">
-                <CategoryItem icon={<Apple size={18} />} text="Fruits & Vegetables" arrow />
-                <CategoryItem icon={<Drumstick size={18} />} text="Meats & Seafood" />
-                <CategoryItem icon={<Egg size={18} />} text="Breakfast & Dairy" />
-                <CategoryItem icon={<Coffee size={18} />} text="Beverages" arrow />
-                <CategoryItem icon={<Croissant size={18} />} text="Breads & Bakery" />
-                <CategoryItem icon={<Snowflake size={18} />} text="Frozen Foods" />
-                <CategoryItem icon={<Candy size={18} />} text="Biscuits & Snacks" />
-                <CategoryItem icon={<Leaf size={18} />} text="Grocery & Staples" />
+                <CategoryItem icon={<Apple size={18} />} text="Meyve & Sebze" arrow />
+                <CategoryItem icon={<Drumstick size={18} />} text="Et & Deniz Ürünleri" />
+                <CategoryItem icon={<Egg size={18} />} text="Kahvaltılık & Süt Ürünleri" />
+                <CategoryItem icon={<Coffee size={18} />} text="İçecekler" arrow />
+                <CategoryItem icon={<Croissant size={18} />} text="Ekmek & Unlu Mamüller" />
+                <CategoryItem icon={<Snowflake size={18} />} text="Dondurulmuş Gıdalar" />
+                <CategoryItem icon={<Candy size={18} />} text="Atıştırmalık & Bisküvi" />
+                <CategoryItem icon={<Leaf size={18} />} text="Temel Gıda" />
             </div>
 
             {/* Extras */}
             <div className="border-t border-slate-700 mt-2">
-                {["Value of the Day", "Top 100 Offers", "New Arrivals"].map((item) => (
+                {["Günün Fırsatı", "En İyi 100 Teklif", "Yeni Gelenler"].map((item) => (
                     <div
                         key={item}
                         className="px-4 py-6 text-slate-200 hover:bg-slate-800 hover:text-sky-400 cursor-pointer transition-colors"

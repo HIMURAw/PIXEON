@@ -16,29 +16,29 @@ export type Product = {
 export const products: Product[] = [
     {
         id: 1,
-        name: "Angie's Boomchickapop Sweet & Salty Kettle Corn",
+        name: "Angie's Boomchickapop Tatlı ve Tuzlu Mısır",
         image: "/products/product-1.jpg",
-        price: "7.99",
+        price: "249.99",
         discount: null,
         organic: false,
         select: true,
     },
     {
         id: 2,
-        name: "Blue Diamond Almonds Lightly Salted",
+        name: "Blue Diamond Almonds Az Tuzlu Badem",
         image: "/products/product-2.png",
-        oldPrice: "11.68",
-        price: "10.58",
+        oldPrice: "349.99",
+        price: "299.99",
         discount: "10%",
         organic: true,
         select: false,
     },
     {
         id: 3,
-        name: "USDA Choice Angus Beef Stew Meat",
+        name: "Angus Dana Kuşbaşı Et",
         image: "/products/product-1.jpg",
-        oldPrice: "79.99",
-        price: "49.99",
+        oldPrice: "899.99",
+        price: "649.99",
         discount: "38%",
         organic: false,
         select: false,
@@ -86,15 +86,15 @@ export default function BestSellers() {
             <div className="flex items-center justify-between">
                 <div>
                     <h2 className="text-xl font-semibold text-white">
-                        Best Sellers
+                        En Çok Satanlar
                     </h2>
                     <p className="text-sm text-gray-400">
-                        Do not miss the current offers until the end of March.
+                        Mart sonuna kadar güncel fırsatları kaçırmayın.
                     </p>
                 </div>
 
                 <button className="cursor-pointer flex items-center gap-2 text-sm text-blue-400 border border-blue-400/40 px-4 py-1.5 rounded-full hover:bg-blue-400/10 transition">
-                    View All →
+                    Tümünü Gör →
                 </button>
             </div>
 
