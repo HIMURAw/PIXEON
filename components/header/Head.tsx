@@ -47,7 +47,7 @@ export default function Head() {
                                 height={96}
                             />
                             <span className="text-xs text-slate-400 text-center">
-                                Online Grocery Shopping Center
+                                Online Market Alışveriş Merkezi
                             </span>
                         </div>
 
@@ -58,7 +58,7 @@ export default function Head() {
                             <div className="relative">
                                 <input
                                     type="text"
-                                    placeholder="Search for products..."
+                                    placeholder="Ürünleri ara..."
                                     className="w-full bg-[#020617] text-slate-200 rounded-lg px-4 py-3 pr-10 outline-none border border-slate-700 focus:border-sky-500 transition"
                                 />
                                 <Search
@@ -93,7 +93,7 @@ export default function Head() {
                     <CategoriesSection />
 
                     <div className="flex-1 flex justify-end gap-2">
-                        {["HOME", "SHOP", "BAKERY", "BEVERAGES", "BLOG", "CONTACT"].map((item) => (
+                        {["ANA SAYFA", "MAĞAZA", "FIRIN", "İÇECEKLER", "BLOG", "İLETİŞİM"].map((item) => (
                             <Link
                                 key={item}
                                 href="#"

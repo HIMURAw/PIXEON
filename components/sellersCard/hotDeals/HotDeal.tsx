@@ -3,11 +3,11 @@ export default function HotDeal() {
         <div className="border border-red-400 rounded-xl p-6 space-y-4">
             <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold">
-                    Hot Product for <span className="text-red-500">This Week</span>
+                    Haftanın <span className="text-red-500">Fırsat Ürünü</span>
                 </h3>
 
                 <button className="cursor-pointer hover:text-black text-sm border px-4 py-1 rounded-full">
-                    View All →
+                    Tümünü Gör →
                 </button>
             </div>
 
@@ -21,15 +21,15 @@ export default function HotDeal() {
 
                 <div className="flex-1 space-y-2">
                     <h4 className="font-medium">
-                        Chobani Complete Vanilla Greek Yogurt
+                        Chobani Tam Yağlı Vanilyalı Yunan Yoğurdu
                     </h4>
 
                     <div>
                         <span className="line-through text-gray-400 mr-2">
-                            $5.49
+                            119.99 ₺
                         </span>
                         <span className="text-red-500 font-bold">
-                            $4.49
+                            89.99 ₺
                         </span>
                     </div>
 
@@ -38,7 +38,7 @@ export default function HotDeal() {
                     </div>
 
                     <span className="text-xs text-gray-500">
-                        Remaining until the end of the offer
+                        Kampanya bitimine kalan süre
                     </span>
                 </div>
             </div>

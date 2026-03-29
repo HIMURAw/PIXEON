@@ -15,7 +15,7 @@ export default function BestSellerCard({ product }: BestSellerCardProps) {
                 )}
                 {product.organic && (
                     <span className="text-xs bg-green-500 text-white px-2 py-0.5 rounded">
-                        Organic
+                        Organik
                     </span>
                 )}
             </div>
@@ -33,7 +33,7 @@ export default function BestSellerCard({ product }: BestSellerCardProps) {
             </h3>
 
             <span className="text-xs text-green-400 font-medium">
-                In Stock
+                Stokta Var
             </span>
 
             <div className="flex items-center gap-1 text-yellow-400 text-xs my-2">
@@ -45,16 +45,16 @@ export default function BestSellerCard({ product }: BestSellerCardProps) {
             <div className="mb-3">
                 {product.oldPrice && (
                     <span className="text-sm text-gray-400 line-through mr-2">
-                        ${product.oldPrice}
+                        {product.oldPrice} ₺
                     </span>
                 )}
                 <span className="text-lg font-bold text-red-500">
-                    ${product.price}
+                    {product.price} ₺
                 </span>
             </div>
 
             <button className="mt-auto w-full border border-blue-400 text-blue-400 py-1.5 rounded-full text-sm hover:bg-blue-400 hover:text-white transition">
-                {product.select ? "Select options" : "Add to cart"}
+                {product.select ? "Seçenekleri Belirle" : "Sepete Ekle"}
             </button>
         </div>
     );

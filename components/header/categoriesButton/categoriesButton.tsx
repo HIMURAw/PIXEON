@@ -16,18 +16,18 @@ export default function CategoriesButton({ isOpen, onToggle }: CategoriesButtonP
                            hover:bg-sky-500 transition-colors duration-200 cursor-pointer"
             >
                 <Menu size={18} />
-                ALL CATEGORIES
+                TÜM KATEGORİLER
                 <ChevronDown
                     size={16}
                     className={`transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
                 />
             </button>
-
+ 
             {/* Badge */}
             <span className="absolute left-1/2 -translate-x-1/2 -bottom-3
                              bg-slate-800 text-sky-400 text-[10px] font-extrabold
                              px-3 py-1 rounded-full whitespace-nowrap shadow-md">
-                TOTAL 63 PRODUCTS
+                TOPLAM 63 ÜRÜN
             </span>
         </div>
     );
