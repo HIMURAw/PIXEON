@@ -79,7 +79,7 @@ export default function HeroCarousel() {
     };
 
     return (
-        <div className="user-select-none relative ml-40 w-full max-w-5xl h-[480px] bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl overflow-hidden group">
+        <div className="user-select-none relative w-full h-[680px] bg-linear-to-br from-slate-900 to-slate-800 rounded-2xl overflow-hidden group">
             <div className="relative w-full h-full">
                 {slides.map((slide, index) => (
                     <div
@@ -91,8 +91,8 @@ export default function HeroCarousel() {
                                 : "opacity-0 translate-x-full"
                             }`}
                     >
-                        <div className="flex items-center h-full px-6 lg:px-10">
-                            <div className="w-1/2 space-y-3 pr-4">
+                        <div className="flex items-center h-full px-8 lg:px-16">
+                            <div className="w-1/2 space-y-6 pr-4">
                                 <div className="inline-block">
                                     <span className="text-[9px] font-bold text-gray-300 bg-gray-700 px-2 py-0.5 rounded-full mr-1">
                                         EXCLUSIVE OFFER
@@ -123,7 +123,7 @@ export default function HeroCarousel() {
                                 </button>
                             </div>
 
-                            <div className="w-1/2 h-full relative">
+                            <div className="w-1/2 h-full relative -translate-y-6">
                                 <Image
                                     src={slide.image}
                                     alt={slide.title}

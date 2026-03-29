@@ -17,10 +17,10 @@ export default function Home() {
             <MainBar />
             <Head />
 
-            <div className="container mx-auto px-4 py-8 space-y-10">
+            <div className="w-full px-4 sm:px-6 lg:px-8 py-12 space-y-24">
                 {/* HERO */}
-                <div className="flex gap-6">
-                    <aside className="w-72">
+                <div className="flex gap-16">
+                    <aside className="hidden lg:block w-72 shrink-0">
                         {/* Categories buraya gelecek */}
                     </aside>
                     <main className="flex-1">
@@ -29,7 +29,7 @@ export default function Home() {
                 </div>
 
                 {/* ALT CONTENT */}
-                <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6 ml-32">
+                <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-16">
                     {/* SOL TARAF */}
                     <aside className="space-y-6">
                         <PromoSection />
@@ -38,7 +38,7 @@ export default function Home() {
                     </aside>
 
                     {/* SAĞ TARAF */}
-                    <main className="space-y-10">
+                    <main className="space-y-24">
                         <BestSellers />
                         <InfoBanner />
                         <HotDeal />

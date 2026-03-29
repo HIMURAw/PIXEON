@@ -1,6 +1,6 @@
 const PromoBanner = () => {
     return (
-        <div className="container mx-auto px-4 my-8">
+        <div className="w-full px-4 my-8">
             <div className="bg-pink-50 border border-pink-100 rounded-lg py-6 px-4 flex flex-col md:flex-row items-center justify-center gap-4 text-center">
                 {/* Metin Kısmı */}
                 <p className="text-gray-700 text-lg font-medium">

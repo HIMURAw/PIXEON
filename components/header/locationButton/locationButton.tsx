@@ -55,7 +55,7 @@ export default function LocationButton() {
             {/* BUTTON */}
             <button
                 onClick={() => setOpen(true)}
-                className="hidden md:flex items-center gap-4 ml-5 px-6 py-2.5
+                className="hidden md:flex items-center gap-4 px-6 py-2.5
                 bg-slate-900 border border-slate-700 rounded-xl
                 hover:border-sky-500 hover:bg-slate-800 transition"
             >
