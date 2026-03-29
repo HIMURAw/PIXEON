@@ -1,6 +1,4 @@
-"use client";
-import { useEffect, useRef, useState } from "react";
-import BestSellerCard from "./bestSellerCard";
+import ProductsCard from "./newProductsCard";
 
 export type Product = {
     id: number;
@@ -52,41 +50,63 @@ export const products: Product[] = [
         organic: false,
         select: true,
     },
+       {
+        id: 4,
+        name: "Angie's Boomchickapop Sweet & Salty Kettle Corn",
+        image: "/products/product-1.jpg",
+        price: "7.99",
+        discount: null,
+        organic: false,
+        select: true,
+    },
+    {
+        id: 5,
+        name: "Blue Diamond Almonds Lightly Salted",
+        image: "/products/product-2.png",
+        oldPrice: "11.68",
+        price: "10.58",
+        discount: "10%",
+        organic: true,
+        select: false,
+    },
+    {
+        id: 6,
+        name: "USDA Choice Angus Beef Stew Meat",
+        image: "/products/product-1.jpg",
+        oldPrice: "79.99",
+        price: "49.99",
+        discount: "38%",
+        organic: false,
+        select: false,
+    },
+    {
+        id: 7,
+        name: "Angie's Boomchickapop Sweet & Salty Kettle Corn",
+        image: "/products/product-1.jpg",
+        price: "7.99",
+        discount: null,
+        organic: false,
+        select: true,
+    },
+    {
+        id: 8,
+        name: "Himura'nın Özel Pembe ***** Tadında Kokusu",
+        image: "/products/product-1.jpg",
+        price: "FREE",
+        discount: null,
+        organic: false,
+        select: true,
+    },
 
 ];
 
-export default function BestSellers() {
-    const [isVisible, setIsVisible] = useState(false);
-    const sectionRef = useRef<HTMLElement>(null);
-
-    useEffect(() => {
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                if (entry.isIntersecting) {
-                    setIsVisible(true);
-                    observer.unobserve(entry.target);
-                }
-            },
-            { threshold: 0.1 }
-        );
-
-        if (sectionRef.current) {
-            observer.observe(sectionRef.current);
-        }
-
-        return () => observer.disconnect();
-    }, []);
-
+export default function Products() {
     return (
-        <section
-            ref={sectionRef}
-            className={`space-y-10 transition-all duration-1000 ease-out transform ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-                }`}
-        >
+        <section className="ml-20 space-y-6">
             <div className="flex items-center justify-between">
                 <div>
                     <h2 className="text-xl font-semibold text-white">
-                        Best Sellers
+                        New Products
                     </h2>
                     <p className="text-sm text-gray-400">
                         Do not miss the current offers until the end of March.
@@ -98,9 +118,9 @@ export default function BestSellers() {
                 </button>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {products.map(product => (
-                    <BestSellerCard key={product.id} product={product} />
+                    <ProductsCard key={product.id} product={product} />
                 ))}
             </div>
         </section>

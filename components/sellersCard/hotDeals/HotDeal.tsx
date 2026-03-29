@@ -6,7 +6,7 @@ export default function HotDeal() {
                     Hot Product for <span className="text-red-500">This Week</span>
                 </h3>
 
-                <button className="text-sm border px-4 py-1 rounded-full">
+                <button className="cursor-pointer hover:text-black text-sm border px-4 py-1 rounded-full">
                     View All →
                 </button>
             </div>
