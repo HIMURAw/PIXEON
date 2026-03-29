@@ -14,7 +14,7 @@ import CategoriesSection from "../categories/CategoriesSection";
 export default function Head() {
     return (
         <header className="w-full bg-[#0c1022] border-b border-slate-800">
-            <div className="max-w-7xl mx-auto px-6">
+            <div className="w-full px-4 sm:px-6 lg:px-8">
 
                 {/* MOBILE */}
                 <div className="flex md:hidden items-center justify-between py-3 text-slate-200">
@@ -35,36 +35,37 @@ export default function Head() {
                 </div>
 
                 {/* DESKTOP */}
-                <div className="hidden md:flex items-center justify-between py-4 text-slate-200">
-
-                    {/* Logo */}
-                    <div className="flex flex-col items-center gap-1">
-                        <Image
-                            className="object-contain"
-                            src="/logo.png"
-                            alt="Logo"
-                            width={96}
-                            height={96}
-                        />
-                        <span className="text-xs text-slate-400 text-center">
-                            Online Grocery Shopping Center
-                        </span>
-                    </div>
-
-                    <LocationButton />
-
-                    {/* Search */}
-                    <div className="flex-1 mx-6 ml-10">
-                        <div className="relative">
-                            <input
-                                type="text"
-                                placeholder="Search for products..."
-                                className="w-full bg-[#020617] text-slate-200 rounded-lg px-4 py-3 pr-10 outline-none border border-slate-700 focus:border-sky-500 transition"
+                <div className="hidden md:flex items-center justify-between py-6 text-slate-200">
+                    <div className="flex items-center gap-8 flex-1">
+                        {/* Logo */}
+                        <div className="flex flex-col items-center gap-1 shrink-0">
+                            <Image
+                                className="object-contain"
+                                src="/logo.png"
+                                alt="Logo"
+                                width={96}
+                                height={96}
                             />
-                            <Search
-                                size={18}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500"
-                            />
+                            <span className="text-xs text-slate-400 text-center">
+                                Online Grocery Shopping Center
+                            </span>
+                        </div>
+
+                        <LocationButton />
+
+                        {/* Search */}
+                        <div className="flex-1 mx-6">
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    placeholder="Search for products..."
+                                    className="w-full bg-[#020617] text-slate-200 rounded-lg px-4 py-3 pr-10 outline-none border border-slate-700 focus:border-sky-500 transition"
+                                />
+                                <Search
+                                    size={18}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500"
+                                />
+                            </div>
                         </div>
                     </div>
 
@@ -91,7 +92,7 @@ export default function Head() {
 
                     <CategoriesSection />
 
-                    <div className="ml-60 flex gap-2">
+                    <div className="flex-1 flex justify-end gap-2">
                         {["HOME", "SHOP", "BAKERY", "BEVERAGES", "BLOG", "CONTACT"].map((item) => (
                             <Link
                                 key={item}

@@ -6,7 +6,7 @@ type BestSellerCardProps = {
 
 export default function BestSellerCard({ product }: BestSellerCardProps) {
     return (
-        <div className="bg-[#0b1220] border border-white/10 rounded-xl p-4 hover:shadow-lg transition">
+        <div className="bg-[#0b1220] border border-white/10 rounded-xl p-4 hover:shadow-lg transition flex flex-col h-full">
             <div className="flex gap-2 mb-3">
                 {product.discount && (
                     <span className="text-xs bg-blue-500 text-white px-2 py-0.5 rounded">
@@ -53,7 +53,7 @@ export default function BestSellerCard({ product }: BestSellerCardProps) {
                 </span>
             </div>
 
-            <button className="w-full border border-blue-400 text-blue-400 py-1.5 rounded-full text-sm hover:bg-blue-400 hover:text-white transition">
+            <button className="mt-auto w-full border border-blue-400 text-blue-400 py-1.5 rounded-full text-sm hover:bg-blue-400 hover:text-white transition">
                 {product.select ? "Select options" : "Add to cart"}
             </button>
         </div>

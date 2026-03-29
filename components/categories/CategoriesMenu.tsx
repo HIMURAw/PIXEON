@@ -20,9 +20,9 @@ export default function CategoriesMenu({ isOpen }: CategoriesMenuProps) {
         <div
             className={`absolute top-14 w-79 border rounded-b-xl bg-slate-900 border-slate-700 shadow-xl z-50 overflow-hidden
             transition-all duration-300 ease-in-out origin-top ${isOpen
-                ? 'opacity-100 scale-y-100 translate-y-0'
-                : 'opacity-0 scale-y-0 -translate-y-4 pointer-events-none'
-            }`}
+                    ? 'opacity-100 scale-y-100 translate-y-0'
+                    : 'opacity-0 scale-y-0 -translate-y-4 pointer-events-none'
+                }`}
         >
             {/* Categories */}
             <div className="py-2">
@@ -41,7 +41,7 @@ export default function CategoriesMenu({ isOpen }: CategoriesMenuProps) {
                 {["Value of the Day", "Top 100 Offers", "New Arrivals"].map((item) => (
                     <div
                         key={item}
-                        className="px-4 py-3 text-slate-200 hover:bg-slate-800 hover:text-sky-400 cursor-pointer transition-colors"
+                        className="px-4 py-6 text-slate-200 hover:bg-slate-800 hover:text-sky-400 cursor-pointer transition-colors"
                     >
                         {item}
                     </div>
@@ -61,7 +61,7 @@ function CategoryItem({
     arrow?: boolean;
 }) {
     return (
-        <div className="flex items-center justify-between px-4 py-3
+        <div className="flex items-center justify-between px-4 py-4.5
                         hover:bg-slate-800 hover:text-sky-400 cursor-pointer transition-colors group">
             <div className="flex items-center gap-3 text-slate-200 group-hover:text-sky-400">
                 <span className="transition-transform group-hover:scale-110 text-sky-400">

@@ -1,3 +1,5 @@
+"use client";
+import { useEffect, useRef, useState } from "react";
 import BestSellerCard from "./bestSellerCard";
 
 export type Product = {
@@ -54,8 +56,33 @@ export const products: Product[] = [
 ];
 
 export default function BestSellers() {
+    const [isVisible, setIsVisible] = useState(false);
+    const sectionRef = useRef<HTMLElement>(null);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setIsVisible(true);
+                    observer.unobserve(entry.target);
+                }
+            },
+            { threshold: 0.1 }
+        );
+
+        if (sectionRef.current) {
+            observer.observe(sectionRef.current);
+        }
+
+        return () => observer.disconnect();
+    }, []);
+
     return (
-        <section className="ml-20 space-y-6">
+        <section
+            ref={sectionRef}
+            className={`space-y-10 transition-all duration-1000 ease-out transform ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+                }`}
+        >
             <div className="flex items-center justify-between">
                 <div>
                     <h2 className="text-xl font-semibold text-white">
@@ -71,7 +98,7 @@ export default function BestSellers() {
                 </button>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
                 {products.map(product => (
                     <BestSellerCard key={product.id} product={product} />
                 ))}

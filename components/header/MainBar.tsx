@@ -9,16 +9,18 @@ import Navbar from "./navbar/Navbar";
 export default function MainBar() {
   return (
     <div className="bg-slate-900 text-slate-300 text-sm border-b border-slate-800">
-      <div className="max-w-7xl mx-auto px-4 py-3">
-        <div className="hidden md:flex items-center justify-between">
-          <Navbar />
-
-          <div className="flex items-center gap-2 text-slate-400 border-r border-slate-700 pr-4">
-            <Hand />
-            <span>100% secure delivery without contacting the courier.</span>
+      <div className="w-full px-4 sm:px-6 lg:px-8 py-3">
+        <div className="hidden md:grid grid-cols-3 items-center">
+          <div className="flex justify-start">
+            <Navbar />
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center justify-center gap-2 text-slate-400 border-r border-slate-700 pr-4">
+            <Hand />
+            <span className="text-center">100% secure delivery without contacting the courier.</span>
+          </div>
+
+          <div className="flex items-center justify-end gap-4">
             <span className="text-slate-400 font-semibold border-r border-slate-700 pr-4">
               <a className="hover:text-sky-400 transition" href="#">
                 Need help?
