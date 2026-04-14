@@ -18,7 +18,7 @@ interface CategoriesMenuProps {
 export default function CategoriesMenu({ isOpen }: CategoriesMenuProps) {
     return (
         <div
-            className={`absolute top-14 w-79 border rounded-b-xl bg-slate-900 border-slate-700 shadow-xl z-50 overflow-hidden
+            className={`absolute top-[85px] w-79 border rounded-b-xl bg-slate-900 border-slate-700 shadow-xl z-50 overflow-hidden
             transition-all duration-300 ease-in-out origin-top ${isOpen
                     ? 'opacity-100 scale-y-100 translate-y-0'
                     : 'opacity-0 scale-y-0 -translate-y-4 pointer-events-none'
