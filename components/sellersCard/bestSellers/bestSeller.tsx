@@ -16,43 +16,38 @@ export type Product = {
 export const products: Product[] = [
     {
         id: 1,
-        name: "Angie's Boomchickapop Tatlı ve Tuzlu Mısır",
-        image: "/products/product-1.jpg",
-        price: "249.99",
+        name: "PS5 Slim + God of War Ragnarök Paketi",
+        image: "/products/ps5-bundle.png",
+        price: "21.499",
         discount: null,
-        organic: false,
-        select: true,
+        category: "Konsollar"
     },
     {
         id: 2,
-        name: "Blue Diamond Almonds Az Tuzlu Badem",
-        image: "/products/product-2.png",
-        oldPrice: "349.99",
-        price: "299.99",
-        discount: "10%",
-        organic: true,
-        select: false,
+        name: "DualSense Edge™ Kablosuz Kontrolcü",
+        image: "/products/dualsense-edge.png",
+        oldPrice: "9.999",
+        price: "8.490",
+        discount: "15%",
+        category: "Aksesuarlar"
     },
     {
         id: 3,
-        name: "Angus Dana Kuşbaşı Et",
-        image: "/products/product-1.jpg",
-        oldPrice: "899.99",
-        price: "649.99",
-        discount: "38%",
-        organic: false,
-        select: false,
+        name: "Horizon Forbidden West - PS5",
+        image: "/products/horizon.png",
+        oldPrice: "1.299",
+        price: "849",
+        discount: "35%",
+        category: "Oyunlar"
     },
     {
         id: 4,
-        name: "Angie's Boomchickapop Sweet & Salty Kettle Corn",
-        image: "/products/product-1.jpg",
-        price: "7.99",
+        name: "Gran Turismo 7 - PS5",
+        image: "/products/gt7.png",
+        price: "1.199",
         discount: null,
-        organic: false,
-        select: true,
+        category: "Oyunlar"
     },
-
 ];
 
 export default function BestSellers() {

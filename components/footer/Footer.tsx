@@ -82,7 +82,7 @@ export default function Footer() {
                     <div className="space-y-6">
                         <Image src="/logo.png" alt="Pixeon Logo" width={120} height={120} />
                         <p className="text-sm leading-relaxed text-slate-400">
-                            Pixeon, en taze ve kaliteli ürünleri en uygun fiyatlarla kapınıza getiren online market alışveriş merkezinizdir.
+                            Pixeon, en yeni PlayStation konsollarını, en popüler oyunları ve profesyonel ekipmanları en uygun fiyatlarla sunan yetkili satış merkezinizdir.
                         </p>
                         <div className="flex gap-4">
                             {[Facebook, Instagram, Twitter].map((Icon, i) => (
@@ -100,10 +100,9 @@ export default function Footer() {
                              Popüler Kategoriler
                         </h4>
                         <ul className="space-y-4 text-sm">
-                            {["Meyve & Sebze", "Et, Tavuk & Balık", "Süt ve Kahvaltılık", "Fırın & Tatlı", "Atıştırmalıklar"].map((link) => (
+                            {["PlayStation Konsollar", "PS5 Oyunları", "PS4 Oyunları", "DualSense Kontrolcüler", "Aksesuarlar"].map((link) => (
                                 <li key={link}>
                                     <Link href="#" className="hover:text-sky-400 transition-colors flex items-center gap-2">
-                                        <ArrowRight size={12} className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
                                         {link}
                                     </Link>
                                 </li>
@@ -165,7 +164,7 @@ export default function Footer() {
             <div className="bg-[#020617] border-t border-white/5 py-8">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
                     <p className="text-sm text-slate-500 text-center md:text-left">
-                        © 2024 <span className="text-white font-bold">PIXEON</span> Online Market. Tüm hakları saklıdır.
+                        © 2024 <span className="text-white font-bold">PIXEON</span> PlayStation Store. Tüm hakları saklıdır.
                     </p>
                     
                     <div className="flex items-center gap-4 opacity-70 grayscale hover:grayscale-0 transition duration-500 px-4 py-2 bg-slate-900/50 rounded-lg border border-white/5">

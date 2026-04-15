@@ -17,13 +17,13 @@ export default function MainBar() {
 
           <div className="flex items-center justify-center gap-2 text-slate-400 border-r border-slate-700 pr-4">
             <Hand />
-            <span className="text-center">Kurye ile temas etmeden %100 güvenli teslimat.</span>
+            <span className="text-center">PlayStation Dünyasına Ücretsiz ve Hızlı Teslimat.</span>
           </div>
 
           <div className="flex items-center justify-end gap-4">
             <span className="text-slate-400 font-semibold border-r border-slate-700 pr-4">
               <a className="hover:text-sky-400 transition" href="#">
-                Yardıma mı ihtiyacınız var?
+                Destek mi lazım?
               </a>{" "}
               Bizi Arayın:
               <span className="text-sky-400"> +90 552 833 08 83</span>

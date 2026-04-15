@@ -2,17 +2,17 @@ export default function InfoBanner() {
     return (
         <div className="flex items-center justify-between bg-gradient-to-br from-slate-900 to-slate-800  rounded-xl p-6">
             <div>
-                <span className="text-sm text-gray-500">
-                    Always Taking Care
+                <span className="text-sm text-blue-400 font-bold">
+                    PlayStation Plus Deluxe
                 </span>
-                <h3 className="text-lg font-semibold">
-                    In store or online your health & safety is our top priority.
+                <h3 className="text-lg font-semibold text-white">
+                    700'den fazla oyun, klasik katalog ve oyun deneme sürümlerine hemen erişin.
                 </h3>
             </div>
 
             <img
-                src="/slider/banner-box2.jpg"
-                className="h-24 object-contain"
+                src="/products/ps-plus-logo.png"
+                className="h-20 object-contain"
             />
         </div>
     );

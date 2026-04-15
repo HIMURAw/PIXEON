@@ -2,33 +2,33 @@ export default function PromoVerticalSmall() {
     return (
         <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-xl overflow-hidden shadow-sm">
             <div className="p-4">
-                <span className="text-xs text-gray-500">
-                    Best Bakery Products
+                <span className="text-xs text-blue-400 font-bold">
+                    PlayStation Plus
                 </span>
 
-                <h3 className="text-base font-semibold mt-1">
-                    Freshest Products <br />
-                    <span className="font-bold">every hour.</span>
+                <h3 className="text-base font-semibold mt-1 text-white">
+                    Sınırsız Eğlenceyi <br />
+                    <span className="font-bold">Keşfet</span>
                 </h3>
 
-                <p className="text-sm mt-2">
-                    only-from
+                <p className="text-[10px] mt-2 text-gray-400 uppercase tracking-tighter">
+                    Aylık Oyunlar ve Çok Oyunculu Mod
                 </p>
 
-                <span className="text-xl font-bold text-red-500">
-                    $24.99
+                <span className="text-xl font-bold text-white">
+                    270 ₺'den başlayan fiyatlarla
                 </span>
             </div>
 
             <div className="relative">
                 <img
-                    src="/products/pngtree-luxurious-blue-perfume-bottle-against-a-transparent-background-png-image_16492004.png"
-                    alt="Bakery"
-                    className="w-full h-40 object-cover"
+                    src="/products/psplus-card.png"
+                    alt="PS Plus"
+                    className="w-full h-40 object-contain bg-slate-900"
                 />
 
-                <button className="cursor-pointer absolute bottom-3 left-1/2 -translate-x-1/2 bg-blue-500 text-white text-sm px-4 py-1.5 rounded-full hover:bg-blue-600 transition">
-                    Shop Now
+                <button className="cursor-pointer absolute bottom-3 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-xs px-4 py-1.5 rounded-full hover:bg-blue-700 transition font-bold">
+                    Üye Ol
                 </button>
             </div>
         </div>

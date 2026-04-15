@@ -13,33 +13,38 @@ export default function HotDeal() {
 
             <div className="flex gap-6 items-center">
                 <div className="relative">
-                    <span className="absolute -top-2 -left-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
-                        19%
+                    <span className="absolute -top-2 -left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded-full font-bold">
+                        %10 FIRSAT
                     </span>
-                    <img src="/products/laura-chouette-4sKdeIMiFEI-unsplash.jpg" className="w-28 h-28" />
+                    <img src="/products/ps5-digital.png" className="w-28 h-28 object-contain" />
                 </div>
 
                 <div className="flex-1 space-y-2">
-                    <h4 className="font-medium">
-                        Chobani Tam Yağlı Vanilyalı Yunan Yoğurdu
+                    <h4 className="font-bold text-white">
+                        PlayStation 5 Slim Dijital Sürüm + 2. Kollu Paket
                     </h4>
 
                     <div>
-                        <span className="line-through text-gray-400 mr-2">
-                            119.99 ₺
+                        <span className="line-through text-gray-400 mr-2 text-sm">
+                            21.999 ₺
                         </span>
-                        <span className="text-red-500 font-bold">
-                            89.99 ₺
+                        <span className="text-blue-400 font-extrabold text-xl">
+                            19.799 ₺
                         </span>
                     </div>
 
-                    <div className="h-2 bg-gray-200 rounded">
-                        <div className="h-full w-[70%] bg-yellow-400 rounded" />
+                    <div className="h-2 bg-slate-800 rounded overflow-hidden">
+                        <div className="h-full w-[85%] bg-blue-500 rounded" />
                     </div>
 
-                    <span className="text-xs text-gray-500">
-                        Kampanya bitimine kalan süre
-                    </span>
+                    <div className="flex justify-between items-center">
+                        <span className="text-[10px] text-gray-500 uppercase tracking-wider font-bold">
+                            Sınırlı Stok: 12 Adet Kaldı
+                        </span>
+                        <span className="text-[10px] text-blue-400 font-bold">
+                            SON 2 GÜN
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>

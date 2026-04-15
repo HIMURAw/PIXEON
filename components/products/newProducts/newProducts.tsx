@@ -7,97 +7,76 @@ export type Product = {
     price: string;
     oldPrice?: string;
     discount?: string | null;
-    organic?: boolean;
-    select?: boolean;
+    category?: string;
 };
 
 export const products: Product[] = [
     {
         id: 1,
-        name: "Angie's Boomchickapop Tatlı ve Tuzlu Mısır",
-        image: "/products/product-1.jpg",
-        price: "249.99",
+        name: "PlayStation 5 Slim Standart Edition",
+        image: "/products/ps5-slim.png",
+        price: "18.999",
         discount: null,
-        organic: false,
-        select: true,
+        category: "Konsollar"
     },
     {
         id: 2,
-        name: "Blue Diamond Almonds Az Tuzlu Badem",
-        image: "/products/product-2.png",
-        oldPrice: "349.99",
-        price: "299.99",
-        discount: "10%",
-        organic: true,
-        select: false,
+        name: "God of War Ragnarök - PS5",
+        image: "/products/gow-ragnarok.png",
+        oldPrice: "1.499",
+        price: "1.249",
+        discount: "16%",
+        category: "Oyunlar"
     },
     {
         id: 3,
-        name: "Angus Dana Kuşbaşı Et",
-        image: "/products/product-1.jpg",
-        oldPrice: "899.99",
-        price: "649.99",
-        discount: "38%",
-        organic: false,
-        select: false,
+        name: "DualSense Kablosuz Kontrolcü - Beyaz",
+        image: "/products/dualsense-white.png",
+        price: "2.899",
+        discount: null,
+        category: "Aksesuarlar"
     },
     {
         id: 4,
-        name: "Angie's Boomchickapop Sweet & Salty Kettle Corn",
-        image: "/products/product-1.jpg",
-        price: "7.99",
+        name: "Marvel's Spider-Man 2 - PS5",
+        image: "/products/spiderman-2.png",
+        price: "1.499",
         discount: null,
-        organic: false,
-        select: true,
-    },
-       {
-        id: 4,
-        name: "Angie's Boomchickapop Sweet & Salty Kettle Corn",
-        image: "/products/product-1.jpg",
-        price: "7.99",
-        discount: null,
-        organic: false,
-        select: true,
+        category: "Oyunlar"
     },
     {
         id: 5,
-        name: "Blue Diamond Almonds Lightly Salted",
-        image: "/products/product-2.png",
-        oldPrice: "11.68",
-        price: "10.58",
-        discount: "10%",
-        organic: true,
-        select: false,
+        name: "Pulse 3D Kablosuz Kulaklık",
+        image: "/products/pulse-3d.png",
+        oldPrice: "3.999",
+        price: "3.499",
+        discount: "12%",
+        category: "Aksesuarlar"
     },
     {
         id: 6,
-        name: "USDA Choice Angus Beef Stew Meat",
-        image: "/products/product-1.jpg",
-        oldPrice: "79.99",
-        price: "49.99",
-        discount: "38%",
-        organic: false,
-        select: false,
+        name: "Elden Ring: Shadow of the Erdtree",
+        image: "/products/elden-ring.png",
+        price: "1.200",
+        discount: null,
+        category: "Oyunlar"
     },
     {
         id: 7,
-        name: "Angie's Boomchickapop Sweet & Salty Kettle Corn",
-        image: "/products/product-1.jpg",
-        price: "7.99",
+        name: "DualSense Şarj İstasyonu",
+        image: "/products/charging-station.png",
+        price: "999",
         discount: null,
-        organic: false,
-        select: true,
+        category: "Aksesuarlar"
     },
     {
         id: 8,
-        name: "Himura'nın Özel Pembe ***** Tadında Kokusu",
-        image: "/products/product-1.jpg",
-        price: "ÜCRETSİZ",
+        name: "PlayStation Plus 12 Aylık - Deluxe",
+        image: "/products/ps-plus-card.png",
+        price: "2.740",
         discount: null,
-        organic: false,
-        select: true,
+        category: "Üyelik"
     },
-
 ];
 
 type ProductsProps = {
