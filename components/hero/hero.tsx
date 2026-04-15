@@ -18,36 +18,36 @@ interface Slide {
 const slides: Slide[] = [
     {
         id: 1,
-        badge: "-20% İNDİRİM",
-        badgeColor: "bg-green-500",
-        title: "Market Alışverişinde Uzman",
-        subtitle: "Sadece bu hafta. Kaçırmayın...",
-        price: "249.99 ₺",
-        buttonText: "Şimdi Al",
+        badge: "YENİ NESİL",
+        badgeColor: "bg-blue-600",
+        title: "PlayStation 5 Pro",
+        subtitle: "4K 120FPS ve Işın İzleme Teknolojisi ile Oyunun Sınırlarını Zorlayın.",
+        price: "24.999 ₺",
+        buttonText: "Hemen İncele",
         buttonLink: "/shop",
-        image: "/slider/hero-1.png"
+        image: "/products/ps5-pro.png"
     },
     {
         id: 2,
-        badge: "-30% İNDİRİM",
-        badgeColor: "bg-red-500",
-        title: "Taze Organik Ürünler",
-        subtitle: "Sezonun en iyi fırsatları...",
-        price: "189.99 ₺",
-        buttonText: "Şimdi Al",
+        badge: "ÖZEL OYUN",
+        badgeColor: "bg-red-600",
+        title: "Marvel's Spider-Man 2",
+        subtitle: "Peter Parker ve Miles Morales ile New York'u Kurtarın. Birlikte Daha Güçlü.",
+        price: "1.499 ₺",
+        buttonText: "Satın Al",
         buttonLink: "/shop",
-        image: "/slider/hero-2.png"
+        image: "/products/spiderman-2.png"
     },
     {
         id: 3,
-        badge: "-15% İNDİRİM",
-        badgeColor: "bg-sky-400",
-        title: "Kalite Garantili",
-        subtitle: "Sizin için en iyi ürünler...",
-        price: "299.99 ₺",
-        buttonText: "Şimdi Al",
+        badge: "PROFESYONEL",
+        badgeColor: "bg-zinc-700",
+        title: "DualSense Edge™",
+        subtitle: "Tamamen Kişiselleştirilebilir Kontrolcü ile Profesyonel Seviye Deneyim.",
+        price: "8.490 ₺",
+        buttonText: "Keşfet",
         buttonLink: "/shop",
-        image: "/slider/hero-3.png"
+        image: "/products/dualsense-edge.png"
     }
 ];
 

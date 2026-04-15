@@ -47,7 +47,7 @@ export default function Head() {
                                 height={96}
                             />
                             <span className="text-xs text-slate-400 text-center">
-                                Online Market Alışveriş Merkezi
+                                Yetkili PlayStation Satış Merkezi
                             </span>
                         </div>
 
@@ -58,7 +58,7 @@ export default function Head() {
                             <div className="relative">
                                 <input
                                     type="text"
-                                    placeholder="Ürünleri ara..."
+                                    placeholder="Oyun, Konsol veya Aksesuar ara..."
                                     className="w-full bg-[#020617] text-slate-200 rounded-lg px-4 py-3 pr-10 outline-none border border-slate-700 focus:border-sky-500 transition"
                                 />
                                 <Search
@@ -93,7 +93,7 @@ export default function Head() {
                     <CategoriesSection />
 
                     <div className="flex-1 flex justify-end gap-2">
-                        {["ANA SAYFA", "MAĞAZA", "FIRIN", "İÇECEKLER", "BLOG", "İLETİŞİM"].map((item) => (
+                        {["ANA SAYFA", "KONSOLLAR", "OYUNLAR", "AKSESUARLAR", "DİJİTAL KODLAR", "İLETİŞİM"].map((item) => (
                             <Link
                                 key={item}
                                 href="#"
@@ -101,7 +101,6 @@ export default function Head() {
                                 hover:bg-slate-800 hover:text-sky-400 transition"
                             >
                                 {item}
-                                {item === "SHOP" && <ChevronDown size={14} className="ml-1" />}
                             </Link>
                         ))}
                     </div>

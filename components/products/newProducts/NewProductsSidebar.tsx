@@ -6,21 +6,21 @@ export default function NewProductsSidebar() {
             {/* Günün Fırsatı Kartı */}
             <div className="relative rounded-xl overflow-hidden group cursor-pointer">
                 <img
-                    src="/ads/yixian-zhao-q7iZCOXGOWY-unsplash.jpg"
+                    src="/products/ps5-pro-sidebar.png"
                     alt="Günün Fırsatı"
                     className="w-full h-[260px] object-cover group-hover:scale-105 transition-transform duration-500"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-4">
                     <span className="inline-block text-[10px] uppercase tracking-widest text-blue-300 font-semibold mb-1">
-                        Günün Fırsatı
+                        Geleceğin Gücü
                     </span>
                     <h4 className="text-white text-sm font-bold leading-tight">
-                        Taze Organik Ürünlerde <br />
-                        <span className="text-blue-400">%40&apos;a Varan İndirim</span>
+                        PlayStation 5 Pro <br />
+                        <span className="text-blue-400">Şimdi Stoklarımızda</span>
                     </h4>
-                    <button className="cursor-pointer mt-3 bg-blue-500 hover:bg-blue-600 text-white text-xs px-4 py-1.5 rounded-full transition-colors">
-                        Alışverişe Başla
+                    <button className="cursor-pointer mt-3 bg-blue-500 hover:bg-blue-600 text-white text-xs px-4 py-1.5 rounded-full transition-colors font-bold">
+                        Hemen İncele
                     </button>
                 </div>
             </div>
@@ -33,11 +33,11 @@ export default function NewProductsSidebar() {
                 </h4>
                 <div className="space-y-2">
                     {[
-                        { icon: "🥩", label: "Et & Tavuk", count: 24 },
-                        { icon: "🥦", label: "Meyve & Sebze", count: 36 },
-                        { icon: "🧀", label: "Süt Ürünleri", count: 18 },
-                        { icon: "🍞", label: "Fırın & Ekmek", count: 12 },
-                        { icon: "🍫", label: "Atıştırmalık", count: 42 },
+                        { icon: "🎮", label: "Konsollar", count: 12 },
+                        { icon: "💿", label: "PS5 Oyunları", count: 124 },
+                        { icon: "🕹️", label: "Kontrolcüler", count: 28 },
+                        { icon: "🎧", label: "Kulaklıklar", count: 14 },
+                        { icon: "💳", label: "Hediye Kartları", count: 42 },
                     ].map((cat) => (
                         <div
                             key={cat.label}
@@ -64,12 +64,12 @@ export default function NewProductsSidebar() {
                     Ücretsiz Kargo
                 </h4>
                 <p className="text-gray-400 text-xs mt-1 leading-relaxed">
-                    500₺ ve üzeri alışverişlerde <br />
+                    10.000 ₺ ve üzeri alışverişlerde <br />
                     kargo tamamen ücretsiz!
                 </p>
                 <div className="mt-3 flex items-center justify-center gap-1">
-                    <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                    <span className="text-green-400 text-[11px] font-medium">Aktif Kampanya</span>
+                    <span className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></span>
+                    <span className="text-blue-400 text-[11px] font-medium">Aktif Kampanya</span>
                 </div>
             </div>
         </div>
