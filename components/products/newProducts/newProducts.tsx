@@ -100,9 +100,15 @@ export const products: Product[] = [
 
 ];
 
-export default function Products() {
+type ProductsProps = {
+    limit?: number;
+};
+
+export default function Products({ limit }: ProductsProps) {
+    const displayProducts = limit ? products.slice(0, limit) : products;
+
     return (
-        <section className="ml-20 space-y-6">
+        <section className="space-y-6">
             <div className="flex items-center justify-between">
                 <div>
                     <h2 className="text-xl font-semibold text-white">
@@ -113,14 +119,17 @@ export default function Products() {
                     </p>
                 </div>
 
-                <button className="cursor-pointer flex items-center gap-2 text-sm text-blue-400 border border-blue-400/40 px-4 py-1.5 rounded-full hover:bg-blue-400/10 transition">
+                <a
+                    href="/yeni-urunler"
+                    className="cursor-pointer flex items-center gap-2 text-sm text-blue-400 border border-blue-400/40 px-4 py-1.5 rounded-full hover:bg-blue-400/10 transition"
+                >
                     Tümünü Gör →
-                </button>
+                </a>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {products.map(product => (
-                    <ProductsCard key={product.id} product={product} />
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {displayProducts.map((product, index) => (
+                    <ProductsCard key={`${product.id}-${index}`} product={product} />
                 ))}
             </div>
         </section>
