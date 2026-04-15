@@ -9,8 +9,7 @@ export type Product = {
     price: string;
     oldPrice?: string;
     discount?: string | null;
-    organic?: boolean;
-    select?: boolean;
+    category?: string;
 };
 
 export const products: Product[] = [

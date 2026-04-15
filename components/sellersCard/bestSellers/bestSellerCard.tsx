@@ -9,13 +9,13 @@ export default function BestSellerCard({ product }: BestSellerCardProps) {
         <div className="bg-[#0b1220] border border-white/10 rounded-xl p-4 hover:shadow-lg transition flex flex-col h-full">
             <div className="flex gap-2 mb-3">
                 {product.discount && (
-                    <span className="text-xs bg-blue-500 text-white px-2 py-0.5 rounded">
-                        {product.discount}
+                    <span className="text-xs bg-blue-500 text-white px-2 py-0.5 rounded font-bold">
+                        {product.discount} İNDİRİM
                     </span>
                 )}
-                {product.organic && (
-                    <span className="text-xs bg-green-500 text-white px-2 py-0.5 rounded">
-                        Organik
+                {product.category && (
+                    <span className="text-xs bg-slate-800 text-slate-400 px-2 py-0.5 rounded border border-white/5">
+                        {product.category}
                     </span>
                 )}
             </div>
@@ -53,8 +53,8 @@ export default function BestSellerCard({ product }: BestSellerCardProps) {
                 </span>
             </div>
 
-            <button className="mt-auto w-full border border-blue-400 text-blue-400 py-1.5 rounded-full text-sm hover:bg-blue-400 hover:text-white transition">
-                {product.select ? "Seçenekleri Belirle" : "Sepete Ekle"}
+            <button className="cursor-pointer mt-auto w-full border border-blue-400 text-blue-400 py-1.5 rounded-full text-sm hover:bg-blue-400 hover:text-white transition font-bold">
+                Sepete Ekle
             </button>
         </div>
     );
