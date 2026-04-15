@@ -25,7 +25,7 @@ const slides: Slide[] = [
         price: "24.999 ₺",
         buttonText: "Hemen İncele",
         buttonLink: "/shop",
-        image: "/products/ps5-pro.png"
+        image: "/products/ps5_pro_hero.png"
     },
     {
         id: 2,
@@ -36,7 +36,7 @@ const slides: Slide[] = [
         price: "1.499 ₺",
         buttonText: "Satın Al",
         buttonLink: "/shop",
-        image: "/products/spiderman-2.png"
+        image: "/products/spiderman_2_hero.png"
     },
     {
         id: 3,
@@ -47,7 +47,7 @@ const slides: Slide[] = [
         price: "8.490 ₺",
         buttonText: "Keşfet",
         buttonLink: "/shop",
-        image: "/products/dualsense-edge.png"
+        image: "/products/dualsense_edge_hero.png"
     }
 ];
 
