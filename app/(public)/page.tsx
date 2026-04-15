@@ -9,7 +9,8 @@ import HotDeal from "@/components/sellersCard/hotDeals/HotDeal";
 import PromoVertical from "@/components/promo/PromoVertical";
 import PromoVerticalSmall from "@/components/promo/PromoVerticalSmall";
 import PromoBanner from "@/components/promo/PromoBanner";
-import Products from "@/components/products/newProducts/newProducts"
+import Products from "@/components/products/newProducts/newProducts";
+import NewProductsSidebar from "@/components/products/newProducts/NewProductsSidebar";
 
 export default function Home() {
     return (
@@ -44,7 +45,16 @@ export default function Home() {
                         <InfoBanner />
                         <HotDeal />
                         <PromoBanner />
-                        <Products />
+                    </main>
+                </div>
+
+                {/* YENİ ÜRÜNLER BÖLÜMÜ */}
+                <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-16 !-mt-14">
+                    <aside>
+                        <NewProductsSidebar />
+                    </aside>
+                    <main>
+                        <Products limit={6} />
                     </main>
                 </div>
             </div>
