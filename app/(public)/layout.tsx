@@ -18,6 +18,8 @@ export const metadata: Metadata = {
 };
 
 import Footer from "@/components/footer/Footer";
+import { SupportProvider } from "@/context/SupportContext";
+import SupportWidget from "@/components/support/SupportWidget";
 
 export default function RootLayout({
   children,
@@ -29,7 +31,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <SupportProvider>
+          {children}
+          <SupportWidget />
+        </SupportProvider>
         <Footer />
       </body>
     </html>

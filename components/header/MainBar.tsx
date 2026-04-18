@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Hand,
   ChevronDown,
@@ -5,8 +7,11 @@ import {
 } from "lucide-react";
 
 import Navbar from "./navbar/Navbar";
+import { useSupport } from "@/context/SupportContext";
 
 export default function MainBar() {
+  const { openSupport } = useSupport();
+
   return (
     <div className="bg-slate-900 text-slate-300 text-sm border-b border-slate-800">
       <div className="w-full px-4 sm:px-6 lg:px-8 py-3">
@@ -22,9 +27,9 @@ export default function MainBar() {
 
           <div className="flex items-center justify-end gap-4">
             <span className="text-slate-400 font-semibold border-r border-slate-700 pr-4">
-              <a className="hover:text-sky-400 transition" href="#">
+              <button onClick={openSupport} className="hover:text-sky-400 transition cursor-pointer">
                 Destek mi lazım?
-              </a>{" "}
+              </button>{" "}
               Bizi Arayın:
               <span className="text-sky-400"> +90 552 833 08 83</span>
             </span>
