@@ -18,7 +18,7 @@ export default function AboutUs() {
                 <section className="relative h-[500px] flex items-center justify-center overflow-hidden">
                     <div className="absolute inset-0 z-0">
                         <Image
-                            src="/products/spiderman.jpg"
+                            src="/slider/banner.jfif"
                             alt="PlayStation Hero"
                             fill
                             className="object-cover opacity-30 scale-105 animate-pulse-slow"
@@ -61,7 +61,7 @@ export default function AboutUs() {
                         </div>
                         <div className="relative aspect-square rounded-3xl overflow-hidden border border-slate-800 shadow-2xl shadow-sky-500/10">
                             <Image
-                                src="/products/ps5.png"
+                                src="/logo.png"
                                 alt="Gaming"
                                 fill
                                 className="object-cover"

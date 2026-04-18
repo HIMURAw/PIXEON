@@ -6,7 +6,7 @@ export default function Navbar() {
             <Link href="/hakkimizda" className="hover:text-[#7dd7fb] text-[#696e7f] transition-colors">Hakkımızda</Link>
             <Link href="/hesabim" className="hover:text-[#7dd7fb] text-[#696e7f] transition-colors">Hesabım</Link>
             <Link href="/istek-listesi" className="hover:text-[#7dd7fb] text-[#696e7f] transition-colors">İstek Listesi</Link>
-            <Link href="#" className="hover:text-[#7dd7fb] text-[#696e7f] transition-colors">Sipariş Takibi</Link>
+            <Link href="/siparis-takibi" className="hover:text-[#7dd7fb] text-[#696e7f] transition-colors">Sipariş Takibi</Link>
         </div>
     );
 }
