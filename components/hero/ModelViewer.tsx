@@ -22,9 +22,11 @@ export default function ModelViewer({ path }: { path: string }) {
   return (
     <div className="w-full h-full min-h-[400px] bg-radial-gradient from-blue-900/10 to-transparent">
       <Canvas dpr={[1, 2]} shadows camera={{ fov: 40, position: [0, 0, 4] }} gl={{ alpha: true }}>
+        <ambientLight intensity={0.5} />
+        <pointLight position={[10, 10, 10]} intensity={1} />
         <Suspense fallback={null}>
-          <PresentationControls speed={1.5} global zoom={0.7} polar={[-0.1, Math.PI / 4]}>
-            <Stage environment="city" intensity={0.6} shadows={false} adjustCamera={1.5}>
+          <PresentationControls speed={1.5} global zoom={0.8} polar={[-0.1, Math.PI / 4]}>
+            <Stage environment="city" intensity={1} shadows={false} adjustCamera={true} center={{}}>
               <Model path={path} />
             </Stage>
           </PresentationControls>
