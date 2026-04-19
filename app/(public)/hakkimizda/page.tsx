@@ -61,7 +61,7 @@ export default function AboutUs() {
                         </div>
                         <div className="relative aspect-square rounded-3xl overflow-hidden border border-slate-800 shadow-2xl shadow-sky-500/10">
                             <Image
-                                src="/logo.png"
+                                src="/logo-nobg.png"
                                 alt="Gaming"
                                 fill
                                 className="object-cover"

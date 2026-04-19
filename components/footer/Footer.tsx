@@ -1,12 +1,12 @@
 import Link from "next/link";
 import Image from "next/image";
-import { 
-    Mail, 
-    Truck, 
-    ShieldCheck, 
-    Clock, 
-    Facebook, 
-    Instagram, 
+import {
+    Mail,
+    Truck,
+    ShieldCheck,
+    Clock,
+    Facebook,
+    Instagram,
     Twitter,
     Phone,
     MapPin,
@@ -27,9 +27,9 @@ export default function Footer() {
                         <div className="w-full lg:w-auto flex flex-col sm:flex-row gap-4">
                             <div className="relative flex-1 sm:w-80">
                                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
-                                <input 
-                                    type="email" 
-                                    placeholder="E-posta adresiniz" 
+                                <input
+                                    type="email"
+                                    placeholder="E-posta adresiniz"
                                     className="w-full bg-[#0c1022] border border-slate-700 rounded-xl py-3 pl-12 pr-4 text-white focus:border-sky-500 outline-none transition"
                                 />
                             </div>
@@ -80,7 +80,7 @@ export default function Footer() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
                     {/* Brand Column */}
                     <div className="space-y-6">
-                        <Image src="/logo.png" alt="Pixeon Logo" width={120} height={120} />
+                        <Image src="/logo-nobg.png" alt="Pixeon Logo" width={120} height={120} />
                         <p className="text-sm leading-relaxed text-slate-400">
                             Pixeon, en yeni PlayStation konsollarını, en popüler oyunları ve profesyonel ekipmanları en uygun fiyatlarla sunan yetkili satış merkezinizdir.
                         </p>
@@ -96,8 +96,8 @@ export default function Footer() {
                     {/* Kategoriler */}
                     <div>
                         <h4 className="text-white font-bold mb-6 flex items-center gap-2">
-                             <span className="w-1.5 h-6 bg-sky-500 rounded-full"></span>
-                             Popüler Kategoriler
+                            <span className="w-1.5 h-6 bg-sky-500 rounded-full"></span>
+                            Popüler Kategoriler
                         </h4>
                         <ul className="space-y-4 text-sm">
                             {["PlayStation Konsollar", "PS5 Oyunları", "PS4 Oyunları", "DualSense Kontrolcüler", "Aksesuarlar"].map((link) => (
@@ -113,8 +113,8 @@ export default function Footer() {
                     {/* Kurumsal */}
                     <div>
                         <h4 className="text-white font-bold mb-6 flex items-center gap-2">
-                             <span className="w-1.5 h-6 bg-sky-500 rounded-full"></span>
-                             Hızlı Linkler
+                            <span className="w-1.5 h-6 bg-sky-500 rounded-full"></span>
+                            Hızlı Linkler
                         </h4>
                         <ul className="space-y-4 text-sm">
                             {["Hakkımızda", "Mağazalarımız", "Kariyer", "İletişim", "Blog"].map((link) => (
@@ -130,8 +130,8 @@ export default function Footer() {
                     {/* Contact & Support */}
                     <div>
                         <h4 className="text-white font-bold mb-6 flex items-center gap-2">
-                             <span className="w-1.5 h-6 bg-sky-500 rounded-full"></span>
-                             Bize Ulaşın
+                            <span className="w-1.5 h-6 bg-sky-500 rounded-full"></span>
+                            Bize Ulaşın
                         </h4>
                         <ul className="space-y-4 text-sm">
                             <li className="flex gap-3">
@@ -166,15 +166,15 @@ export default function Footer() {
                     <p className="text-sm text-slate-500 text-center md:text-left">
                         © 2024 <span className="text-white font-bold">PIXEON</span> PlayStation Store. Tüm hakları saklıdır.
                     </p>
-                    
+
                     <div className="flex items-center gap-4 opacity-70 grayscale hover:grayscale-0 transition duration-500 px-4 py-2 bg-slate-900/50 rounded-lg border border-white/5">
                         <span className="text-[10px] text-slate-500 mr-2 uppercase tracking-widest font-bold">Ödeme Yöntemleri</span>
                         <div className="flex gap-3 text-white">
-                             {/* Dummy Payment Icons/Text */}
-                             <span className="font-bold">VISA</span>
-                             <span className="font-bold">MASTERCARD</span>
-                             <span className="font-bold">AMEX</span>
-                             <span className="font-bold"> Troy</span>
+                            {/* Dummy Payment Icons/Text */}
+                            <span className="font-bold">VISA</span>
+                            <span className="font-bold">MASTERCARD</span>
+                            <span className="font-bold">AMEX</span>
+                            <span className="font-bold"> Troy</span>
                         </div>
                     </div>
                 </div>

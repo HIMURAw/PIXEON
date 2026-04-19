@@ -11,7 +11,7 @@ export default function InfoBanner() {
             </div>
 
             <img
-                src="/products/ps-plus-logo.png"
+                src="/products/ps-plus-logo-nobg.png"
                 className="h-20 object-contain"
             />
         </div>
