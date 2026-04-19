@@ -50,7 +50,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                                 P
                             </div>
                             {isSidebarOpen && (
-                                <span className="ml-3 font-bold text-xl tracking-tight text-white">PIXEON<span className="text-blue-500">.</span></span>
+                                <span className="ml-3 font-bold text-xl tracking-tight text-white">TUGER<span className="text-blue-500">.</span></span>
                             )}
                         </div>
 

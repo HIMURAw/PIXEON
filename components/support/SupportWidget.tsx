@@ -8,7 +8,7 @@ export default function SupportWidget() {
     const { isOpen, toggleSupport, closeSupport } = useSupport();
     const [message, setMessage] = useState("");
     const [chat, setChat] = useState([
-        { id: 1, type: "agent", text: "Merhaba! Ben PIXEON Destek Asistanı. Size nasıl yardımcı olabilirim?", time: "02:30" }
+        { id: 1, type: "agent", text: "Merhaba! Ben TUGER Destek Asistanı. Size nasıl yardımcı olabilirim?", time: "02:30" }
     ]);
     const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -65,11 +65,10 @@ export default function SupportWidget() {
                     <div ref={scrollRef} className="flex-1 p-6 overflow-y-auto space-y-4 bg-[url('/grid-pattern.png')] bg-fixed">
                         {chat.map((msg) => (
                             <div key={msg.id} className={`flex ${msg.type === "user" ? "justify-end" : "justify-start"}`}>
-                                <div className={`max-w-[80%] p-4 rounded-2xl text-sm ${
-                                    msg.type === "user" 
-                                    ? "bg-blue-600 text-white rounded-tr-none shadow-lg shadow-blue-600/20" 
-                                    : "bg-slate-900 border border-white/5 text-slate-200 rounded-tl-none"
-                                }`}>
+                                <div className={`max-w-[80%] p-4 rounded-2xl text-sm ${msg.type === "user"
+                                        ? "bg-blue-600 text-white rounded-tr-none shadow-lg shadow-blue-600/20"
+                                        : "bg-slate-900 border border-white/5 text-slate-200 rounded-tl-none"
+                                    }`}>
                                     <p className="leading-relaxed">{msg.text}</p>
                                     <span className={`text-[10px] mt-1 block ${msg.type === "user" ? "text-white/50" : "text-slate-500"}`}>
                                         {msg.time}
@@ -82,8 +81,8 @@ export default function SupportWidget() {
                     {/* Input Area */}
                     <div className="p-4 bg-slate-950 border-t border-white/5">
                         <form onSubmit={handleSend} className="relative">
-                            <input 
-                                type="text" 
+                            <input
+                                type="text"
                                 value={message}
                                 onChange={(e) => setMessage(e.target.value)}
                                 placeholder="Mesajınızı yazın..."
@@ -99,21 +98,20 @@ export default function SupportWidget() {
                             </div>
                         </form>
                         <p className="text-[10px] text-center text-slate-600 mt-3 font-medium uppercase tracking-widest">
-                            PIXEON DESTEK EKİBİ
+                            TUGER DESTEK EKİBİ
                         </p>
                     </div>
                 </div>
             )}
 
             {/* BUBBLE BUTTON */}
-            <button 
+            <button
                 onClick={toggleSupport}
-                className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 shadow-2xl relative ${
-                    isOpen ? "bg-red-500 rotate-90" : "bg-blue-600 hover:bg-blue-500 hover:scale-110"
-                }`}
+                className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 shadow-2xl relative ${isOpen ? "bg-red-500 rotate-90" : "bg-blue-600 hover:bg-blue-500 hover:scale-110"
+                    }`}
             >
                 {isOpen ? <X className="text-white" size={28} /> : <MessageCircle className="text-white" size={28} />}
-                
+
                 {!isOpen && (
                     <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 border-2 border-[#020617] rounded-full flex items-center justify-center text-[10px] font-bold text-white">
                         1

@@ -32,7 +32,7 @@ export default function AboutUs() {
                             OYUNUN GELECEĞİ BURADA
                         </h1>
                         <p className="text-xl md:text-2xl text-slate-400 font-medium animate-fade-in-up delay-200">
-                            PIXEON olarak, Türkiye'nin en seçkin PlayStation topluluğunu inşa ediyoruz.
+                            TUGER olarak, Türkiye'nin en seçkin PlayStation topluluğunu inşa ediyoruz.
                         </p>
                     </div>
                 </section>
@@ -44,7 +44,7 @@ export default function AboutUs() {
                         <div className="space-y-8">
                             <h2 className="text-4xl font-bold tracking-tight">Biz Kimiz?</h2>
                             <p className="text-lg text-slate-400 leading-relaxed">
-                                PIXEON, 2024 yılında oyun tutkunları tarafından oyun tutkunları için kuruldu.
+                                TUGER, 2024 yılında oyun tutkunları tarafından oyun tutkunları için kuruldu.
                                 Sadece bir mağaza değil, PlayStation ekosisteminin kalbinde yer alan bir teknoloji merkeziyiz.
                                 En yeni konsolları, en heyecan verici oyunları ve özel aksesuarları en hızlı şekilde sizlere ulaştırmayı görev edindik.
                             </p>
@@ -73,7 +73,7 @@ export default function AboutUs() {
                     {/* Why Us? */}
                     <section className="space-y-16">
                         <div className="text-center space-y-4">
-                            <h2 className="text-4xl font-bold tracking-tight">Neden PIXEON?</h2>
+                            <h2 className="text-4xl font-bold tracking-tight">Neden TUGER?</h2>
                             <p className="text-slate-400 max-w-2xl mx-auto text-lg">
                                 PlayStation deneyiminizi mükemmelleştirmek için buradayız. İşte bizi farklı kılan özelliklerimiz:
                             </p>
