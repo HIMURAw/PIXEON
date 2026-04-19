@@ -82,12 +82,12 @@ export default function Head() {
                             <span className="font-medium text-slate-200 group-hover:text-sky-400 transition-colors">$0.00</span>
                         </Link>
 
-                        <div className="flex items-center gap-2">
-                            <div className="w-10 h-10 bg-slate-900 flex items-center justify-center border border-slate-700 rounded-full">
+                        <Link href="/sepet" className="flex items-center gap-2 group">
+                            <div className="w-10 h-10 bg-slate-900 flex items-center justify-center border border-slate-700 rounded-full group-hover:border-sky-500/50 group-hover:bg-slate-800 transition-all">
                                 <ShoppingCart color="#E5E7EB" size={16} />
                             </div>
-                            <span className="font-medium text-slate-200">0</span>
-                        </div>
+                            <span className="font-medium text-slate-200 group-hover:text-sky-400 transition-colors">0</span>
+                        </Link>
                     </div>
                 </div>
 
