@@ -23,7 +23,7 @@ export default function Head() {
 
                     <Link href="/" className="shrink-0">
                         <Image
-                            src="/logo.png"
+                            src="/logo-nobg.png"
                             alt="Logo"
                             width={48}
                             height={48}
@@ -45,7 +45,7 @@ export default function Head() {
                         <Link href="/" className="flex flex-col items-center gap-1 shrink-0 group">
                             <Image
                                 className="object-contain transition-transform group-hover:scale-105"
-                                src="/logo.png"
+                                src="/logo-nobg.png"
                                 alt="Logo"
                                 width={96}
                                 height={96}

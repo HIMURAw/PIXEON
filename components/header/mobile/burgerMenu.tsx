@@ -35,7 +35,7 @@ export default function BurgerMenu() {
                 <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-900 to-blue-800">
                     <div className="flex items-center gap-2">
                         <Image
-                            src="/logo.png"
+                            src="/logo-nobg.png"
                             alt="Logo"
                             width={48}
                             height={48}
