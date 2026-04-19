@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { db } from "@/lib/db";
+import { users } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 
 export async function POST(request: NextRequest) {
@@ -7,11 +9,9 @@ export async function POST(request: NextRequest) {
     const { name, email, password } = await request.json();
 
     // 1. Kullanıcı var mı kontrol et
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
-    });
+    const existingUsers = await db.select().from(users).where(eq(users.email, email)).limit(1);
 
-    if (existingUser) {
+    if (existingUsers.length > 0) {
       return NextResponse.json(
         { success: false, message: "Bu e-posta adresi zaten kullanımda" },
         { status: 400 }
@@ -22,13 +22,12 @@ export async function POST(request: NextRequest) {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // 3. Kullanıcıyı oluştur
-    const user = await prisma.user.create({
-      data: {
-        name,
-        email,
-        password: hashedPassword,
-        role: "USER", // Varsayılan rol
-      },
+    await db.insert(users).values({
+      id: crypto.randomUUID(), // uuid v4
+      name,
+      email,
+      password: hashedPassword,
+      role: "USER",
     });
 
     return NextResponse.json(

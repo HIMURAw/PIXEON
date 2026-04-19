@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { encrypt, SESSION_COOKIE_NAME } from "@/lib/auth";
-import prisma from "@/lib/prisma";
+import { db } from "@/lib/db";
+import { users } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 
 export async function POST(request: NextRequest) {
@@ -8,10 +10,9 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { email, password } = body;
 
-    // 1. Kullanıcıyı veritabanında bul
-    const user = await prisma.user.findUnique({
-      where: { email },
-    });
+    // 1. Kullanıcıyı bul
+    const foundUsers = await db.select().from(users).where(eq(users.email, email)).limit(1);
+    const user = foundUsers[0];
 
     if (!user) {
       return NextResponse.json(
