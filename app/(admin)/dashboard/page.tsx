@@ -10,6 +10,7 @@ import {
     ArrowDownRight,
     MoreHorizontal
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export default function AdminDashboard() {
     return (
