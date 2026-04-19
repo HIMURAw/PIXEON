@@ -12,7 +12,9 @@ import {
     LogOut,
     Bell,
     Search,
-    ChevronLeft,
+    FileSpreadsheet,
+    TicketPlus,
+    Cuboid,
     Menu
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -25,6 +27,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         { label: "Ürünler", icon: Package, href: "/admin/products" },
         { label: "Siparişler", icon: ShoppingCart, href: "/admin/orders" },
         { label: "Müşteriler", icon: Users, href: "/admin/users" },
+        { label: "Relamlar", icon: FileSpreadsheet, href: "/admin/realms" },
+        { label: "Kupponlar", icon: TicketPlus, href: "/admin/coupons" },
+        { label: "Kargo", icon: Cuboid, href: "/admin/cargo" },
+        { label: "Raporlar", icon: FileSpreadsheet, href: "/admin/reports" },
         { label: "Ayarlar", icon: Settings, href: "/admin/settings" },
     ];
 
