@@ -8,29 +8,35 @@ export default function AuthLayout({
 }) {
   return (
     <html lang="tr">
-      <body className="antialiased">
+      <body className="antialiased selection:bg-sky-500/30">
         <div className="min-h-screen w-full flex items-center justify-center bg-[#020617] relative overflow-hidden font-sans">
-      {/* Background Orbs */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/20 blur-[120px] rounded-full animate-pulse" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-600/20 blur-[120px] rounded-full animate-pulse" />
+          {/* Subtle Grid Background */}
+          <div className="absolute inset-0 z-0 opacity-20" 
+               style={{ backgroundImage: `radial-gradient(#1e293b 1px, transparent 1px)`, backgroundSize: '24px 24px' }} />
+          
+          {/* Refined Animated Orbs */}
+          <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-blue-600/10 blur-[150px] rounded-full animate-pulse" />
+          <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-sky-500/10 blur-[150px] rounded-full animate-pulse transition-all duration-1000" />
+          
+          {/* Interactive Glow following cursor (optional/simulated) */}
+          <div className="absolute inset-0 z-0 bg-gradient-to-b from-transparent via-[#020617]/50 to-[#020617]" />
 
-      {/* Content Container */}
-      <div className="relative z-10 w-full max-w-md p-4">
-        <div className="bg-slate-900/40 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl">
-          <div className="flex flex-col items-center mb-8">
-            <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 tracking-tighter mb-2">
-              TUGER
-            </h1>
-            <p className="text-slate-400 text-sm font-medium">PlayStation Store & Beyond</p>
+          {/* Main Content */}
+          <div className="relative z-10 w-full max-w-[440px] px-6 py-12">
+            <div className="animate-in">
+              {children}
+            </div>
           </div>
-          {children}
-        </div>
-      </div>
 
-      {/* Footer Text */}
-      <div className="absolute bottom-6 left-0 w-full text-center text-slate-500 text-xs font-medium uppercase tracking-widest opacity-50">
-        © 2026 TUGER Gaming Store
-      </div>
-    </div>
+          {/* Copyright / Brand Badge */}
+          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2">
+            <div className="h-px w-12 bg-gradient-to-r from-transparent via-slate-700 to-transparent" />
+            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-[0.3em] opacity-40">
+              Powered by TUGER Engine
+            </p>
+          </div>
+        </div>
+      </body>
+    </html>
   );
 }
