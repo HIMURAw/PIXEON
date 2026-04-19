@@ -20,10 +20,45 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+
 type TabType = "dashboard" | "orders" | "addresses" | "profile" | "favorites";
 
 export default function AccountPage() {
     const [activeTab, setActiveTab] = useState<TabType>("dashboard");
+    const [user, setUser] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+    const router = useRouter();
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const res = await fetch("/api/auth/me");
+                const data = await res.json();
+                if (data.success) {
+                    setUser(data.user);
+                } else {
+                    router.push("/login");
+                }
+            } catch (err) {
+                console.error("User fetch error:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchUser();
+    }, [router]);
+
+    const handleLogout = async () => {
+        try {
+            await fetch("/api/auth/logout", { method: "POST" });
+            router.push("/");
+            router.refresh();
+        } catch (err) {
+            console.error("Logout error:", err);
+        }
+    };
 
     const menuItems = [
         { id: "dashboard", label: "Genel Bakış", icon: <User size={20} /> },
@@ -48,12 +83,12 @@ export default function AccountPage() {
                             {/* User Info Brief */}
                             <div className="p-6 border-b border-slate-800 bg-gradient-to-br from-blue-900/20 to-transparent">
                                 <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 bg-sky-500 rounded-full flex items-center justify-center font-bold text-slate-950 text-xl">
-                                        JD
+                                    <div className="w-12 h-12 bg-sky-500 rounded-full flex items-center justify-center font-bold text-slate-950 text-xl uppercase">
+                                        {user?.name?.substring(0, 2) || "U"}
                                     </div>
-                                    <div>
-                                        <h3 className="font-bold">John Doe</h3>
-                                        <p className="text-xs text-slate-400">john.doe@example.com</p>
+                                    <div className="min-w-0">
+                                        <h3 className="font-bold truncate">{user?.name || "Kullanıcı"}</h3>
+                                        <p className="text-xs text-slate-400 truncate">{user?.email}</p>
                                     </div>
                                 </div>
                             </div>
@@ -65,8 +100,8 @@ export default function AccountPage() {
                                         key={item.id}
                                         onClick={() => setActiveTab(item.id as TabType)}
                                         className={`w-full flex items-center justify-between px-4 py-3.5 rounded-2xl transition-all duration-200 group ${activeTab === item.id
-                                                ? "bg-sky-500 text-slate-950 font-bold shadow-lg shadow-sky-500/20"
-                                                : "text-slate-400 hover:bg-slate-800 hover:text-slate-200"
+                                            ? "bg-sky-500 text-slate-950 font-bold shadow-lg shadow-sky-500/20"
+                                            : "text-slate-400 hover:bg-slate-800 hover:text-slate-200"
                                             }`}
                                     >
                                         <div className="flex items-center gap-3">
@@ -78,7 +113,10 @@ export default function AccountPage() {
                                 ))}
 
                                 <div className="mt-4 pt-4 border-t border-slate-800">
-                                    <button className="w-full flex items-center gap-3 px-4 py-3.5 text-red-400 hover:bg-red-400/10 rounded-2xl transition-all">
+                                    <button
+                                        onClick={handleLogout}
+                                        className="w-full flex items-center gap-3 px-4 py-3.5 text-red-400 hover:bg-red-400/10 rounded-2xl transition-all"
+                                    >
                                         <LogOut size={20} />
                                         <span>Çıkış Yap</span>
                                     </button>
@@ -90,10 +128,10 @@ export default function AccountPage() {
                     {/* MAIN CONTENT */}
                     <main className="flex-1 min-w-0">
                         <div className="bg-[#0c1022] border border-slate-800 rounded-[32px] p-6 md:p-10 min-h-[600px] shadow-2xl">
-                            {activeTab === "dashboard" && <DashboardView setActiveTab={setActiveTab} />}
+                            {activeTab === "dashboard" && <DashboardView user={user} setActiveTab={setActiveTab} />}
                             {activeTab === "orders" && <OrdersView />}
                             {activeTab === "addresses" && <AddressesView />}
-                            {activeTab === "profile" && <ProfileView />}
+                            {activeTab === "profile" && <ProfileView user={user} />}
                             {activeTab === "favorites" && <FavoritesView />}
                         </div>
                     </main>
@@ -103,11 +141,11 @@ export default function AccountPage() {
     );
 }
 
-function DashboardView({ setActiveTab }: { setActiveTab: (tab: TabType) => void }) {
+function DashboardView({ user, setActiveTab }: { user: any, setActiveTab: (tab: TabType) => void }) {
     return (
         <div className="space-y-10 animate-in">
             <div>
-                <h1 className="text-3xl font-black tracking-tight mb-2">Hoş Geldin, John! 👋</h1>
+                <h1 className="text-3xl font-black tracking-tight mb-2">Hoş Geldin, {user?.name?.split(" ")[0]}! 👋</h1>
                 <p className="text-slate-400">Hesap özetin ve son aktivitelerin burada yer alır.</p>
             </div>
 
@@ -255,7 +293,7 @@ function AddressesView() {
     );
 }
 
-function ProfileView() {
+function ProfileView({ user }: { user: any }) {
     return (
         <div className="space-y-10 animate-in">
             <div>
@@ -267,11 +305,11 @@ function ProfileView() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                         <label className="text-sm font-bold text-slate-400">Ad Soyad</label>
-                        <input type="text" defaultValue="John Doe" className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3 outline-none focus:border-sky-500 transition" />
+                        <input type="text" defaultValue={user?.name} className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3 outline-none focus:border-sky-500 transition" />
                     </div>
                     <div className="space-y-2">
                         <label className="text-sm font-bold text-slate-400">E-posta</label>
-                        <input type="email" defaultValue="john.doe@example.com" className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3 outline-none focus:border-sky-500 transition" />
+                        <input type="email" defaultValue={user?.email} className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3 outline-none focus:border-sky-500 transition" />
                     </div>
                 </div>
 

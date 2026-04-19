@@ -1,41 +1,54 @@
 import { NextRequest, NextResponse } from "next/server";
 import { decrypt, SESSION_COOKIE_NAME } from "@/lib/auth";
 
-// Add paths that require authentication
-const protectedRoutes = ["/dashboard", "/products", "/hesabim"];
-// Add paths that are only accessible to unauthenticated users
-const authRoutes = ["/login", "/register"];
-
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
-  const isProtectedRoute = protectedRoutes.some((route) => path.startsWith(route));
-  const isAuthRoute = authRoutes.some((route) => path.startsWith(route));
 
+  // 1. Rotaları belirle
+  const isAdminRoute = path.startsWith("/dashboard") || path.startsWith("/products");
+  const isProtectedUserRoute = path.startsWith("/hesabim");
+  const isAuthRoute = path.startsWith("/login") || path.startsWith("/register");
+
+  // 2. Session kontrolü yap
   const cookie = request.cookies.get(SESSION_COOKIE_NAME)?.value;
-  let session = null;
+  let session: any = null;
 
   if (cookie) {
     try {
       session = await decrypt(cookie);
     } catch (e) {
-      // Invalid token
+      // Geçersiz token
     }
   }
 
-  // Redirect to /login if the user is not authenticated and tries to access a protected route
-  if (isProtectedRoute && !session) {
-    return NextResponse.redirect(new URL("/login", request.nextUrl));
+  // 3. Admin rotası koruması
+  if (isAdminRoute) {
+    if (!session) {
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
+    // Eğer rolü ADMIN değilse ana sayfaya at
+    if (session.user.role !== "ADMIN") {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
   }
 
-  // Redirect to /dashboard if the user is authenticated and tries to access an auth route
+  // 4. Korumalı kullanıcı rotası (Hesabım vb.)
+  if (isProtectedUserRoute && !session) {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  // 5. Giriş yapmış kullanıcıyı login/register'dan uzaklaştır
   if (isAuthRoute && session) {
-    return NextResponse.redirect(new URL("/dashboard", request.nextUrl));
+    // Admin ise dashboard'a, kullanıcı ise ana sayfaya
+    if (session.user.role === "ADMIN") {
+      return NextResponse.redirect(new URL("/dashboard", request.url));
+    }
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
   return NextResponse.next();
 }
 
-// Routes Middleware should not run on
 export const config = {
   matcher: ["/((?!api|_next/static|_next/image|.*\\.png$).*)"],
 };

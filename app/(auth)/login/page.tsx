@@ -53,7 +53,12 @@ export default function LoginPage() {
       const result = await response.json();
 
       if (response.ok && result.success) {
-        router.push("/dashboard");
+        // Rolüne göre yönlendir
+        if (result.user.role === "ADMIN") {
+          router.push("/dashboard");
+        } else {
+          router.push("/");
+        }
         router.refresh();
       } else {
         setError(result.message || "Giriş başarısız oldu");
