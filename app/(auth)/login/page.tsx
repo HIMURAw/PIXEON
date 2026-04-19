@@ -4,9 +4,11 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Mail, Lock, Loader2, ArrowRight, Github } from "lucide-react";
+import { Mail, Lock, Loader2, ArrowRight, ShieldCheck, Eye, EyeOff, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { FcGoogle } from "react-icons/fc";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect } from "react";
 
 const loginSchema = z.object({
   email: z.string().email("Geçerli bir e-posta adresi giriniz"),
@@ -17,13 +19,22 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams.get("registered")) {
+      setSuccess("Hesabınız başarıyla oluşturuldu! Şimdi giriş yapabilirsiniz.");
+    }
+  }, [searchParams]);
 
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
   });
@@ -55,96 +66,136 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="text-center">
-        <h2 className="text-2xl font-bold text-white mb-1">Tekrar Hoş Geldin</h2>
-        <p className="text-slate-400 text-sm">Devam etmek için hesabına giriş yap</p>
+    <div className="w-full space-y-8">
+      {/* Header Section */}
+      <div className="flex flex-col items-center text-center space-y-3">
+        <div className="w-16 h-16 bg-sky-500/10 border border-sky-500/20 rounded-2xl flex items-center justify-center mb-2 shadow-inner group transition-transform duration-500 hover:rotate-[360deg]">
+          <ShieldCheck className="text-sky-400 w-8 h-8 group-hover:scale-110 transition-transform" />
+        </div>
+        <h1 className="text-3xl font-black text-white tracking-tight flex items-center gap-1">
+          TUGER<span className="text-sky-500 text-4xl">.</span>
+        </h1>
+        <p className="text-slate-400 text-sm font-medium max-w-[280px]">
+          Yeni nesil oyun deneyimine kaldığın yerden devam et
+        </p>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        {error && (
-          <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm p-3 rounded-xl flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-            {error}
-          </div>
-        )}
+      <div className="bg-slate-900/60 backdrop-blur-2xl border border-white/5 rounded-[2rem] p-8 shadow-2xl relative overflow-hidden group/card">
+        {/* Subtle inner glow */}
+        <div className="absolute inset-0 bg-gradient-to-br from-sky-500/5 to-transparent pointer-events-none" />
 
-        <div className="space-y-2">
-          <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider ml-1">E-Posta</label>
-          <div className="relative group">
-            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500 group-focus-within:text-blue-500 transition-colors">
-              <Mail size={18} />
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 relative z-10">
+          {success && (
+            <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[11px] py-3 px-4 rounded-xl flex items-center gap-3 animate-in">
+              <CheckCircle2 size={16} />
+              {success}
             </div>
-            <input
-              {...register("email")}
-              type="email"
-              placeholder="admin@TUGER.com"
-              className="w-full bg-slate-800/50 border border-white/5 focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 rounded-2xl py-3.5 pl-11 pr-4 text-white placeholder-slate-600 outline-none transition-all"
-            />
-          </div>
-          {errors.email && <p className="text-red-400 text-[11px] ml-1 mt-1">{errors.email.message}</p>}
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider ml-1">Şifre</label>
-          <div className="relative group">
-            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500 group-focus-within:text-blue-500 transition-colors">
-              <Lock size={18} />
-            </div>
-            <input
-              {...register("password")}
-              type="password"
-              placeholder="••••••••"
-              className="w-full bg-slate-800/50 border border-white/5 focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 rounded-2xl py-3.5 pl-11 pr-4 text-white placeholder-slate-600 outline-none transition-all"
-            />
-          </div>
-          {errors.password && <p className="text-red-400 text-[11px] ml-1 mt-1">{errors.password.message}</p>}
-        </div>
-
-        <div className="flex items-center justify-end">
-          <Link href="#" className="text-xs font-medium text-blue-400 hover:text-blue-300 transition-colors">
-            Şifremi Unuttum
-          </Link>
-        </div>
-
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-900/20 flex items-center justify-center gap-2 group disabled:opacity-70 disabled:cursor-not-allowed transition-all active:scale-[0.98]"
-        >
-          {isLoading ? (
-            <Loader2 className="animate-spin" size={20} />
-          ) : (
-            <>
-              Giriş Yap
-              <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-            </>
           )}
-        </button>
-      </form>
 
-      <div className="relative py-2">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-white/5"></div>
-        </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-[#0f172a] px-2 text-slate-500 font-medium">Veya şununla devam et</span>
+          {error && (
+            <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-xs py-3 px-4 rounded-xl flex items-center gap-3 animate-in">
+              <span className="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]" />
+              {error}
+            </div>
+          )}
+
+          {/* Email Input */}
+          <div className="space-y-1.5">
+            <div className="relative group/input">
+              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within/input:text-sky-400 transition-colors" />
+              <input
+                {...register("email")}
+                type="email"
+                placeholder="E-posta Adresi"
+                className="w-full bg-slate-950/50 border border-white/5 focus:border-sky-500/50 focus:ring-[6px] focus:ring-sky-500/5 rounded-2xl py-4 pl-11 pr-4 text-sm text-white placeholder-slate-600 outline-none transition-all"
+              />
+            </div>
+            {errors.email && <p className="text-red-400 text-[10px] font-medium ml-1">{errors.email.message}</p>}
+          </div>
+
+          {/* Password Input */}
+          <div className="space-y-1.5">
+            <div className="relative group/input">
+              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within/input:text-sky-400 transition-colors" />
+              <input
+                {...register("password")}
+                type={showPassword ? "text" : "password"}
+                placeholder="Şifre"
+                className="w-full bg-slate-950/50 border border-white/5 focus:border-sky-500/50 focus:ring-[6px] focus:ring-sky-500/5 rounded-2xl py-4 pl-11 pr-12 text-sm text-white placeholder-slate-600 outline-none transition-all"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors"
+              >
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
+            {errors.password && <p className="text-red-400 text-[10px] font-medium ml-1">{errors.password.message}</p>}
+          </div>
+
+          <div className="flex items-center justify-between px-1">
+            <label className="flex items-center gap-2 cursor-pointer group">
+              <div className="relative w-4 h-4 rounded-md border border-white/10 bg-slate-950/50 group-hover:border-sky-500/50 transition-all flex items-center justify-center">
+                <input type="checkbox" className="peer absolute inset-0 opacity-0 cursor-pointer" />
+                <div className="w-2 h-2 rounded-sm bg-sky-500 scale-0 peer-checked:scale-100 transition-transform shadow-[0_0_8px_rgba(14,165,233,0.5)]" />
+              </div>
+              <span className="text-xs text-slate-400 font-medium group-hover:text-slate-300">Beni Hatırla</span>
+            </label>
+            <Link href="#" className="text-xs font-bold text-sky-400 hover:text-sky-300 transition-colors">
+              Şifremi Unuttum?
+            </Link>
+          </div>
+
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full relative group/btn overflow-hidden rounded-2xl p-px disabled:opacity-70 disabled:cursor-not-allowed transition-all active:scale-[0.98]"
+          >
+            {/* Animated border/bg */}
+            <div className="absolute inset-0 bg-gradient-to-r from-sky-600 via-blue-600 to-sky-600 group-hover/btn:bg-sky-500" />
+
+            <div className="relative bg-sky-600 group-hover/btn:bg-transparent py-4 flex items-center justify-center gap-2 font-black text-sm text-white transition-all uppercase tracking-widest">
+              {isLoading ? (
+                <Loader2 className="animate-spin" size={18} />
+              ) : (
+                <>
+                  Giriş Yap
+                  <ArrowRight size={16} className="group-hover/btn:translate-x-1 transition-transform" />
+                </>
+              )}
+            </div>
+          </button>
+        </form>
+
+        <div className="mt-8 space-y-6 relative z-10">
+          <div className="flex items-center gap-4">
+            <div className="flex-1 h-px bg-white/5" />
+            <span className="text-[10px] text-slate-600 font-black uppercase tracking-widest">Veya</span>
+            <div className="flex-1 h-px bg-white/5" />
+          </div>
+
+          <button className="w-full bg-slate-950/50 hover:bg-slate-950 border border-white/5 hover:border-sky-500/20 text-slate-300 font-bold py-3.5 rounded-2xl flex items-center justify-center gap-3 transition-all group shadow-sm">
+            <FcGoogle size={20} className="group-hover:scale-110 transition-transform" />
+            <span className="text-sm">Google Hesabı</span>
+          </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4">
-        <button className="w-full bg-white/5 hover:bg-white/10 border border-white/5 text-slate-300 font-medium py-3 rounded-2xl flex items-center justify-center gap-3 transition-all">
-          <Github size={20} />
-          GitHub ile Giriş
-        </button>
-      </div>
-
-      <p className="text-center text-slate-400 text-sm mt-8">
+      <p className="text-center text-slate-500 text-sm font-medium">
         Hesabın yok mu?{" "}
-        <Link href="/register" className="text-blue-400 font-bold hover:underline">
-          Hemen Kayıt Ol
+        <Link href="/register" className="text-sky-400 font-black hover:text-sky-300 transition-colors border-b border-sky-400/20 hover:border-sky-300">
+          Kayıt Ol
         </Link>
       </p>
+
+      {/* Back to Home Link */}
+      <div className="flex justify-center pt-4">
+        <Link href="/" className="text-[10px] text-slate-600 font-black uppercase tracking-[0.2em] hover:text-sky-500 transition-colors flex items-center gap-2">
+          <span className="w-1 h-1 rounded-full bg-slate-700" />
+          Ana Sayfaya Dön
+        </Link>
+      </div>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import ModelViewer from "./ModelViewer";
+import ModelViewer, { preloadModels } from "./ModelViewer";
 
 interface Slide {
     id: number;
@@ -150,15 +150,22 @@ const slides: Slide[] = [
     }
 ];
 
+
 export default function HeroCarousel() {
     const [currentSlide, setCurrentSlide] = useState(0);
     const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+
+    // Tüm modelleri önden yüklüyoruz
+    useEffect(() => {
+        const modelPaths = slides.map(s => s.modelPath);
+        preloadModels(modelPaths);
+    }, []);
 
     useEffect(() => {
         if (!isAutoPlaying) return;
         const interval = setInterval(() => {
             setCurrentSlide((prev) => (prev + 1) % slides.length);
-        }, 8000); // 3D modeller için biraz daha uzun süre verelim
+        }, 8000);
         return () => clearInterval(interval);
     }, [isAutoPlaying]);
 
@@ -179,19 +186,19 @@ export default function HeroCarousel() {
 
     return (
         <div className="user-select-none relative w-full h-[680px] bg-linear-to-br from-slate-900 to-slate-800 rounded-2xl overflow-hidden group">
-            <div className="relative w-full h-full">
-                {slides.map((slide, index) => (
-                    <div
-                        key={slide.id}
-                        className={`absolute inset-0 transition-all duration-700 ease-in-out ${index === currentSlide
-                            ? "opacity-100 translate-x-0"
-                            : index < currentSlide
-                                ? "opacity-0 -translate-x-full"
-                                : "opacity-0 translate-x-full"
-                            }`}
-                    >
-                        <div className="flex items-center h-full px-8 lg:px-16">
-                            <div className="w-1/2 space-y-6 pr-4 z-10">
+            <div className="relative w-full h-full flex">
+                
+                {/* Sol Taraf: Metin İçerikleri (Slaytlar) */}
+                <div className="w-1/2 h-full relative overflow-hidden">
+                    {slides.map((slide, index) => (
+                        <div
+                            key={slide.id}
+                            className={`absolute inset-0 transition-all duration-700 ease-in-out flex items-center px-8 lg:px-16 ${index === currentSlide
+                                ? "opacity-100 translate-x-0 z-10"
+                                : "opacity-0 -translate-x-10 z-0"
+                                }`}
+                        >
+                            <div className="space-y-6 pr-4">
                                 <div className="inline-block">
                                     <span className="text-[9px] font-bold text-gray-300 bg-gray-700 px-2 py-0.5 rounded-full mr-1">
                                         ÖZEL TEKLİF
@@ -221,14 +228,14 @@ export default function HeroCarousel() {
                                     <span className="group-hover/btn:translate-x-1 transition-transform">→</span>
                                 </button>
                             </div>
-
-                            <div className="w-1/2 h-full relative">
-                                <ModelViewer path={slide.modelPath} />
-                                <div className="absolute inset-0 pointer-events-none bg-gradient-to-r from-slate-900/40 to-transparent"></div>
-                            </div>
                         </div>
-                    </div>
-                ))}
+                    ))}
+                </div>
+
+                {/* Sağ Taraf: Sabit Tek 3D Görüntüleyici */}
+                <div className="w-1/2 h-full relative z-10 bg-gradient-to-l from-slate-900/20 to-transparent">
+                    <ModelViewer path={slides[currentSlide].modelPath} />
+                </div>
             </div>
 
             <button
