@@ -80,9 +80,9 @@ export default function Footer() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
                     {/* Brand Column */}
                     <div className="space-y-6">
-                        <Image src="/logo-nobg.png" alt="Pixeon Logo" width={120} height={120} />
+                        <Image src="/logo-nobg.png" alt="TUGER Logo" width={120} height={120} />
                         <p className="text-sm leading-relaxed text-slate-400">
-                            Pixeon, en yeni PlayStation konsollarını, en popüler oyunları ve profesyonel ekipmanları en uygun fiyatlarla sunan yetkili satış merkezinizdir.
+                            TUGER, en yeni PlayStation konsollarını, en popüler oyunları ve profesyonel ekipmanları en uygun fiyatlarla sunan yetkili satış merkezinizdir.
                         </p>
                         <div className="flex gap-4">
                             {[Facebook, Instagram, Twitter].map((Icon, i) => (
@@ -144,7 +144,7 @@ export default function Footer() {
                             <li className="flex gap-3">
                                 <Mail size={18} className="text-sky-400" />
                                 <div>
-                                    <p className="text-white font-semibold">destek@pixeon.com</p>
+                                    <p className="text-white font-semibold">destek@TUGER.com</p>
                                     <p className="text-xs text-slate-500">7/24 Teknik Destek</p>
                                 </div>
                             </li>
@@ -164,7 +164,7 @@ export default function Footer() {
             <div className="bg-[#020617] border-t border-white/5 py-8">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
                     <p className="text-sm text-slate-500 text-center md:text-left">
-                        © 2024 <span className="text-white font-bold">PIXEON</span> PlayStation Store. Tüm hakları saklıdır.
+                        © 2024 <span className="text-white font-bold">TUGER</span> PlayStation Store. Tüm hakları saklıdır.
                     </p>
 
                     <div className="flex items-center gap-4 opacity-70 grayscale hover:grayscale-0 transition duration-500 px-4 py-2 bg-slate-900/50 rounded-lg border border-white/5">
