@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -8,7 +8,6 @@ import { Mail, Lock, Loader2, ArrowRight, ShieldCheck, Eye, EyeOff, CheckCircle2
 import Link from "next/link";
 import { FcGoogle } from "react-icons/fc";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
 
 const loginSchema = z.object({
   email: z.string().email("Geçerli bir e-posta adresi giriniz"),
@@ -17,19 +16,24 @@ const loginSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
-export default function LoginPage() {
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const router = useRouter();
+const SearchParamHandler = ({ setSuccess }: { setSuccess: (val: string | null) => void }) => {
   const searchParams = useSearchParams();
 
   useEffect(() => {
     if (searchParams.get("registered")) {
       setSuccess("Hesabınız başarıyla oluşturuldu! Şimdi giriş yapabilirsiniz.");
     }
-  }, [searchParams]);
+  }, [searchParams, setSuccess]);
+
+  return null;
+};
+
+export default function LoginPage() {
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter();
 
   const {
     register,
@@ -88,6 +92,10 @@ export default function LoginPage() {
       <div className="bg-slate-900/60 backdrop-blur-2xl border border-white/5 rounded-[2rem] p-8 shadow-2xl relative overflow-hidden group/card">
         {/* Subtle inner glow */}
         <div className="absolute inset-0 bg-gradient-to-br from-sky-500/5 to-transparent pointer-events-none" />
+
+        <Suspense fallback={null}>
+          <SearchParamHandler setSuccess={setSuccess} />
+        </Suspense>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 relative z-10">
           {success && (
