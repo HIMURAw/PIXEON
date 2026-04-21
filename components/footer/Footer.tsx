@@ -167,14 +167,17 @@ export default function Footer() {
                         © 2024 <span className="text-white font-bold">TUGER</span> PlayStation Store. Tüm hakları saklıdır.
                     </p>
 
-                    <div className="flex items-center gap-4 opacity-70 grayscale hover:grayscale-0 transition duration-500 px-4 py-2 bg-slate-900/50 rounded-lg border border-white/5">
-                        <span className="text-[10px] text-slate-500 mr-2 uppercase tracking-widest font-bold">Ödeme Yöntemleri</span>
-                        <div className="flex gap-3 text-white">
-                            {/* Dummy Payment Icons/Text */}
-                            <span className="font-bold">VISA</span>
-                            <span className="font-bold">MASTERCARD</span>
-                            <span className="font-bold">AMEX</span>
-                            <span className="font-bold"> Troy</span>
+                    <div className="flex items-center gap-4 opacity-70 grayscale hover:grayscale-0 transition duration-500 px-4 py-2 rounded-lg border">
+                        <span className="text-[10px]  mr-2 uppercase tracking-widest font-bold">
+                            Ödeme Yöntemleri
+                        </span>
+
+                        <div className="flex items-center">
+                            <img
+                                src="/assets/payment-methods.png"
+                                alt="Ödeme Yöntemleri"
+                                className="h-6 object-contain"
+                            />
                         </div>
                     </div>
                 </div>
