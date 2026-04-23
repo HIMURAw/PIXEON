@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import {
     ChevronRight,
     Gamepad2,
@@ -13,6 +14,22 @@ interface CategoriesMenuProps {
     isOpen: boolean;
 }
 
+const categories = [
+    { icon: <Gamepad2 size={18} />, text: "PlayStation Konsollar", href: "/konsollar", arrow: true },
+    { icon: <Disc size={18} />, text: "PS5 Oyunları", href: "/oyunlar", arrow: false },
+    { icon: <Disc size={18} />, text: "PS4 Oyunları", href: "/oyunlar", arrow: false },
+    { icon: <Gamepad size={18} />, text: "DualSense & Kontrolcüler", href: "/aksesuarlar", arrow: true },
+    { icon: <Headset size={18} />, text: "Kulaklık & Ses", href: "/aksesuarlar", arrow: false },
+    { icon: <CreditCard size={18} />, text: "PS Plus & Hediye Kartları", href: "/dijital-kodlar", arrow: false },
+    { icon: <Zap size={18} />, text: "Aksesuarlar", href: "/aksesuarlar", arrow: false },
+];
+
+const extras = [
+    { name: "Günün Fırsatı", href: "/dijital-kodlar" },
+    { name: "En Çok Satanlar", href: "/oyunlar" },
+    { name: "Yeni Gelenler", href: "/yeni-urunler" },
+];
+
 export default function CategoriesMenu({ isOpen }: CategoriesMenuProps) {
     return (
         <div
@@ -24,54 +41,41 @@ export default function CategoriesMenu({ isOpen }: CategoriesMenuProps) {
         >
             {/* Categories */}
             <div className="py-2">
-                <CategoryItem icon={<Gamepad2 size={18} />} text="PlayStation Konsollar" arrow />
-                <CategoryItem icon={<Disc size={18} />} text="PS5 Oyunları" />
-                <CategoryItem icon={<Disc size={18} />} text="PS4 Oyunları" />
-                <CategoryItem icon={<Gamepad size={18} />} text="DualSense & Kontrolcüler" arrow />
-                <CategoryItem icon={<Headset size={18} />} text="Kulaklık & Ses" />
-                <CategoryItem icon={<CreditCard size={18} />} text="PS Plus & Hediye Kartları" />
-                <CategoryItem icon={<Zap size={18} />} text="Aksesuarlar" />
+                {categories.map((cat) => (
+                    <Link
+                        key={cat.text}
+                        href={cat.href}
+                        className="flex items-center justify-between px-4 py-4
+                                hover:bg-slate-800 hover:text-sky-400 cursor-pointer transition-colors group"
+                    >
+                        <div className="flex items-center gap-3 text-slate-200 group-hover:text-sky-400">
+                            <span className="transition-transform group-hover:scale-110 text-sky-400">
+                                {cat.icon}
+                            </span>
+                            <span>{cat.text}</span>
+                        </div>
+                        {cat.arrow && (
+                            <ChevronRight
+                                size={14}
+                                className="text-slate-400 group-hover:text-sky-400 transition-transform group-hover:translate-x-1"
+                            />
+                        )}
+                    </Link>
+                ))}
             </div>
 
             {/* Extras */}
             <div className="border-t border-slate-700 mt-2">
-                {["Günün Fırsatı", "En Çok Satanlar", "Yeni Gelenler"].map((item) => (
-                    <div
-                        key={item}
-                        className="px-4 py-6 text-slate-200 hover:bg-slate-800 hover:text-sky-400 cursor-pointer transition-colors"
+                {extras.map((item) => (
+                    <Link
+                        key={item.name}
+                        href={item.href}
+                        className="block px-4 py-4 text-slate-200 hover:bg-slate-800 hover:text-sky-400 cursor-pointer transition-colors"
                     >
-                        {item}
-                    </div>
+                        {item.name}
+                    </Link>
                 ))}
             </div>
-        </div>
-    );
-}
-
-function CategoryItem({
-    icon,
-    text,
-    arrow
-}: {
-    icon: React.ReactNode;
-    text: string;
-    arrow?: boolean;
-}) {
-    return (
-        <div className="flex items-center justify-between px-4 py-4.5
-                        hover:bg-slate-800 hover:text-sky-400 cursor-pointer transition-colors group">
-            <div className="flex items-center gap-3 text-slate-200 group-hover:text-sky-400">
-                <span className="transition-transform group-hover:scale-110 text-sky-400">
-                    {icon}
-                </span>
-                <span>{text}</span>
-            </div>
-            {arrow && (
-                <ChevronRight
-                    size={14}
-                    className="text-slate-400 group-hover:text-sky-400 transition-transform group-hover:translate-x-1"
-                />
-            )}
         </div>
     );
 }
