@@ -99,11 +99,11 @@ export default function Head() {
                     <div className="flex-1 flex justify-end gap-2">
                         {[
                             { name: "ANA SAYFA", href: "/" },
-                            { name: "KONSOLLAR", href: "#" },
-                            { name: "OYUNLAR", href: "#" },
-                            { name: "AKSESUARLAR", href: "#" },
-                            { name: "DİJİTAL KODLAR", href: "#" },
-                            { name: "İLETİŞİM", href: "#" }
+                            { name: "KONSOLLAR", href: "/konsollar" },
+                            { name: "OYUNLAR", href: "/oyunlar" },
+                            { name: "AKSESUARLAR", href: "/aksesuarlar" },
+                            { name: "DİJİTAL KODLAR", href: "/dijital-kodlar" },
+                            { name: "İLETİŞİM", href: "/iletisim" }
                         ].map((item) => (
                             <Link
                                 key={item.name}
