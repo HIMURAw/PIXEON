@@ -1,10 +1,10 @@
 "use client";
 
 import React from "react";
-import { 
-    Search, 
-    Filter, 
-    MoreHorizontal, 
+import {
+    Search,
+    Filter,
+    MoreHorizontal,
     Eye,
     ChevronLeft,
     ChevronRight,
@@ -76,9 +76,9 @@ export default function AdminCustomers() {
             <div className="bg-[#020617] border border-white/10 p-4 rounded-3xl flex flex-col lg:flex-row items-center gap-4 shadow-xl">
                 <div className="relative flex-1 w-full group">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-400 transition-colors" size={18} />
-                    <input 
-                        type="text" 
-                        placeholder="Müşteri adı, e-posta veya telefon ara..." 
+                    <input
+                        type="text"
+                        placeholder="Müşteri adı, e-posta veya telefon ara..."
                         className="w-full bg-slate-950 border border-white/5 rounded-2xl px-12 py-3 text-sm outline-none focus:border-blue-500/50 transition-all placeholder:text-slate-600"
                     />
                 </div>
@@ -184,7 +184,7 @@ export default function AdminCustomers() {
                             <ChevronLeft size={20} />
                         </button>
                         <div className="flex items-center gap-1">
-                            {[1, 2, 3, 4].map(i => (
+                            {[1, 2, 3, "...", 124].map((i, idx) => (
                                 <button key={i} className={cn(
                                     "w-10 h-10 rounded-xl text-xs font-black transition-all border border-transparent",
                                     i === 1 ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" : "text-slate-500 hover:bg-white/5 hover:border-white/10"

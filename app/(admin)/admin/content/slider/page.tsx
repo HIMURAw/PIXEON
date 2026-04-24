@@ -8,7 +8,7 @@ import {
     Pencil,
     Trash2,
     Eye,
-    Save,
+    ShoppingCart,
     Box,
     Layers,
     Palette

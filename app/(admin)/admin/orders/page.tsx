@@ -1,10 +1,10 @@
 "use client";
 
 import React from "react";
-import { 
-    Search, 
-    Filter, 
-    MoreHorizontal, 
+import {
+    Search,
+    Filter,
+    MoreHorizontal,
     Eye,
     ChevronLeft,
     ChevronRight,
@@ -78,9 +78,9 @@ export default function AdminOrders() {
             <div className="bg-[#020617] border border-white/10 p-4 rounded-3xl flex flex-col lg:flex-row items-center gap-4 shadow-xl">
                 <div className="relative flex-1 w-full group">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-400 transition-colors" size={18} />
-                    <input 
-                        type="text" 
-                        placeholder="Sipariş ID, müşteri adı veya e-posta..." 
+                    <input
+                        type="text"
+                        placeholder="Sipariş ID, müşteri adı veya e-posta..."
                         className="w-full bg-slate-950 border border-white/5 rounded-2xl px-12 py-3 text-sm outline-none focus:border-blue-500/50 transition-all placeholder:text-slate-600"
                     />
                 </div>
@@ -143,15 +143,15 @@ export default function AdminOrders() {
                                         <span className={cn(
                                             "px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border",
                                             order.status === "Completed" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" :
-                                            order.status === "Pending" ? "bg-amber-500/10 text-amber-400 border-amber-500/20" :
-                                            order.status === "Processing" ? "bg-blue-500/10 text-blue-400 border-blue-500/20" : 
-                                            order.status === "Shipped" ? "bg-purple-500/10 text-purple-400 border-purple-500/20" :
-                                            "bg-red-500/10 text-red-400 border-red-500/20"
+                                                order.status === "Pending" ? "bg-amber-500/10 text-amber-400 border-amber-500/20" :
+                                                    order.status === "Processing" ? "bg-blue-500/10 text-blue-400 border-blue-500/20" :
+                                                        order.status === "Shipped" ? "bg-purple-500/10 text-purple-400 border-purple-500/20" :
+                                                            "bg-red-500/10 text-red-400 border-red-500/20"
                                         )}>
                                             {order.status === "Completed" ? "TAMAMLANDI" :
-                                             order.status === "Pending" ? "BEKLEMEDE" :
-                                             order.status === "Processing" ? "HAZIRLANIYOR" :
-                                             order.status === "Shipped" ? "KARGODA" : "İPTAL EDİLDİ"}
+                                                order.status === "Pending" ? "BEKLEMEDE" :
+                                                    order.status === "Processing" ? "HAZIRLANIYOR" :
+                                                        order.status === "Shipped" ? "KARGODA" : "İPTAL EDİLDİ"}
                                         </span>
                                     </td>
                                     <td className="px-8 py-6 text-right">
@@ -178,11 +178,11 @@ export default function AdminOrders() {
                             <ChevronLeft size={20} />
                         </button>
                         <div className="flex items-center gap-1">
-                            {[1, 2, 3, ...124].map((i, idx) => (
+                            {[1, 2, 3, "...", 124].map((i, idx) => (
                                 <button key={idx} className={cn(
                                     "w-10 h-10 rounded-xl text-xs font-black transition-all border border-transparent",
-                                    i === 1 ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" : 
-                                    i === "..." ? "text-slate-600 cursor-default" : "text-slate-500 hover:bg-white/5 hover:border-white/10"
+                                    i === 1 ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" :
+                                        i === "..." ? "text-slate-600 cursor-default" : "text-slate-500 hover:bg-white/5 hover:border-white/10"
                                 )}>{i}</button>
                             ))}
                         </div>
