@@ -16,8 +16,8 @@ interface CategoriesMenuProps {
 
 const categories = [
     { icon: <Gamepad2 size={18} />, text: "PlayStation Konsollar", href: "/konsollar", arrow: true },
-    { icon: <Disc size={18} />, text: "PS5 Oyunları", href: "/oyunlar", arrow: false },
-    { icon: <Disc size={18} />, text: "PS4 Oyunları", href: "/oyunlar", arrow: false },
+    { icon: <Disc size={18} />, text: "PS5 Oyunları", href: "/oyunlar/ps5", arrow: false },
+    { icon: <Disc size={18} />, text: "PS4 Oyunları", href: "/oyunlar/ps4", arrow: false },
     { icon: <Gamepad size={18} />, text: "DualSense & Kontrolcüler", href: "/aksesuarlar", arrow: true },
     { icon: <Headset size={18} />, text: "Kulaklık & Ses", href: "/aksesuarlar", arrow: false },
     { icon: <CreditCard size={18} />, text: "PS Plus & Hediye Kartları", href: "/dijital-kodlar", arrow: false },

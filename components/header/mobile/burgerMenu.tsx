@@ -25,8 +25,8 @@ const navItems = [
         href: "/oyunlar",
         icon: <Disc size={18} />,
         children: [
-            { name: "PS5 Oyunları", href: "/oyunlar" },
-            { name: "PS4 Oyunları", href: "/oyunlar" },
+            { name: "PS5 Oyunları", href: "/oyunlar/ps5" },
+            { name: "PS4 Oyunları", href: "/oyunlar/ps4" },
         ],
     },
     {

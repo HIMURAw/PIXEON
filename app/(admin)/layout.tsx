@@ -14,24 +14,79 @@ import {
     Search,
     FileSpreadsheet,
     TicketPlus,
-    Cuboid,
-    Menu
+    Menu,
+    Gamepad2,
+    Disc,
+    Headset,
+    CreditCard,
+    Layers,
+    Wallet,
+    Truck,
+    MessageSquare,
+    LifeBuoy,
+    MonitorPlay,
+    Image,
+    FileText,
+    PenTool,
+    ShieldCheck
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
-    const menuItems = [
-        { label: "Dashboard", icon: LayoutDashboard, href: "/admin/dashboard" },
-        { label: "Ürünler", icon: Package, href: "/admin/products" },
-        { label: "Siparişler", icon: ShoppingCart, href: "/admin/orders" },
-        { label: "Müşteriler", icon: Users, href: "/admin/users" },
-        { label: "Relamlar", icon: FileSpreadsheet, href: "/admin/realms" },
-        { label: "Kupponlar", icon: TicketPlus, href: "/admin/coupons" },
-        { label: "Kargo", icon: Cuboid, href: "/admin/cargo" },
-        { label: "Raporlar", icon: FileSpreadsheet, href: "/admin/reports" },
-        { label: "Ayarlar", icon: Settings, href: "/admin/settings" },
+    const menuGroups = [
+        {
+            title: "GENEL",
+            items: [
+                { label: "Dashboard", icon: LayoutDashboard, href: "/admin/dashboard" },
+                { label: "Raporlar & Analiz", icon: FileSpreadsheet, href: "/admin/reports" },
+            ]
+        },
+        {
+            title: "KATALOG YÖNETİMİ",
+            items: [
+                { label: "Tüm Ürünler", icon: Package, href: "/admin/products" },
+                { label: "Konsollar", icon: Gamepad2, href: "/admin/products?category=consoles" },
+                { label: "Oyunlar", icon: Disc, href: "/admin/products?category=games" },
+                { label: "Aksesuarlar", icon: Headset, href: "/admin/products?category=accessories" },
+                { label: "Dijital Kodlar", icon: CreditCard, href: "/admin/products?category=codes" },
+                { label: "Kategoriler", icon: Layers, href: "/admin/categories" },
+            ]
+        },
+        {
+            title: "SATIŞ & OPERASYON",
+            items: [
+                { label: "Siparişler", icon: ShoppingCart, href: "/admin/orders" },
+                { label: "Ödemeler", icon: Wallet, href: "/admin/payments" },
+                { label: "Kuponlar", icon: TicketPlus, href: "/admin/coupons" },
+                { label: "Kargo Ayarları", icon: Truck, href: "/admin/shipping" },
+            ]
+        },
+        {
+            title: "MÜŞTERİLER",
+            items: [
+                { label: "Müşteri Listesi", icon: Users, href: "/admin/customers" },
+                { label: "Yorum & Değerlendirme", icon: MessageSquare, href: "/admin/reviews" },
+                { label: "Destek Talepleri", icon: LifeBuoy, href: "/admin/support" },
+            ]
+        },
+        {
+            title: "İÇERİK YÖNETİMİ",
+            items: [
+                { label: "Slider / Hero", icon: MonitorPlay, href: "/admin/content/slider" },
+                { label: "Kampanya Bannerları", icon: Image, href: "/admin/content/banners" },
+                { label: "Sayfalar (CMS)", icon: FileText, href: "/admin/content/pages" },
+                { label: "Blog Yazıları", icon: PenTool, href: "/admin/content/blog" },
+            ]
+        },
+        {
+            title: "AYARLAR",
+            items: [
+                { label: "Genel Ayarlar", icon: Settings, href: "/admin/settings" },
+                { label: "Admin Kullanıcıları", icon: ShieldCheck, href: "/admin/settings/admins" },
+            ]
+        }
     ];
 
     return (
@@ -55,16 +110,32 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                         </div>
 
                         {/* Nav Links */}
-                        <nav className="flex-1 py-6 px-3 space-y-2">
-                            {menuItems.map((item) => (
-                                <Link
-                                    key={item.label}
-                                    href={item.href}
-                                    className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:bg-white/5 hover:text-white transition-all group"
-                                >
-                                    <item.icon size={20} className="group-hover:text-blue-400 transition-colors" />
-                                    {isSidebarOpen && <span className="font-medium text-sm">{item.label}</span>}
-                                </Link>
+                        <nav className="flex-1 py-6 px-3 space-y-8 overflow-y-auto custom-scrollbar">
+                            {menuGroups.map((group) => (
+                                <div key={group.title} className="space-y-2">
+                                    {isSidebarOpen && (
+                                        <h3 className="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">
+                                            {group.title}
+                                        </h3>
+                                    )}
+                                    <div className="space-y-1">
+                                        {group.items.map((item) => (
+                                            <Link
+                                                key={item.label}
+                                                href={item.href}
+                                                className="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-400 hover:bg-white/5 hover:text-white transition-all group relative"
+                                            >
+                                                <item.icon size={18} className="group-hover:text-blue-400 transition-colors" />
+                                                {isSidebarOpen && <span className="font-medium text-xs">{item.label}</span>}
+                                                {!isSidebarOpen && (
+                                                    <div className="absolute left-full ml-2 px-2 py-1 bg-slate-900 border border-white/10 rounded text-[10px] whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50">
+                                                        {item.label}
+                                                    </div>
+                                                )}
+                                            </Link>
+                                        ))}
+                                    </div>
+                                </div>
                             ))}
                         </nav>
 
