@@ -1,71 +1,78 @@
 "use client";
 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { useGLTF, Environment, PresentationControls, AdaptiveDpr, Center } from "@react-three/drei";
-import { Suspense, useRef, memo, useEffect } from "react";
+import { useGLTF, Environment, AdaptiveDpr } from "@react-three/drei";
+import { Suspense, useRef, memo } from "react";
 import * as THREE from "three";
 
-// Sadece modeli render eder — merkeze alma ve kamera üst componentlarda
-const Model = memo(({ path }: { path: string }) => {
+// ---------------------------------------------------------------------------
+// ModelScene — path başına Canvas sıfırlanacağından (key={path}),
+// bu component her model için temiz state ile başlar.
+// ---------------------------------------------------------------------------
+const ModelScene = ({ path }: { path: string }) => {
   const { scene } = useGLTF(path);
-  return <primitive object={scene} />;
-});
-Model.displayName = "Model";
-
-// Model'i döndürür + yüklenince kamerayı otomatik sığdırır
-const SpinningModel = ({ path }: { path: string }) => {
-  const groupRef = useRef<THREE.Group>(null);
   const { camera } = useThree();
+
+  // GLB sahnesinin klonu — paylaşılan cache'i kirletmemek için
+  const clonedScene = useRef<THREE.Object3D>(scene.clone(true));
+  const pivotRef = useRef<THREE.Group>(null);
   const fitted = useRef(false);
 
-  // Model değiştiğinde kamera fit'ini sıfırla
-  useEffect(() => {
-    fitted.current = false;
-  }, [path]);
-
   useFrame(() => {
-    if (!groupRef.current) return;
+    const pivot = pivotRef.current;
+    if (!pivot) return;
 
-    // Rotasyon
-    groupRef.current.rotation.y += 0.005;
+    // Y ekseninde döndür
+    pivot.rotation.y += 0.005;
 
-    // Kamera fit — model hazır olduğunda (boş değilse) bir kere çalışır
+    // İlk frame'de bounding box hesapla ve kamerayı/pivotu ayarla
     if (!fitted.current) {
-      const box = new THREE.Box3().setFromObject(groupRef.current);
+      const box = new THREE.Box3().setFromObject(pivot);
       if (!box.isEmpty()) {
         fitted.current = true;
+
+        // Merkezi hesapla ve pivot'u kaydır
+        const center = box.getCenter(new THREE.Vector3());
         const size = box.getSize(new THREE.Vector3());
+
+        pivot.position.set(-center.x, -center.y, -center.z);
+
+        // Kamera mesafesini hesapla
         const maxDim = Math.max(size.x, size.y, size.z);
         const fov = ((camera as THREE.PerspectiveCamera).fov * Math.PI) / 180;
-        // Modelin tamamını görüntülemek için gereken mesafe + %90 boşluk payı
-        const distance = (maxDim / 2 / Math.tan(fov / 2)) * 1.9;
-        camera.position.set(0, 0, distance);
-        camera.near = Math.max(0.01, distance / 100);
-        camera.far = distance * 100;
+        const dist = (maxDim / 2 / Math.tan(fov / 2)) * 2.2;
+
+        camera.position.set(0, 0, dist);
+        camera.near = Math.max(0.001, dist / 500);
+        camera.far = dist * 500;
         camera.updateProjectionMatrix();
       }
     }
   });
 
   return (
-    <group ref={groupRef}>
-      {/* Center: GLB'nin kendi origin'inden bağımsız olarak geometrik merkezi (0,0,0)'a taşır */}
-      <Center>
-        <Model path={path} />
-      </Center>
+    <group ref={pivotRef}>
+      <primitive object={clonedScene.current} />
     </group>
   );
 };
 
-// Modelleri önden yüklemek için
+// ---------------------------------------------------------------------------
+// Modelleri önceden yükle
+// ---------------------------------------------------------------------------
 export function preloadModels(paths: string[]) {
   paths.forEach((path) => useGLTF.preload(path));
 }
 
-export default function ModelViewer({ path }: { path: string }) {
+// ---------------------------------------------------------------------------
+// ModelViewer — key={path} ile Canvas her model değişiminde tamamen sıfırlanır.
+// Bu sayede önceki modelin kamera ve state'i bir sonrakine karışmaz.
+// ---------------------------------------------------------------------------
+const ModelViewer = memo(({ path }: { path: string }) => {
   return (
     <div className="w-full h-full relative">
       <Canvas
+        key={path}
         dpr={[1, 1.5]}
         gl={{
           antialias: true,
@@ -73,27 +80,21 @@ export default function ModelViewer({ path }: { path: string }) {
           powerPreference: "high-performance",
           preserveDrawingBuffer: false,
         }}
-        camera={{ fov: 50, near: 0.1, far: 1000, position: [0, 0, 10] }}
+        camera={{ fov: 50, near: 0.1, far: 10000, position: [0, 0, 10] }}
       >
         <AdaptiveDpr pixelated />
-        <ambientLight intensity={0.6} />
-        <directionalLight position={[5, 5, 5]} intensity={1.2} />
-        <directionalLight position={[-5, -3, -5]} intensity={0.3} />
+        <ambientLight intensity={0.7} />
+        <directionalLight position={[5, 5, 5]} intensity={1.5} />
+        <directionalLight position={[-5, -3, -5]} intensity={0.4} />
         <Environment preset="city" />
 
         <Suspense fallback={null}>
-          <PresentationControls
-            speed={1.5}
-            global
-            zoom={0.9}
-            polar={[-Math.PI / 6, Math.PI / 6]}
-            azimuth={[-Infinity, Infinity]}
-            snap={false}
-          >
-            <SpinningModel path={path} />
-          </PresentationControls>
+          <ModelScene path={path} />
         </Suspense>
       </Canvas>
     </div>
   );
-}
+});
+ModelViewer.displayName = "ModelViewer";
+
+export default ModelViewer;
