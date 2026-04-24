@@ -5,7 +5,7 @@ import TopBar from "@/components/header/TopBar";
 import MainBar from "@/components/header/MainBar";
 import Head from "@/components/header/Head";
 import Footer from "@/components/footer/Footer";
-import { Star, ShoppingCart, Filter, Search, ChevronDown, Headset, Gamepad2, Camera, Remote, Zap, Square } from "lucide-react";
+import { Star, ShoppingCart, Filter, Search, ChevronDown, Headset, Gamepad2, Camera, Tv, Zap, Square } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type Accessory = {
@@ -39,7 +39,7 @@ const catGroups = [
     { key: "Kontrolcü", title: "Kontrolcüler",           icon: Gamepad2 },
     { key: "Kulaklık",  title: "Kulaklıklar & Ses",      icon: Headset },
     { key: "Kamera",    title: "Kamera",                  icon: Camera },
-    { key: "Remote",    title: "Media Remote",            icon: Remote },
+    { key: "Remote",    title: "Media Remote",            icon: Tv },
     { key: "Şarj",      title: "Şarj İstasyonları",      icon: Zap },
     { key: "Stand",     title: "Stand & Tutucu",          icon: Square },
 ];
