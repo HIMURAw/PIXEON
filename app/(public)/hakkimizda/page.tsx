@@ -1,191 +1,169 @@
 "use client";
 
+import React from "react";
 import TopBar from "@/components/header/TopBar";
 import MainBar from "@/components/header/MainBar";
 import Head from "@/components/header/Head";
+import Footer from "@/components/footer/Footer";
 import Image from "next/image";
-import { Award, ShieldCheck, Truck, Zap, Gamepad2, Users } from "lucide-react";
+import { Award, ShieldCheck, Truck, Zap, Gamepad2, Users, Rocket, Target, Heart, ArrowRight } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export default function AboutUs() {
     return (
-        <>
+        <div className="min-h-screen bg-slate-950 text-slate-200">
             <TopBar />
             <MainBar />
             <Head />
 
-            <div className="min-h-screen bg-[#020617] text-slate-200">
-                {/* Hero Section */}
-                <section className="relative h-[500px] flex items-center justify-center overflow-hidden">
-                    <div className="absolute inset-0 z-0">
-                        <Image
-                            src="/slider/banner.jfif"
-                            alt="PlayStation Hero"
-                            fill
-                            className="object-cover opacity-30 scale-105 animate-pulse-slow"
-                            priority
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-b from-[#020617]/50 via-transparent to-[#020617]"></div>
-                    </div>
+            {/* Hero Section */}
+            <section className="relative h-[60vh] lg:h-[70vh] flex items-center justify-center overflow-hidden">
+                <div className="absolute inset-0 z-0">
+                    <div className="absolute inset-0 bg-[#020617]/60 z-10"></div>
+                    <Image
+                        src="/slider/banner.jfif"
+                        alt="PlayStation Hero"
+                        fill
+                        className="object-cover scale-110 animate-pulse-slow"
+                        priority
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-b from-slate-950/0 via-slate-950/20 to-slate-950 z-20"></div>
+                </div>
 
-                    <div className="relative z-10 text-center px-4 max-w-4xl mx-auto space-y-6">
-                        <h1 className="text-5xl md:text-7xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-blue-600 animate-fade-in-up">
-                            OYUNUN GELECEĞİ BURADA
-                        </h1>
-                        <p className="text-xl md:text-2xl text-slate-400 font-medium animate-fade-in-up delay-200">
-                            TUGER olarak, Türkiye'nin en seçkin PlayStation topluluğunu inşa ediyoruz.
+                <div className="relative z-30 text-center px-4 max-w-5xl mx-auto space-y-8">
+                    <div className="inline-flex items-center gap-2 bg-blue-600/20 border border-blue-500/30 px-4 py-2 rounded-full backdrop-blur-md animate-in fade-in slide-in-from-bottom-4 duration-700">
+                        <Zap size={14} className="text-blue-400" fill="currentColor" />
+                        <span className="text-[10px] font-black text-white uppercase tracking-widest">Oyunun Geleceği</span>
+                    </div>
+                    <h1 className="text-5xl md:text-8xl font-black tracking-tighter text-white animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-200">
+                        BİZ <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-sky-600">PIXEON'UZ</span>
+                    </h1>
+                    <p className="text-xl md:text-2xl text-slate-400 font-medium max-w-3xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-500">
+                        Türkiye'nin en seçkin PlayStation topluluğunu ve alışveriş deneyimini inşa ediyoruz.
+                    </p>
+                </div>
+            </section>
+
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 space-y-40">
+                
+                {/* Brand Story */}
+                <section className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+                    <div className="space-y-10 order-2 lg:order-1">
+                        <div className="space-y-4">
+                            <h2 className="text-4xl lg:text-5xl font-black text-white tracking-tight">Hikayemiz</h2>
+                            <div className="w-20 h-1.5 bg-blue-600 rounded-full"></div>
+                        </div>
+                        <p className="text-xl text-slate-400 leading-relaxed font-medium">
+                            PIXEON, 2024 yılında oyun tutkunları tarafından oyun tutkunları için kuruldu. 
+                            Sadece bir mağaza değil, PlayStation ekosisteminin kalbinde yer alan bir teknoloji ve eğlence merkeziyiz.
                         </p>
+                        <p className="text-lg text-slate-500 leading-relaxed">
+                            En yeni konsolları, en heyecan verici oyunları ve özel aksesuarları en hızlı şekilde sizlere ulaştırmayı görev edindik. 
+                            Her paketimizde, bir oyuncunun heyecanını taşıyoruz.
+                        </p>
+                        
+                        <div className="grid grid-cols-2 gap-10 pt-6">
+                            <div className="space-y-2">
+                                <span className="text-5xl font-black text-white tracking-tighter">10K+</span>
+                                <p className="text-xs font-black text-blue-400 uppercase tracking-widest">Mutlu Oyuncu</p>
+                            </div>
+                            <div className="space-y-2">
+                                <span className="text-5xl font-black text-white tracking-tighter">5K+</span>
+                                <p className="text-xs font-black text-blue-400 uppercase tracking-widest">Ürün Çeşidi</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div className="relative aspect-square rounded-[60px] overflow-hidden border border-white/5 shadow-2xl group order-1 lg:order-2">
+                        <Image
+                            src="/logo-nobg.png"
+                            alt="PIXEON Office"
+                            fill
+                            className="object-contain p-20 bg-[#020617] group-hover:scale-110 transition-transform duration-1000"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-tr from-blue-600/10 via-transparent to-transparent"></div>
                     </div>
                 </section>
 
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 space-y-32">
+                {/* Values / Why Us */}
+                <section className="space-y-20">
+                    <div className="text-center space-y-6">
+                        <h2 className="text-4xl lg:text-5xl font-black text-white tracking-tight">Neden PIXEON?</h2>
+                        <p className="text-slate-500 max-w-2xl mx-auto text-lg font-medium">
+                            PlayStation deneyiminizi kusursuz hale getirmek için odaklandığımız temel değerlerimiz.
+                        </p>
+                    </div>
 
-                    {/* Brand Story */}
-                    <section className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {[
+                            { icon: Award, title: "Yetkili Satış", desc: "Tüm ürünlerimiz %100 orijinal ve resmi distribütör garantilidir.", color: "text-blue-400" },
+                            { icon: Truck, title: "Hızlı Teslimat", desc: "Aynı gün kargo ve İstanbul içi hızlı teslimat seçenekleri.", color: "text-sky-400" },
+                            { icon: ShieldCheck, title: "Güvenli Alışveriş", desc: "En üst düzey güvenlik protokolleri ile huzurlu bir alışveriş deneyimi.", color: "text-emerald-400" },
+                            { icon: Zap, title: "En Yeni Ürünler", desc: "PS5 Pro ve özel sürümler her zaman ilk olarak bizim mağazamızda.", color: "text-amber-400" },
+                            { icon: Users, title: "Uzman Destek", desc: "Oyun dünyasına hakim uzman ekibimizle her zaman yanınızdayız.", color: "text-purple-400" },
+                            { icon: Gamepad2, title: "Oyuncu Dostu", desc: "Topluluk etkinlikleri ve sadece oyunculara özel fırsatlar.", color: "text-red-400" },
+                        ].map((item, i) => (
+                            <div key={i} className="group p-10 bg-white/[0.02] border border-white/5 rounded-[40px] hover:bg-white/[0.05] hover:border-blue-500/30 transition-all duration-500">
+                                <div className={cn("mb-8 p-5 bg-slate-950 rounded-[24px] w-fit border border-white/5 shadow-inner group-hover:scale-110 transition-transform duration-500", item.color)}>
+                                    <item.icon size={32} />
+                                </div>
+                                <h3 className="text-2xl font-bold text-white mb-4 tracking-tight">{item.title}</h3>
+                                <p className="text-slate-500 leading-relaxed font-medium">{item.desc}</p>
+                            </div>
+                        ))}
+                    </div>
+                </section>
+
+                {/* Mission & Vision */}
+                <section className="relative p-12 lg:p-24 bg-[#020617] rounded-[60px] border border-white/5 overflow-hidden">
+                    <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/10 blur-[150px] rounded-full -mr-64 -mt-64"></div>
+                    <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-sky-600/5 blur-[150px] rounded-full -ml-64 -mb-64"></div>
+
+                    <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
                         <div className="space-y-8">
-                            <h2 className="text-4xl font-bold tracking-tight">Biz Kimiz?</h2>
-                            <p className="text-lg text-slate-400 leading-relaxed">
-                                TUGER, 2024 yılında oyun tutkunları tarafından oyun tutkunları için kuruldu.
-                                Sadece bir mağaza değil, PlayStation ekosisteminin kalbinde yer alan bir teknoloji merkeziyiz.
-                                En yeni konsolları, en heyecan verici oyunları ve özel aksesuarları en hızlı şekilde sizlere ulaştırmayı görev edindik.
+                            <h2 className="text-4xl lg:text-5xl font-black text-white tracking-tight">Misyonumuz</h2>
+                            <p className="text-xl text-slate-400 leading-relaxed font-medium">
+                                Türkiye'deki PlayStation ekosistemini güçlendirmek ve her seviyeden oyuncuya kusursuz bir deneyim sunmak. Teknolojinin sınırlarını zorlayan ürünleri, samimi bir hizmet anlayışıyla birleştiriyoruz.
                             </p>
-                            <div className="grid grid-cols-2 gap-8 pt-4">
-                                <div className="space-y-2 border-l-2 border-sky-500 pl-4">
-                                    <span className="text-3xl font-bold text-sky-400">10k+</span>
-                                    <p className="text-sm text-slate-500 uppercase tracking-wider font-semibold">Mutlu Oyuncu</p>
-                                </div>
-                                <div className="space-y-2 border-l-2 border-blue-500 pl-4">
-                                    <span className="text-3xl font-bold text-blue-400">5k+</span>
-                                    <p className="text-sm text-slate-500 uppercase tracking-wider font-semibold">Ürün Çeşidi</p>
-                                </div>
+                            <button className="bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-widest px-10 py-5 rounded-2xl flex items-center gap-3 transition-all shadow-xl shadow-blue-600/20 active:scale-95 group">
+                                MAĞAZAYI KEŞFET
+                                <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
+                            </button>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div className="p-10 bg-white/[0.03] backdrop-blur-xl border border-white/5 rounded-[40px] space-y-4">
+                                <div className="p-4 bg-blue-600/10 text-blue-400 rounded-2xl w-fit"><Target size={24} /></div>
+                                <h4 className="text-xl font-bold text-white">Vizyonumuz</h4>
+                                <p className="text-sm text-slate-500 font-medium leading-relaxed">Bölgenin en güvenilir ve yenilikçi oyun perakendecisi olarak sektöre yön vermek.</p>
+                            </div>
+                            <div className="p-10 bg-white/[0.03] backdrop-blur-xl border border-white/5 rounded-[40px] space-y-4">
+                                <div className="p-4 bg-emerald-600/10 text-emerald-400 rounded-2xl w-fit"><Heart size={24} /></div>
+                                <h4 className="text-xl font-bold text-white">Değerlerimiz</h4>
+                                <p className="text-sm text-slate-500 font-medium leading-relaxed">Dürüstlük, tutku, mükemmeliyetçilik ve topluluk odaklı yaklaşım.</p>
                             </div>
                         </div>
-                        <div className="relative aspect-square rounded-3xl overflow-hidden border border-slate-800 shadow-2xl shadow-sky-500/10">
-                            <Image
-                                src="/logo-nobg.png"
-                                alt="Gaming"
-                                fill
-                                className="object-cover"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-tr from-[#020617] via-transparent to-transparent opacity-60"></div>
-                        </div>
-                    </section>
+                    </div>
+                </section>
+            </main>
 
-                    {/* Why Us? */}
-                    <section className="space-y-16">
-                        <div className="text-center space-y-4">
-                            <h2 className="text-4xl font-bold tracking-tight">Neden TUGER?</h2>
-                            <p className="text-slate-400 max-w-2xl mx-auto text-lg">
-                                PlayStation deneyiminizi mükemmelleştirmek için buradayız. İşte bizi farklı kılan özelliklerimiz:
-                            </p>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                            {[
-                                {
-                                    icon: <Award className="w-8 h-8 text-sky-400" />,
-                                    title: "Yetkili Satış",
-                                    desc: "Tüm ürünlerimiz %100 orijinal ve resmi distribütör garantilidir."
-                                },
-                                {
-                                    icon: <Truck className="w-8 h-8 text-blue-400" />,
-                                    title: "Hızlı Teslimat",
-                                    desc: "Aynı gün kargo ve İstanbul içi hızlı teslimat seçenekleri."
-                                },
-                                {
-                                    icon: <ShieldCheck className="w-8 h-8 text-sky-400" />,
-                                    title: "Güvenli Alışveriş",
-                                    desc: "En üst düzey güvenlik protokolleri ile huzurlu bir alışveriş deneyimi."
-                                },
-                                {
-                                    icon: <Zap className="w-8 h-8 text-blue-400" />,
-                                    title: "En Yeni Teknolojiler",
-                                    desc: "PS5 Pro, VR2 ve en yeni özel sürümler her zaman ilk bizde."
-                                },
-                                {
-                                    icon: <Users className="w-8 h-8 text-sky-400" />,
-                                    title: "Uzman Destek",
-                                    desc: "Oyun dünyasına hakim uzman ekibimizle her zaman yanınızdayız."
-                                },
-                                {
-                                    icon: <Gamepad2 className="w-8 h-8 text-blue-400" />,
-                                    title: "Oyuncu Dostu",
-                                    desc: "Topluluk etkinlikleri, turnuvalar ve özel indirim fırsatları."
-                                }
-                            ].map((item, i) => (
-                                <div key={i} className="group p-8 bg-slate-900/50 border border-slate-800 rounded-2xl hover:bg-slate-800/80 hover:border-sky-500/50 transition-all duration-300">
-                                    <div className="mb-6 p-4 bg-slate-950 rounded-xl w-fit group-hover:scale-110 transition-transform">
-                                        {item.icon}
-                                    </div>
-                                    <h3 className="text-xl font-bold mb-3">{item.title}</h3>
-                                    <p className="text-slate-400 leading-relaxed">{item.desc}</p>
-                                </div>
-                            ))}
-                        </div>
-                    </section>
-
-                    {/* Mission Section */}
-                    <section className="relative py-24 px-8 md:px-16 bg-gradient-to-br from-blue-900/20 to-sky-900/20 rounded-[40px] border border-slate-800 overflow-hidden">
-                        <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-96 h-96 bg-sky-500/10 blur-[100px] rounded-full"></div>
-                        <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/2 w-96 h-96 bg-blue-500/10 blur-[100px] rounded-full"></div>
-
-                        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-                            <div className="space-y-6">
-                                <h2 className="text-4xl font-bold">Misyonumuz</h2>
-                                <p className="text-lg text-slate-300 leading-relaxed">
-                                    Türkiye'deki PlayStation ekosistemini güçlendirmek ve her seviyeden oyuncuya kusursuz bir deneyim sunmak. Teknolojinin sınırlarını zorlayan ürünleri, samimi bir hizmet anlayışıyla birleştiriyoruz.
-                                </p>
-                                <div className="pt-4">
-                                    <button className="px-8 py-4 bg-sky-500 hover:bg-sky-400 text-slate-950 font-black rounded-full transition-all transform hover:scale-105 active:scale-95 shadow-lg shadow-sky-500/20">
-                                        MAĞAZAYI KEŞFET
-                                    </button>
-                                </div>
-                            </div>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div className="p-6 bg-slate-950/40 backdrop-blur-md border border-slate-700/50 rounded-2xl">
-                                    <h4 className="font-bold mb-2">Vizyonumuz</h4>
-                                    <p className="text-sm text-slate-400 text-justify">Bölgenin en güvenilir ve yenilikçi oyun perakendecisi olmak.</p>
-                                </div>
-                                <div className="p-6 bg-slate-950/40 backdrop-blur-md border border-slate-700/50 rounded-2xl">
-                                    <h4 className="font-bold mb-2">Değerlerimiz</h4>
-                                    <p className="text-sm text-slate-400 text-justify">Dürüstlük, tutku, mükemmeliyetçilik ve topluluk odaklılık.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-                </div>
-            </div>
+            <Footer />
 
             <style jsx>{`
-                @keyframes fadeInUp {
-                    from {
-                        opacity: 0;
-                        transform: translateY(20px);
-                    }
-                    to {
-                        opacity: 1;
-                        transform: translateY(0);
-                    }
-                }
-                .animate-fade-in-up {
-                    animation: fadeInUp 0.8s ease-out forwards;
-                }
                 .animate-pulse-slow {
-                    animation: pulse 8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+                    animation: pulse 12s cubic-bezier(0.4, 0, 0.6, 1) infinite;
                 }
                 @keyframes pulse {
                     0%, 100% {
-                        opacity: 0.3;
-                        transform: scale(1.05);
-                    }
-                    50% {
-                        opacity: 0.4;
+                        opacity: 0.6;
                         transform: scale(1.1);
                     }
-                }
-                .delay-200 {
-                    animation-delay: 0.2s;
+                    50% {
+                        opacity: 0.8;
+                        transform: scale(1.15);
+                    }
                 }
             `}</style>
-        </>
+        </div>
     );
 }

@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import TopBar from "@/components/header/TopBar";
 import MainBar from "@/components/header/MainBar";
 import Head from "@/components/header/Head";
+import Footer from "@/components/footer/Footer";
 import { 
     Trash2, 
     Plus, 
@@ -12,13 +13,16 @@ import {
     CreditCard, 
     ShieldCheck, 
     Truck,
-    ShoppingBag
+    ShoppingBag,
+    ArrowRight,
+    Zap,
+    Ticket
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 export default function CartPage() {
-    // Mock cart data
     const [cartItems, setCartItems] = useState([
         { 
             id: 1, 
@@ -53,61 +57,68 @@ export default function CartPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#020617] text-slate-200">
+        <div className="min-h-screen bg-slate-950 text-slate-200">
             <TopBar />
             <MainBar />
             <Head />
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <div className="flex items-center gap-4 mb-10">
-                    <Link href="/" className="p-2 hover:bg-slate-800 rounded-full transition-colors text-slate-400 hover:text-white">
-                        <ChevronLeft size={24} />
-                    </Link>
-                    <h1 className="text-4xl font-black tracking-tight flex items-center gap-3">
-                        Sepetim <span className="text-sky-500 text-lg font-bold bg-sky-500/10 px-3 py-1 rounded-full">{cartItems.length} Ürün</span>
-                    </h1>
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
+                {/* Cart Header */}
+                <div className="mb-12 flex flex-col md:flex-row md:items-center justify-between gap-8">
+                    <div className="flex items-center gap-6">
+                        <Link href="/" className="group p-4 bg-white/5 border border-white/5 rounded-3xl text-slate-400 hover:text-white transition-all hover:bg-blue-600 hover:border-blue-500 shadow-xl">
+                            <ChevronLeft size={24} className="group-hover:-translate-x-1 transition-transform" />
+                        </Link>
+                        <div>
+                            <h1 className="text-4xl lg:text-5xl font-black text-white tracking-tight">Alışveriş Sepeti</h1>
+                            <p className="text-slate-500 font-medium mt-2 flex items-center gap-2">
+                                <ShoppingBag size={14} className="text-blue-400" />
+                                {cartItems.length} ürün hazır ve sizi bekliyor.
+                            </p>
+                        </div>
+                    </div>
                 </div>
 
                 {cartItems.length > 0 ? (
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 items-start">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
                         
-                        {/* LEFT: Items List */}
-                        <div className="lg:col-span-2 space-y-6">
+                        {/* LEFT: Items List (8 cols) */}
+                        <div className="lg:col-span-8 space-y-6">
                             {cartItems.map((item) => (
-                                <div key={item.id} className="group relative bg-slate-900/40 backdrop-blur-xl border border-white/5 rounded-[2rem] p-6 hover:border-sky-500/20 transition-all duration-500 shadow-2xl overflow-hidden">
-                                    <div className="absolute inset-0 bg-gradient-to-br from-sky-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                                <div key={item.id} className="group bg-[#0b1220]/50 backdrop-blur-xl border border-white/5 rounded-[40px] p-8 hover:border-blue-500/20 transition-all duration-500 shadow-2xl relative overflow-hidden">
+                                    <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 blur-[100px] rounded-full -mr-32 -mt-32 pointer-events-none group-hover:bg-blue-500/10 transition-all duration-500"></div>
                                     
-                                    <div className="relative z-10 flex flex-col sm:flex-row items-center gap-8">
+                                    <div className="relative z-10 flex flex-col sm:flex-row items-center gap-10">
                                         {/* Image */}
-                                        <div className="w-32 h-32 bg-slate-950 rounded-2xl border border-white/5 flex items-center justify-center p-4 group-hover:scale-105 transition-transform duration-500">
-                                            <Image src={item.image} alt={item.name} width={100} height={100} className="object-contain" />
+                                        <div className="w-40 h-40 bg-slate-950 rounded-[32px] border border-white/5 flex items-center justify-center p-6 group-hover:scale-105 transition-transform duration-700 shadow-2xl">
+                                            <Image src={item.image} alt={item.name} width={120} height={120} className="object-contain drop-shadow-2xl shadow-blue-500/20" />
                                         </div>
 
                                         {/* Details */}
-                                        <div className="flex-1 text-center sm:text-left">
-                                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-sky-400 mb-1 block">
+                                        <div className="flex-1 text-center sm:text-left space-y-2">
+                                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-400">
                                                 {item.category}
                                             </span>
-                                            <h3 className="text-xl font-bold mb-2 group-hover:text-white transition-colors">{item.name}</h3>
-                                            <div className="text-2xl font-black text-white">
-                                                {item.price.toLocaleString("tr-TR")} ₺
+                                            <h3 className="text-xl lg:text-2xl font-black text-white leading-tight group-hover:text-blue-400 transition-colors">{item.name}</h3>
+                                            <div className="text-2xl font-black text-white tracking-tighter pt-2">
+                                                ₺{item.price.toLocaleString("tr-TR")}
                                             </div>
                                         </div>
 
                                         {/* Controls */}
-                                        <div className="flex items-center gap-6">
-                                            <div className="flex items-center bg-slate-950 border border-white/5 rounded-2xl p-1">
+                                        <div className="flex flex-col sm:items-end gap-6">
+                                            <div className="flex items-center bg-slate-950 border border-white/5 rounded-2xl p-1.5 shadow-inner">
                                                 <button 
                                                     onClick={() => updateQuantity(item.id, -1)}
-                                                    className="w-10 h-10 flex items-center justify-center hover:text-sky-400 transition-colors disabled:opacity-20"
+                                                    className="w-10 h-10 flex items-center justify-center hover:text-blue-400 transition-colors disabled:opacity-20"
                                                     disabled={item.quantity <= 1}
                                                 >
                                                     <Minus size={18} />
                                                 </button>
-                                                <span className="w-8 text-center font-bold text-lg">{item.quantity}</span>
+                                                <span className="w-10 text-center font-black text-xl text-white">{item.quantity}</span>
                                                 <button 
                                                     onClick={() => updateQuantity(item.id, 1)}
-                                                    className="w-10 h-10 flex items-center justify-center hover:text-sky-400 transition-colors"
+                                                    className="w-10 h-10 flex items-center justify-center hover:text-blue-400 transition-colors"
                                                 >
                                                     <Plus size={18} />
                                                 </button>
@@ -115,58 +126,83 @@ export default function CartPage() {
 
                                             <button 
                                                 onClick={() => removeItem(item.id)}
-                                                className="p-3 bg-red-500/10 text-red-500 rounded-2xl hover:bg-red-500 hover:text-white transition-all duration-300"
+                                                className="flex items-center gap-2 px-4 py-2 text-red-400 hover:text-red-300 transition-colors font-black text-[10px] uppercase tracking-widest"
                                             >
-                                                <Trash2 size={20} />
+                                                <Trash2 size={16} />
+                                                Ürünü Kaldır
                                             </button>
                                         </div>
                                     </div>
                                 </div>
                             ))}
+
+                            {/* Cart Features */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6">
+                                {[
+                                    { icon: Zap, title: "Anında Onay", desc: "Siparişin saniyeler içinde işleme alınır." },
+                                    { icon: ShieldCheck, title: "Resmi Garanti", desc: "Tüm ürünler 2 yıl Sony Türkiye garantilidir." },
+                                    { icon: Truck, title: "Hızlı Kargo", desc: "Bugün saat 16:00'ya kadar aynı gün kargo." },
+                                ].map((feat, i) => (
+                                    <div key={i} className="p-6 bg-white/[0.02] border border-white/5 rounded-3xl flex items-center gap-4">
+                                        <div className="p-3 bg-blue-600/10 text-blue-400 rounded-xl"><feat.icon size={20} /></div>
+                                        <div>
+                                            <h4 className="text-xs font-black text-white uppercase tracking-tight">{feat.title}</h4>
+                                            <p className="text-[10px] text-slate-500 font-medium mt-1">{feat.desc}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
 
-                        {/* RIGHT: Summary Card */}
-                        <div className="space-y-6">
-                            <div className="bg-[#0c1022] border border-white/5 rounded-[2.5rem] p-8 shadow-2xl sticky top-8">
-                                <h2 className="text-2xl font-black mb-8 border-b border-white/5 pb-4">Sipariş Özeti</h2>
+                        {/* RIGHT: Order Summary (4 cols) */}
+                        <div className="lg:col-span-4 space-y-6">
+                            <div className="bg-[#0b1220]/80 backdrop-blur-2xl border border-white/10 rounded-[48px] p-10 shadow-2xl sticky top-8 relative overflow-hidden">
+                                <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/10 blur-[100px] rounded-full -mr-32 -mt-32 pointer-events-none"></div>
                                 
-                                <div className="space-y-4 mb-8">
-                                    <div className="flex justify-between text-slate-400">
-                                        <span>Ara Toplam</span>
-                                        <span className="text-white font-bold">{subtotal.toLocaleString("tr-TR")} ₺</span>
+                                <h2 className="text-2xl font-black text-white tracking-tight mb-8">Sipariş Özeti</h2>
+                                
+                                <div className="space-y-5 mb-10">
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-slate-500 font-bold">Ara Toplam</span>
+                                        <span className="text-white font-black">₺{subtotal.toLocaleString("tr-TR")}</span>
                                     </div>
-                                    <div className="flex justify-between text-slate-400">
-                                        <span>Kargo</span>
-                                        <span className={shipping === 0 ? "text-emerald-400 font-bold" : "text-white font-bold"}>
-                                            {shipping === 0 ? "Ücretsiz" : `${shipping} ₺`}
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-slate-500 font-bold">Kargo Bedeli</span>
+                                        <span className={cn("font-black", shipping === 0 ? "text-emerald-400" : "text-white")}>
+                                            {shipping === 0 ? "Ücretsiz" : `₺${shipping}`}
                                         </span>
                                     </div>
-                                    <div className="pt-4 border-t border-white/5 flex justify-between">
-                                        <span className="text-xl font-bold">Toplam</span>
-                                        <div className="text-right">
-                                            <div className="text-3xl font-black text-sky-400">{total.toLocaleString("tr-TR")} ₺</div>
-                                            <p className="text-[10px] text-slate-500 uppercase font-bold tracking-widest mt-1">KDV DAHİL</p>
+                                    
+                                    {/* Coupon Input */}
+                                    <div className="pt-4">
+                                        <div className="relative group">
+                                            <Ticket size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-blue-400 transition-colors" />
+                                            <input 
+                                                type="text" 
+                                                placeholder="İndirim Kuponu" 
+                                                className="w-full bg-slate-950 border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-xs font-bold outline-none focus:border-blue-500/50 transition-all placeholder:text-slate-700"
+                                            />
                                         </div>
+                                    </div>
+
+                                    <div className="pt-8 border-t border-white/5 flex justify-between items-end">
+                                        <div>
+                                            <span className="text-xs text-slate-500 font-black uppercase tracking-widest">Ödenecek Tutar</span>
+                                            <div className="text-4xl font-black text-white tracking-tighter mt-1">₺{total.toLocaleString("tr-TR")}</div>
+                                        </div>
+                                        <p className="text-[10px] text-slate-600 font-black tracking-widest pb-1 uppercase">KDV DAHİL</p>
                                     </div>
                                 </div>
 
-                                <button className="w-full relative group overflow-hidden rounded-2xl p-px transition-all active:scale-[0.98]">
-                                    <div className="absolute inset-0 bg-gradient-to-r from-sky-600 via-blue-600 to-sky-600 group-hover:bg-sky-500" />
-                                    <div className="relative bg-sky-600 group-hover:bg-transparent py-5 flex items-center justify-center gap-3 font-black text-lg text-white transition-all uppercase tracking-widest">
-                                        <CreditCard size={22} />
-                                        ÖDEMEYE GEÇ
-                                    </div>
+                                <button className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-widest py-6 rounded-3xl flex items-center justify-center gap-3 transition-all shadow-xl shadow-blue-600/30 active:scale-95 group">
+                                    <CreditCard size={22} />
+                                    Güvenle Öde
+                                    <ArrowRight size={20} className="group-hover:translate-x-1.5 transition-transform" />
                                 </button>
 
-                                <div className="mt-8 space-y-4">
-                                    <div className="flex items-center gap-3 text-xs text-slate-400">
-                                        <ShieldCheck className="text-emerald-400" size={18} />
-                                        <span>Güvenli 256-bit SSL Ödeme Altyapısı</span>
-                                    </div>
-                                    <div className="flex items-center gap-3 text-xs text-slate-400">
-                                        <Truck className="text-sky-400" size={18} />
-                                        <span>Aynı Gün Ücretsiz Kargo (5000 ₺ ve üzeri)</span>
-                                    </div>
+                                <div className="mt-10 flex items-center justify-center gap-3 opacity-40">
+                                    <ShieldCheck size={20} />
+                                    <span className="text-[10px] font-black uppercase tracking-widest">256-Bit SSL Güvenlik</span>
                                 </div>
                             </div>
                         </div>
@@ -174,25 +210,40 @@ export default function CartPage() {
                     </div>
                 ) : (
                     /* EMPTY STATE */
-                    <div className="bg-[#0c1022] border border-white/5 rounded-[3rem] p-20 text-center space-y-8 animate-in shadow-2xl relative overflow-hidden">
-                        <div className="absolute inset-0 bg-gradient-to-b from-sky-500/5 to-transparent pointer-events-none" />
-                        <div className="relative z-10">
-                            <div className="w-24 h-24 bg-slate-900 border border-white/10 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-inner animate-bounce">
-                                <ShoppingBag size={48} className="text-slate-500" />
+                    <div className="bg-[#0b1220]/50 backdrop-blur-xl border border-white/5 rounded-[60px] p-24 text-center space-y-10 animate-in fade-in zoom-in duration-1000 shadow-2xl relative overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-b from-blue-500/5 to-transparent pointer-events-none" />
+                        <div className="relative z-10 space-y-8">
+                            <div className="w-32 h-32 bg-slate-950 border border-white/5 rounded-[40px] flex items-center justify-center mx-auto mb-8 shadow-2xl group animate-bounce-slow">
+                                <ShoppingBag size={56} className="text-slate-700 group-hover:text-blue-500 transition-colors" />
                             </div>
-                            <h2 className="text-3xl font-black text-white">Sepetiniz Boş Görünüyor</h2>
-                            <p className="text-slate-400 max-w-sm mx-auto">
-                                Henüz sepetinize bir ürün eklemediniz. En yeni oyun ve konsollara göz atmaya ne dersiniz?
-                            </p>
-                            <div className="pt-8">
-                                <Link href="/" className="inline-flex items-center gap-3 bg-sky-500 hover:bg-sky-400 text-slate-950 font-black px-10 py-4 rounded-2xl transition-all shadow-xl shadow-sky-500/20 active:scale-95 uppercase tracking-widest text-sm">
+                            <div className="space-y-4">
+                                <h2 className="text-4xl font-black text-white tracking-tight">Sepetin Bomboş...</h2>
+                                <p className="text-xl text-slate-500 font-medium max-w-md mx-auto">
+                                    En yeni maceralar ve güçlü donanımlar sizi bekliyor. Hemen keşfetmeye başlayın!
+                                </p>
+                            </div>
+                            <div className="pt-6">
+                                <Link href="/" className="inline-flex items-center gap-4 bg-blue-600 hover:bg-blue-500 text-white font-black px-12 py-5 rounded-[2rem] transition-all shadow-2xl shadow-blue-600/30 active:scale-95 uppercase tracking-widest text-sm group">
                                     Alışverişe Başla
+                                    <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
                                 </Link>
                             </div>
                         </div>
                     </div>
                 )}
-            </div>
+            </main>
+
+            <Footer />
+
+            <style jsx>{`
+                @keyframes bounceSlow {
+                    0%, 100% { transform: translateY(0); }
+                    50% { transform: translateY(-20px); }
+                }
+                .animate-bounce-slow {
+                    animation: bounceSlow 4s ease-in-out infinite;
+                }
+            `}</style>
         </div>
     );
 }
