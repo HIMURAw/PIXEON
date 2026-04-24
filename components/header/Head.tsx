@@ -100,7 +100,8 @@ export default function Head() {
                         {[
                             { name: "ANA SAYFA", href: "/" },
                             { name: "KONSOLLAR", href: "/konsollar" },
-                            { name: "OYUNLAR", href: "/oyunlar" },
+                            { name: "PS5 OYUNLARI", href: "/oyunlar/ps5" },
+                            { name: "PS4 OYUNLARI", href: "/oyunlar/ps4" },
                             { name: "AKSESUARLAR", href: "/aksesuarlar" },
                             { name: "DİJİTAL KODLAR", href: "/dijital-kodlar" },
                             { name: "İLETİŞİM", href: "/iletisim" }
