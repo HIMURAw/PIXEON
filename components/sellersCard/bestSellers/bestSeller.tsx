@@ -1,9 +1,10 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import BestSellerCard from "./bestSellerCard";
+import { getBestSellers } from "@/lib/actions/product-actions";
 
 export type Product = {
-    id: number;
+    id: string;
     name: string;
     image: string;
     price: string;
@@ -12,46 +13,28 @@ export type Product = {
     category?: string;
 };
 
-export const products: Product[] = [
-    {
-        id: 1,
-        name: "PS5 Slim + God of War Ragnarök Paketi",
-        image: "/products/ps5-bundle.png",
-        price: "21.499",
-        discount: null,
-        category: "Konsollar"
-    },
-    {
-        id: 2,
-        name: "DualSense Edge™ Kablosuz Kontrolcü",
-        image: "/products/dualsense-edge.png",
-        oldPrice: "9.999",
-        price: "8.490",
-        discount: "15%",
-        category: "Aksesuarlar"
-    },
-    {
-        id: 3,
-        name: "Horizon Forbidden West - PS5",
-        image: "/products/horizon.png",
-        oldPrice: "1.299",
-        price: "849",
-        discount: "35%",
-        category: "Oyunlar"
-    },
-    {
-        id: 4,
-        name: "Gran Turismo 7 - PS5",
-        image: "/products/gt7.png",
-        price: "1.199",
-        discount: null,
-        category: "Oyunlar"
-    },
-];
-
 export default function BestSellers() {
+    const [dbProducts, setDbProducts] = useState<Product[]>([]);
     const [isVisible, setIsVisible] = useState(false);
     const sectionRef = useRef<HTMLElement>(null);
+
+    useEffect(() => {
+        const fetchProducts = async () => {
+            const data = await getBestSellers();
+            // Map DB products to the local Product type if needed
+            const mapped = data.map(p => ({
+                id: p.id,
+                name: p.name,
+                image: p.image || "/placeholder.png",
+                price: p.price.toString(),
+                oldPrice: p.oldPrice?.toString(),
+                discount: p.oldPrice ? Math.round((1 - p.price / p.oldPrice) * 100) + "%" : null,
+                category: "Ürün" // This can be expanded later to fetch category name
+            }));
+            setDbProducts(mapped);
+        };
+        fetchProducts();
+    }, []);
 
     useEffect(() => {
         const observer = new IntersectionObserver(
@@ -93,7 +76,7 @@ export default function BestSellers() {
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-                {products.map(product => (
+                {dbProducts.map(product => (
                     <BestSellerCard key={product.id} product={product} />
                 ))}
             </div>
