@@ -22,7 +22,7 @@ export default function BestSellers() {
         const fetchProducts = async () => {
             const data = await getBestSellers();
             // Map DB products to the local Product type if needed
-            const mapped = data.map(p => ({
+            const mapped = data.map((p: any) => ({
                 id: p.id,
                 name: p.name,
                 image: p.image || "/placeholder.png",
