@@ -21,7 +21,7 @@ import {
 import { useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { getProducts, deleteProduct } from "@/lib/actions/product-actions";
-import AddProductModal from "@/components/admin/AddProductModal";
+import ProductModal from "@/components/admin/ProductModal";
 
 export default function AdminProducts() {
     const searchParams = useSearchParams();
@@ -29,7 +29,8 @@ export default function AdminProducts() {
 
     const [products, setProducts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState<any>(null);
 
     const fetchProducts = async () => {
         setLoading(true);
@@ -53,18 +54,29 @@ export default function AdminProducts() {
         }
     };
 
-    const filteredProducts = categoryFilter
+    const handleEdit = (product: any) => {
+        setSelectedProduct(product);
+        setIsModalOpen(true);
+    };
+
+    const handleAdd = () => {
+        setSelectedProduct(null);
+        setIsModalOpen(true);
+    };
+
+    const filteredProducts = categoryFilter 
         ? products.filter(p => p.category?.slug === categoryFilter)
         : products;
 
     return (
         <div className="space-y-8 animate-in fade-in duration-700">
-            <AddProductModal
-                isOpen={isAddModalOpen}
+            <ProductModal 
+                isOpen={isModalOpen} 
+                product={selectedProduct}
                 onClose={() => {
-                    setIsAddModalOpen(false);
+                    setIsModalOpen(false);
                     fetchProducts();
-                }}
+                }} 
             />
 
             {/* Page Header */}
@@ -84,7 +96,7 @@ export default function AdminProducts() {
                         Dışa Aktar
                     </button>
                     <button
-                        onClick={() => setIsAddModalOpen(true)}
+                        onClick={handleAdd}
                         className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 py-2.5 rounded-xl flex items-center gap-2 transition-all shadow-lg shadow-blue-600/20 active:scale-95"
                     >
                         <Plus size={20} />
@@ -165,74 +177,89 @@ export default function AdminProducts() {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-white/5">
-                            {filteredProducts.map((product) => (
-                                <tr key={product.id} className="hover:bg-white/[0.01] transition-all group">
-                                    <td className="px-8 py-6">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-14 h-14 bg-slate-900 rounded-2xl overflow-hidden border border-white/10 flex items-center justify-center p-2 group-hover:border-blue-500/30 transition-all">
-                                                <img src={product.image || "/placeholder.png"} alt="" className="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform duration-500" />
-                                            </div>
-                                            <div className="space-y-1">
-                                                <div className="font-black text-white group-hover:text-blue-400 transition-colors text-sm">
-                                                    {product.name}
-                                                </div>
-                                                <div className="text-[10px] text-slate-500 font-bold uppercase tracking-tight">SKU: {product.sku}</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td className="px-8 py-6">
-                                        <span className="px-3 py-1 bg-blue-500/10 text-blue-400 rounded-full text-[10px] font-black uppercase tracking-wider border border-blue-500/20">
-                                            {product.category?.name || "Belirsiz"}
-                                        </span>
-                                    </td>
-                                    <td className="px-8 py-6 text-center">
-                                        <span className="font-bold text-slate-400">{product.salesCount}</span>
-                                    </td>
-                                    <td className="px-8 py-6">
-                                        <div className="font-black text-white text-base">{product.price.toLocaleString('tr-TR')} ₺</div>
-                                        <p className="text-[10px] text-slate-600 font-bold">+ 18% KDV Dahil</p>
-                                    </td>
-                                    <td className="px-8 py-6">
-                                        <div className="space-y-2">
-                                            <div className="flex items-center justify-between text-[10px] font-bold">
-                                                <span className={cn(
-                                                    product.stock === 0 ? "text-red-400" :
-                                                        product.stock < 10 ? "text-amber-400" : "text-emerald-400"
-                                                )}>
-                                                    {product.stock === 0 ? "Stok Bitti" : `${product.stock} Adet`}
-                                                </span>
-                                                <span className="text-slate-600">{Math.min(product.stock, 100)}%</span>
-                                            </div>
-                                            <div className="h-1.5 w-32 bg-white/5 rounded-full overflow-hidden">
-                                                <div
-                                                    style={{ width: `${Math.min(product.stock, 100)}%` }}
-                                                    className={cn(
-                                                        "h-full rounded-full transition-all duration-1000",
-                                                        product.stock === 0 ? "bg-red-500" :
-                                                            product.stock < 10 ? "bg-amber-500" : "bg-emerald-500"
-                                                    )}
-                                                ></div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td className="px-8 py-6">
-                                        <div className="flex items-center justify-end gap-1">
-                                            <button className="p-2.5 hover:bg-blue-500/10 rounded-xl text-slate-500 hover:text-blue-400 transition-all border border-transparent hover:border-blue-500/20">
-                                                <Pencil size={18} />
-                                            </button>
-                                            <button
-                                                onClick={() => handleDelete(product.id)}
-                                                className="p-2.5 hover:bg-red-500/10 rounded-xl text-slate-500 hover:text-red-400 transition-all border border-transparent hover:border-red-500/20"
-                                            >
-                                                <Trash2 size={18} />
-                                            </button>
-                                            <button className="p-2.5 hover:bg-white/5 rounded-xl text-slate-500 hover:text-white transition-all border border-transparent hover:border-white/10">
-                                                <Eye size={18} />
-                                            </button>
+                            {filteredProducts.length === 0 ? (
+                                <tr>
+                                    <td colSpan={6} className="px-8 py-20 text-center">
+                                        <div className="flex flex-col items-center gap-3 text-slate-500">
+                                            <Package2 size={48} className="opacity-20" />
+                                            <p className="text-sm font-bold uppercase tracking-widest">Henüz ürün bulunamadı.</p>
+                                            <button onClick={handleAdd} className="text-blue-400 text-xs font-black uppercase tracking-widest hover:underline mt-2">İLK ÜRÜNÜNÜZÜ EKLEYİN</button>
                                         </div>
                                     </td>
                                 </tr>
-                            ))}
+                            ) : (
+                                filteredProducts.map((product) => (
+                                    <tr key={product.id} className="hover:bg-white/[0.01] transition-all group">
+                                        <td className="px-8 py-6">
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-14 h-14 bg-slate-900 rounded-2xl overflow-hidden border border-white/10 flex items-center justify-center p-2 group-hover:border-blue-500/30 transition-all">
+                                                    <img src={product.image || "/placeholder.png"} alt="" className="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform duration-500" />
+                                                </div>
+                                                <div className="space-y-1">
+                                                    <div className="font-black text-white group-hover:text-blue-400 transition-colors text-sm">
+                                                        {product.name}
+                                                    </div>
+                                                    <div className="text-[10px] text-slate-500 font-bold uppercase tracking-tight">SKU: {product.sku}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-8 py-6">
+                                            <span className="px-3 py-1 bg-blue-500/10 text-blue-400 rounded-full text-[10px] font-black uppercase tracking-wider border border-blue-500/20">
+                                                {product.category?.name || "Belirsiz"}
+                                            </span>
+                                        </td>
+                                        <td className="px-8 py-6 text-center">
+                                            <span className="font-bold text-slate-400">{product.salesCount}</span>
+                                        </td>
+                                        <td className="px-8 py-6">
+                                            <div className="font-black text-white text-base">{product.price.toLocaleString('tr-TR')} ₺</div>
+                                            <p className="text-[10px] text-slate-600 font-bold">+ 18% KDV Dahil</p>
+                                        </td>
+                                        <td className="px-8 py-6">
+                                            <div className="space-y-2">
+                                                <div className="flex items-center justify-between text-[10px] font-bold">
+                                                    <span className={cn(
+                                                        product.stock === 0 ? "text-red-400" :
+                                                            product.stock < 10 ? "text-amber-400" : "text-emerald-400"
+                                                    )}>
+                                                        {product.stock === 0 ? "Stok Bitti" : `${product.stock} Adet`}
+                                                    </span>
+                                                    <span className="text-slate-600">{Math.min(product.stock, 100)}%</span>
+                                                </div>
+                                                <div className="h-1.5 w-32 bg-white/5 rounded-full overflow-hidden">
+                                                    <div
+                                                        style={{ width: `${Math.min(product.stock, 100)}%` }}
+                                                        className={cn(
+                                                            "h-full rounded-full transition-all duration-1000",
+                                                            product.stock === 0 ? "bg-red-500" :
+                                                                product.stock < 10 ? "bg-amber-500" : "bg-emerald-500"
+                                                        )}
+                                                    ></div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-8 py-6">
+                                            <div className="flex items-center justify-end gap-1">
+                                                <button 
+                                                    onClick={() => handleEdit(product)}
+                                                    className="p-2.5 hover:bg-blue-500/10 rounded-xl text-slate-500 hover:text-blue-400 transition-all border border-transparent hover:border-blue-500/20"
+                                                >
+                                                    <Pencil size={18} />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDelete(product.id)}
+                                                    className="p-2.5 hover:bg-red-500/10 rounded-xl text-slate-500 hover:text-red-400 transition-all border border-transparent hover:border-red-500/20"
+                                                >
+                                                    <Trash2 size={18} />
+                                                </button>
+                                                <button className="p-2.5 hover:bg-white/5 rounded-xl text-slate-500 hover:text-white transition-all border border-transparent hover:border-white/10">
+                                                    <Eye size={18} />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
                         </tbody>
                     </table>
                 </div>
