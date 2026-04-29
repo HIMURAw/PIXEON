@@ -26,11 +26,27 @@ import ProductModal from "@/components/admin/ProductModal";
 export default function AdminProducts() {
     const searchParams = useSearchParams();
     const categoryFilter = searchParams.get("category");
+    type Product = {
+      id: number;
+      name: string;
+      price: number;
+    
+      image?: string;
+      sku?: string;
+    
+      stock: number;
+      salesCount: number;
+    
+      category?: {
+        name: string;
+        slug: string;
+      };
+    };
 
-    const [products, setProducts] = useState<any[]>([]);
+    const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedProduct, setSelectedProduct] = useState<any>(null);
+    const [selectedProduct, setSelectedProduct] = useState<Product>(null);
 
     const fetchProducts = async () => {
         setLoading(true);
@@ -54,7 +70,7 @@ export default function AdminProducts() {
         }
     };
 
-    const handleEdit = (product: any) => {
+    const handleEdit = (product: Product) => {
         setSelectedProduct(product);
         setIsModalOpen(true);
     };
