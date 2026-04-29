@@ -27,28 +27,29 @@ export default function AdminProducts() {
     const searchParams = useSearchParams();
     const categoryFilter = searchParams.get("category");
     type Product = {
-      id: number;
-      name: string;
-      price: number;
-    
-      image?: string;
-      sku?: string;
-    
-      stock: number;
-      salesCount: number;
-    
-      category?: {
+        id: number;
         name: string;
-        slug: string;
-      };
+        price: number;
+
+        image?: string;
+        sku?: string;
+
+        stock: number;
+        salesCount: number;
+
+        category?: {
+            name: string;
+            slug: string;
+        };
     };
 
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedProduct, setSelectedProduct] = useState<Product>(null);
+    const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
     const fetchProducts = async () => {
+        setLoading(true);
         const data = await getProducts();
         setProducts(data);
         setLoading(false);
@@ -58,9 +59,9 @@ export default function AdminProducts() {
         fetchProducts();
     }, []);
 
-    const handleDelete = async (id: string) => {
+    const handleDelete = async (id: number) => {
         if (confirm("Bu ürünü silmek istediğinize emin misiniz?")) {
-            const result = await deleteProduct(id);
+            const result = await deleteProduct(id.toString());
             if (result.success) {
                 fetchProducts();
             } else {
@@ -79,19 +80,19 @@ export default function AdminProducts() {
         setIsModalOpen(true);
     };
 
-    const filteredProducts = categoryFilter 
+    const filteredProducts = categoryFilter
         ? products.filter(p => p.category?.slug === categoryFilter)
         : products;
 
     return (
         <div className="space-y-8 animate-in fade-in duration-700">
-            <ProductModal 
-                isOpen={isModalOpen} 
+            <ProductModal
+                isOpen={isModalOpen}
                 product={selectedProduct}
                 onClose={() => {
                     setIsModalOpen(false);
                     fetchProducts();
-                }} 
+                }}
             />
 
             {/* Page Header */}
@@ -255,7 +256,7 @@ export default function AdminProducts() {
                                         </td>
                                         <td className="px-8 py-6">
                                             <div className="flex items-center justify-end gap-1">
-                                                <button 
+                                                <button
                                                     onClick={() => handleEdit(product)}
                                                     className="p-2.5 hover:bg-blue-500/10 rounded-xl text-slate-500 hover:text-blue-400 transition-all border border-transparent hover:border-blue-500/20"
                                                 >
