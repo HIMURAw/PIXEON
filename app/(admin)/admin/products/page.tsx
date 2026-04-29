@@ -49,7 +49,6 @@ export default function AdminProducts() {
     const [selectedProduct, setSelectedProduct] = useState<Product>(null);
 
     const fetchProducts = async () => {
-        setLoading(true);
         const data = await getProducts();
         setProducts(data);
         setLoading(false);
