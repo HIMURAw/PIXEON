@@ -23,6 +23,7 @@ import { cn } from "@/lib/utils";
 import { getProducts, deleteProduct } from "@/lib/actions/product-actions";
 import { getCategories } from "@/lib/actions/category-actions";
 import ProductModal from "@/components/admin/ProductModal";
+import ProductViewModal from "@/components/admin/ProductViewModal";
 import { AdminNotificationContainer, NotificationType } from "@/components/admin/AdminNotification";
 import AdminConfirmModal from "@/components/admin/AdminConfirmModal";
 
@@ -52,7 +53,9 @@ export default function AdminProducts() {
     const [loading, setLoading] = useState(true);
     const [viewMode, setViewMode] = useState<"list" | "grid">("list");
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isViewOpen, setIsViewOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+    const [viewProduct, setViewProduct] = useState<Product | null>(null);
     const [notifications, setNotifications] = useState<{ id: string; type: NotificationType; message: string }[]>([]);
     const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; title: string; message: string; onConfirm: () => void }>({
         isOpen: false,
@@ -138,6 +141,11 @@ export default function AdminProducts() {
         setIsModalOpen(true);
     };
 
+    const handleView = (product: Product) => {
+        setViewProduct(product);
+        setIsViewOpen(true);
+    };
+
     // Advanced Filtering (Category + Search + Stock)
     const filteredProducts = products
         .filter(p => {
@@ -203,6 +211,12 @@ export default function AdminProducts() {
             <AdminNotificationContainer
                 notifications={notifications}
                 onClose={removeNotification}
+            />
+
+            <ProductViewModal 
+                isOpen={isViewOpen}
+                onClose={() => setIsViewOpen(false)}
+                product={viewProduct}
             />
 
             {/* Page Header */}
@@ -460,7 +474,10 @@ export default function AdminProducts() {
                                                     >
                                                         <Trash2 size={18} />
                                                     </button>
-                                                    <button className="p-2.5 hover:bg-white/5 rounded-xl text-slate-500 hover:text-white transition-all border border-transparent hover:border-white/10">
+                                                    <button 
+                                                        onClick={() => handleView(product)}
+                                                        className="p-2.5 hover:bg-white/5 rounded-xl text-slate-500 hover:text-white transition-all border border-transparent hover:border-white/10"
+                                                    >
                                                         <Eye size={18} />
                                                     </button>
                                                 </div>
@@ -505,7 +522,10 @@ export default function AdminProducts() {
                                     </div>
                                     <div className="mt-6 pt-6 border-t border-white/5 flex items-center justify-between">
                                         <div className="text-[10px] text-slate-600 font-bold uppercase tracking-tight">Satış: {product.salesCount}</div>
-                                        <button className="text-[10px] font-black uppercase tracking-widest text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors">
+                                        <button 
+                                            onClick={() => handleView(product)}
+                                            className="text-[10px] font-black uppercase tracking-widest text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors"
+                                        >
                                             Detay <Eye size={12} />
                                         </button>
                                     </div>

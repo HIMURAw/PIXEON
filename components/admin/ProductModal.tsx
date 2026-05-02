@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { X, Upload, Save, AlertCircle } from "lucide-react";
 import { createProduct, updateProduct } from "@/lib/actions/product-actions";
 import { getCategories } from "@/lib/actions/category-actions";
@@ -13,12 +14,17 @@ interface ProductModalProps {
 }
 
 export default function ProductModal({ isOpen, onClose, product }: ProductModalProps) {
+    const [mounted, setMounted] = useState(false);
     const [categories, setCategories] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
 
     const isEdit = !!product;
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     useEffect(() => {
         if (isOpen) {
@@ -31,7 +37,7 @@ export default function ProductModal({ isOpen, onClose, product }: ProductModalP
         }
     }, [isOpen, isEdit, product]);
 
-    if (!isOpen) return null;
+    if (!mounted || !isOpen) return null;
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -70,8 +76,8 @@ export default function ProductModal({ isOpen, onClose, product }: ProductModalP
         }
     };
 
-    return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+    return createPortal(
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-300">
             <div className="bg-[#020617] border border-white/10 w-full max-w-2xl rounded-[40px] overflow-hidden shadow-2xl animate-in zoom-in duration-300">
                 <div className="p-8 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
                     <div>
@@ -161,6 +167,7 @@ export default function ProductModal({ isOpen, onClose, product }: ProductModalP
                     </div>
                 </form>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }
