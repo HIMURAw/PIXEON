@@ -28,27 +28,27 @@ import AdminConfirmModal from "@/components/admin/AdminConfirmModal";
 export default function AdminProducts() {
     const searchParams = useSearchParams();
     const categoryFilter = searchParams.get("category");
+    type Product = {
+        id: number;
+        name: string;
+        price: number;
 
-    const [products, setProducts] = useState<any[]>([]);
+        image?: string;
+        sku?: string;
+
+        stock: number;
+        salesCount: number;
+
+        category?: {
+            name: string;
+            slug: string;
+        };
+    };
+
+    const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedProduct, setSelectedProduct] = useState<any>(null);
-    const [notifications, setNotifications] = useState<{ id: string; type: NotificationType; message: string }[]>([]);
-    const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; title: string; message: string; onConfirm: () => void }>({
-        isOpen: false,
-        title: "",
-        message: "",
-        onConfirm: () => {}
-    });
-
-    const addNotification = (type: NotificationType, message: string) => {
-        const id = Math.random().toString(36).substring(2, 9);
-        setNotifications(prev => [...prev, { id, type, message }]);
-    };
-
-    const removeNotification = (id: string) => {
-        setNotifications(prev => prev.filter(n => n.id !== id));
-    };
+    const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
     const fetchProducts = async () => {
         setLoading(true);
@@ -61,25 +61,18 @@ export default function AdminProducts() {
         fetchProducts();
     }, []);
 
-    const handleDelete = (id: string) => {
-        setConfirmModal({
-            isOpen: true,
-            title: "Ürünü Sil",
-            message: "Bu ürünü silmek istediğinize emin misiniz? Bu işlem geri alınamaz ve ürün kalıcı olarak kaldırılır.",
-            onConfirm: async () => {
-                const result = await deleteProduct(id);
-                if (result.success) {
-                    addNotification("success", "Ürün başarıyla silindi.");
-                    fetchProducts();
-                } else {
-                    addNotification("error", "Ürün silinirken bir hata oluştu.");
-                }
-                setConfirmModal(prev => ({ ...prev, isOpen: false }));
+    const handleDelete = async (id: number) => {
+        if (confirm("Bu ürünü silmek istediğinize emin misiniz?")) {
+            const result = await deleteProduct(id.toString());
+            if (result.success) {
+                fetchProducts();
+            } else {
+                alert("Ürün silinemedi.");
             }
         });
     };
 
-    const handleEdit = (product: any) => {
+    const handleEdit = (product: Product) => {
         setSelectedProduct(product);
         setIsModalOpen(true);
     };
@@ -89,22 +82,19 @@ export default function AdminProducts() {
         setIsModalOpen(true);
     };
 
-    const filteredProducts = categoryFilter 
+    const filteredProducts = categoryFilter
         ? products.filter(p => p.category?.slug === categoryFilter)
         : products;
 
     return (
         <div className="space-y-8 animate-in fade-in duration-700">
-            <ProductModal 
-                isOpen={isModalOpen} 
+            <ProductModal
+                isOpen={isModalOpen}
                 product={selectedProduct}
                 onClose={(success?: boolean) => {
                     setIsModalOpen(false);
-                    if (success) {
-                        addNotification("success", selectedProduct ? "Ürün başarıyla güncellendi." : "Yeni ürün başarıyla eklendi.");
-                        fetchProducts();
-                    }
-                }} 
+                    fetchProducts();
+                }}
             />
 
             <AdminConfirmModal
@@ -282,7 +272,7 @@ export default function AdminProducts() {
                                         </td>
                                         <td className="px-8 py-6">
                                             <div className="flex items-center justify-end gap-1">
-                                                <button 
+                                                <button
                                                     onClick={() => handleEdit(product)}
                                                     className="p-2.5 hover:bg-blue-500/10 rounded-xl text-slate-500 hover:text-blue-400 transition-all border border-transparent hover:border-blue-500/20"
                                                 >
