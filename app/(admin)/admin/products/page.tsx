@@ -49,6 +49,22 @@ export default function AdminProducts() {
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+    const [notifications, setNotifications] = useState<{ id: string; type: NotificationType; message: string }[]>([]);
+    const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; title: string; message: string; onConfirm: () => void }>({
+        isOpen: false,
+        title: "",
+        message: "",
+        onConfirm: () => { }
+    });
+
+    const addNotification = (type: NotificationType, message: string) => {
+        const id = Math.random().toString(36).substring(2, 9);
+        setNotifications(prev => [...prev, { id, type, message }]);
+    };
+
+    const removeNotification = (id: string) => {
+        setNotifications(prev => prev.filter(n => n.id !== id));
+    };
 
     const fetchProducts = async () => {
         setLoading(true);
@@ -61,13 +77,20 @@ export default function AdminProducts() {
         fetchProducts();
     }, []);
 
-    const handleDelete = async (id: number) => {
-        if (confirm("Bu ürünü silmek istediğinize emin misiniz?")) {
-            const result = await deleteProduct(id.toString());
-            if (result.success) {
-                fetchProducts();
-            } else {
-                alert("Ürün silinemedi.");
+    const handleDelete = (id: number) => {
+        setConfirmModal({
+            isOpen: true,
+            title: "Ürünü Sil",
+            message: "Bu ürünü silmek istediğinize emin misiniz? Bu işlem geri alınamaz ve ürün kalıcı olarak kaldırılır.",
+            onConfirm: async () => {
+                const result = await deleteProduct(id.toString());
+                if (result.success) {
+                    addNotification("success", "Ürün başarıyla silindi.");
+                    fetchProducts();
+                } else {
+                    addNotification("error", "Ürün silinirken bir hata oluştu.");
+                }
+                setConfirmModal(prev => ({ ...prev, isOpen: false }));
             }
         });
     };
@@ -93,7 +116,10 @@ export default function AdminProducts() {
                 product={selectedProduct}
                 onClose={(success?: boolean) => {
                     setIsModalOpen(false);
-                    fetchProducts();
+                    if (success) {
+                        addNotification("success", selectedProduct ? "Ürün başarıyla güncellendi." : "Yeni ürün başarıyla eklendi.");
+                        fetchProducts();
+                    }
                 }}
             />
 
@@ -106,9 +132,9 @@ export default function AdminProducts() {
                 variant="danger"
             />
 
-            <AdminNotificationContainer 
-                notifications={notifications} 
-                onClose={removeNotification} 
+            <AdminNotificationContainer
+                notifications={notifications}
+                onClose={removeNotification}
             />
 
             {/* Page Header */}
