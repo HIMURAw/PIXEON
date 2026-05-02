@@ -136,6 +136,19 @@ export default function AccountPage() {
                                     </button>
                                 ))}
 
+                                {user?.role === "ADMIN" && (
+                                    <Link
+                                        href="/admin/dashboard"
+                                        className="w-full flex items-center justify-between px-6 py-4 rounded-3xl transition-all duration-300 group text-amber-400 hover:bg-amber-400/10 mb-2"
+                                    >
+                                        <div className="flex items-center gap-4">
+                                            <ShieldCheck size={20} className="text-amber-500" />
+                                            <span className="text-sm font-black tracking-tight">Admin Paneli</span>
+                                        </div>
+                                        <ChevronRight size={18} className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                                    </Link>
+                                )}
+
                                 <div className="mt-6 pt-6 border-t border-white/5">
                                     <button
                                         onClick={handleLogout}
