@@ -2,7 +2,7 @@
 
 import { db } from "@/lib/db";
 import { products, categories } from "@/lib/db/schema";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, and, gte } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import fs from "fs/promises";
 import path from "path";
@@ -84,6 +84,27 @@ export async function getBestSellers() {
     return JSON.parse(JSON.stringify(data));
   } catch (error) {
     console.error("Error fetching best sellers:", error);
+    return [];
+  }
+}
+
+export async function getNewProducts(limit: number = 6) {
+  try {
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const data = await db.select()
+      .from(products)
+      .where(and(
+        eq(products.status, "ACTIVE"),
+        gte(products.createdAt, thirtyDaysAgo)
+      ))
+      .orderBy(desc(products.createdAt))
+      .limit(limit);
+
+    return JSON.parse(JSON.stringify(data));
+  } catch (error) {
+    console.error("Error fetching new products:", error);
     return [];
   }
 }

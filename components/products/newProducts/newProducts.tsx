@@ -1,7 +1,10 @@
+"use client";
+import { useEffect, useState } from "react";
 import ProductsCard from "./newProductsCard";
+import { getNewProducts } from "@/lib/actions/product-actions";
 
 export type Product = {
-    id: number;
+    id: string;
     name: string;
     image: string;
     price: string;
@@ -84,7 +87,36 @@ type ProductsProps = {
 };
 
 export default function Products({ limit }: ProductsProps) {
-    const displayProducts = limit ? products.slice(0, limit) : products;
+    const [dbProducts, setDbProducts] = useState<Product[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchProducts = async () => {
+            const data = await getNewProducts(limit);
+            const mapped = data.map((p: any) => ({
+                id: p.id,
+                name: p.name,
+                image: p.image || "/placeholder.png",
+                price: p.price.toString(),
+                oldPrice: p.oldPrice?.toString(),
+                discount: p.oldPrice ? Math.round((1 - p.price / p.oldPrice) * 100) + "%" : null,
+                category: "Yeni"
+            }));
+            setDbProducts(mapped);
+            setLoading(false);
+        };
+        fetchProducts();
+    }, [limit]);
+
+    if (loading) {
+        return (
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                    <div key={i} className="aspect-[4/5] bg-white/5 rounded-2xl animate-pulse" />
+                ))}
+            </div>
+        );
+    }
 
     return (
         <section className="space-y-6">
@@ -94,7 +126,7 @@ export default function Products({ limit }: ProductsProps) {
                         Yeni Ürünler
                     </h2>
                     <p className="text-sm text-gray-400">
-                        Mart sonuna kadar güncel fırsatları kaçırmayın.
+                        Son 1 ay içerisinde eklenen en yeni ürünler.
                     </p>
                 </div>
 
@@ -107,9 +139,15 @@ export default function Products({ limit }: ProductsProps) {
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {displayProducts.map((product, index) => (
-                    <ProductsCard key={`${product.id}-${index}`} product={product} />
-                ))}
+                {dbProducts.length === 0 ? (
+                    <div className="col-span-full py-12 text-center text-slate-500 font-bold uppercase tracking-widest bg-white/[0.02] border border-dashed border-white/5 rounded-3xl">
+                        Yakın zamanda eklenen yeni ürün bulunamadı.
+                    </div>
+                ) : (
+                    dbProducts.map((product) => (
+                        <ProductsCard key={product.id} product={product} />
+                    ))
+                )}
             </div>
         </section>
     );
