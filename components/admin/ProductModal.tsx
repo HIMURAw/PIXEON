@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 
 interface ProductModalProps {
     isOpen: boolean;
-    onClose: () => void;
+    onClose: (success?: boolean) => void;
     product?: any; // If provided, we are in EDIT mode
 }
 
@@ -56,7 +56,7 @@ export default function ProductModal({ isOpen, onClose, product }: ProductModalP
         setLoading(false);
 
         if (result.success) {
-            onClose();
+            onClose(true);
         } else {
             setError(result.error || "Bir hata oluştu.");
         }
