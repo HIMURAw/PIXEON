@@ -39,7 +39,7 @@ export default function ProductModal({ isOpen, onClose, product }: ProductModalP
         setError(null);
 
         const formData = new FormData(e.currentTarget);
-        
+
         // Basic slug generation if empty
         if (!formData.get("slug")) {
             const name = formData.get("name") as string;
@@ -82,7 +82,7 @@ export default function ProductModal({ isOpen, onClose, product }: ProductModalP
                             {isEdit ? "Ürün bilgilerini ve görselini güncelleyin." : "Mağaza kataloğuna yeni bir öğe tanımlayın."}
                         </p>
                     </div>
-                    <button onClick={onClose} className="p-3 hover:bg-white/5 rounded-2xl text-slate-500 hover:text-white transition-all">
+                    <button onClick={() => onClose()} className="p-3 hover:bg-white/5 rounded-2xl text-slate-500 hover:text-white transition-all">
                         <X size={24} />
                     </button>
                 </div>
@@ -138,13 +138,13 @@ export default function ProductModal({ isOpen, onClose, product }: ProductModalP
                                 )}
                             </div>
                             <div className="flex-1 space-y-2">
-                                <input 
-                                    name="image" 
-                                    required={!isEdit} 
-                                    type="file" 
-                                    accept="image/*" 
+                                <input
+                                    name="image"
+                                    required={!isEdit}
+                                    type="file"
+                                    accept="image/*"
                                     onChange={handleImageChange}
-                                    className="w-full bg-slate-950 border border-white/10 rounded-2xl px-5 py-3 text-sm text-white outline-none focus:border-blue-500/50 transition-all file:mr-4 file:py-1 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-black file:uppercase file:tracking-widest file:bg-blue-600/10 file:text-blue-400 hover:file:bg-blue-600/20" 
+                                    className="w-full bg-slate-950 border border-white/10 rounded-2xl px-5 py-3 text-sm text-white outline-none focus:border-blue-500/50 transition-all file:mr-4 file:py-1 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-black file:uppercase file:tracking-widest file:bg-blue-600/10 file:text-blue-400 hover:file:bg-blue-600/20"
                                 />
                                 <p className="text-[10px] text-slate-600 font-bold ml-1">
                                     {isEdit ? "Değiştirmek istemiyorsanız boş bırakın." : "PNG, JPG veya WEBP formatında bir görsel seçin."}
@@ -154,7 +154,7 @@ export default function ProductModal({ isOpen, onClose, product }: ProductModalP
                     </div>
 
                     <div className="flex items-center gap-4 pt-4">
-                        <button type="button" onClick={onClose} className="flex-1 py-4 border border-white/10 rounded-2xl text-xs font-black uppercase tracking-widest text-slate-500 hover:bg-white/5 transition-all">İptal</button>
+                        <button type="button" onClick={() => onClose()} className="flex-1 py-4 border border-white/10 rounded-2xl text-xs font-black uppercase tracking-widest text-slate-500 hover:bg-white/5 transition-all">İptal</button>
                         <button disabled={loading} type="submit" className="flex-1 py-4 bg-blue-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-blue-500 transition-all shadow-xl shadow-blue-600/20 flex items-center justify-center gap-2 disabled:opacity-50">
                             {loading ? "Kaydediliyor..." : <><Save size={18} /> {isEdit ? "Değişiklikleri Kaydet" : "Ürünü Kaydet"}</>}
                         </button>

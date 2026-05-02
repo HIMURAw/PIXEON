@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { CheckCircle2, AlertCircle, XCircle, Info, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -58,11 +59,20 @@ interface NotificationContainerProps {
 }
 
 export function AdminNotificationContainer({ notifications, onClose }: NotificationContainerProps) {
-  return (
-    <div className="fixed bottom-8 right-8 z-[100] flex flex-col-reverse gap-4 pointer-events-none max-w-md w-full">
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
+  return createPortal(
+    <div className="fixed bottom-8 right-8 z-[999] flex flex-col-reverse gap-4 pointer-events-none max-w-md w-full">
       {notifications.map((n) => (
         <AdminNotification key={n.id} {...n} onClose={onClose} />
       ))}
-    </div>
+    </div>,
+    document.body
   );
 }

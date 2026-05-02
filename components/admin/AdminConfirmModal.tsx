@@ -1,7 +1,8 @@
 "use client";
 
-import React from "react";
-import { AlertTriangle, X } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
+import { CheckCircle2, AlertTriangle, XCircle, Info, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface AdminConfirmModalProps {
@@ -12,7 +13,7 @@ interface AdminConfirmModalProps {
   cancelText?: string;
   onConfirm: () => void;
   onCancel: () => void;
-  variant?: "danger" | "warning" | "info";
+  variant?: "danger" | "warning" | "info" | "success";
 }
 
 export default function AdminConfirmModal({
@@ -25,11 +26,17 @@ export default function AdminConfirmModal({
   onCancel,
   variant = "danger"
 }: AdminConfirmModalProps) {
-  if (!isOpen) return null;
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!isOpen || !mounted) return null;
 
   const variants = {
     danger: {
-      icon: <AlertTriangle className="text-red-400" size={32} />,
+      icon: <XCircle className="text-red-400" size={32} />,
       button: "bg-red-600 hover:bg-red-500 shadow-red-600/20",
       glow: "bg-red-600/10",
       border: "border-red-500/20"
@@ -41,17 +48,23 @@ export default function AdminConfirmModal({
       border: "border-amber-500/20"
     },
     info: {
-      icon: <AlertTriangle className="text-blue-400" size={32} />,
+      icon: <Info className="text-blue-400" size={32} />,
       button: "bg-blue-600 hover:bg-blue-500 shadow-blue-600/20",
       glow: "bg-blue-600/10",
       border: "border-blue-500/20"
+    },
+    success: {
+      icon: <CheckCircle2 className="text-emerald-400" size={32} />,
+      button: "bg-emerald-600 hover:bg-emerald-500 shadow-emerald-600/20",
+      glow: "bg-emerald-600/10",
+      border: "border-emerald-500/20"
     }
   };
 
   const currentVariant = variants[variant];
 
-  return (
-    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 sm:p-6">
+  return createPortal(
+    <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 sm:p-6">
       {/* Backdrop */}
       <div 
         className="absolute inset-0 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-300"
@@ -103,6 +116,7 @@ export default function AdminConfirmModal({
           <X size={20} />
         </button>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
