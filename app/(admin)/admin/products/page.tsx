@@ -41,6 +41,7 @@ export default function AdminProducts() {
 
         stock: number;
         salesCount: number;
+        createdAt: Date | string;
 
         category?: {
             name: string;
@@ -146,6 +147,45 @@ export default function AdminProducts() {
         setIsViewOpen(true);
     };
 
+    const handleExport = () => {
+        if (filteredProducts.length === 0) {
+            addNotification("error", "Dışa aktarılacak ürün bulunamadı.");
+            return;
+        }
+
+        // CSV Headers
+        const headers = ["ID", "Ürün Adı", "SKU", "Kategori", "Fiyat", "Stok", "Satış Sayısı", "Eklenme Tarihi"];
+        
+        // CSV Rows
+        const rows = filteredProducts.map(p => [
+            p.id,
+            `"${p.name.replace(/"/g, '""')}"`, // Escape quotes
+            p.sku || "",
+            p.category?.name || "",
+            p.price,
+            p.stock,
+            p.salesCount,
+            new Date(p.createdAt).toLocaleDateString('tr-TR')
+        ]);
+
+        const csvContent = [
+            headers.join(","),
+            ...rows.map(row => row.join(","))
+        ].join("\n");
+
+        // Download logic
+        const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `pixeon_urunler_${new Date().toISOString().split('T')[0]}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        addNotification("success", `${filteredProducts.length} ürün dışa aktarıldı.`);
+    };
+
     // Advanced Filtering (Category + Search + Stock)
     const filteredProducts = products
         .filter(p => {
@@ -231,7 +271,10 @@ export default function AdminProducts() {
                     </p>
                 </div>
                 <div className="flex items-center gap-3">
-                    <button className="bg-slate-900 border border-white/10 text-slate-300 px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-slate-800 transition-all">
+                    <button 
+                        onClick={handleExport}
+                        className="bg-slate-900 border border-white/10 text-slate-300 px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-slate-800 transition-all active:scale-95"
+                    >
                         <Download size={18} />
                         Dışa Aktar
                     </button>
