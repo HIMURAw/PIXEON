@@ -5,7 +5,7 @@ export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
   // 1. Rotaları belirle
-  const isAdminRoute = path.startsWith("/dashboard") || path.startsWith("/products");
+  const isAdminRoute = path.startsWith("/admin/dashboard") || path.startsWith("/products");
   const isProtectedUserRoute = path.startsWith("/hesabim");
   const isAuthRoute = path.startsWith("/login") || path.startsWith("/register");
 
@@ -41,7 +41,7 @@ export async function middleware(request: NextRequest) {
   if (isAuthRoute && session) {
     // Admin ise dashboard'a, kullanıcı ise ana sayfaya
     if (session.user.role === "ADMIN") {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
+      return NextResponse.redirect(new URL("/admin/dashboard", request.url));
     }
     return NextResponse.redirect(new URL("/", request.url));
   }
