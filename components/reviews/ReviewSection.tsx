@@ -1,13 +1,24 @@
 import React from "react";
+import Image from "next/image";
 import { MessageSquare, Star, Quote } from "lucide-react";
 import { getApprovedReviews } from "@/lib/actions/review-actions";
 import { getSession } from "@/lib/auth";
+import { db } from "@/lib/db";
+import { users } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 import ReviewForm from "./ReviewForm";
 import { cn } from "@/lib/utils";
 
 export default async function ReviewSection() {
     const reviews = await getApprovedReviews();
     const session = await getSession();
+
+    let currentUser = null;
+    if (session?.user) {
+        currentUser = await db.query.users.findFirst({
+            where: eq(users.id, session.user.id)
+        });
+    }
 
     return (
         <section className="space-y-16">
@@ -44,8 +55,12 @@ export default async function ReviewSection() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Review Form or Login Prompt */}
                 <div className="lg:col-span-1">
-                    {session ? (
-                        <ReviewForm userId={session.id} userName={session.name} />
+                    {currentUser ? (
+                        <ReviewForm
+                            userId={currentUser.id}
+                            userName={currentUser.name}
+                            userImage={currentUser.image ?? undefined}
+                        />
                     ) : (
                         <div className="bg-[#020617] border border-white/10 p-8 rounded-[32px] h-full flex flex-col items-center justify-center text-center space-y-6">
                             <div className="w-16 h-16 bg-slate-900 rounded-3xl border border-white/10 flex items-center justify-center text-slate-700">
@@ -82,8 +97,12 @@ export default async function ReviewSection() {
                                 </div>
                                 <p className="text-slate-300 text-sm font-medium italic leading-relaxed">"{rv.comment}"</p>
                                 <div className="flex items-center gap-3 pt-2">
-                                    <div className="w-8 h-8 bg-blue-600/10 rounded-lg flex items-center justify-center text-blue-400 font-black text-xs">
-                                        {rv.user.name[0]}
+                                    <div className="w-8 h-8 bg-blue-600/10 rounded-lg overflow-hidden flex items-center justify-center text-blue-400 font-black text-xs relative">
+                                        {rv.user.image ? (
+                                            <Image src={rv.user.image} alt={rv.user.name} fill className="object-cover" />
+                                        ) : (
+                                            rv.user.name[0]
+                                        )}
                                     </div>
                                     <span className="text-xs font-black text-white uppercase tracking-wider">{rv.user.name}</span>
                                 </div>

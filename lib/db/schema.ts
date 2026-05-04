@@ -15,6 +15,19 @@ export const users = mysqlTable("users", {
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
 });
 
+export const userAddresses = mysqlTable("user_addresses", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  userId: varchar("user_id", { length: 255 }).notNull().references(() => users.id),
+  title: varchar("title", { length: 100 }).notNull(), // Home, Work, etc.
+  name: varchar("name", { length: 255 }),
+  phone: varchar("phone", { length: 20 }),
+  city: varchar("city", { length: 100 }).notNull(),
+  district: varchar("district", { length: 100 }).notNull(),
+  addressDetail: text("address_detail").notNull(),
+  isDefault: boolean("is_default").default(false).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // 2. Catalog Management
 export const categories = mysqlTable("categories", {
   id: varchar("id", { length: 255 }).primaryKey(),

@@ -35,7 +35,6 @@ export default function RootLayout({
           {children}
           <SupportWidget />
         </SupportProvider>
-        <Footer />
       </body>
     </html>
   );

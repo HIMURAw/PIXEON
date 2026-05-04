@@ -1,11 +1,12 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { users } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
+import { users, userAddresses } from "@/lib/db/schema";
+import { eq, and } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import fs from "fs/promises";
 import path from "path";
+import { randomUUID } from "crypto";
 
 export async function uploadProfilePicture(userId: string, formData: FormData) {
   try {
@@ -45,7 +46,7 @@ export async function uploadProfilePicture(userId: string, formData: FormData) {
     await db.update(users).set({ image: imageUrl }).where(eq(users.id, userId));
 
     revalidatePath("/");
-    revalidatePath("/admin/customers"); // If there is a customers page
+    revalidatePath("/admin/customers");
 
     return { success: true, imageUrl };
   } catch (error) {
@@ -63,5 +64,95 @@ export async function getUserProfile(userId: string) {
     } catch (error) {
         console.error("Error fetching user profile:", error);
         return null;
+    }
+}
+
+export async function updateUserProfile(userId: string, data: { name?: string; phone?: string }) {
+    try {
+        await db.update(users).set(data).where(eq(users.id, userId));
+        revalidatePath("/hesabim");
+        return { success: true };
+    } catch (error) {
+        console.error("Error updating profile:", error);
+        return { success: false, error: "Profil güncellenemedi." };
+    }
+}
+
+export async function getUserAddresses(userId: string) {
+    try {
+        const addresses = await db.select().from(userAddresses).where(eq(userAddresses.userId, userId));
+        return JSON.parse(JSON.stringify(addresses));
+    } catch (error) {
+        console.error("Error fetching addresses:", error);
+        return [];
+    }
+}
+
+export async function addAddress(userId: string, data: any) {
+    try {
+        const id = randomUUID();
+        
+        // If it's the first address, make it default
+        const existing = await db.select().from(userAddresses).where(eq(userAddresses.userId, userId));
+        const isDefault = existing.length === 0 || data.isDefault;
+
+        if (isDefault) {
+            // Remove default from others
+            await db.update(userAddresses).set({ isDefault: false }).where(eq(userAddresses.userId, userId));
+        }
+
+        await db.insert(userAddresses).values({
+            id,
+            userId,
+            title: data.title,
+            city: data.city,
+            district: data.district,
+            addressDetail: data.addressDetail,
+            isDefault
+        });
+
+        if (isDefault) {
+            await db.update(users).set({ address: id }).where(eq(users.id, userId));
+        }
+
+        revalidatePath("/hesabim");
+        return { success: true };
+    } catch (error) {
+        console.error("Error adding address:", error);
+        return { success: false, error: "Adres eklenemedi." };
+    }
+}
+
+export async function deleteAddress(userId: string, addressId: string) {
+    try {
+        await db.delete(userAddresses).where(and(eq(userAddresses.id, addressId), eq(userAddresses.userId, userId)));
+        
+        // If the deleted address was the default one, clear users.address
+        const user = await db.query.users.findFirst({ where: eq(users.id, userId) });
+        if (user?.address === addressId) {
+            await db.update(users).set({ address: null }).where(eq(users.id, userId));
+        }
+
+        revalidatePath("/hesabim");
+        return { success: true };
+    } catch (error) {
+        console.error("Error deleting address:", error);
+        return { success: false, error: "Adres silinemedi." };
+    }
+}
+
+export async function setDefaultAddress(userId: string, addressId: string) {
+    try {
+        await db.update(userAddresses).set({ isDefault: false }).where(eq(userAddresses.userId, userId));
+        await db.update(userAddresses).set({ isDefault: true }).where(and(eq(userAddresses.id, addressId), eq(userAddresses.userId, userId)));
+        
+        // Sync to users table
+        await db.update(users).set({ address: addressId }).where(eq(users.id, userId));
+
+        revalidatePath("/hesabim");
+        return { success: true };
+    } catch (error) {
+        console.error("Error setting default address:", error);
+        return { success: false, error: "Varsayılan adres ayarlanamadı." };
     }
 }

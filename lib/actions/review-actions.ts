@@ -71,6 +71,7 @@ export async function getApprovedReviews() {
       createdAt: reviews.createdAt,
       user: {
         name: users.name,
+        image: users.image,
       }
     })
     .from(reviews)
