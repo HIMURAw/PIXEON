@@ -1,24 +1,26 @@
 import React from "react";
 import Image from "next/image";
-import { MessageSquare, Star, Quote } from "lucide-react";
+import { MessageSquare, Star, Quote, Heart, Package } from "lucide-react";
 import { getApprovedReviews } from "@/lib/actions/review-actions";
 import { getSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { users } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import ReviewForm from "./ReviewForm";
+import ReviewLikeButton from "./ReviewLikeButton";
 import { cn } from "@/lib/utils";
 
 export default async function ReviewSection() {
-    const reviews = await getApprovedReviews();
     const session = await getSession();
-
+    
     let currentUser = null;
     if (session?.user) {
         currentUser = await db.query.users.findFirst({
             where: eq(users.id, session.user.id)
         });
     }
+
+    const reviews = await getApprovedReviews(currentUser?.id);
 
     return (
         <section className="space-y-16">
@@ -86,7 +88,8 @@ export default async function ReviewSection() {
                         </div>
                     ) : (
                         reviews.map((rv: any) => (
-                            <div key={rv.id} className="bg-slate-900/30 border border-white/5 p-8 rounded-[32px] space-y-6 hover:border-white/10 transition-all group">
+                            <div key={rv.id} className="bg-slate-900/30 border border-white/5 p-8 rounded-[32px] space-y-5 hover:border-white/10 transition-all group flex flex-col">
+                                {/* Stars + Date */}
                                 <div className="flex items-center justify-between">
                                     <div className="flex gap-1">
                                         {[...Array(5)].map((_, i) => (
@@ -95,16 +98,38 @@ export default async function ReviewSection() {
                                     </div>
                                     <span className="text-[10px] text-slate-600 font-bold uppercase">{new Date(rv.createdAt).toLocaleDateString('tr-TR')}</span>
                                 </div>
-                                <p className="text-slate-300 text-sm font-medium italic leading-relaxed">"{rv.comment}"</p>
-                                <div className="flex items-center gap-3 pt-2">
-                                    <div className="w-8 h-8 bg-blue-600/10 rounded-lg overflow-hidden flex items-center justify-center text-blue-400 font-black text-xs relative">
-                                        {rv.user.image ? (
-                                            <Image src={rv.user.image} alt={rv.user.name} fill className="object-cover" />
-                                        ) : (
-                                            rv.user.name[0]
-                                        )}
+
+                                {/* Product badge */}
+                                {rv.product?.name && (
+                                    <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600/10 text-blue-400 rounded-full text-[10px] font-black uppercase tracking-widest border border-blue-500/10 w-fit">
+                                        <Package size={10} />
+                                        {rv.product.name}
                                     </div>
-                                    <span className="text-xs font-black text-white uppercase tracking-wider">{rv.user.name}</span>
+                                )}
+
+                                {/* Comment */}
+                                <p className="text-slate-300 text-sm font-medium italic leading-relaxed flex-1">"{rv.comment}"</p>
+
+                                {/* User + Like */}
+                                <div className="flex items-center justify-between pt-2">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-8 h-8 bg-blue-600/10 rounded-lg overflow-hidden flex items-center justify-center text-blue-400 font-black text-xs relative">
+                                            {rv.user.image ? (
+                                                <Image src={rv.user.image} alt={rv.user.name} fill className="object-cover" />
+                                            ) : (
+                                                rv.user.name[0]
+                                            )}
+                                        </div>
+                                        <span className="text-xs font-black text-white uppercase tracking-wider">{rv.user.name}</span>
+                                    </div>
+
+                                    {/* Like button */}
+                                    <ReviewLikeButton
+                                        reviewId={rv.id}
+                                        initialLikes={rv.likes}
+                                        initialLiked={rv.likedByUser}
+                                        userId={currentUser?.id ?? null}
+                                    />
                                 </div>
                             </div>
                         ))

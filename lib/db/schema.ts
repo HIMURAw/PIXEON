@@ -91,6 +91,13 @@ export const reviews = mysqlTable("reviews", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const reviewLikes = mysqlTable("review_likes", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  reviewId: varchar("review_id", { length: 255 }).notNull().references(() => reviews.id),
+  userId: varchar("user_id", { length: 255 }).notNull().references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 export const coupons = mysqlTable("coupons", {
   id: varchar("id", { length: 255 }).primaryKey(),
   code: varchar("code", { length: 50 }).notNull().unique(),
