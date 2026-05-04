@@ -68,7 +68,7 @@ export const orderItems = mysqlTable("order_items", {
 // 4. Marketing & Content
 export const reviews = mysqlTable("reviews", {
   id: varchar("id", { length: 255 }).primaryKey(),
-  productId: varchar("product_id", { length: 255 }).references(() => products.id).notNull(),
+  productId: varchar("product_id", { length: 255 }).references(() => products.id),
   userId: varchar("user_id", { length: 255 }).references(() => users.id).notNull(),
   rating: int("rating").notNull(),
   comment: text("comment"),

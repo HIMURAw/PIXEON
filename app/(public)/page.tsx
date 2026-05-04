@@ -11,6 +11,7 @@ import PromoVerticalSmall from "@/components/promo/PromoVerticalSmall";
 import PromoBanner from "@/components/promo/PromoBanner";
 import Products from "@/components/products/newProducts/newProducts";
 import NewProductsSidebar from "@/components/products/newProducts/NewProductsSidebar";
+import ReviewSection from "@/components/reviews/ReviewSection";
 
 export default function Home() {
     return (
@@ -56,6 +57,11 @@ export default function Home() {
                     <main>
                         <Products limit={6} />
                     </main>
+                </div>
+
+                {/* YORUMLAR BÖLÜMÜ */}
+                <div className="pt-20 border-t border-white/5">
+                    <ReviewSection />
                 </div>
             </div>
         </>
