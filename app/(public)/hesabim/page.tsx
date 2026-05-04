@@ -27,7 +27,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { uploadProfilePicture, updateUserProfile, getUserAddresses, addAddress, deleteAddress, setDefaultAddress } from "@/lib/actions/user-actions";
-import { Camera, Plus, Trash2, CheckCircle2, X } from "lucide-react";
+import { Camera, Plus } from "lucide-react";
+import { NotificationToast, ConfirmModal } from "@/components/ui/Feedback";
+import type { NotificationType } from "@/components/ui/Feedback";
 
 type TabType = "dashboard" | "orders" | "addresses" | "profile" | "favorites";
 
@@ -35,12 +37,11 @@ export default function AccountPage() {
     const [activeTab, setActiveTab] = useState<TabType>("dashboard");
     const [user, setUser] = useState<any>(null);
     const [loading, setLoading] = useState(true);
-    const [notification, setNotification] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
+    const [notification, setNotification] = useState<{ message: string; type: NotificationType } | null>(null);
     const router = useRouter();
 
-    const showNotification = (message: string, type: 'success' | 'error' = 'success') => {
+    const showNotification = (message: string, type: NotificationType = "success") => {
         setNotification({ message, type });
-        setTimeout(() => setNotification(null), 3000);
     };
 
     const formatPhoneNumber = (value: string) => {
@@ -207,19 +208,12 @@ export default function AccountPage() {
                 </div>
             </div>
 
-            {/* NOTIFICATION TOAST */}
             {notification && (
-                <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[200] animate-in slide-in-from-bottom-5 duration-300">
-                    <div className={cn(
-                        "px-8 py-4 rounded-2xl shadow-2xl backdrop-blur-xl border flex items-center gap-4 min-w-[300px]",
-                        notification.type === 'success' 
-                            ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" 
-                            : "bg-red-500/10 border-red-500/20 text-red-400"
-                    )}>
-                        {notification.type === 'success' ? <CheckCircle2 size={20} /> : <X size={20} />}
-                        <span className="font-black text-sm uppercase tracking-widest">{notification.message}</span>
-                    </div>
-                </div>
+                <NotificationToast
+                    message={notification.message}
+                    type={notification.type}
+                    onClose={() => setNotification(null)}
+                />
             )}
 
             <Footer />
@@ -337,6 +331,7 @@ function AddressesView({ user, showNotification, formatPhone }: { user: any, sho
     const [addresses, setAddresses] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
+    const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
     const [newAddress, setNewAddress] = useState({
         title: "",
         city: "",
@@ -370,8 +365,13 @@ function AddressesView({ user, showNotification, formatPhone }: { user: any, sho
     };
 
     const handleDelete = async (id: string) => {
-        if (!confirm("Bu adresi silmek istediğinize emin misiniz?")) return;
-        const result = await deleteAddress(user.id, id);
+        setConfirmDeleteId(id);
+    };
+
+    const confirmDelete = async () => {
+        if (!confirmDeleteId) return;
+        const result = await deleteAddress(user.id, confirmDeleteId);
+        setConfirmDeleteId(null);
         if (result.success) {
             fetchAddresses();
             showNotification("Adres silindi.");
@@ -468,16 +468,20 @@ function AddressesView({ user, showNotification, formatPhone }: { user: any, sho
                 </div>
             )}
 
-            {/* ADDRESS MODAL */}
+            {/* ADDRESS ADD MODAL */}
             {showModal && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 overflow-hidden">
-                    <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-xl" onClick={() => setShowModal(false)}></div>
-                    <div className="relative w-full max-w-2xl bg-[#0b1220] border border-white/10 rounded-[48px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 max-h-[90vh] flex flex-col">
-                        <div className="p-10 space-y-8 overflow-y-auto custom-scrollbar">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
+                    <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-xl" onClick={() => setShowModal(false)} />
+                    <div className="relative w-full max-w-2xl bg-[#0b1220] border border-white/10 rounded-[48px] shadow-2xl animate-in zoom-in-95 duration-300 max-h-[90vh] flex flex-col">
+                        <div className="p-10 space-y-8 overflow-y-auto">
                             <div className="flex items-center justify-between">
                                 <h3 className="text-2xl font-black text-white">Yeni Adres</h3>
-                                <button onClick={() => setShowModal(false)} className="p-2 hover:bg-white/5 rounded-full transition-colors text-slate-500">
-                                    <X size={24} />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowModal(false)}
+                                    className="p-2 hover:bg-white/5 rounded-full transition-colors text-slate-500"
+                                >
+                                    <Plus size={24} className="rotate-45" />
                                 </button>
                             </div>
 
@@ -511,6 +515,19 @@ function AddressesView({ user, showNotification, formatPhone }: { user: any, sho
                         </div>
                     </div>
                 </div>
+            )}
+
+            {/* DELETE CONFIRM MODAL */}
+            {confirmDeleteId && (
+                <ConfirmModal
+                    title="Adresi Sil"
+                    description="Bu adresi silmek istediğinize emin misiniz? Bu işlem geri alınamaz."
+                    confirmLabel="Evet, Sil"
+                    cancelLabel="İptal"
+                    destructive
+                    onConfirm={confirmDelete}
+                    onCancel={() => setConfirmDeleteId(null)}
+                />
             )}
         </div>
     );
