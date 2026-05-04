@@ -26,6 +26,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { uploadProfilePicture } from "@/lib/actions/user-actions";
+import { Camera } from "lucide-react";
 
 type TabType = "dashboard" | "orders" | "addresses" | "profile" | "favorites";
 
@@ -104,8 +106,12 @@ export default function AccountPage() {
                                 <div className="flex flex-col items-center text-center space-y-4">
                                     <div className="relative group">
                                         <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-sky-400 rounded-full blur opacity-40 group-hover:opacity-75 transition duration-1000"></div>
-                                        <div className="relative w-20 h-20 bg-slate-950 rounded-full border-2 border-white/10 flex items-center justify-center font-black text-white text-2xl uppercase">
-                                            {user?.name?.substring(0, 2) || "PX"}
+                                        <div className="relative w-20 h-20 bg-slate-950 rounded-full border-2 border-white/10 overflow-hidden flex items-center justify-center font-black text-white text-2xl uppercase">
+                                            {user?.image ? (
+                                                <Image src={user.image} alt={user.name} fill className="object-cover" />
+                                            ) : (
+                                                user?.name?.substring(0, 2) || "PX"
+                                            )}
                                         </div>
                                     </div>
                                     <div>
@@ -347,6 +353,48 @@ function ProfileView({ user }: { user: any }) {
             <div>
                 <h2 className="text-3xl font-black text-white tracking-tight mb-3">Profil Ayarları</h2>
                 <p className="text-slate-500 font-medium leading-relaxed">Kişisel bilgilerini ve şifre güvenliğini buradan yönet.</p>
+            </div>
+
+            <div className="flex flex-col md:flex-row items-center gap-10 p-8 bg-white/[0.03] border border-white/5 rounded-[40px]">
+                <div className="relative group">
+                    <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-sky-400 rounded-full blur opacity-40"></div>
+                    <div className="relative w-32 h-32 bg-slate-950 rounded-full border-2 border-white/10 overflow-hidden flex items-center justify-center font-black text-white text-4xl uppercase shadow-2xl">
+                        {user?.image ? (
+                            <Image src={user.image} alt={user.name} fill className="object-cover" />
+                        ) : (
+                            user?.name?.substring(0, 2) || "PX"
+                        )}
+                    </div>
+                </div>
+                <div className="space-y-4 text-center md:text-left">
+                    <div>
+                        <h4 className="text-lg font-black text-white tracking-tight">Profil Fotoğrafı</h4>
+                        <p className="text-sm text-slate-500 font-medium">PNG, JPG veya WEBP (Max. 2MB)</p>
+                    </div>
+                    <label className="inline-flex items-center gap-2 px-6 py-3 bg-white/5 border border-white/10 rounded-2xl text-xs font-black text-white hover:bg-blue-600 hover:border-blue-600 transition-all cursor-pointer uppercase tracking-widest active:scale-95 shadow-lg shadow-black/20">
+                        <Camera size={16} />
+                        FOTOĞRAF YÜKLE
+                        <input 
+                            type="file" 
+                            className="hidden" 
+                            accept="image/*"
+                            onChange={async (e) => {
+                                const file = e.target.files?.[0];
+                                if (!file) return;
+                                
+                                const formData = new FormData();
+                                formData.append("file", file);
+                                
+                                const result = await uploadProfilePicture(user.id, formData);
+                                if (result.success) {
+                                    window.location.reload();
+                                } else {
+                                    alert(result.error);
+                                }
+                            }}
+                        />
+                    </label>
+                </div>
             </div>
 
             <form className="space-y-10 max-w-3xl">

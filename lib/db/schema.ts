@@ -10,6 +10,7 @@ export const users = mysqlTable("users", {
   role: mysqlEnum("role", ["USER", "ADMIN"]).default("USER").notNull(),
   phone: varchar("phone", { length: 20 }),
   address: text("address"),
+  image: varchar("image", { length: 255 }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
 });
