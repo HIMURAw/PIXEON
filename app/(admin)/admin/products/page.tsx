@@ -51,6 +51,7 @@ export default function AdminProducts() {
 
     const [products, setProducts] = useState<Product[]>([]);
     const [dbCategories, setDbCategories] = useState<any[]>([]);
+    const currentCategory = dbCategories.find(c => c.slug === categoryFilter);
     const [loading, setLoading] = useState(true);
     const [viewMode, setViewMode] = useState<"list" | "grid">("list");
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -263,11 +264,13 @@ export default function AdminProducts() {
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                 <div>
                     <h1 className="text-3xl font-extrabold text-white tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
-                        Ürün Yönetimi
+                        {currentCategory ? `${currentCategory.name} Yönetimi` : "Ürün Yönetimi"}
                     </h1>
                     <p className="text-slate-500 mt-1 flex items-center gap-2">
                         <Package2 className="text-blue-400" size={14} />
-                        Katalogdaki ürünlerin stok, fiyat ve durumlarını yönetin.
+                        {currentCategory 
+                            ? `${currentCategory.name} kategorisindeki ürünlerin stok, fiyat ve durumlarını yönetin.`
+                            : "Katalogdaki ürünlerin stok, fiyat ve durumlarını yönetin."}
                     </p>
                 </div>
                 <div className="flex items-center gap-3">
@@ -291,9 +294,27 @@ export default function AdminProducts() {
             {/* Quick Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {[
-                    { label: "Toplam Ürün", value: products.length.toString(), icon: Package2, color: "text-blue-400", bg: "bg-blue-400/10" },
-                    { label: "Düşük Stok", value: products.filter(p => p.stock < 10).length.toString(), icon: AlertCircle, color: "text-amber-400", bg: "bg-amber-400/10" },
-                    { label: "Aktif Kategoriler", value: "8", icon: LayoutGrid, color: "text-emerald-400", bg: "bg-emerald-400/10" },
+                    { 
+                        label: currentCategory ? `${currentCategory.name} Sayısı` : "Toplam Ürün", 
+                        value: filteredProducts.length.toString(), 
+                        icon: Package2, 
+                        color: "text-blue-400", 
+                        bg: "bg-blue-400/10" 
+                    },
+                    { 
+                        label: "Düşük Stok", 
+                        value: filteredProducts.filter(p => p.stock < 10).length.toString(), 
+                        icon: AlertCircle, 
+                        color: "text-amber-400", 
+                        bg: "bg-amber-400/10" 
+                    },
+                    { 
+                        label: "Aktif Kategoriler", 
+                        value: dbCategories.length.toString(), 
+                        icon: LayoutGrid, 
+                        color: "text-emerald-400", 
+                        bg: "bg-emerald-400/10" 
+                    },
                 ].map((stat, i) => (
                     <div key={i} className="bg-[#020617] border border-white/10 p-6 rounded-2xl flex items-center gap-4">
                         <div className={cn("p-3 rounded-xl", stat.bg, stat.color)}>

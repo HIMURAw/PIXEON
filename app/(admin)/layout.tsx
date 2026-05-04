@@ -47,10 +47,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             title: "KATALOG YÖNETİMİ",
             items: [
                 { label: "Tüm Ürünler", icon: Package, href: "/admin/products" },
-                { label: "Konsollar", icon: Gamepad2, href: "/admin/products?category=consoles" },
-                { label: "Oyunlar", icon: Disc, href: "/admin/products?category=games" },
-                { label: "Aksesuarlar", icon: Headset, href: "/admin/products?category=accessories" },
-                { label: "Dijital Kodlar", icon: CreditCard, href: "/admin/products?category=codes" },
+                { label: "Konsollar", icon: Gamepad2, href: "/admin/products?category=konsollar" },
+                { label: "Oyunlar", icon: Disc, href: "/admin/products?category=oyunlar" },
+                { label: "Aksesuarlar", icon: Headset, href: "/admin/products?category=aksesuarlar" },
+                { label: "Dijital Kodlar", icon: CreditCard, href: "/admin/products?category=dijital-kodlar" },
                 { label: "Kategoriler", icon: Layers, href: "/admin/categories" },
             ]
         },
