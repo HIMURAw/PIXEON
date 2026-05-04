@@ -27,6 +27,20 @@ export async function uploadProfilePicture(userId: string, formData: FormData) {
 
     const imageUrl = `/profile/${fileName}`;
 
+    // Get current user to check for old image
+    const currentUser = await db.query.users.findFirst({
+      where: eq(users.id, userId),
+    });
+
+    if (currentUser?.image) {
+      const oldFilePath = path.join(process.cwd(), "public", currentUser.image);
+      try {
+        await fs.unlink(oldFilePath);
+      } catch (e) {
+        console.error("Old file could not be deleted:", e);
+      }
+    }
+
     // Update user in DB
     await db.update(users).set({ image: imageUrl }).where(eq(users.id, userId));
 

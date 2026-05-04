@@ -2,15 +2,17 @@
 
 import React, { useState } from "react";
 import { Star, Send, User } from "lucide-react";
+import Image from "next/image";
 import { createReview } from "@/lib/actions/review-actions";
 import { cn } from "@/lib/utils";
 
 interface ReviewFormProps {
     userId: string;
     userName: string;
+    userImage?: string;
 }
 
-export default function ReviewForm({ userId, userName }: ReviewFormProps) {
+export default function ReviewForm({ userId, userName, userImage }: ReviewFormProps) {
     const [rating, setRating] = useState(5);
     const [hover, setHover] = useState(0);
     const [comment, setComment] = useState("");
@@ -62,8 +64,12 @@ export default function ReviewForm({ userId, userName }: ReviewFormProps) {
             
             <div className="relative z-10 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-slate-900 rounded-xl border border-white/5 flex items-center justify-center text-slate-500">
-                        <User size={20} />
+                    <div className="w-10 h-10 bg-slate-900 rounded-xl border border-white/5 overflow-hidden flex items-center justify-center text-slate-500 relative">
+                        {userImage ? (
+                            <Image src={userImage} alt={userName} fill className="object-cover" />
+                        ) : (
+                            <User size={20} />
+                        )}
                     </div>
                     <div>
                         <h4 className="text-sm font-black text-white">{userName}</h4>
