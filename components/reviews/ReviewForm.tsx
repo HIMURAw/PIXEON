@@ -81,15 +81,17 @@ export default function ReviewForm({ userId, userName, userImage }: ReviewFormPr
 
     if (submitted) {
         return (
-            <div className="bg-slate-900/50 border border-emerald-500/20 p-8 rounded-[32px] text-center space-y-4 animate-in zoom-in-95 duration-500">
-                <div className="w-16 h-16 bg-emerald-500/10 text-emerald-400 rounded-full flex items-center justify-center mx-auto">
-                    <Star size={32} fill="currentColor" />
+            <div className="bg-white/[0.03] border border-emerald-500/20 p-10 rounded-[40px] text-center space-y-6 animate-in zoom-in-95 duration-500 backdrop-blur-xl">
+                <div className="w-20 h-20 bg-emerald-500/10 text-emerald-400 rounded-3xl flex items-center justify-center mx-auto shadow-2xl shadow-emerald-500/10 border border-emerald-500/20">
+                    <Star size={36} fill="currentColor" />
                 </div>
-                <h3 className="text-xl font-black text-white">Teşekkürler!</h3>
-                <p className="text-slate-400 text-sm">Yorumunuz başarıyla gönderildi ve onaylandıktan sonra yayına alınacaktır.</p>
+                <div className="space-y-2">
+                    <h3 className="text-2xl font-black text-white">Harika!</h3>
+                    <p className="text-slate-400 text-sm font-medium leading-relaxed">Yorumunuz başarıyla gönderildi ve onaylandıktan sonra yayına alınacaktır.</p>
+                </div>
                 <button
                     onClick={() => setSubmitted(false)}
-                    className="text-blue-400 text-xs font-black uppercase tracking-widest hover:underline"
+                    className="w-full bg-slate-900 text-white text-xs font-black uppercase tracking-[0.2em] py-4 rounded-2xl hover:bg-slate-800 transition-all border border-white/5"
                 >
                     YENİ BİR YORUM YAP
                 </button>
@@ -98,7 +100,7 @@ export default function ReviewForm({ userId, userName, userImage }: ReviewFormPr
     }
 
     return (
-        <form onSubmit={handleSubmit} className="bg-[#020617] border border-white/10 p-8 rounded-[32px] space-y-6 shadow-2xl relative overflow-hidden group">
+        <form onSubmit={handleSubmit} className="bg-white/[0.03] border border-white/10 p-8 rounded-[40px] space-y-6 shadow-2xl relative overflow-hidden group backdrop-blur-xl">
             <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
 
             {/* User + Rating */}

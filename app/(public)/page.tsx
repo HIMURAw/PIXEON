@@ -12,6 +12,7 @@ import PromoBanner from "@/components/promo/PromoBanner";
 import Products from "@/components/products/newProducts/newProducts";
 import NewProductsSidebar from "@/components/products/newProducts/NewProductsSidebar";
 import ReviewSection from "@/components/reviews/ReviewSection";
+import Footer from "@/components/footer/Footer";
 
 export default function Home() {
     return (
@@ -64,6 +65,7 @@ export default function Home() {
                     <ReviewSection />
                 </div>
             </div>
+            <Footer />
         </>
     );
 }

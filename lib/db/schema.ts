@@ -1,4 +1,4 @@
-import { mysqlTable, varchar, text, double, int, timestamp, mysqlEnum, boolean } from "drizzle-orm/mysql-core";
+import { mysqlTable, varchar, text, double, int, timestamp, mysqlEnum, boolean, primaryKey } from "drizzle-orm/mysql-core";
 import { sql } from "drizzle-orm";
 
 // 1. Users & Authentication
