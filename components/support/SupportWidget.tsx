@@ -24,6 +24,8 @@ interface Message {
     role: "user" | "ai" | "agent";
     text: string;
     time: string;
+    senderName?: string;
+    senderImage?: string;
     isMarkdown?: boolean;
 }
 
@@ -189,6 +191,8 @@ export default function SupportWidget() {
                         id: m.id,
                         role: m.senderRole === "ADMIN" ? "agent" : "user",
                         text: m.message,
+                        senderName: m.senderName,
+                        senderImage: m.senderImage,
                         time: new Date(m.createdAt).toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" })
                     }));
                     
@@ -373,10 +377,23 @@ export default function SupportWidget() {
                                     {isLiveEnabled && user && liveMessages.length === 0 && <div className="flex-1 flex flex-col items-center justify-center text-center p-6"><p className="text-slate-500 text-xs">Bir mesaj yazarak ekibimizle görüşmeye başlayın.</p></div>}
                                     {isLiveEnabled && user && liveMessages.map((msg) => (
                                         <div key={msg.id} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-                                            {msg.role === "agent" && <div className="w-7 h-7 rounded-full bg-gradient-to-br from-sky-600 to-cyan-500 flex items-center justify-center shrink-0 mr-2 mt-auto mb-1"><Headset size={12} className="text-white" /></div>}
-                                            <div className={`max-w-[78%] px-4 py-3 rounded-2xl text-sm ${msg.role === "user" ? "bg-blue-600 text-white rounded-tr-sm" : "bg-slate-900 border border-white/6 text-slate-300 rounded-tl-sm"}`}>
-                                                <p className="leading-relaxed">{msg.text}</p>
-                                                <span className={`text-[9px] mt-1.5 block ${msg.role === "user" ? "text-white/40 text-right" : "text-slate-600"}`}>{msg.time}</span>
+                                            {msg.role === "agent" && (
+                                                <div className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center shrink-0 mr-2 mt-auto mb-1 overflow-hidden bg-slate-900">
+                                                    {msg.senderImage ? (
+                                                        <img src={msg.senderImage} alt={msg.senderName} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <Headset size={14} className="text-white" />
+                                                    )}
+                                                </div>
+                                            )}
+                                            <div className="flex flex-col max-w-[78%]">
+                                                {msg.role === "agent" && (
+                                                    <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">{msg.senderName}</span>
+                                                )}
+                                                <div className={`px-4 py-3 rounded-2xl text-sm ${msg.role === "user" ? "bg-blue-600 text-white rounded-tr-sm" : "bg-slate-900 border border-white/6 text-slate-300 rounded-tl-sm"}`}>
+                                                    <p className="leading-relaxed">{msg.text}</p>
+                                                    <span className={`text-[9px] mt-1.5 block ${msg.role === "user" ? "text-white/40 text-right" : "text-slate-600"}`}>{msg.time}</span>
+                                                </div>
                                             </div>
                                         </div>
                                     ))}

@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { liveChatMessages } from "@/lib/db/schema";
 import { eq, asc, desc, sql } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
+import { getSession } from "@/lib/auth";
 
 export async function GET(req: NextRequest) {
     const sessionId = req.nextUrl.searchParams.get("sessionId");
@@ -38,6 +39,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
     try {
         const { sessionId, message } = await req.json();
+        const session = await getSession();
 
         if (!sessionId || !message) {
             return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -46,7 +48,8 @@ export async function POST(req: NextRequest) {
         const newMessage = {
             id: `msg_admin_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
             sessionId,
-            senderName: "Destek Ekibi",
+            senderName: session?.user?.name || "Destek Ekibi",
+            senderImage: session?.user?.image || null,
             senderRole: "ADMIN" as const,
             message,
             createdAt: new Date(),
@@ -63,5 +66,18 @@ export async function POST(req: NextRequest) {
     } catch (error) {
         console.error("Admin response error:", error);
         return NextResponse.json({ error: "Failed to send admin response" }, { status: 500 });
+    }
+}
+
+export async function DELETE(req: NextRequest) {
+    try {
+        const sessionId = req.nextUrl.searchParams.get("sessionId");
+        if (!sessionId) return NextResponse.json({ error: "Missing sessionId" }, { status: 400 });
+
+        await db.delete(liveChatMessages).where(eq(liveChatMessages.sessionId, sessionId));
+
+        return NextResponse.json({ success: true });
+    } catch (error) {
+        return NextResponse.json({ error: "Failed to delete session" }, { status: 500 });
     }
 }

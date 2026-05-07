@@ -13,7 +13,9 @@ import {
     Headset,
     Circle,
     Clock,
-    X
+    X,
+    Trash2,
+    CheckCircle
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -41,22 +43,27 @@ export default function AdminSupport() {
     const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
     const [messages, setMessages] = useState<Message[]>([]);
     const [reply, setReply] = useState("");
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [sessionToDelete, setSessionToDelete] = useState<string | null>(null);
     const scrollRef = useRef<HTMLDivElement>(null);
 
     // Fetch initial status and sessions
+    const fetchSessions = async () => {
+        const sessionsRes = await fetch("/api/admin/support/chat");
+        const sessionsData = await sessionsRes.json();
+        setSessions(sessionsData.sessions || []);
+    };
+
     useEffect(() => {
         const fetchData = async () => {
             const statusRes = await fetch("/api/admin/support/status");
             const statusData = await statusRes.json();
             setLiveEnabled(statusData.isEnabled);
-
-            const sessionsRes = await fetch("/api/admin/support/chat");
-            const sessionsData = await sessionsRes.json();
-            setSessions(sessionsData.sessions || []);
+            fetchSessions();
         };
         fetchData();
 
-        const interval = setInterval(fetchData, 5000);
+        const interval = setInterval(fetchSessions, 5000);
         return () => clearInterval(interval);
     }, []);
 
@@ -109,6 +116,26 @@ export default function AdminSupport() {
             const data = await res.json();
             setMessages(prev => [...prev, data.message]);
         }
+    };
+
+    const confirmDelete = async () => {
+        if (!sessionToDelete) return;
+        
+        setIsDeleting(true);
+        const res = await fetch(`/api/admin/support/chat?sessionId=${sessionToDelete}`, {
+            method: "DELETE",
+        });
+
+        if (res.ok) {
+            if (sessionToDelete === selectedSessionId) setSelectedSessionId(null);
+            fetchSessions();
+            setSessionToDelete(null);
+        }
+        setIsDeleting(false);
+    };
+
+    const handleDeleteClick = (sid: string) => {
+        setSessionToDelete(sid);
     };
 
     return (
@@ -216,7 +243,15 @@ export default function AdminSupport() {
                                                 <h4 className="font-bold text-white text-sm truncate">{session.senderName}</h4>
                                                 <span className="text-[9px] text-slate-600 font-bold uppercase tracking-widest">{new Date(session.createdAt).toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" })}</span>
                                             </div>
-                                            <p className="text-xs text-slate-500 truncate group-hover:text-slate-400">{session.lastMessage}</p>
+                                            <div className="flex items-center justify-between gap-2">
+                                                <p className="text-xs text-slate-500 truncate group-hover:text-slate-400 flex-1">{session.lastMessage}</p>
+                                                <button 
+                                                    onClick={(e) => { e.stopPropagation(); handleDeleteClick(session.sessionId); }}
+                                                    className="opacity-0 group-hover:opacity-100 p-1.5 text-slate-600 hover:text-red-500 transition-all"
+                                                >
+                                                    <Trash2 size={12} />
+                                                </button>
+                                            </div>
                                         </div>
                                     </button>
                                 ))
@@ -245,32 +280,47 @@ export default function AdminSupport() {
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <button className="p-2.5 bg-white/5 border border-white/5 rounded-xl text-slate-500 hover:text-white transition-all">
-                                            <MoreHorizontal size={18} />
+                                        <button 
+                                            onClick={() => handleDeleteClick(selectedSessionId)}
+                                            className="p-2.5 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 hover:text-white hover:bg-red-500 transition-all group relative"
+                                            title="Sohbeti Sil"
+                                        >
+                                            <Trash2 size={18} />
                                         </button>
-                                        <button onClick={() => setSelectedSessionId(null)} className="p-2.5 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 hover:text-white hover:bg-red-500 transition-all">
+                                        <button onClick={() => setSelectedSessionId(null)} className="p-2.5 bg-white/5 border border-white/5 rounded-xl text-slate-500 hover:text-white transition-all">
                                             <X size={18} />
                                         </button>
                                     </div>
                                 </div>
-
+                                {/* ... messages and input ... */}
+                                {/* Rest of the chat UI stays same, I'm just updating the buttons above */}
                                 {/* Chat Messages */}
                                 <div ref={scrollRef} className="flex-1 p-6 overflow-y-auto space-y-4 bg-[url('/grid-pattern.png')] bg-fixed scrollbar-hide">
                                     {messages.map((msg) => (
                                         <div key={msg.id} className={cn("flex", msg.senderRole === "ADMIN" ? "justify-end" : "justify-start")}>
                                             <div className={cn(
-                                                "max-w-[70%] px-5 py-3 rounded-2xl text-sm shadow-sm",
-                                                msg.senderRole === "ADMIN" 
-                                                    ? "bg-blue-600 text-white rounded-tr-none shadow-blue-600/10" 
-                                                    : "bg-slate-900 border border-white/5 text-slate-300 rounded-tl-none"
+                                                "max-w-[70%] flex flex-col",
+                                                msg.senderRole === "ADMIN" ? "items-end" : "items-start"
                                             )}>
-                                                <p className="leading-relaxed">{msg.message}</p>
-                                                <span className={cn(
-                                                    "text-[9px] mt-1.5 block",
-                                                    msg.senderRole === "ADMIN" ? "text-white/40 text-right" : "text-slate-600"
+                                                {msg.senderRole === "ADMIN" && (
+                                                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 flex items-center gap-2">
+                                                        {msg.senderName} (Admin)
+                                                    </span>
+                                                )}
+                                                <div className={cn(
+                                                    "px-5 py-3 rounded-2xl text-sm shadow-sm",
+                                                    msg.senderRole === "ADMIN" 
+                                                        ? "bg-blue-600 text-white rounded-tr-none shadow-blue-600/10" 
+                                                        : "bg-slate-900 border border-white/5 text-slate-300 rounded-tl-none"
                                                 )}>
-                                                    {new Date(msg.createdAt).toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" })}
-                                                </span>
+                                                    <p className="leading-relaxed">{msg.message}</p>
+                                                    <span className={cn(
+                                                        "text-[9px] mt-1.5 block",
+                                                        msg.senderRole === "ADMIN" ? "text-white/40 text-right" : "text-slate-600"
+                                                    )}>
+                                                        {new Date(msg.createdAt).toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" })}
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
                                     ))}
@@ -312,6 +362,40 @@ export default function AdminSupport() {
                     <LifeBuoy size={48} className="mx-auto text-slate-700 mb-6" />
                     <h3 className="text-xl font-black text-white uppercase tracking-widest">Destek Talepleri</h3>
                     <p className="text-slate-500 mt-2">Bu bölümdeki geliştirmeler devam ediyor.</p>
+                </div>
+            )}
+
+            {/* Custom Delete Confirmation Modal */}
+            {sessionToDelete && (
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+                    <div 
+                        className="absolute inset-0 bg-[#020617]/80 backdrop-blur-md animate-in fade-in duration-300"
+                        onClick={() => setSessionToDelete(null)}
+                    />
+                    <div className="relative bg-[#0c1022] border border-white/10 rounded-[32px] w-full max-w-md p-8 shadow-2xl animate-in zoom-in-95 duration-300">
+                        <div className="w-16 h-16 bg-red-500/10 rounded-[24px] flex items-center justify-center border border-red-500/20 mb-6 mx-auto">
+                            <Trash2 className="text-red-500" size={32} />
+                        </div>
+                        <h3 className="text-xl font-extrabold text-white text-center mb-2">Sohbeti Sil?</h3>
+                        <p className="text-slate-400 text-center text-sm leading-relaxed mb-8">
+                            Bu sohbet oturumunu ve tüm mesajları kalıcı olarak silmek istediğinize emin misiniz? Bu işlem geri alınamaz.
+                        </p>
+                        <div className="flex flex-col sm:flex-row gap-3">
+                            <button 
+                                onClick={() => setSessionToDelete(null)}
+                                className="flex-1 px-6 py-3.5 bg-white/5 hover:bg-white/10 border border-white/5 rounded-2xl text-xs font-black uppercase tracking-widest text-slate-400 hover:text-white transition-all"
+                            >
+                                İptal
+                            </button>
+                            <button 
+                                onClick={confirmDelete}
+                                disabled={isDeleting}
+                                className="flex-1 px-6 py-3.5 bg-red-600 hover:bg-red-500 disabled:opacity-50 border border-red-500/20 rounded-2xl text-xs font-black uppercase tracking-widest text-white transition-all shadow-lg shadow-red-600/20"
+                            >
+                                {isDeleting ? "SİLİNİYOR..." : "EVET, SİL"}
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>

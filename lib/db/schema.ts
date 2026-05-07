@@ -223,6 +223,7 @@ export const liveChatMessages = mysqlTable("live_chat_messages", {
   id: varchar("id", { length: 255 }).primaryKey(),
   sessionId: varchar("session_id", { length: 255 }).notNull(), // To group messages from same session/user
   senderName: varchar("sender_name", { length: 255 }),
+  senderImage: varchar("sender_image", { length: 255 }), // Admin profile image
   senderRole: mysqlEnum("sender_role", ["USER", "ADMIN"]).default("USER").notNull(),
   message: text("message").notNull(),
   isRead: boolean("is_read").default(false).notNull(),
