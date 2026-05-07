@@ -14,7 +14,24 @@ import NewProductsSidebar from "@/components/products/newProducts/NewProductsSid
 import ReviewSection from "@/components/reviews/ReviewSection";
 import Footer from "@/components/footer/Footer";
 
-export default function Home() {
+import { getSession } from "@/lib/auth";
+import { db } from "@/lib/db";
+import { users } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
+import { getApprovedReviews } from "@/lib/actions/review-actions";
+
+export default async function Home() {
+    const session = await getSession();
+    
+    let currentUser = null;
+    if (session?.user) {
+        currentUser = await db.query.users.findFirst({
+            where: eq(users.id, session.user.id)
+        });
+    }
+
+    const reviews = await getApprovedReviews(currentUser?.id);
+
     return (
         <>
             <TopBar />
@@ -62,7 +79,7 @@ export default function Home() {
 
                 {/* YORUMLAR BÖLÜMÜ */}
                 <div className="pt-20 border-t border-white/5">
-                    <ReviewSection />
+                    <ReviewSection currentUser={currentUser} reviews={reviews} />
                 </div>
             </div>
             <Footer />

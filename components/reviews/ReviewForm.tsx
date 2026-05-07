@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Star, Send, User, ChevronDown, Package, Search, X } from "lucide-react";
+import { Star, Send, User, ChevronDown, Package, Search, CheckCircle } from "lucide-react";
 import Image from "next/image";
 import { createReview, getProductsForReview } from "@/lib/actions/review-actions";
 import { cn } from "@/lib/utils";
@@ -81,161 +81,139 @@ export default function ReviewForm({ userId, userName, userImage }: ReviewFormPr
 
     if (submitted) {
         return (
-            <div className="bg-white/[0.03] border border-emerald-500/20 p-10 rounded-[40px] text-center space-y-6 animate-in zoom-in-95 duration-500 backdrop-blur-xl">
-                <div className="w-20 h-20 bg-emerald-500/10 text-emerald-400 rounded-3xl flex items-center justify-center mx-auto shadow-2xl shadow-emerald-500/10 border border-emerald-500/20">
-                    <Star size={36} fill="currentColor" />
+            <div className="bg-slate-900/50 border border-emerald-500/20 p-8 rounded-2xl text-center space-y-6">
+                <div className="w-16 h-16 bg-emerald-500/10 text-emerald-500 rounded-xl flex items-center justify-center mx-auto">
+                    <CheckCircle size={32} />
                 </div>
                 <div className="space-y-2">
-                    <h3 className="text-2xl font-black text-white">Harika!</h3>
-                    <p className="text-slate-400 text-sm font-medium leading-relaxed">Yorumunuz başarıyla gönderildi ve onaylandıktan sonra yayına alınacaktır.</p>
+                    <h3 className="text-xl font-bold text-white">Teşekkürler!</h3>
+                    <p className="text-slate-400 text-sm">Yorumunuz başarıyla alındı ve onay sürecine eklendi.</p>
                 </div>
                 <button
                     onClick={() => setSubmitted(false)}
-                    className="w-full bg-slate-900 text-white text-xs font-black uppercase tracking-[0.2em] py-4 rounded-2xl hover:bg-slate-800 transition-all border border-white/5"
+                    className="w-full bg-slate-800 text-white text-xs font-bold uppercase tracking-widest py-3 rounded-xl hover:bg-slate-700 transition-all border border-white/5"
                 >
-                    YENİ BİR YORUM YAP
+                    Yeni Yorum Yap
                 </button>
             </div>
         );
     }
 
     return (
-        <form onSubmit={handleSubmit} className="bg-white/[0.03] border border-white/10 p-8 rounded-[40px] space-y-6 shadow-2xl relative overflow-hidden group backdrop-blur-xl">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-
-            {/* User + Rating */}
-            <div className="relative z-10 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-slate-900 rounded-xl border border-white/5 overflow-hidden flex items-center justify-center text-slate-500 relative">
-                        {userImage ? (
-                            <Image src={userImage} alt={userName} fill className="object-cover" />
-                        ) : (
-                            <User size={20} />
-                        )}
-                    </div>
-                    <div>
-                        <h4 className="text-sm font-black text-white">{userName}</h4>
-                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Görüşlerinizi Paylaşın</p>
+        <form onSubmit={handleSubmit} className="bg-slate-900/40 border border-white/5 p-6 rounded-2xl space-y-6 shadow-xl">
+            {/* Rating + Comment Area First */}
+            <div className="space-y-4">
+                <div className="flex items-center justify-between bg-black/20 p-3 rounded-xl border border-white/5">
+                    <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest ml-1">Puanınız</span>
+                    <div className="flex items-center gap-1">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                            <button
+                                key={star}
+                                type="button"
+                                onClick={() => setRating(star)}
+                                onMouseEnter={() => setHover(star)}
+                                onMouseLeave={() => setHover(0)}
+                                className="p-0.5 transition-transform hover:scale-110"
+                            >
+                                <Star
+                                    size={18}
+                                    className={cn(
+                                        "transition-colors",
+                                        (hover || rating) >= star ? "text-yellow-500 fill-yellow-500" : "text-slate-800"
+                                    )}
+                                />
+                            </button>
+                        ))}
                     </div>
                 </div>
-                <div className="flex items-center gap-1">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                        <button
-                            key={star}
-                            type="button"
-                            onClick={() => setRating(star)}
-                            onMouseEnter={() => setHover(star)}
-                            onMouseLeave={() => setHover(0)}
-                            className="p-1 transition-all hover:scale-110"
-                        >
-                            <Star
-                                size={20}
-                                className={cn(
-                                    "transition-colors",
-                                    (hover || rating) >= star ? "text-yellow-400 fill-yellow-400" : "text-slate-700"
-                                )}
-                            />
-                        </button>
-                    ))}
+
+                <div className="space-y-2">
+                    <textarea
+                        required
+                        value={comment}
+                        onChange={(e) => setComment(e.target.value)}
+                        placeholder="Deneyiminizi anlatın..."
+                        className="w-full bg-slate-950 border border-white/5 rounded-xl p-4 text-sm text-white outline-none focus:border-blue-500/30 transition-all min-h-[120px] resize-none"
+                    ></textarea>
                 </div>
             </div>
 
-            {/* Searchable Product Dropdown */}
+            {/* Product Dropdown */}
             <div className="relative z-20" ref={dropdownRef}>
-                <label className="text-[10px] text-slate-600 font-black uppercase tracking-widest ml-1 block mb-2">
+                <label className="text-[10px] text-slate-500 font-bold uppercase tracking-widest ml-1 block mb-2">
                     Yorum Konusu
                 </label>
 
-                {/* Trigger button */}
                 <button
                     type="button"
                     onClick={() => { setDropdownOpen(prev => !prev); setSearch(""); }}
-                    className="w-full bg-slate-950 border border-white/5 rounded-2xl px-4 py-3 text-sm text-white flex items-center justify-between gap-3 hover:border-white/10 transition-all focus:border-blue-500/50 outline-none"
+                    className="w-full bg-slate-950 border border-white/5 rounded-xl px-4 py-3 text-sm text-white flex items-center justify-between gap-3 hover:border-white/10 transition-all outline-none"
                 >
-                    <span className="flex items-center gap-2 truncate">
+                    <span className="flex items-center gap-2 truncate text-slate-300">
                         {productId === "general"
-                            ? <><span className="text-base">🌐</span><span className="truncate">{selectedLabel}</span></>
-                            : <><Package size={14} className="text-blue-400 shrink-0" /><span className="truncate">{selectedLabel}</span></>
+                            ? <><span className="text-base">🌐</span><span className="truncate">Genel Mağaza Deneyimi</span></>
+                            : <><Package size={14} className="text-blue-500 shrink-0" /><span className="truncate">{selectedLabel}</span></>
                         }
                     </span>
-                    <ChevronDown size={16} className={cn("text-slate-500 shrink-0 transition-transform duration-200", dropdownOpen && "rotate-180")} />
+                    <ChevronDown size={16} className={cn("text-slate-500 transition-transform duration-300", dropdownOpen && "rotate-180")} />
                 </button>
 
-                {/* Dropdown panel */}
                 {dropdownOpen && (
-                    <div className="absolute top-full left-0 right-0 mt-2 bg-[#0b1220] border border-white/10 rounded-2xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
-                        {/* Search input */}
-                        <div className="p-3 border-b border-white/5">
-                            <div className="flex items-center gap-2 bg-slate-950 border border-white/10 rounded-xl px-3 py-2">
-                                <Search size={14} className="text-slate-500 shrink-0" />
+                    <div className="absolute top-full left-0 right-0 mt-2 bg-slate-900 border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                        <div className="p-2 border-b border-white/5">
+                            <div className="flex items-center gap-2 bg-slate-950 border border-white/10 rounded-lg px-3 py-2">
+                                <Search size={14} className="text-slate-600" />
                                 <input
                                     autoFocus
                                     type="text"
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
-                                    placeholder="Ürün ara..."
-                                    className="bg-transparent text-sm text-white outline-none w-full placeholder:text-slate-600"
+                                    placeholder="Ara..."
+                                    className="bg-transparent text-sm text-white outline-none w-full"
                                 />
-                                {search && (
-                                    <button type="button" onClick={() => setSearch("")} className="text-slate-600 hover:text-slate-400">
-                                        <X size={14} />
-                                    </button>
-                                )}
                             </div>
                         </div>
 
-                        {/* Options list */}
                         <div className="max-h-52 overflow-y-auto">
-                            {filtered.length === 0 ? (
-                                <p className="text-slate-600 text-xs text-center py-6 font-bold uppercase tracking-widest">Sonuç bulunamadı</p>
-                            ) : (
-                                filtered.map(p => (
-                                    <button
-                                        key={p.id}
-                                        type="button"
-                                        onClick={() => handleSelect(p.id, p.name)}
-                                        className={cn(
-                                            "w-full text-left px-4 py-3 text-sm flex items-center gap-3 hover:bg-white/5 transition-colors",
-                                            productId === p.id ? "text-blue-400 bg-blue-600/5" : "text-slate-300"
-                                        )}
-                                    >
-                                        {p.id === "general"
-                                            ? <span className="text-base shrink-0">🌐</span>
-                                            : <Package size={14} className="text-slate-500 shrink-0" />
-                                        }
-                                        <span className="truncate">{p.name}</span>
-                                    </button>
-                                ))
-                            )}
+                            {filtered.map(p => (
+                                <button
+                                    key={p.id}
+                                    type="button"
+                                    onClick={() => handleSelect(p.id, p.name)}
+                                    className={cn(
+                                        "w-full text-left px-4 py-3 text-xs font-bold uppercase tracking-widest flex items-center gap-3 hover:bg-blue-600/10 transition-colors",
+                                        productId === p.id ? "text-blue-400" : "text-slate-400"
+                                    )}
+                                >
+                                    {p.id === "general" ? "🌐" : <Package size={12} />}
+                                    <span className="truncate">{p.name}</span>
+                                </button>
+                            ))}
                         </div>
                     </div>
                 )}
             </div>
 
             {/* Comment */}
-            <div className="relative z-10">
+            <div className="space-y-2">
+                <label className="text-[10px] text-slate-500 font-bold uppercase tracking-widest ml-1 block">
+                    Yorumunuz
+                </label>
                 <textarea
                     required
                     value={comment}
                     onChange={(e) => setComment(e.target.value)}
                     placeholder="Deneyiminizi anlatın..."
-                    className="w-full bg-slate-950 border border-white/5 rounded-2xl p-4 text-sm text-white outline-none focus:border-blue-500/50 transition-all min-h-[120px] resize-none placeholder:text-slate-700"
+                    className="w-full bg-slate-950 border border-white/5 rounded-xl p-4 text-sm text-white outline-none focus:border-blue-500/30 transition-all min-h-[120px] resize-none"
                 ></textarea>
             </div>
 
             <button
                 type="submit"
                 disabled={loading || !comment.trim()}
-                className="relative z-10 w-full bg-blue-600 hover:bg-blue-500 disabled:bg-slate-800 disabled:text-slate-600 text-white font-black py-4 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-blue-600/20 active:scale-[0.98]"
+                className="w-full bg-blue-600 hover:bg-blue-500 disabled:bg-slate-900 disabled:text-slate-700 text-white font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-blue-600/10 active:scale-[0.98] uppercase text-xs tracking-widest"
             >
-                {loading ? (
-                    <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
-                ) : (
-                    <>
-                        <Send size={18} />
-                        YORUMU GÖNDER
-                    </>
-                )}
+                {loading ? "GÖNDERİLİYOR..." : "YORUMU YAYINLA"}
             </button>
         </form>
     );
