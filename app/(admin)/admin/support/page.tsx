@@ -59,6 +59,7 @@ export default function AdminSupport() {
     const [selectedTicket, setSelectedTicket] = useState<any>(null);
     const [ticketMessages, setTicketMessages] = useState<any[]>([]);
     const [ticketReply, setTicketReply] = useState("");
+    const [ticketToDelete, setTicketToDelete] = useState<any>(null);
     const ticketScrollRef = useRef<HTMLDivElement>(null);
 
     // Fetch initial status and sessions
@@ -140,6 +141,23 @@ export default function AdminSupport() {
             }
         } catch (err) {
             console.error("Send reply error:", err);
+        }
+    };
+
+    const handleDeleteTicket = async () => {
+        if (!ticketToDelete) return;
+        setIsDeleting(true);
+        try {
+            const res = await fetch(`/api/admin/support/tickets?ticketId=${ticketToDelete.id}`, { method: "DELETE" });
+            if (res.ok) {
+                setTickets(tickets.filter(t => t.id !== ticketToDelete.id));
+                setSelectedTicket(null);
+                setTicketToDelete(null);
+            }
+        } catch (err) {
+            console.error("Delete ticket error:", err);
+        } finally {
+            setIsDeleting(false);
         }
     };
 
@@ -354,6 +372,20 @@ export default function AdminSupport() {
                                         <div className="w-10 h-10 bg-blue-600/10 rounded-xl flex items-center justify-center border border-blue-500/20 text-blue-500"><MessageSquare size={18} /></div>
                                         <div><h3 className="text-white font-bold text-sm">{selectedTicket.subject}</h3><p className="text-slate-500 text-[9px] font-black uppercase tracking-widest mt-0.5">{selectedTicket.category} • {selectedTicket.priority}</p></div>
                                     </div>
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            onClick={() => setTicketToDelete(selectedTicket)}
+                                            className="px-4 py-2 bg-red-500/10 border border-red-500/20 rounded-xl text-[10px] font-black text-red-500 hover:text-white hover:bg-red-500 transition-all uppercase tracking-widest"
+                                        >
+                                            Talebi Sil
+                                        </button>
+                                        <button
+                                            onClick={() => setSelectedTicket(null)}
+                                            className="p-2.5 bg-white/5 border border-white/5 rounded-xl text-slate-500 hover:text-white transition-all"
+                                        >
+                                            <X size={18} />
+                                        </button>
+                                    </div>
                                 </div>
                                 <div className="flex-1 p-6 overflow-y-auto space-y-6 scrollbar-hide">
                                     {ticketMessages.map((msg) => (
@@ -392,7 +424,24 @@ export default function AdminSupport() {
                 </div>
             )}
 
-            {/* Modals */}
+            {/* Ticket Delete Modal */}
+            {ticketToDelete && (
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-[#020617]/80 backdrop-blur-md" onClick={() => setTicketToDelete(null)} />
+                    <div className="relative bg-[#0c1022] border border-white/10 rounded-[32px] w-full max-w-md p-8 shadow-2xl animate-in zoom-in-95">
+                        <div className="w-16 h-16 bg-red-500/10 rounded-[24px] flex items-center justify-center border border-red-500/20 mb-6 mx-auto"><Trash2 className="text-red-500" size={32} /></div>
+                        <h3 className="text-xl font-extrabold text-white text-center mb-2">Talebi Sil?</h3>
+                        <p className="text-slate-400 text-center text-sm leading-relaxed mb-2">Bu destek talebi ve tüm mesajları kalıcı olarak silinecektir.</p>
+                        <p className="text-red-500/50 text-center text-[10px] font-black uppercase mb-8">Bu işlem geri alınamaz!</p>
+                        <div className="flex gap-3">
+                            <button onClick={() => setTicketToDelete(null)} className="flex-1 px-6 py-3.5 bg-white/5 rounded-2xl text-xs font-black uppercase text-slate-400">İptal</button>
+                            <button onClick={handleDeleteTicket} disabled={isDeleting} className="flex-1 px-6 py-3.5 bg-red-600 rounded-2xl text-xs font-black uppercase text-white shadow-lg shadow-red-600/20">
+                                {isDeleting ? "SİLİNİYOR..." : "EVET, SİL"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
             {sessionToDelete && (
                 <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-[#020617]/80 backdrop-blur-md" onClick={() => setSessionToDelete(null)} />

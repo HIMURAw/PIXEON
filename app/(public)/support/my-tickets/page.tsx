@@ -31,9 +31,14 @@ export default function MyTicketsPage() {
     }, []);
 
     useEffect(() => {
-        if (selectedTicket) {
+        if (!selectedTicket) return;
+        
+        fetchMessages(selectedTicket.id);
+        const interval = setInterval(() => {
             fetchMessages(selectedTicket.id);
-        }
+        }, 4000); // Poll every 4 seconds
+
+        return () => clearInterval(interval);
     }, [selectedTicket]);
 
     useEffect(() => {

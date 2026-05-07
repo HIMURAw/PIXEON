@@ -435,12 +435,20 @@ export default function SupportWidget() {
                                             <p className="text-slate-500 text-xs leading-relaxed mb-8 max-w-[220px]">
                                                 Şu an canlı destek ekibimiz müsait değil. Sorununuzu bir destek talebi olarak bize iletebilirsiniz.
                                             </p>
-                                            <Link 
-                                                href="/support/ticket"
-                                                className="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl transition-all shadow-xl shadow-blue-600/20"
-                                            >
-                                                DESTEK TALEBİ OLUŞTUR
-                                            </Link>
+                                            <div className="grid grid-cols-1 gap-3 w-full">
+                                                <Link
+                                                    href="/support/ticket"
+                                                    className="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl transition-all shadow-xl shadow-blue-600/20"
+                                                >
+                                                    YENİ TALEP OLUŞTUR
+                                                </Link>
+                                                <Link
+                                                    href="/support/my-tickets"
+                                                    className="w-full py-4 bg-slate-900 hover:bg-slate-800 text-slate-300 text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl border border-white/5 transition-all"
+                                                >
+                                                    TALEPLERİM VE CEVAPLAR
+                                                </Link>
+                                            </div>
                                         </div>
                                     )}
                                     {isLiveEnabled && user && liveMessages.map((msg) => (

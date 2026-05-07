@@ -3,6 +3,8 @@ import { supportTickets, supportMessages, users } from "@/lib/db/schema";
 import { eq, desc, asc } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
+import fs from "fs/promises";
+import path from "path";
 
 export async function GET(req: NextRequest) {
     try {
@@ -73,5 +75,37 @@ export async function POST(req: NextRequest) {
     } catch (error) {
         console.error("Admin ticket response error:", error);
         return NextResponse.json({ error: "Failed to send response" }, { status: 500 });
+    }
+}
+
+export async function DELETE(req: NextRequest) {
+    try {
+        const ticketId = req.nextUrl.searchParams.get("ticketId");
+        if (!ticketId) return NextResponse.json({ error: "Missing ticketId" }, { status: 400 });
+
+        // 1. Get all messages to delete files
+        const messages = await db.select({ imageUrl: supportMessages.imageUrl })
+            .from(supportMessages)
+            .where(eq(supportMessages.ticketId, ticketId));
+
+        for (const msg of messages) {
+            if (msg.imageUrl && msg.imageUrl.startsWith("/uploads/")) {
+                try {
+                    const filePath = path.join(process.cwd(), "public", msg.imageUrl);
+                    await fs.unlink(filePath);
+                } catch (err) {
+                    console.error("File deletion error:", err);
+                }
+            }
+        }
+
+        // 2. Delete from DB
+        await db.delete(supportMessages).where(eq(supportMessages.ticketId, ticketId));
+        await db.delete(supportTickets).where(eq(supportTickets.id, ticketId));
+
+        return NextResponse.json({ success: true });
+    } catch (error) {
+        console.error("Admin ticket delete error:", error);
+        return NextResponse.json({ error: "Failed to delete ticket" }, { status: 500 });
     }
 }
