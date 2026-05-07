@@ -174,7 +174,7 @@ export default function MyTicketsPage() {
                                         <div key={msg.id} className={cn("flex flex-col", msg.senderRole === "ADMIN" ? "items-start" : "items-end")}>
                                             <div className="flex items-center gap-2 mb-2 px-1">
                                                 <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
-                                                    {msg.senderRole === "ADMIN" ? "PIXEON DESTEK" : "SİZ"}
+                                                    {msg.senderRole === "ADMIN" ? msg.senderName : "SİZ"}
                                                 </span>
                                             </div>
                                             <div className={cn(

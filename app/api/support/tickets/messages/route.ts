@@ -18,7 +18,8 @@ export async function GET(req: NextRequest) {
             message: supportMessages.message,
             imageUrl: supportMessages.imageUrl,
             senderId: supportMessages.senderId,
-            senderRole: users.role, // Get USER or ADMIN role
+            senderName: users.name, // Adı ekledik
+            senderRole: users.role,
             createdAt: supportMessages.createdAt,
         })
         .from(supportMessages)

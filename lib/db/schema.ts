@@ -232,6 +232,17 @@ export const liveChatMessages = mysqlTable("live_chat_messages", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const notifications = mysqlTable("notifications", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  userId: varchar("user_id", { length: 255 }), // null means ALL users
+  title: varchar("title", { length: 255 }).notNull(),
+  message: text("message").notNull(),
+  link: varchar("link", { length: 255 }),
+  type: mysqlEnum("type", ["INFO", "SUCCESS", "WARNING", "DANGER"]).default("INFO").notNull(),
+  isRead: boolean("is_read").default(false).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // 12. Relations
 import { relations } from "drizzle-orm";
 
