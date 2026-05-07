@@ -1,8 +1,15 @@
 import { db } from "@/lib/db";
-import { notifications, users } from "@/lib/db/schema";
+import { notifications, users, pushSubscriptions } from "@/lib/db/schema";
 import { eq, desc } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
+import webpush from "web-push";
+
+webpush.setVapidDetails(
+    'mailto:support@pixeon.com',
+    'BPDYMAjKVDJeG5yrcEb2GzPs5DJL2707rQPIVWidrCUvGO_Y7kcarwB6Spd_dVtUj9h8y2JYjgBvESP6Fi1EGMQ',
+    'R7DgeQk_9yMs2uT30HOiK4NYU8sMZyD6cTXuzBYMKeU'
+);
 
 export async function GET(req: NextRequest) {
     try {
@@ -38,13 +45,37 @@ export async function POST(req: NextRequest) {
 
         await db.insert(notifications).values({
             id: notificationId,
-            userId: targetUserId || null, // null means broadcast to everyone
+            userId: targetUserId || null,
             title,
             message,
             type: type || "INFO",
             link: link || null,
             createdAt: new Date(),
         });
+
+        // --- WEB PUSH LOGIC ---
+        const subs = await db.select().from(pushSubscriptions);
+        
+        const payload = JSON.stringify({
+            title: title,
+            body: message,
+            url: link || '/'
+        });
+
+        // Send to all subscribers
+        const pushPromises = subs.map(async (row) => {
+            try {
+                const sub = JSON.parse(row.subscription);
+                await webpush.sendNotification(sub, payload);
+            } catch (err: any) {
+                if (err.statusCode === 410 || err.statusCode === 404) {
+                    // Subscription expired or invalid, delete it
+                    await db.delete(pushSubscriptions).where(eq(pushSubscriptions.id, row.id));
+                }
+            }
+        });
+
+        await Promise.all(pushPromises);
 
         return NextResponse.json({ success: true, id: notificationId });
     } catch (error) {

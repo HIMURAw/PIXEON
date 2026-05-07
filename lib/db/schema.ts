@@ -243,6 +243,13 @@ export const notifications = mysqlTable("notifications", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const pushSubscriptions = mysqlTable("push_subscriptions", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  userId: varchar("user_id", { length: 255 }), // can be null for guests
+  subscription: text("subscription").notNull(), // JSON string of PushSubscription object
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // 12. Relations
 import { relations } from "drizzle-orm";
 

@@ -12,9 +12,37 @@ export default function NotificationBell() {
 
     useEffect(() => {
         fetchNotifications();
-        const interval = setInterval(fetchNotifications, 10000); // 10 saniyede bir kontrol
+        const interval = setInterval(fetchNotifications, 10000);
+        
+        // Push Notification Init
+        if ('serviceWorker' in navigator && 'PushManager' in window) {
+            subscribeToPush();
+        }
+
         return () => clearInterval(interval);
     }, []);
+
+    const subscribeToPush = async () => {
+        try {
+            const registration = await navigator.serviceWorker.register('/sw.js');
+            const permission = await Notification.requestPermission();
+            
+            if (permission === 'granted') {
+                const subscription = await registration.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: 'BPDYMAjKVDJeG5yrcEb2GzPs5DJL2707rQPIVWidrCUvGO_Y7kcarwB6Spd_dVtUj9h8y2JYjgBvESP6Fi1EGMQ'
+                });
+
+                await fetch('/api/notifications/subscribe', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ subscription })
+                });
+            }
+        } catch (err) {
+            console.error("Push subscription failed:", err);
+        }
+    };
 
     const fetchNotifications = async () => {
         try {
