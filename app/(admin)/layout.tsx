@@ -53,6 +53,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             title: "GENEL",
             items: [
                 { label: "Dashboard", icon: LayoutDashboard, href: "/admin/dashboard" },
+                { label: "Bildirimler", icon: Bell, href: "/admin/notifications" },
                 { label: "Raporlar & Analiz", icon: FileSpreadsheet, href: "/admin/reports" },
             ]
         },
