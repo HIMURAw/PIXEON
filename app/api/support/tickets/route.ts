@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const { subject, category, priority, message } = await req.json();
+        const { subject, category, priority, message, imageUrl } = await req.json();
 
         if (!subject || !message || !category) {
             return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -36,6 +36,7 @@ export async function POST(req: NextRequest) {
             ticketId: ticketId,
             senderId: session.user.id,
             message: message,
+            imageUrl: imageUrl || null,
             createdAt: new Date(),
         });
 

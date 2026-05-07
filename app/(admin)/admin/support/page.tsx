@@ -18,7 +18,8 @@ import {
     CheckCircle,
     Paperclip,
     ZoomIn,
-    LogOut
+    LogOut,
+    TicketPlus
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -53,6 +54,13 @@ export default function AdminSupport() {
     const [previewImage, setPreviewImage] = useState<string | null>(null);
     const scrollRef = useRef<HTMLDivElement>(null);
 
+    // Support Ticket States
+    const [tickets, setTickets] = useState<any[]>([]);
+    const [selectedTicket, setSelectedTicket] = useState<any>(null);
+    const [ticketMessages, setTicketMessages] = useState<any[]>([]);
+    const [ticketReply, setTicketReply] = useState("");
+    const ticketScrollRef = useRef<HTMLDivElement>(null);
+
     // Fetch initial status and sessions
     const fetchSessions = async () => {
         const sessionsRes = await fetch("/api/admin/support/chat");
@@ -78,6 +86,62 @@ export default function AdminSupport() {
         const interval = setInterval(fetchSessions, 5000);
         return () => clearInterval(interval);
     }, []);
+
+    useEffect(() => {
+        if (activeTab === "tickets") {
+            fetchTickets();
+        }
+    }, [activeTab]);
+
+    useEffect(() => {
+        if (selectedTicket) {
+            fetchTicketMessages(selectedTicket.id);
+        }
+    }, [selectedTicket]);
+
+    useEffect(() => {
+        if (ticketScrollRef.current) {
+            ticketScrollRef.current.scrollTop = ticketScrollRef.current.scrollHeight;
+        }
+    }, [ticketMessages]);
+
+    const fetchTickets = async () => {
+        try {
+            const res = await fetch("/api/admin/support/tickets");
+            const data = await res.json();
+            setTickets(data.tickets || []);
+        } catch (err) {
+            console.error("Fetch tickets error:", err);
+        }
+    };
+
+    const fetchTicketMessages = async (ticketId: string) => {
+        try {
+            const res = await fetch(`/api/admin/support/tickets?ticketId=${ticketId}`);
+            const data = await res.json();
+            setTicketMessages(data.messages || []);
+        } catch (err) {
+            console.error("Fetch ticket messages error:", err);
+        }
+    };
+
+    const handleSendTicketReply = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!ticketReply.trim() || !selectedTicket) return;
+        try {
+            const res = await fetch("/api/admin/support/tickets", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ ticketId: selectedTicket.id, message: ticketReply })
+            });
+            if (res.ok) {
+                setTicketReply("");
+                fetchTicketMessages(selectedTicket.id);
+            }
+        } catch (err) {
+            console.error("Send reply error:", err);
+        }
+    };
 
     useEffect(() => {
         if (!selectedSessionId) return;
@@ -259,7 +323,73 @@ export default function AdminSupport() {
                     </div>
                 </div>
             ) : (
-                <div className="bg-[#020617] border border-white/10 p-12 rounded-[40px] text-center shadow-xl"><LifeBuoy size={48} className="mx-auto text-slate-700 mb-6" /><h3 className="text-xl font-black text-white uppercase tracking-widest">Destek Talepleri</h3><p className="text-slate-500 mt-2">Bu bölümdeki geliştirmeler devam ediyor.</p></div>
+                <div className="grid grid-cols-1 lg:grid-cols-[400px_1fr] gap-8 h-[650px] animate-in fade-in duration-500">
+                    <div className="bg-[#020617] border border-white/10 rounded-[32px] flex flex-col overflow-hidden shadow-xl">
+                        <div className="p-4 border-b border-white/5 bg-white/[0.02]">
+                            <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                                <TicketPlus size={14} className="text-blue-500" /> Aktif Destek Talepleri
+                            </h3>
+                        </div>
+                        <div className="flex-1 overflow-y-auto p-2 space-y-2 scrollbar-hide">
+                            {tickets.map((t) => (
+                                <button key={t.id} onClick={() => setSelectedTicket(t)} className={cn("w-full text-left p-4 rounded-2xl border transition-all", selectedTicket?.id === t.id ? "bg-blue-600 border-blue-500 shadow-lg shadow-blue-600/20" : "bg-slate-950/40 border-white/5 hover:border-white/10")}>
+                                    <div className="flex justify-between items-start mb-2">
+                                        <span className={cn("text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-widest", selectedTicket?.id === t.id ? "bg-white/20 text-white" : "bg-slate-900 text-slate-500")}>#{t.id.split('_').pop()?.substring(0, 6)}</span>
+                                        <span className={cn("text-[9px] font-black uppercase tracking-widest", t.status === "OPEN" ? "text-green-400" : "text-amber-400")}>{t.status === "OPEN" ? "YENİ" : "İŞLEMDE"}</span>
+                                    </div>
+                                    <h4 className={cn("font-bold text-sm truncate", selectedTicket?.id === t.id ? "text-white" : "text-slate-200")}>{t.subject}</h4>
+                                    <div className="flex items-center gap-2 mt-3 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                                        <User size={10} /> {t.userName}
+                                    </div>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="bg-[#020617] border border-white/10 rounded-[32px] flex flex-col overflow-hidden shadow-xl relative">
+                        {selectedTicket ? (
+                            <>
+                                <div className="p-5 border-b border-white/5 bg-white/[0.02] flex items-center justify-between">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-10 h-10 bg-blue-600/10 rounded-xl flex items-center justify-center border border-blue-500/20 text-blue-500"><MessageSquare size={18} /></div>
+                                        <div><h3 className="text-white font-bold text-sm">{selectedTicket.subject}</h3><p className="text-slate-500 text-[9px] font-black uppercase tracking-widest mt-0.5">{selectedTicket.category} • {selectedTicket.priority}</p></div>
+                                    </div>
+                                </div>
+                                <div className="flex-1 p-6 overflow-y-auto space-y-6 scrollbar-hide">
+                                    {ticketMessages.map((msg) => (
+                                        <div key={msg.id} className={cn("flex flex-col", msg.role === "ADMIN" ? "items-end" : "items-start")}>
+                                            <div className="flex items-center gap-2 mb-1.5">
+                                                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{msg.senderName}</span>
+                                            </div>
+                                            <div className={cn("max-w-[80%] px-5 py-3 rounded-2xl text-sm", msg.role === "ADMIN" ? "bg-blue-600 text-white rounded-tr-none" : "bg-slate-900 border border-white/5 text-slate-300 rounded-tl-none")}>
+                                                {msg.imageUrl && (
+                                                    <div className="mb-3 rounded-xl overflow-hidden border border-white/5 cursor-zoom-in" onClick={() => setPreviewImage(msg.imageUrl)}>
+                                                        <img src={msg.imageUrl} alt="" className="max-w-full h-auto" />
+                                                    </div>
+                                                )}
+                                                <p className="leading-relaxed">{msg.message}</p>
+                                                <span className={cn("text-[9px] mt-1.5 block", msg.role === "ADMIN" ? "text-white/40" : "text-slate-600")}>{new Date(msg.createdAt).toLocaleTimeString()}</span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                    <div ref={ticketScrollRef} />
+                                </div>
+                                <div className="p-4 bg-slate-950/50 border-t border-white/5">
+                                    <form onSubmit={handleSendTicketReply} className="flex gap-3">
+                                        <input type="text" value={ticketReply} onChange={(e) => setTicketReply(e.target.value)} placeholder="Cevabınızı buraya yazın..." className="flex-1 bg-slate-900 border border-white/10 rounded-2xl px-6 py-4 text-sm text-white outline-none" />
+                                        <button type="submit" disabled={!ticketReply.trim()} className="px-8 bg-blue-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-500 transition-all disabled:opacity-40">GÖNDER</button>
+                                    </form>
+                                </div>
+                            </>
+                        ) : (
+                            <div className="flex-1 flex flex-col items-center justify-center text-center p-12 opacity-30">
+                                <LifeBuoy size={48} className="text-slate-700 mb-6" />
+                                <h3 className="text-xl font-black text-white uppercase tracking-widest">Talep Seçin</h3>
+                                <p className="text-sm mt-3 max-w-xs font-bold text-slate-500">Yanıtlamak istediğiniz destek talebini soldan seçin.</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
             )}
 
             {/* Modals */}

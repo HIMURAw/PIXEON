@@ -8,7 +8,10 @@ import {
     LifeBuoy,
     Clock,
     ShieldCheck,
-    MessageSquare
+    MessageSquare,
+    Paperclip,
+    X,
+    Image as ImageIcon
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -29,12 +32,35 @@ export default function CreateTicketPage() {
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [uploading, setUploading] = useState(false);
     const [formData, setFormData] = useState({
         subject: "",
         category: "technical",
         priority: "LOW",
-        message: ""
+        message: "",
+        imageUrl: ""
     });
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setUploading(true);
+        const uploadData = new FormData();
+        uploadData.append("file", file);
+
+        try {
+            const res = await fetch("/api/support/upload", { method: "POST", body: uploadData });
+            const data = await res.json();
+            if (data.url) {
+                setFormData(prev => ({ ...prev, imageUrl: data.url }));
+            }
+        } catch (err) {
+            setError("Resim yüklenemedi.");
+        } finally {
+            setUploading(false);
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -159,6 +185,37 @@ export default function CreateTicketPage() {
                                     placeholder="Lütfen sorununuzu detaylı bir şekilde açıklayın..."
                                     className="w-full bg-[#020617] border border-white/10 rounded-2xl px-5 py-5 text-sm text-white placeholder:text-slate-700 outline-none focus:border-blue-500/50 transition-all resize-none"
                                 />
+                            </div>
+
+                            {/* Image Upload Area */}
+                            <div className="space-y-3">
+                                <label className="text-xs font-bold text-slate-400 ml-1">Ek Görsel (Opsiyonel)</label>
+                                {formData.imageUrl ? (
+                                    <div className="relative w-full max-w-sm rounded-2xl overflow-hidden border border-white/10 aspect-video group">
+                                        <img src={formData.imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                                        <button 
+                                            type="button"
+                                            onClick={() => setFormData({...formData, imageUrl: ""})}
+                                            className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-xl opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                                        >
+                                            <X size={16} />
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <label className="flex flex-col items-center justify-center w-full py-8 bg-[#020617] border-2 border-dashed border-white/10 rounded-2xl cursor-pointer hover:border-blue-500/30 transition-all group">
+                                        <div className="flex flex-col items-center justify-center space-y-2">
+                                            {uploading ? (
+                                                <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                                            ) : (
+                                                <>
+                                                    <Paperclip className="text-slate-500 group-hover:text-blue-500 transition-colors" size={24} />
+                                                    <span className="text-xs font-bold text-slate-500 group-hover:text-slate-300">Resim veya Ekran Görüntüsü Yükle</span>
+                                                </>
+                                            )}
+                                        </div>
+                                        <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} disabled={uploading} />
+                                    </label>
+                                )}
                             </div>
 
                             <button 
