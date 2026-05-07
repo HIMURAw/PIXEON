@@ -1,33 +1,115 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { 
     LifeBuoy, 
     Search, 
-    Filter, 
-    Plus, 
-    Clock, 
-    CheckCircle2, 
-    AlertCircle, 
     MessageSquare, 
     User, 
     ArrowRight, 
     MoreHorizontal,
-    ChevronLeft,
-    ChevronRight,
-    Zap,
-    ShieldCheck
+    Send,
+    Bot,
+    Headset,
+    Circle,
+    Clock,
+    X
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+interface ChatSession {
+    sessionId: string;
+    senderName: string;
+    lastMessage: string;
+    createdAt: string;
+    unreadCount: number;
+}
+
+interface Message {
+    id: string;
+    sessionId: string;
+    senderName: string;
+    senderRole: "USER" | "ADMIN";
+    message: string;
+    createdAt: string;
+}
+
 export default function AdminSupport() {
-    const tickets = [
-        { id: "#TKT-1024", user: "Murat S.", subject: "Kargom Nerede?", priority: "High", status: "Open", date: "10 dk önce", category: "Lojistik" },
-        { id: "#TKT-1023", user: "Zeynep L.", subject: "İade Talebi - Yanlış Ürün", priority: "Medium", status: "In Progress", date: "1 saat önce", category: "İade" },
-        { id: "#TKT-1022", user: "Hakan V.", subject: "PS Plus Kodu Çalışmıyor", priority: "Emergency", status: "Open", date: "2 saat önce", category: "Teknik" },
-        { id: "#TKT-1021", user: "Ayşe T.", subject: "Ödeme Onayı Bekliyor", priority: "Low", status: "Closed", date: "5 saat önce", category: "Ödeme" },
-        { id: "#TKT-1020", user: "Deniz G.", subject: "Ürün Bilgisi Hakkında", priority: "Low", status: "Closed", date: "1 gün önce", category: "Bilgi" },
-    ];
+    const [activeTab, setActiveTab] = useState<"tickets" | "live">("live");
+    const [liveEnabled, setLiveEnabled] = useState(false);
+    const [sessions, setSessions] = useState<ChatSession[]>([]);
+    const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
+    const [messages, setMessages] = useState<Message[]>([]);
+    const [reply, setReply] = useState("");
+    const scrollRef = useRef<HTMLDivElement>(null);
+
+    // Fetch initial status and sessions
+    useEffect(() => {
+        const fetchData = async () => {
+            const statusRes = await fetch("/api/admin/support/status");
+            const statusData = await statusRes.json();
+            setLiveEnabled(statusData.isEnabled);
+
+            const sessionsRes = await fetch("/api/admin/support/chat");
+            const sessionsData = await sessionsRes.json();
+            setSessions(sessionsData.sessions || []);
+        };
+        fetchData();
+
+        const interval = setInterval(fetchData, 5000);
+        return () => clearInterval(interval);
+    }, []);
+
+    // Fetch messages for selected session
+    useEffect(() => {
+        if (!selectedSessionId) return;
+
+        const fetchMessages = async () => {
+            const res = await fetch(`/api/admin/support/chat?sessionId=${selectedSessionId}`);
+            const data = await res.json();
+            setMessages(data.messages || []);
+        };
+        fetchMessages();
+
+        const interval = setInterval(fetchMessages, 3000);
+        return () => clearInterval(interval);
+    }, [selectedSessionId]);
+
+    // Scroll to bottom
+    useEffect(() => {
+        if (scrollRef.current) {
+            scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+        }
+    }, [messages]);
+
+    const toggleLiveSupport = async () => {
+        const newValue = !liveEnabled;
+        setLiveEnabled(newValue);
+        await fetch("/api/admin/support/status", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ enabled: newValue }),
+        });
+    };
+
+    const sendReply = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!reply.trim() || !selectedSessionId) return;
+
+        const msgText = reply;
+        setReply("");
+
+        const res = await fetch("/api/admin/support/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ sessionId: selectedSessionId, message: msgText }),
+        });
+
+        if (res.ok) {
+            const data = await res.json();
+            setMessages(prev => [...prev, data.message]);
+        }
+    };
 
     return (
         <div className="space-y-8 animate-in fade-in duration-700">
@@ -39,139 +121,199 @@ export default function AdminSupport() {
                     </h1>
                     <p className="text-slate-500 mt-1 flex items-center gap-2">
                         <LifeBuoy className="text-blue-400" size={14} />
-                        Müşteri taleplerini yanıtlayın, sorunları çözün ve memnuniyeti artırın.
+                        Müşteri taleplerini yanıtlayın ve canlı destek verin.
                     </p>
                 </div>
-                <div className="flex items-center gap-3">
-                    <div className="flex bg-[#020617] border border-white/10 p-1.5 rounded-2xl items-center gap-2">
-                        <div className="px-4 py-1.5 bg-blue-600/10 text-blue-400 rounded-xl text-[10px] font-black uppercase tracking-widest">
-                            8 Aktif
-                        </div>
-                        <div className="px-4 py-1.5 bg-slate-900 text-slate-500 rounded-xl text-[10px] font-black uppercase tracking-widest">
-                            142 Tamamlanan
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Quick Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                {[
-                    { label: "Yeni Talepler", value: "3", icon: AlertCircle, color: "text-red-400", bg: "bg-red-400/10" },
-                    { label: "Yanıt Bekleyen", value: "5", icon: Clock, color: "text-amber-400", bg: "bg-amber-400/10" },
-                    { label: "Çözüm Süresi", value: "2.4 sa", icon: Zap, color: "text-blue-400", bg: "bg-blue-400/10" },
-                    { label: "Memnuniyet", value: "%98", icon: ShieldCheck, color: "text-emerald-400", bg: "bg-emerald-400/10" },
-                ].map((stat, i) => (
-                    <div key={i} className="bg-[#020617] border border-white/10 p-6 rounded-3xl flex items-center gap-4 shadow-lg">
-                        <div className={cn("p-3 rounded-2xl", stat.bg, stat.color)}>
-                            <stat.icon size={24} />
-                        </div>
-                        <div>
-                            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{stat.label}</p>
-                            <p className="text-xl font-black text-white mt-0.5">{stat.value}</p>
-                        </div>
-                    </div>
-                ))}
-            </div>
-
-            {/* Support List & Controls */}
-            <div className="space-y-6">
-                <div className="bg-[#020617] border border-white/10 p-4 rounded-3xl flex flex-col lg:flex-row items-center gap-4 shadow-xl">
-                    <div className="relative flex-1 w-full group">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-400 transition-colors" size={18} />
-                        <input 
-                            type="text" 
-                            placeholder="Talep ID, Müşteri veya Konu ara..." 
-                            className="w-full bg-slate-950 border border-white/5 rounded-2xl px-12 py-3 text-sm outline-none focus:border-blue-500/50 transition-all placeholder:text-slate-600"
-                        />
-                    </div>
-                    <div className="flex items-center gap-3 w-full lg:w-auto">
-                        <button className="flex items-center gap-2 px-5 py-3 bg-slate-900 border border-white/5 rounded-2xl text-sm font-bold text-slate-400 hover:text-white transition-all">
-                            <Filter size={18} />
-                            Filtrele
+                <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-3 px-4 py-2 bg-[#020617] border border-white/10 rounded-2xl">
+                        <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Canlı Destek Durumu</span>
+                        <button 
+                            onClick={toggleLiveSupport}
+                            className={cn(
+                                "relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none",
+                                liveEnabled ? "bg-green-500" : "bg-slate-700"
+                            )}
+                        >
+                            <span className={cn(
+                                "inline-block h-4 w-4 transform rounded-full bg-white transition-transform",
+                                liveEnabled ? "translate-x-6" : "translate-x-1"
+                            )} />
                         </button>
-                        <select className="bg-slate-900 border border-white/5 rounded-2xl px-5 py-3 text-sm font-bold text-slate-400 outline-none focus:border-blue-500/50 transition-all cursor-pointer min-w-[160px]">
-                            <option>Tüm Durumlar</option>
-                            <option>Açık</option>
-                            <option>İşlemde</option>
-                            <option>Kapalı</option>
-                        </select>
+                        <span className={cn(
+                            "text-[10px] font-black uppercase tracking-widest",
+                            liveEnabled ? "text-green-400" : "text-slate-500"
+                        )}>
+                            {liveEnabled ? "AKTİF" : "KAPALI"}
+                        </span>
                     </div>
                 </div>
+            </div>
 
-                <div className="grid grid-cols-1 gap-4">
-                    {tickets.map((tkt) => (
-                        <div key={tkt.id} className="bg-[#0b1220]/50 border border-white/5 rounded-[32px] p-6 hover:border-blue-500/30 transition-all duration-300 group flex flex-col lg:flex-row items-center justify-between gap-6">
-                            <div className="flex items-center gap-6 w-full lg:w-auto">
-                                <div className={cn(
-                                    "w-12 h-12 rounded-2xl flex items-center justify-center border transition-all",
-                                    tkt.status === "Open" ? "bg-red-500/10 border-red-500/20 text-red-400 shadow-lg shadow-red-500/5" :
-                                    tkt.status === "In Progress" ? "bg-amber-500/10 border-amber-500/20 text-amber-400" :
-                                    "bg-slate-900 border-white/5 text-slate-600"
-                                )}>
-                                    <MessageSquare size={20} />
-                                </div>
-                                <div className="space-y-1">
-                                    <div className="flex items-center gap-3">
-                                        <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest">{tkt.id}</span>
-                                        <h3 className="font-bold text-white text-base tracking-tight">{tkt.subject}</h3>
-                                    </div>
-                                    <p className="text-xs text-slate-500 font-medium">Başlatan: {tkt.user} • Kategori: {tkt.category}</p>
-                                </div>
-                            </div>
+            {/* Tabs */}
+            <div className="flex gap-4 border-b border-white/5 pb-px">
+                <button 
+                    onClick={() => setActiveTab("live")}
+                    className={cn(
+                        "px-6 py-4 text-xs font-black uppercase tracking-widest transition-all relative",
+                        activeTab === "live" ? "text-blue-400" : "text-slate-500 hover:text-slate-300"
+                    )}
+                >
+                    Canlı Sohbetler
+                    {activeTab === "live" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]" />}
+                </button>
+                <button 
+                    onClick={() => setActiveTab("tickets")}
+                    className={cn(
+                        "px-6 py-4 text-xs font-black uppercase tracking-widest transition-all relative",
+                        activeTab === "tickets" ? "text-blue-400" : "text-slate-500 hover:text-slate-300"
+                    )}
+                >
+                    Destek Talepleri
+                    {activeTab === "tickets" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]" />}
+                </button>
+            </div>
 
-                            <div className="flex flex-wrap items-center justify-between w-full lg:w-auto lg:justify-end gap-8">
-                                <div className="flex items-center gap-12">
-                                    <div className="text-center lg:text-right hidden sm:block">
-                                        <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest mb-1">Öncelik</p>
-                                        <span className={cn(
-                                            "text-[9px] font-black uppercase tracking-[0.2em] px-2.5 py-1 rounded-full",
-                                            tkt.priority === "Emergency" ? "bg-red-600 text-white" :
-                                            tkt.priority === "High" ? "bg-orange-500/20 text-orange-400" :
-                                            tkt.priority === "Medium" ? "bg-blue-500/20 text-blue-400" : "bg-slate-800 text-slate-500"
-                                        )}>{tkt.priority}</span>
-                                    </div>
-                                    <div className="text-center lg:text-right">
-                                        <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest mb-1">Son İşlem</p>
-                                        <p className="text-xs font-bold text-white">{tkt.date}</p>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-center gap-3">
-                                    <button className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white font-black rounded-xl hover:bg-blue-500 transition-all text-[10px] uppercase tracking-widest shadow-xl shadow-blue-600/20 active:scale-95">
-                                        Yanıtla
-                                        <ArrowRight size={14} />
-                                    </button>
-                                    <button className="p-2.5 bg-white/5 border border-white/5 rounded-xl text-slate-500 hover:text-white transition-all">
-                                        <MoreHorizontal size={18} />
-                                    </button>
-                                </div>
+            {activeTab === "live" ? (
+                <div className="grid grid-cols-1 lg:grid-cols-[350px_1fr] gap-8 h-[600px]">
+                    {/* Session List */}
+                    <div className="bg-[#020617] border border-white/10 rounded-[32px] overflow-hidden flex flex-col shadow-xl">
+                        <div className="p-4 border-b border-white/5">
+                            <div className="relative group">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-blue-400 transition-colors" size={14} />
+                                <input 
+                                    type="text" 
+                                    placeholder="Sohbet ara..." 
+                                    className="w-full bg-slate-950 border border-white/5 rounded-xl px-10 py-2.5 text-xs outline-none focus:border-blue-500/50 transition-all"
+                                />
                             </div>
                         </div>
-                    ))}
-                </div>
-
-                {/* Pagination */}
-                <div className="flex items-center justify-between pt-6">
-                    <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Görüntülenen: 5 / 150 Talep</p>
-                    <div className="flex items-center gap-2">
-                        <button className="p-3 bg-slate-900 border border-white/10 rounded-xl text-slate-500 hover:text-white disabled:opacity-50 transition-all" disabled>
-                            <ChevronLeft size={20} />
-                        </button>
-                        <div className="flex items-center gap-1">
-                            {[1, 2, 3].map(i => (
-                                <button key={i} className={cn(
-                                    "w-10 h-10 rounded-xl text-xs font-black transition-all border border-transparent",
-                                    i === 1 ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" : "text-slate-500 hover:bg-white/5 hover:border-white/10"
-                                )}>{i}</button>
-                            ))}
+                        <div className="flex-1 overflow-y-auto p-2 space-y-1 scrollbar-hide">
+                            {sessions.length === 0 ? (
+                                <div className="flex flex-col items-center justify-center h-full text-center p-8 opacity-40">
+                                    <MessageSquare size={32} className="mb-2" />
+                                    <p className="text-xs font-bold uppercase tracking-widest">Henüz sohbet yok</p>
+                                </div>
+                            ) : (
+                                sessions.map((session) => (
+                                    <button 
+                                        key={session.sessionId}
+                                        onClick={() => setSelectedSessionId(session.sessionId)}
+                                        className={cn(
+                                            "w-full text-left p-4 rounded-2xl transition-all group flex items-start gap-4",
+                                            selectedSessionId === session.sessionId ? "bg-blue-600/10 border border-blue-500/20" : "hover:bg-white/5 border border-transparent"
+                                        )}
+                                    >
+                                        <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center border border-white/5 group-hover:border-white/10 shrink-0 relative">
+                                            <User size={18} className="text-slate-500" />
+                                            {session.unreadCount > 0 && (
+                                                <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-[8px] font-black flex items-center justify-center text-white ring-2 ring-[#020617]">
+                                                    {session.unreadCount}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center justify-between mb-1">
+                                                <h4 className="font-bold text-white text-sm truncate">{session.senderName}</h4>
+                                                <span className="text-[9px] text-slate-600 font-bold uppercase tracking-widest">{new Date(session.createdAt).toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" })}</span>
+                                            </div>
+                                            <p className="text-xs text-slate-500 truncate group-hover:text-slate-400">{session.lastMessage}</p>
+                                        </div>
+                                    </button>
+                                ))
+                            )}
                         </div>
-                        <button className="p-3 bg-slate-900 border border-white/10 rounded-xl text-slate-500 hover:text-white transition-all">
-                            <ChevronRight size={20} />
-                        </button>
+                    </div>
+
+                    {/* Chat Area */}
+                    <div className="bg-[#020617] border border-white/10 rounded-[32px] overflow-hidden flex flex-col shadow-xl">
+                        {selectedSessionId ? (
+                            <>
+                                {/* Chat Header */}
+                                <div className="p-5 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-10 h-10 bg-blue-600/10 rounded-xl flex items-center justify-center border border-blue-500/20">
+                                            <User size={18} className="text-blue-400" />
+                                        </div>
+                                        <div>
+                                            <h3 className="font-bold text-white text-sm">
+                                                {sessions.find(s => s.sessionId === selectedSessionId)?.senderName || "Misafir"}
+                                            </h3>
+                                            <div className="flex items-center gap-1.5 mt-0.5">
+                                                <Circle size={8} className="text-green-500 fill-green-500 animate-pulse" />
+                                                <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest">Çevrimiçi</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <button className="p-2.5 bg-white/5 border border-white/5 rounded-xl text-slate-500 hover:text-white transition-all">
+                                            <MoreHorizontal size={18} />
+                                        </button>
+                                        <button onClick={() => setSelectedSessionId(null)} className="p-2.5 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 hover:text-white hover:bg-red-500 transition-all">
+                                            <X size={18} />
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Chat Messages */}
+                                <div ref={scrollRef} className="flex-1 p-6 overflow-y-auto space-y-4 bg-[url('/grid-pattern.png')] bg-fixed scrollbar-hide">
+                                    {messages.map((msg) => (
+                                        <div key={msg.id} className={cn("flex", msg.senderRole === "ADMIN" ? "justify-end" : "justify-start")}>
+                                            <div className={cn(
+                                                "max-w-[70%] px-5 py-3 rounded-2xl text-sm shadow-sm",
+                                                msg.senderRole === "ADMIN" 
+                                                    ? "bg-blue-600 text-white rounded-tr-none shadow-blue-600/10" 
+                                                    : "bg-slate-900 border border-white/5 text-slate-300 rounded-tl-none"
+                                            )}>
+                                                <p className="leading-relaxed">{msg.message}</p>
+                                                <span className={cn(
+                                                    "text-[9px] mt-1.5 block",
+                                                    msg.senderRole === "ADMIN" ? "text-white/40 text-right" : "text-slate-600"
+                                                )}>
+                                                    {new Date(msg.createdAt).toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" })}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Chat Input */}
+                                <div className="p-4 bg-slate-950/50 border-t border-white/5">
+                                    <form onSubmit={sendReply} className="relative">
+                                        <input 
+                                            type="text" 
+                                            value={reply}
+                                            onChange={(e) => setReply(e.target.value)}
+                                            placeholder="Yanıtınızı buraya yazın..."
+                                            className="w-full bg-slate-900 border border-white/10 rounded-2xl px-6 py-4 pr-16 text-sm text-white placeholder:text-slate-600 outline-none focus:border-blue-500/50 transition-all shadow-inner"
+                                        />
+                                        <button 
+                                            type="submit"
+                                            disabled={!reply.trim()}
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center hover:bg-blue-500 disabled:opacity-40 disabled:scale-100 transition-all active:scale-90 shadow-lg shadow-blue-600/20"
+                                        >
+                                            <Send size={18} />
+                                        </button>
+                                    </form>
+                                </div>
+                            </>
+                        ) : (
+                            <div className="flex-1 flex flex-col items-center justify-center text-center p-12 opacity-30">
+                                <div className="w-24 h-24 bg-slate-900 rounded-[40px] flex items-center justify-center border border-white/5 mb-6">
+                                    <MessageSquare size={40} className="text-slate-500" />
+                                </div>
+                                <h3 className="text-xl font-black text-white uppercase tracking-[0.2em]">Sohbet Seçin</h3>
+                                <p className="text-sm mt-3 max-w-xs font-bold text-slate-500">Yanıtlamak istediğiniz bir canlı destek oturumunu soldaki listeden seçin.</p>
+                            </div>
+                        )}
                     </div>
                 </div>
-            </div>
+            ) : (
+                <div className="bg-[#020617] border border-white/10 p-12 rounded-[40px] text-center shadow-xl">
+                    <LifeBuoy size={48} className="mx-auto text-slate-700 mb-6" />
+                    <h3 className="text-xl font-black text-white uppercase tracking-widest">Destek Talepleri</h3>
+                    <p className="text-slate-500 mt-2">Bu bölümdeki geliştirmeler devam ediyor.</p>
+                </div>
+            )}
         </div>
     );
 }

@@ -11,6 +11,7 @@ import {
     Sparkles,
     RotateCcw,
     ExternalLink,
+    Clock,
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
@@ -126,16 +127,66 @@ export default function SupportWidget() {
     const aiScrollRef = useRef<HTMLDivElement>(null);
 
     // Live Support state
-    const [liveMessages, setLiveMessages] = useState<Message[]>([
-        {
-            id: 1,
-            role: "agent",
-            text: "Merhaba! Ben TUGER Destek Ekibi'nden bir yetkiliyim. Size nasıl yardımcı olabilirim?",
-            time: now(),
-        },
-    ]);
+    const [isLiveEnabled, setIsLiveEnabled] = useState(true);
+    const [liveMessages, setLiveMessages] = useState<Message[]>([]);
     const [liveInput, setLiveInput] = useState("");
+    const [sessionId, setSessionId] = useState<string | null>(null);
     const liveScrollRef = useRef<HTMLDivElement>(null);
+
+    // Initial load: handle sessionId and check live status
+    useEffect(() => {
+        // Handle Session ID
+        let sid = localStorage.getItem("pixeon_support_sid");
+        if (!sid) {
+            sid = `sid_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+            localStorage.setItem("pixeon_support_sid", sid);
+        }
+        setSessionId(sid);
+
+        // Check Live Support Status
+        const checkStatus = async () => {
+            try {
+                const res = await fetch("/api/support/status");
+                const data = await res.json();
+                setIsLiveEnabled(data.isEnabled);
+            } catch (err) {
+                console.error("Status check failed", err);
+            }
+        };
+        checkStatus();
+    }, []);
+
+    // Fetch live messages periodically if tab is "live" and isOpen
+    useEffect(() => {
+        if (!isOpen || tab !== "live" || !sessionId) return;
+
+        const fetchMessages = async () => {
+            try {
+                const res = await fetch(`/api/support/chat?sessionId=${sessionId}`);
+                const data = await res.json();
+                if (data.messages) {
+                    const mapped: Message[] = data.messages.map((m: any) => ({
+                        id: m.id,
+                        role: m.senderRole === "ADMIN" ? "agent" : "user",
+                        text: m.message,
+                        time: new Date(m.createdAt).toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" })
+                    }));
+                    
+                    // Only update if there are new messages
+                    setLiveMessages(prev => {
+                        if (prev.length === mapped.length) return prev;
+                        return mapped;
+                    });
+                }
+            } catch (err) {
+                console.error("Failed to fetch messages", err);
+            }
+        };
+
+        fetchMessages();
+        const interval = setInterval(fetchMessages, 3000); // Poll every 3s
+        return () => clearInterval(interval);
+    }, [isOpen, tab, sessionId]);
 
     // Auto-scroll
     useEffect(() => {
@@ -188,25 +239,37 @@ export default function SupportWidget() {
     };
 
     // ── Live Send ─────────────────────────────────────────────────────────────
-    const handleLiveSend = (e: React.FormEvent) => {
+    const handleLiveSend = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!liveInput.trim()) return;
+        if (!liveInput.trim() || !sessionId) return;
 
-        const userMsg: Message = { id: Date.now(), role: "user", text: liveInput, time: now() };
-        setLiveMessages((prev) => [...prev, userMsg]);
+        const msgText = liveInput;
         setLiveInput("");
 
-        setTimeout(() => {
-            setLiveMessages((prev) => [
-                ...prev,
-                {
-                    id: Date.now() + 1,
-                    role: "agent",
-                    text: "Mesajınızı aldım. En kısa sürede size dönüş yapacağız.",
-                    time: now(),
-                },
-            ]);
-        }, 1200);
+        try {
+            const res = await fetch("/api/support/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    sessionId,
+                    message: msgText,
+                    senderName: "Misafir"
+                }),
+            });
+            
+            if (res.ok) {
+                const data = await res.json();
+                const newMessage: Message = {
+                    id: data.message.id,
+                    role: "user",
+                    text: data.message.message,
+                    time: now()
+                };
+                setLiveMessages(prev => [...prev, newMessage]);
+            }
+        } catch (err) {
+            console.error("Failed to send live message", err);
+        }
     };
 
     // ── Reset AI ──────────────────────────────────────────────────────────────
@@ -401,10 +464,38 @@ export default function SupportWidget() {
                             {/* Messages */}
                             <div
                                 ref={liveScrollRef}
-                                className="flex-1 p-4 overflow-y-auto space-y-3 scrollbar-hide"
+                                className="flex-1 p-4 overflow-y-auto space-y-3 scrollbar-hide flex flex-col"
                                 style={{ background: "linear-gradient(180deg, #080e1c 0%, #0c1022 100%)" }}
                             >
-                                {liveMessages.map((msg) => (
+                                {!isLiveEnabled && (
+                                    <div className="flex-1 flex flex-col items-center justify-center text-center p-6 space-y-4">
+                                        <div className="w-16 h-16 bg-slate-900 rounded-3xl flex items-center justify-center border border-white/5 text-slate-500">
+                                            <Clock size={32} />
+                                        </div>
+                                        <div>
+                                            <h4 className="text-white font-bold text-sm">Canlı Destek Şu An Kapalı</h4>
+                                            <p className="text-slate-500 text-xs mt-2 leading-relaxed">
+                                                Destek ekibimiz şu an aktif değil. Lütfen AI Asistanımız ile devam edin veya hafta içi 09:00 - 18:00 saatleri arasında tekrar deneyin.
+                                            </p>
+                                        </div>
+                                        <button 
+                                            onClick={() => setTab("ai")}
+                                            className="px-6 py-2 bg-blue-600/10 text-blue-400 border border-blue-500/20 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-600/20 transition-all"
+                                        >
+                                            AI Asistana Sor
+                                        </button>
+                                    </div>
+                                )}
+
+                                {isLiveEnabled && liveMessages.length === 0 && (
+                                    <div className="flex-1 flex flex-col items-center justify-center text-center p-6">
+                                        <p className="text-slate-500 text-xs">
+                                            Bir mesaj yazarak canlı destek ekibimizle görüşmeye başlayabilirsiniz.
+                                        </p>
+                                    </div>
+                                )}
+
+                                {isLiveEnabled && liveMessages.map((msg) => (
                                     <div
                                         key={msg.id}
                                         className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
@@ -432,34 +523,36 @@ export default function SupportWidget() {
                             </div>
 
                             {/* Input */}
-                            <div className="p-3 bg-slate-950/90 border-t border-white/5 shrink-0">
-                                <form onSubmit={handleLiveSend} className="relative">
-                                    <input
-                                        type="text"
-                                        value={liveInput}
-                                        onChange={(e) => setLiveInput(e.target.value)}
-                                        placeholder="Mesajınızı yazın..."
-                                        className="w-full bg-slate-900 border border-white/6 focus:border-sky-500/50 rounded-2xl px-4 py-3 pr-24 text-sm text-white placeholder:text-slate-600 outline-none transition-all"
-                                    />
-                                    <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
-                                        <button
-                                            type="button"
-                                            className="w-7 h-7 text-slate-500 hover:text-sky-400 transition-colors flex items-center justify-center"
-                                        >
-                                            <Paperclip size={15} />
-                                        </button>
-                                        <button
-                                            type="submit"
-                                            className="w-8 h-8 bg-sky-600 hover:bg-sky-500 text-white rounded-xl flex items-center justify-center transition-all shadow-lg shadow-sky-600/20 active:scale-95"
-                                        >
-                                            <Send size={14} />
-                                        </button>
-                                    </div>
-                                </form>
-                                <p className="text-[9px] text-center text-slate-600 mt-2 uppercase tracking-widest font-bold">
-                                    Tuger Destek Ekibi · Hft İçi 09:00–18:00
-                                </p>
-                            </div>
+                            {isLiveEnabled && (
+                                <div className="p-3 bg-slate-950/90 border-t border-white/5 shrink-0">
+                                    <form onSubmit={handleLiveSend} className="relative">
+                                        <input
+                                            type="text"
+                                            value={liveInput}
+                                            onChange={(e) => setLiveInput(e.target.value)}
+                                            placeholder="Mesajınızı yazın..."
+                                            className="w-full bg-slate-900 border border-white/6 focus:border-sky-500/50 rounded-2xl px-4 py-3 pr-24 text-sm text-white placeholder:text-slate-600 outline-none transition-all"
+                                        />
+                                        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                                            <button
+                                                type="button"
+                                                className="w-7 h-7 text-slate-500 hover:text-sky-400 transition-colors flex items-center justify-center"
+                                            >
+                                                <Paperclip size={15} />
+                                            </button>
+                                            <button
+                                                type="submit"
+                                                className="w-8 h-8 bg-sky-600 hover:bg-sky-500 text-white rounded-xl flex items-center justify-center transition-all shadow-lg shadow-sky-600/20 active:scale-95"
+                                            >
+                                                <Send size={14} />
+                                            </button>
+                                        </div>
+                                    </form>
+                                    <p className="text-[9px] text-center text-slate-600 mt-2 uppercase tracking-widest font-bold">
+                                        Tuger Destek Ekibi · Hft İçi 09:00–18:00
+                                    </p>
+                                </div>
+                            )}
                         </>
                     )}
                 </div>
