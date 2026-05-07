@@ -20,7 +20,7 @@ import Link from "next/link";
 type Tab = "ai" | "live";
 
 interface Message {
-    id: number;
+    id: string | number;
     role: "user" | "ai" | "agent";
     text: string;
     time: string;
@@ -112,6 +112,10 @@ export default function SupportWidget() {
     const { isOpen, toggleSupport, closeSupport } = useSupport();
     const [tab, setTab] = useState<Tab>("ai");
 
+    // User Auth state
+    const [user, setUser] = useState<any>(null);
+    const [isAuthLoading, setIsAuthLoading] = useState(true);
+
     // AI Chat state
     const [aiMessages, setAiMessages] = useState<Message[]>([
         {
@@ -133,7 +137,7 @@ export default function SupportWidget() {
     const [sessionId, setSessionId] = useState<string | null>(null);
     const liveScrollRef = useRef<HTMLDivElement>(null);
 
-    // Initial load: handle sessionId and check live status
+    // Initial load: handle sessionId, check live status, and check auth
     useEffect(() => {
         // Handle Session ID
         let sid = localStorage.getItem("pixeon_support_sid");
@@ -154,11 +158,27 @@ export default function SupportWidget() {
             }
         };
         checkStatus();
+
+        // Check User Auth
+        const checkAuth = async () => {
+            try {
+                const res = await fetch("/api/auth/me");
+                if (res.ok) {
+                    const data = await res.json();
+                    setUser(data.user);
+                }
+            } catch (err) {
+                console.error("Auth check failed", err);
+            } finally {
+                setIsAuthLoading(false);
+            }
+        };
+        checkAuth();
     }, []);
 
     // Fetch live messages periodically if tab is "live" and isOpen
     useEffect(() => {
-        if (!isOpen || tab !== "live" || !sessionId) return;
+        if (!isOpen || tab !== "live" || !sessionId || !user) return;
 
         const fetchMessages = async () => {
             try {
@@ -172,7 +192,6 @@ export default function SupportWidget() {
                         time: new Date(m.createdAt).toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" })
                     }));
                     
-                    // Only update if there are new messages
                     setLiveMessages(prev => {
                         if (prev.length === mapped.length) return prev;
                         return mapped;
@@ -184,27 +203,23 @@ export default function SupportWidget() {
         };
 
         fetchMessages();
-        const interval = setInterval(fetchMessages, 3000); // Poll every 3s
+        const interval = setInterval(fetchMessages, 3000);
         return () => clearInterval(interval);
-    }, [isOpen, tab, sessionId]);
+    }, [isOpen, tab, sessionId, user]);
 
     // Auto-scroll
     useEffect(() => {
-        if (aiScrollRef.current) {
-            aiScrollRef.current.scrollTop = aiScrollRef.current.scrollHeight;
-        }
+        if (aiScrollRef.current) aiScrollRef.current.scrollTop = aiScrollRef.current.scrollHeight;
     }, [aiMessages, isTyping]);
 
     useEffect(() => {
-        if (liveScrollRef.current) {
-            liveScrollRef.current.scrollTop = liveScrollRef.current.scrollHeight;
-        }
+        if (liveScrollRef.current) liveScrollRef.current.scrollTop = liveScrollRef.current.scrollHeight;
     }, [liveMessages]);
 
     // ── AI Send ──────────────────────────────────────────────────────────────
     const handleAiSend = async (text?: string) => {
         const msg = (text ?? aiInput).trim();
-        if (!msg || isTyping) return;
+        if (!msg || isTyping || !user) return;
 
         const userMsg: Message = { id: Date.now(), role: "user", text: msg, time: now() };
         setAiMessages((prev) => [...prev, userMsg]);
@@ -226,12 +241,7 @@ export default function SupportWidget() {
         } catch {
             setAiMessages((prev) => [
                 ...prev,
-                {
-                    id: Date.now() + 1,
-                    role: "ai",
-                    text: "Bağlantı hatası. Lütfen tekrar deneyin.",
-                    time: now(),
-                },
+                { id: Date.now() + 1, role: "ai", text: "Bağlantı hatası.", time: now() },
             ]);
         } finally {
             setIsTyping(false);
@@ -241,7 +251,7 @@ export default function SupportWidget() {
     // ── Live Send ─────────────────────────────────────────────────────────────
     const handleLiveSend = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!liveInput.trim() || !sessionId) return;
+        if (!liveInput.trim() || !sessionId || !user) return;
 
         const msgText = liveInput;
         setLiveInput("");
@@ -250,21 +260,12 @@ export default function SupportWidget() {
             const res = await fetch("/api/support/chat", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    sessionId,
-                    message: msgText,
-                    senderName: "Misafir"
-                }),
+                body: JSON.stringify({ sessionId, message: msgText, senderName: user.name }),
             });
             
             if (res.ok) {
                 const data = await res.json();
-                const newMessage: Message = {
-                    id: data.message.id,
-                    role: "user",
-                    text: data.message.message,
-                    time: now()
-                };
+                const newMessage: Message = { id: data.message.id, role: "user", text: data.message.message, time: now() };
                 setLiveMessages(prev => [...prev, newMessage]);
             }
         } catch (err) {
@@ -272,336 +273,145 @@ export default function SupportWidget() {
         }
     };
 
-    // ── Reset AI ──────────────────────────────────────────────────────────────
     const resetAi = () => {
-        setAiMessages([
-            {
-                id: 1,
-                role: "ai",
-                text: "👋 Merhaba! Ben **Pixeon AI Asistanı**. Kargo, iade, ödeme, garanti ve daha fazlası hakkında sorularınızı yanıtlayabilirim.\n\nSize nasıl yardımcı olabilirim?",
-                time: now(),
-                isMarkdown: true,
-            },
-        ]);
+        setAiMessages([{ id: 1, role: "ai", text: "👋 Merhaba! Ben **Pixeon AI Asistanı**. Size nasıl yardımcı olabilirim?", time: now(), isMarkdown: true }]);
     };
 
     return (
         <div className="fixed bottom-6 right-6 z-[9999]">
-            {/* ── Chat Window ─────────────────────────────────────────── */}
             {isOpen && (
                 <div
-                    className="absolute bottom-20 right-0 w-[390px] bg-[#0c1022] border border-white/10 rounded-[28px] shadow-2xl shadow-black/60 flex flex-col overflow-hidden"
-                    style={{
-                        height: "560px",
-                        animation: "slideUp 0.25s cubic-bezier(0.34,1.56,0.64,1)",
-                    }}
+                    className="absolute bottom-20 right-0 w-[390px] h-[560px] bg-[#0c1022] border border-white/10 rounded-[28px] shadow-2xl flex flex-col overflow-hidden"
+                    style={{ animation: "slideUp 0.25s cubic-bezier(0.34,1.56,0.64,1)" }}
                 >
-                    {/* ── Header ──────────────────────────────────────── */}
+                    {/* Header */}
                     <div className="bg-gradient-to-r from-[#1a2aff] via-[#2563eb] to-[#06b6d4] p-5 flex items-center justify-between shrink-0">
                         <div className="flex items-center gap-3">
                             <div className="relative">
                                 <div className="w-11 h-11 bg-white/15 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/20">
-                                    {tab === "ai" ? (
-                                        <Bot className="text-white" size={22} />
-                                    ) : (
-                                        <Headset className="text-white" size={22} />
-                                    )}
+                                    {tab === "ai" ? <Bot className="text-white" size={22} /> : <Headset className="text-white" size={22} />}
                                 </div>
                                 <span className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-green-400 rounded-full border-2 border-[#1a40c9] animate-pulse" />
                             </div>
                             <div>
-                                <h3 className="text-white font-bold text-sm">
-                                    {tab === "ai" ? "Pixeon AI Asistanı" : "Canlı Destek"}
-                                </h3>
-                                <span className="text-white/65 text-[10px] font-medium uppercase tracking-wider">
-                                    {tab === "ai" ? "7/24 Hizmetinizdeyim" : "Çevrimiçi · Ortalama 5 dk"}
-                                </span>
+                                <h3 className="text-white font-bold text-sm">{tab === "ai" ? "Pixeon AI Asistanı" : "Canlı Destek"}</h3>
+                                <span className="text-white/65 text-[10px] font-medium uppercase tracking-wider">{tab === "ai" ? "7/24 Hizmetinizde" : "Çevrimiçi"}</span>
                             </div>
                         </div>
                         <div className="flex items-center gap-2">
-                            {tab === "ai" && (
-                                <button
-                                    onClick={resetAi}
-                                    title="Sohbeti sıfırla"
-                                    className="w-8 h-8 bg-white/15 hover:bg-white/25 transition-colors rounded-xl flex items-center justify-center text-white/80 hover:text-white"
-                                >
-                                    <RotateCcw size={14} />
-                                </button>
-                            )}
-                            <button
-                                onClick={closeSupport}
-                                className="w-8 h-8 bg-white/15 hover:bg-white/25 transition-colors rounded-xl flex items-center justify-center text-white/80 hover:text-white"
-                            >
-                                <X size={16} />
-                            </button>
+                            {tab === "ai" && <button onClick={resetAi} className="w-8 h-8 bg-white/15 hover:bg-white/25 rounded-xl flex items-center justify-center text-white/80"><RotateCcw size={14} /></button>}
+                            <button onClick={closeSupport} className="w-8 h-8 bg-white/15 hover:bg-white/25 rounded-xl flex items-center justify-center text-white/80"><X size={16} /></button>
                         </div>
                     </div>
 
-                    {/* ── Tab Bar ─────────────────────────────────────── */}
+                    {/* Tab Bar */}
                     <div className="flex shrink-0 bg-slate-950/80 border-b border-white/5">
                         {(["ai", "live"] as Tab[]).map((t) => (
                             <button
                                 key={t}
                                 onClick={() => setTab(t)}
-                                className={`flex-1 py-3 text-xs font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${tab === t
-                                    ? "text-blue-400 border-b-2 border-blue-500"
-                                    : "text-slate-500 hover:text-slate-300 border-b-2 border-transparent"
-                                    }`}
+                                className={`flex-1 py-3 text-xs font-bold uppercase tracking-widest transition-all border-b-2 ${tab === t ? "text-blue-400 border-blue-500" : "text-slate-500 border-transparent hover:text-slate-300"}`}
                             >
-                                {t === "ai" ? (
-                                    <>
-                                        <Sparkles size={12} />
-                                        AI Asistan
-                                    </>
-                                ) : (
-                                    <>
-                                        <Headset size={12} />
-                                        Canlı Destek
-                                    </>
-                                )}
+                                {t === "ai" ? "AI Asistan" : "Canlı Destek"}
                             </button>
                         ))}
                     </div>
 
-                    {/* ── AI TAB ──────────────────────────────────────── */}
-                    {tab === "ai" && (
-                        <>
-                            {/* Messages */}
-                            <div
-                                ref={aiScrollRef}
-                                className="flex-1 p-4 overflow-y-auto space-y-3 scrollbar-hide"
-                                style={{ background: "linear-gradient(180deg, #080e1c 0%, #0c1022 100%)" }}
-                            >
-                                {aiMessages.map((msg) => (
-                                    <div
-                                        key={msg.id}
-                                        className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-                                    >
-                                        {msg.role === "ai" && (
-                                            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center shrink-0 mr-2 mt-auto mb-1 shadow-lg shadow-blue-500/20">
-                                                <Bot size={13} className="text-white" />
-                                            </div>
-                                        )}
-                                        <div
-                                            className={`max-w-[78%] px-4 py-3 rounded-2xl ${msg.role === "user"
-                                                ? "bg-blue-600 text-white rounded-tr-sm shadow-lg shadow-blue-600/25"
-                                                : "bg-slate-900 border border-white/6 text-slate-300 rounded-tl-sm"
-                                                }`}
-                                        >
-                                            {msg.isMarkdown ? (
-                                                <RenderText text={msg.text} />
-                                            ) : (
-                                                <p className="text-sm leading-relaxed">{msg.text}</p>
-                                            )}
-                                            <span
-                                                className={`text-[9px] mt-1.5 block ${msg.role === "user" ? "text-white/40 text-right" : "text-slate-600"}`}
-                                            >
-                                                {msg.time}
-                                            </span>
-                                        </div>
-                                    </div>
-                                ))}
-
-                                {isTyping && <TypingIndicator />}
-
-                                {/* Quick suggestions — only show after first message */}
-                                {aiMessages.length === 1 && !isTyping && (
-                                    <div className="pt-2 space-y-1.5">
-                                        <p className="text-[10px] text-slate-600 uppercase tracking-widest font-bold pl-1">
-                                            Hızlı sorular
-                                        </p>
-                                        {QUICK_SUGGESTIONS.map((s) => (
-                                            <button
-                                                key={s}
-                                                onClick={() => handleAiSend(s)}
-                                                className="block w-full text-left text-xs text-slate-400 bg-slate-900/60 hover:bg-slate-800/80 border border-white/5 hover:border-blue-500/30 rounded-xl px-3 py-2.5 transition-all hover:text-slate-200"
-                                            >
-                                                {s}
-                                            </button>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Input */}
-                            <div className="p-3 bg-slate-950/90 border-t border-white/5 shrink-0">
-                                <form
-                                    onSubmit={(e) => {
-                                        e.preventDefault();
-                                        handleAiSend();
-                                    }}
-                                    className="relative"
-                                >
-                                    <input
-                                        type="text"
-                                        value={aiInput}
-                                        onChange={(e) => setAiInput(e.target.value)}
-                                        placeholder="Bir şey sorun..."
-                                        disabled={isTyping}
-                                        className="w-full bg-slate-900 border border-white/6 focus:border-blue-500/50 rounded-2xl px-4 py-3 pr-12 text-sm text-white placeholder:text-slate-600 outline-none transition-all disabled:opacity-50"
-                                    />
-                                    <button
-                                        type="submit"
-                                        disabled={isTyping || !aiInput.trim()}
-                                        className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-blue-600 hover:bg-blue-500 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-xl flex items-center justify-center transition-all shadow-lg shadow-blue-600/20 active:scale-95"
-                                    >
-                                        <Send size={14} />
-                                    </button>
-                                </form>
-                                <div className="flex items-center justify-center gap-1.5 mt-2">
-                                    <Sparkles size={9} className="text-blue-500/60" />
-                                    <p className="text-[9px] text-slate-600 uppercase tracking-widest font-bold">
-                                        Pixeon AI · Kural Tabanlı Asistan
-                                    </p>
+                    {/* Content Area */}
+                    <div className="flex-1 overflow-hidden flex flex-col relative">
+                        {/* Auth Required Overlay */}
+                        {!isAuthLoading && !user && (
+                            <div className="absolute inset-0 z-50 backdrop-blur-md bg-slate-950/60 flex flex-col items-center justify-center text-center p-8 space-y-4">
+                                <div className="w-16 h-16 bg-slate-900 rounded-3xl flex items-center justify-center border border-white/5 text-blue-500 shadow-xl">
+                                    {tab === "ai" ? <Bot size={32} /> : <Headset size={32} />}
                                 </div>
+                                <h4 className="text-white font-bold text-sm uppercase tracking-widest">Giriş Yapmalısınız</h4>
+                                <p className="text-slate-400 text-xs leading-relaxed">Destek sistemini kullanabilmek için lütfen hesabınıza giriş yapın.</p>
+                                <Link href="/login" className="px-8 py-3 bg-blue-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-500 transition-all">Giriş Yap</Link>
                             </div>
-                        </>
-                    )}
+                        )}
 
-                    {/* ── LIVE SUPPORT TAB ────────────────────────────── */}
-                    {tab === "live" && (
-                        <>
-                            {/* Messages */}
-                            <div
-                                ref={liveScrollRef}
-                                className="flex-1 p-4 overflow-y-auto space-y-3 scrollbar-hide flex flex-col"
-                                style={{ background: "linear-gradient(180deg, #080e1c 0%, #0c1022 100%)" }}
-                            >
-                                {!isLiveEnabled && (
-                                    <div className="flex-1 flex flex-col items-center justify-center text-center p-6 space-y-4">
-                                        <div className="w-16 h-16 bg-slate-900 rounded-3xl flex items-center justify-center border border-white/5 text-slate-500">
-                                            <Clock size={32} />
-                                        </div>
-                                        <div>
-                                            <h4 className="text-white font-bold text-sm">Canlı Destek Şu An Kapalı</h4>
-                                            <p className="text-slate-500 text-xs mt-2 leading-relaxed">
-                                                Destek ekibimiz şu an aktif değil. Lütfen AI Asistanımız ile devam edin veya hafta içi 09:00 - 18:00 saatleri arasında tekrar deneyin.
-                                            </p>
-                                        </div>
-                                        <button 
-                                            onClick={() => setTab("ai")}
-                                            className="px-6 py-2 bg-blue-600/10 text-blue-400 border border-blue-500/20 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-600/20 transition-all"
-                                        >
-                                            AI Asistana Sor
-                                        </button>
-                                    </div>
-                                )}
-
-                                {isLiveEnabled && liveMessages.length === 0 && (
-                                    <div className="flex-1 flex flex-col items-center justify-center text-center p-6">
-                                        <p className="text-slate-500 text-xs">
-                                            Bir mesaj yazarak canlı destek ekibimizle görüşmeye başlayabilirsiniz.
-                                        </p>
-                                    </div>
-                                )}
-
-                                {isLiveEnabled && liveMessages.map((msg) => (
-                                    <div
-                                        key={msg.id}
-                                        className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-                                    >
-                                        {msg.role === "agent" && (
-                                            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-sky-600 to-cyan-500 flex items-center justify-center shrink-0 mr-2 mt-auto mb-1 shadow-lg shadow-sky-500/20">
-                                                <Headset size={12} className="text-white" />
+                        {tab === "ai" ? (
+                            <div className="flex-1 flex flex-col overflow-hidden">
+                                <div ref={aiScrollRef} className="flex-1 p-4 overflow-y-auto space-y-3 scrollbar-hide" style={{ background: "linear-gradient(180deg, #080e1c 0%, #0c1022 100%)" }}>
+                                    {aiMessages.map((msg) => (
+                                        <div key={msg.id} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+                                            {msg.role === "ai" && <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center shrink-0 mr-2 mt-auto mb-1"><Bot size={13} className="text-white" /></div>}
+                                            <div className={`max-w-[78%] px-4 py-3 rounded-2xl ${msg.role === "user" ? "bg-blue-600 text-white rounded-tr-sm" : "bg-slate-900 border border-white/6 text-slate-300 rounded-tl-sm"}`}>
+                                                {msg.isMarkdown ? <RenderText text={msg.text} /> : <p className="text-sm leading-relaxed">{msg.text}</p>}
+                                                <span className={`text-[9px] mt-1.5 block ${msg.role === "user" ? "text-white/40 text-right" : "text-slate-600"}`}>{msg.time}</span>
                                             </div>
-                                        )}
-                                        <div
-                                            className={`max-w-[78%] px-4 py-3 rounded-2xl text-sm ${msg.role === "user"
-                                                ? "bg-blue-600 text-white rounded-tr-sm shadow-lg shadow-blue-600/25"
-                                                : "bg-slate-900 border border-white/6 text-slate-300 rounded-tl-sm"
-                                                }`}
-                                        >
-                                            <p className="leading-relaxed">{msg.text}</p>
-                                            <span
-                                                className={`text-[9px] mt-1.5 block ${msg.role === "user" ? "text-white/40 text-right" : "text-slate-600"}`}
-                                            >
-                                                {msg.time}
-                                            </span>
                                         </div>
-                                    </div>
-                                ))}
-                            </div>
-
-                            {/* Input */}
-                            {isLiveEnabled && (
-                                <div className="p-3 bg-slate-950/90 border-t border-white/5 shrink-0">
-                                    <form onSubmit={handleLiveSend} className="relative">
-                                        <input
-                                            type="text"
-                                            value={liveInput}
-                                            onChange={(e) => setLiveInput(e.target.value)}
-                                            placeholder="Mesajınızı yazın..."
-                                            className="w-full bg-slate-900 border border-white/6 focus:border-sky-500/50 rounded-2xl px-4 py-3 pr-24 text-sm text-white placeholder:text-slate-600 outline-none transition-all"
-                                        />
-                                        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
-                                            <button
-                                                type="button"
-                                                className="w-7 h-7 text-slate-500 hover:text-sky-400 transition-colors flex items-center justify-center"
-                                            >
-                                                <Paperclip size={15} />
-                                            </button>
-                                            <button
-                                                type="submit"
-                                                className="w-8 h-8 bg-sky-600 hover:bg-sky-500 text-white rounded-xl flex items-center justify-center transition-all shadow-lg shadow-sky-600/20 active:scale-95"
-                                            >
-                                                <Send size={14} />
-                                            </button>
+                                    ))}
+                                    {isTyping && <TypingIndicator />}
+                                    {aiMessages.length === 1 && !isTyping && user && (
+                                        <div className="pt-2 space-y-1.5">
+                                            {QUICK_SUGGESTIONS.map((s) => (
+                                                <button key={s} onClick={() => handleAiSend(s)} className="block w-full text-left text-xs text-slate-400 bg-slate-900/60 hover:bg-slate-800/80 border border-white/5 rounded-xl px-3 py-2.5 transition-all">{s}</button>
+                                            ))}
                                         </div>
+                                    )}
+                                </div>
+                                <div className="p-3 bg-slate-950/90 border-t border-white/5">
+                                    <form onSubmit={(e) => { e.preventDefault(); handleAiSend(); }} className="relative">
+                                        <input type="text" value={aiInput} onChange={(e) => setAiInput(e.target.value)} placeholder="Bir şey sorun..." disabled={isTyping || !user} className="w-full bg-slate-900 border border-white/6 rounded-2xl px-4 py-3 pr-12 text-sm text-white outline-none disabled:opacity-50" />
+                                        <button type="submit" disabled={isTyping || !aiInput.trim() || !user} className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-blue-600 text-white rounded-xl flex items-center justify-center disabled:opacity-40"><Send size={14} /></button>
                                     </form>
-                                    <p className="text-[9px] text-center text-slate-600 mt-2 uppercase tracking-widest font-bold">
-                                        Tuger Destek Ekibi · Hft İçi 09:00–18:00
-                                    </p>
                                 </div>
-                            )}
-                        </>
-                    )}
+                            </div>
+                        ) : (
+                            <div className="flex-1 flex flex-col overflow-hidden">
+                                <div ref={liveScrollRef} className="flex-1 p-4 overflow-y-auto space-y-3 scrollbar-hide flex flex-col" style={{ background: "linear-gradient(180deg, #080e1c 0%, #0c1022 100%)" }}>
+                                    {!isLiveEnabled && (
+                                        <div className="flex-1 flex flex-col items-center justify-center text-center p-6 space-y-4">
+                                            <div className="w-16 h-16 bg-slate-900 rounded-3xl flex items-center justify-center border border-white/5 text-slate-500"><Clock size={32} /></div>
+                                            <h4 className="text-white font-bold text-sm">Canlı Destek Şu An Kapalı</h4>
+                                            <p className="text-slate-500 text-xs leading-relaxed">Şu an aktif değiliz. Lütfen AI Asistan ile devam edin.</p>
+                                            <button onClick={() => setTab("ai")} className="px-6 py-2 bg-blue-600/10 text-blue-400 border border-blue-500/20 rounded-xl text-[10px] font-black uppercase tracking-widest">AI Asistana Sor</button>
+                                        </div>
+                                    )}
+                                    {isLiveEnabled && user && liveMessages.length === 0 && <div className="flex-1 flex flex-col items-center justify-center text-center p-6"><p className="text-slate-500 text-xs">Bir mesaj yazarak ekibimizle görüşmeye başlayın.</p></div>}
+                                    {isLiveEnabled && user && liveMessages.map((msg) => (
+                                        <div key={msg.id} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+                                            {msg.role === "agent" && <div className="w-7 h-7 rounded-full bg-gradient-to-br from-sky-600 to-cyan-500 flex items-center justify-center shrink-0 mr-2 mt-auto mb-1"><Headset size={12} className="text-white" /></div>}
+                                            <div className={`max-w-[78%] px-4 py-3 rounded-2xl text-sm ${msg.role === "user" ? "bg-blue-600 text-white rounded-tr-sm" : "bg-slate-900 border border-white/6 text-slate-300 rounded-tl-sm"}`}>
+                                                <p className="leading-relaxed">{msg.text}</p>
+                                                <span className={`text-[9px] mt-1.5 block ${msg.role === "user" ? "text-white/40 text-right" : "text-slate-600"}`}>{msg.time}</span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                                {isLiveEnabled && user && (
+                                    <div className="p-3 bg-slate-950/90 border-t border-white/5">
+                                        <form onSubmit={handleLiveSend} className="relative">
+                                            <input type="text" value={liveInput} onChange={(e) => setLiveInput(e.target.value)} placeholder="Mesajınızı yazın..." className="w-full bg-slate-900 border border-white/6 rounded-2xl px-4 py-3 pr-24 text-sm text-white outline-none" />
+                                            <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                                                <button type="button" className="w-7 h-7 text-slate-500 hover:text-sky-400"><Paperclip size={15} /></button>
+                                                <button type="submit" className="w-8 h-8 bg-sky-600 text-white rounded-xl flex items-center justify-center shadow-lg"><Send size={14} /></button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
                 </div>
             )}
 
-            {/* ── Bubble Button ─────────────────────────────────────────── */}
             <button
-                id="support-bubble-btn"
                 onClick={toggleSupport}
-                className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 shadow-2xl relative group ${isOpen
-                    ? "bg-red-500 shadow-red-500/30 rotate-[135deg]"
-                    : "bg-gradient-to-br from-blue-600 to-cyan-500 shadow-blue-600/40 hover:scale-110 hover:shadow-blue-500/60"
-                    }`}
-                aria-label={isOpen ? "Destek panelini kapat" : "Destek panelini aç"}
+                className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 shadow-2xl relative group ${isOpen ? "bg-red-500 rotate-[135deg]" : "bg-gradient-to-br from-blue-600 to-cyan-500 hover:scale-110"}`}
             >
-                {isOpen ? (
-                    <X className="text-white" size={26} />
-                ) : (
-                    <MessageCircle className="text-white" size={26} />
-                )}
-
-                {/* Pulse ring */}
-                {!isOpen && (
-                    <span className="absolute inset-0 rounded-full bg-blue-500/30 animate-ping" />
-                )}
-
-                {/* Unread badge */}
-                {!isOpen && (
-                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 border-2 border-[#020617] rounded-full flex items-center justify-center text-[9px] font-black text-white shadow-lg shadow-red-500/50">
-                        AI
-                    </span>
-                )}
+                {isOpen ? <X className="text-white" size={26} /> : <MessageCircle className="text-white" size={26} />}
+                {!isOpen && <span className="absolute inset-0 rounded-full bg-blue-500/30 animate-ping" />}
+                {!isOpen && <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 border-2 border-[#020617] rounded-full flex items-center justify-center text-[9px] font-black text-white shadow-lg shadow-red-500/50">AI</span>}
             </button>
 
-            {/* ── Tooltip (when closed) ──────────────────────────────── */}
-            {!isOpen && (
-                <div className="absolute bottom-20 right-0 bg-slate-900 border border-white/10 text-white text-xs font-semibold px-4 py-2 rounded-2xl whitespace-nowrap shadow-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity">
-                    AI Asistanla Konuş ✨
-                </div>
-            )}
-
             <style>{`
-        @keyframes slideUp {
-          from { opacity: 0; transform: translateY(20px) scale(0.95); }
-          to   { opacity: 1; transform: translateY(0)   scale(1); }
-        }
-        .scrollbar-hide::-webkit-scrollbar { display: none; }
-        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
-      `}</style>
+                @keyframes slideUp { from { opacity: 0; transform: translateY(20px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+                .scrollbar-hide::-webkit-scrollbar { display: none; }
+                .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+            `}</style>
         </div>
     );
 }
