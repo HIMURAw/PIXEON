@@ -12,6 +12,7 @@ import {
     RotateCcw,
     ExternalLink,
     Clock,
+    ZoomIn,
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
@@ -26,6 +27,7 @@ interface Message {
     time: string;
     senderName?: string;
     senderImage?: string;
+    imageUrl?: string;
     isMarkdown?: boolean;
 }
 
@@ -137,6 +139,7 @@ export default function SupportWidget() {
     const [liveMessages, setLiveMessages] = useState<Message[]>([]);
     const [liveInput, setLiveInput] = useState("");
     const [sessionId, setSessionId] = useState<string | null>(null);
+    const [previewImage, setPreviewImage] = useState<string | null>(null);
     const liveScrollRef = useRef<HTMLDivElement>(null);
 
     // Initial load: handle sessionId, check live status, and check auth
@@ -193,9 +196,10 @@ export default function SupportWidget() {
                         text: m.message,
                         senderName: m.senderName,
                         senderImage: m.senderImage,
+                        imageUrl: m.imageUrl,
                         time: new Date(m.createdAt).toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" })
                     }));
-                    
+
                     setLiveMessages(prev => {
                         if (prev.length === mapped.length) return prev;
                         return mapped;
@@ -219,6 +223,50 @@ export default function SupportWidget() {
     useEffect(() => {
         if (liveScrollRef.current) liveScrollRef.current.scrollTop = liveScrollRef.current.scrollHeight;
     }, [liveMessages]);
+
+    // ── Image Upload ────────────────────────────────────────────────────────
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file || !sessionId || !user) return;
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+            const uploadRes = await fetch("/api/support/upload", {
+                method: "POST",
+                body: formData,
+            });
+            const uploadData = await uploadRes.json();
+
+            if (uploadData.url) {
+                // Send as a message
+                const res = await fetch("/api/support/chat", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        sessionId,
+                        message: "Görsel gönderdi.",
+                        imageUrl: uploadData.url,
+                        senderName: user.name
+                    }),
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    setLiveMessages(prev => [...prev, {
+                        id: data.message.id,
+                        role: "user",
+                        text: data.message.message,
+                        imageUrl: data.message.imageUrl,
+                        time: now()
+                    }]);
+                }
+            }
+        } catch (err) {
+            console.error("Image upload failed", err);
+        }
+    };
 
     // ── AI Send ──────────────────────────────────────────────────────────────
     const handleAiSend = async (text?: string) => {
@@ -266,7 +314,7 @@ export default function SupportWidget() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ sessionId, message: msgText, senderName: user.name }),
             });
-            
+
             if (res.ok) {
                 const data = await res.json();
                 const newMessage: Message = { id: data.message.id, role: "user", text: data.message.message, time: now() };
@@ -374,7 +422,27 @@ export default function SupportWidget() {
                                             <button onClick={() => setTab("ai")} className="px-6 py-2 bg-blue-600/10 text-blue-400 border border-blue-500/20 rounded-xl text-[10px] font-black uppercase tracking-widest">AI Asistana Sor</button>
                                         </div>
                                     )}
-                                    {isLiveEnabled && user && liveMessages.length === 0 && <div className="flex-1 flex flex-col items-center justify-center text-center p-6"><p className="text-slate-500 text-xs">Bir mesaj yazarak ekibimizle görüşmeye başlayın.</p></div>}
+                                    {isLiveEnabled && user && liveMessages.length === 0 && <div className="flex-1 flex flex-col items-center justify-center text-center p-6"><p className="text-slate-500 text-xs font-bold uppercase tracking-widest">Bir mesaj yazarak ekibimizle görüşmeye başlayın.</p></div>}
+                                    {!isLiveEnabled && (
+                                        <div className="flex-1 flex flex-col items-center justify-center text-center p-8 animate-in fade-in duration-700">
+                                            <div className="w-20 h-20 bg-slate-900 rounded-[32px] flex items-center justify-center border border-white/5 mb-6 relative">
+                                                <Clock className="text-slate-600" size={32} />
+                                                <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-amber-500/20 border border-amber-500/30 rounded-full flex items-center justify-center">
+                                                    <div className="w-2 h-2 bg-amber-500 rounded-full animate-pulse" />
+                                                </div>
+                                            </div>
+                                            <h3 className="text-white font-black uppercase tracking-widest mb-3">Canlı Destek Çevrimdışı</h3>
+                                            <p className="text-slate-500 text-xs leading-relaxed mb-8 max-w-[220px]">
+                                                Şu an canlı destek ekibimiz müsait değil. Sorununuzu bir destek talebi olarak bize iletebilirsiniz.
+                                            </p>
+                                            <Link 
+                                                href="/support/ticket"
+                                                className="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl transition-all shadow-xl shadow-blue-600/20"
+                                            >
+                                                DESTEK TALEBİ OLUŞTUR
+                                            </Link>
+                                        </div>
+                                    )}
                                     {isLiveEnabled && user && liveMessages.map((msg) => (
                                         <div key={msg.id} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
                                             {msg.role === "agent" && (
@@ -391,7 +459,18 @@ export default function SupportWidget() {
                                                     <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-1">{msg.senderName}</span>
                                                 )}
                                                 <div className={`px-4 py-3 rounded-2xl text-sm ${msg.role === "user" ? "bg-blue-600 text-white rounded-tr-sm" : "bg-slate-900 border border-white/6 text-slate-300 rounded-tl-sm"}`}>
-                                                    <p className="leading-relaxed">{msg.text}</p>
+                                                    {msg.imageUrl && (
+                                                        <div
+                                                            className="mb-2 rounded-lg overflow-hidden border border-white/5 cursor-zoom-in group/img relative"
+                                                            onClick={() => setPreviewImage(msg.imageUrl || null)}
+                                                        >
+                                                            <img src={msg.imageUrl} alt="Chat" className="w-full h-auto max-h-60 object-cover transition-transform group-hover/img:scale-105" />
+                                                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
+                                                                <ZoomIn className="text-white" size={20} />
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                    {msg.text !== "Görsel gönderdi." && <p className="leading-relaxed">{msg.text}</p>}
                                                     <span className={`text-[9px] mt-1.5 block ${msg.role === "user" ? "text-white/40 text-right" : "text-slate-600"}`}>{msg.time}</span>
                                                 </div>
                                             </div>
@@ -403,7 +482,10 @@ export default function SupportWidget() {
                                         <form onSubmit={handleLiveSend} className="relative">
                                             <input type="text" value={liveInput} onChange={(e) => setLiveInput(e.target.value)} placeholder="Mesajınızı yazın..." className="w-full bg-slate-900 border border-white/6 rounded-2xl px-4 py-3 pr-24 text-sm text-white outline-none" />
                                             <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
-                                                <button type="button" className="w-7 h-7 text-slate-500 hover:text-sky-400"><Paperclip size={15} /></button>
+                                                <label className="w-7 h-7 text-slate-500 hover:text-sky-400 cursor-pointer flex items-center justify-center transition-colors">
+                                                    <Paperclip size={15} />
+                                                    <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
+                                                </label>
                                                 <button type="submit" className="w-8 h-8 bg-sky-600 text-white rounded-xl flex items-center justify-center shadow-lg"><Send size={14} /></button>
                                             </div>
                                         </form>
@@ -429,6 +511,29 @@ export default function SupportWidget() {
                 .scrollbar-hide::-webkit-scrollbar { display: none; }
                 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
             `}</style>
+
+            {/* Image Preview Modal (Lightbox) */}
+            {previewImage && (
+                <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
+                    <div
+                        className="absolute inset-0 bg-black/90 backdrop-blur-md animate-in fade-in duration-300"
+                        onClick={() => setPreviewImage(null)}
+                    />
+                    <div className="relative max-w-full max-h-full animate-in zoom-in-95 duration-300">
+                        <img
+                            src={previewImage}
+                            alt="Preview"
+                            className="max-w-full max-h-[80vh] object-contain rounded-xl shadow-2xl border border-white/10"
+                        />
+                        <button
+                            onClick={() => setPreviewImage(null)}
+                            className="absolute -top-10 right-0 p-2 text-white/60 hover:text-white transition-colors"
+                        >
+                            <X size={24} />
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

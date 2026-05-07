@@ -27,9 +27,9 @@ export default function MainBar() {
 
           <div className="flex items-center justify-end gap-4">
             <span className="text-slate-400 font-semibold border-r border-slate-700 pr-4">
-              <button onClick={openSupport} className="hover:text-sky-400 transition cursor-pointer">
+              <a href="support/ticket" className="hover:text-sky-400 transition cursor-pointer">
                 Destek mi lazım?
-              </button>{" "}
+              </a>{" "}
               Bizi Arayın:
               <span className="text-sky-400"> +90 552 833 08 83</span>
             </span>

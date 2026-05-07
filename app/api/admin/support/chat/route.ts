@@ -1,8 +1,10 @@
 import { db } from "@/lib/db";
 import { liveChatMessages } from "@/lib/db/schema";
-import { eq, asc, desc, sql } from "drizzle-orm";
+import { eq, asc, desc, sql, and, isNotNull } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
+import { unlink } from "fs/promises";
+import path from "path";
 
 export async function GET(req: NextRequest) {
     const sessionId = req.nextUrl.searchParams.get("sessionId");
@@ -38,7 +40,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
     try {
-        const { sessionId, message } = await req.json();
+        const { sessionId, message, imageUrl } = await req.json();
         const session = await getSession();
 
         if (!sessionId || !message) {
@@ -52,6 +54,7 @@ export async function POST(req: NextRequest) {
             senderImage: session?.user?.image || null,
             senderRole: "ADMIN" as const,
             message,
+            imageUrl: imageUrl || null,
             createdAt: new Date(),
         };
 
@@ -74,10 +77,32 @@ export async function DELETE(req: NextRequest) {
         const sessionId = req.nextUrl.searchParams.get("sessionId");
         if (!sessionId) return NextResponse.json({ error: "Missing sessionId" }, { status: 400 });
 
+        // 1. Find all messages with images in this session
+        const messagesWithImages = await db.query.liveChatMessages.findMany({
+            where: and(
+                eq(liveChatMessages.sessionId, sessionId),
+                isNotNull(liveChatMessages.imageUrl)
+            )
+        });
+
+        // 2. Delete files from disk
+        for (const msg of messagesWithImages) {
+            if (msg.imageUrl) {
+                try {
+                    const filePath = path.join(process.cwd(), "public", msg.imageUrl);
+                    await unlink(filePath);
+                } catch (e) {
+                    console.error("Failed to delete file:", msg.imageUrl, e);
+                }
+            }
+        }
+
+        // 3. Delete messages from DB
         await db.delete(liveChatMessages).where(eq(liveChatMessages.sessionId, sessionId));
 
         return NextResponse.json({ success: true });
     } catch (error) {
+        console.error("Delete session error:", error);
         return NextResponse.json({ error: "Failed to delete session" }, { status: 500 });
     }
 }

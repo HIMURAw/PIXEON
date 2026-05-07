@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../globals.css";
 import Link from "next/link";
 import {
@@ -28,12 +28,25 @@ import {
     Image,
     FileText,
     PenTool,
-    ShieldCheck
+    ShieldCheck,
+    User
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const [user, setUser] = useState<any>(null);
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            const res = await fetch("/api/auth/me");
+            if (res.ok) {
+                const data = await res.json();
+                setUser(data.user);
+            }
+        };
+        fetchUser();
+    }, []);
 
     const menuGroups = [
         {
@@ -179,10 +192,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
                                 <div className="flex items-center gap-3 border-l border-white/10 pl-6">
                                     <div className="text-right hidden sm:block">
-                                        <p className="text-sm font-bold text-white">Admin User</p>
-                                        <p className="text-xs text-slate-500">Yönetici</p>
+                                        <p className="text-sm font-bold text-white">
+                                            {user?.name || "Yükleniyor..."}
+                                        </p>
+                                        <p className="text-xs text-slate-500">Yetkili Yönetici</p>
                                     </div>
-                                    <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-600 to-sky-400 border-2 border-[#020617] shadow-lg"></div>
+                                    <div className="w-10 h-10 rounded-full bg-slate-900 border-2 border-[#020617] shadow-lg overflow-hidden">
+                                        {user?.image ? (
+                                            <img src={user.image} alt={user.name} className="w-full h-full object-cover" />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center bg-blue-600/10 text-blue-400">
+                                                <User size={18} />
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </header>

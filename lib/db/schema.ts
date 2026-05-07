@@ -140,6 +140,7 @@ export const supportMessages = mysqlTable("support_messages", {
   ticketId: varchar("ticket_id", { length: 255 }).references(() => supportTickets.id).notNull(),
   senderId: varchar("sender_id", { length: 255 }).references(() => users.id).notNull(),
   message: text("message").notNull(),
+  imageUrl: varchar("image_url", { length: 255 }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -226,6 +227,7 @@ export const liveChatMessages = mysqlTable("live_chat_messages", {
   senderImage: varchar("sender_image", { length: 255 }), // Admin profile image
   senderRole: mysqlEnum("sender_role", ["USER", "ADMIN"]).default("USER").notNull(),
   message: text("message").notNull(),
+  imageUrl: varchar("image_url", { length: 255 }), // Chat images
   isRead: boolean("is_read").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });

@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
     try {
-        const { sessionId, message, senderName } = await req.json();
+        const { sessionId, message, senderName, imageUrl } = await req.json();
 
         if (!sessionId || !message) {
             return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -30,9 +30,10 @@ export async function POST(req: NextRequest) {
         const newMessage = {
             id: `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
             sessionId,
-            senderName: senderName || "Misafir",
+            senderName: senderName || "Kullanıcı",
             senderRole: "USER" as const,
             message,
+            imageUrl: imageUrl || null,
             createdAt: new Date(),
         };
 
@@ -40,7 +41,7 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json({ success: true, message: newMessage });
     } catch (error) {
-        console.error("Chat error:", error);
+        console.error("Chat message error:", error);
         return NextResponse.json({ error: "Failed to send message" }, { status: 500 });
     }
 }
