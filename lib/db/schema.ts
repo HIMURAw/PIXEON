@@ -215,10 +215,21 @@ export const banners = mysqlTable("banners", {
 export const settings = mysqlTable("settings", {
   key: varchar("key", { length: 100 }).primaryKey(),
   value: text("value"),
-  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-// 11. Relations
+// 11. Live Chat System
+export const liveChatMessages = mysqlTable("live_chat_messages", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  sessionId: varchar("session_id", { length: 255 }).notNull(), // To group messages from same session/user
+  senderName: varchar("sender_name", { length: 255 }),
+  senderRole: mysqlEnum("sender_role", ["USER", "ADMIN"]).default("USER").notNull(),
+  message: text("message").notNull(),
+  isRead: boolean("is_read").default(false).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// 12. Relations
 import { relations } from "drizzle-orm";
 
 export const usersRelations = relations(users, ({ many }) => ({
