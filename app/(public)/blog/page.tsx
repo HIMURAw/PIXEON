@@ -6,6 +6,12 @@ import MainBar from "@/components/header/MainBar";
 import Head from "@/components/header/Head";
 import Footer from "@/components/footer/Footer";
 import { Calendar, Clock, ChevronRight } from "lucide-react";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "Blog & Haberler | PIXEON PlayStation Mağazası",
+    description: "Oyun dünyasından en son haberler, PlayStation rehberleri ve incelemeler PIXEON Blog'da.",
+};
 
 export default async function BlogListPage() {
     const res = await getBlogPosts();
@@ -30,15 +36,15 @@ export default async function BlogListPage() {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {posts?.map((post) => (
-                            <Link 
-                                key={post.id} 
+                            <Link
+                                key={post.id}
                                 href={`/blog/${post.slug}`}
                                 className="group bg-slate-900/50 border border-white/5 rounded-[32px] overflow-hidden hover:border-blue-500/50 transition-all duration-500 hover:shadow-2xl hover:shadow-blue-500/10"
                             >
                                 <div className="aspect-video relative overflow-hidden">
-                                    <img 
-                                        src={post.image || "/placeholder.jpg"} 
-                                        alt={post.title} 
+                                    <img
+                                        src={post.image || "/placeholder.jpg"}
+                                        alt={post.title}
                                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-60" />

@@ -14,6 +14,7 @@ import NewProductsSidebar from "@/components/products/newProducts/NewProductsSid
 import ReviewSection from "@/components/reviews/ReviewSection";
 import Footer from "@/components/footer/Footer";
 import BannerSection from "@/components/promo/BannerSection";
+import BlogHomepageSection from "@/components/blog/BlogHomepageSection";
 
 import { getSession } from "@/lib/auth";
 import { db } from "@/lib/db";
@@ -85,6 +86,11 @@ export default async function Home() {
                 {/* YORUMLAR BÖLÜMÜ */}
                 <div className="pt-20 border-t border-white/5">
                     <ReviewSection currentUser={currentUser} reviews={reviews} />
+                </div>
+
+                {/* BLOG BÖLÜMÜ */}
+                <div className="pt-20 border-t border-white/5">
+                    <BlogHomepageSection />
                 </div>
             </div>
             <Footer />

@@ -5,7 +5,35 @@ import TopBar from "@/components/header/TopBar";
 import MainBar from "@/components/header/MainBar";
 import Head from "@/components/header/Head";
 import Footer from "@/components/footer/Footer";
-import { Calendar, User, Clock } from "lucide-react";
+import { Calendar, User, Clock, Share2 } from "lucide-react";
+import Script from "next/script";
+import { Metadata } from "next";
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+    const { slug } = await params;
+    const res = await getBlogPostBySlug(slug);
+    const post = res.post;
+
+    if (!post) return { title: "Blog Yazısı Bulunamadı | PIXEON" };
+
+    return {
+        title: `${post.title} | PIXEON Blog`,
+        description: post.excerpt || `${post.title} hakkında detaylı bilgiler ve oyun dünyasından haberler.`,
+        openGraph: {
+            title: post.title,
+            description: post.excerpt || "",
+            images: post.image ? [{ url: post.image }] : [],
+            type: "article",
+            publishedTime: post.createdAt.toString(),
+        },
+        twitter: {
+            card: "summary_large_image",
+            title: post.title,
+            description: post.excerpt || "",
+            images: post.image ? [post.image] : [],
+        }
+    };
+}
 
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params;
@@ -17,22 +45,41 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
     const post = res.post;
 
+    const jsonLd = {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "headline": post.title,
+        "image": post.image,
+        "datePublished": post.createdAt.toISOString(),
+        "author": [{
+            "@type": "Person",
+            "name": "PIXEON Editor",
+            "url": "https://pixeon.com"
+        }],
+        "description": post.excerpt
+    };
+
     return (
         <>
+            <Script
+                id="blog-jsonld"
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            />
             <TopBar />
             <MainBar />
             <Head />
-            
+
             <div className="min-h-screen bg-[#020617] text-white">
                 {/* Hero Section */}
                 <div className="relative h-[60vh] min-h-[400px] w-full overflow-hidden">
-                    <img 
-                        src={post.image || "/placeholder.jpg"} 
-                        alt={post.title} 
+                    <img
+                        src={post.image || "/placeholder.jpg"}
+                        alt={post.title}
                         className="w-full h-full object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/40 to-transparent" />
-                    
+
                     <div className="absolute bottom-0 left-0 right-0 p-6 md:p-20">
                         <div className="max-w-4xl mx-auto space-y-6">
                             <div className="flex flex-wrap items-center gap-6 text-[10px] md:text-xs font-black uppercase tracking-widest text-blue-400">
@@ -62,7 +109,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                         {post.excerpt}
                     </p>
 
-                    <article 
+                    <article
                         className="prose prose-invert prose-blue max-w-none 
                         prose-headings:font-black prose-headings:tracking-tight
                         prose-p:text-slate-400 prose-p:leading-relaxed prose-p:text-lg
