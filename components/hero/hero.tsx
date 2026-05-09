@@ -3,170 +3,30 @@ import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import ModelViewer, { preloadModels } from "./ModelViewer";
 
-interface Slide {
-    id: number;
-    badge: string;
-    badgeColor: string;
-    title: string;
-    subtitle: string;
-    price: string;
-    buttonText: string;
-    buttonLink: string;
-    modelPath: string;
-}
-
-const slides: Slide[] = [
-    {
-        id: 1,
-        badge: "YENİ NESİL",
-        badgeColor: "bg-blue-600",
-        title: "PlayStation 5",
-        subtitle: "4K 120FPS ve Işın İzleme Teknolojisi ile Oyunun Sınırlarını Zorlayın.",
-        price: "18.999 ₺",
-        buttonText: "Hemen İncele",
-        buttonLink: "/shop",
-        modelPath: "/3D/ps5.glb"
-    },
-    {
-        id: 2,
-        badge: "YENİ NESİL",
-        badgeColor: "bg-sky-500",
-        title: "DualSense™ Wireless",
-        subtitle: "Dokunsal Geri Bildirim ve Uyarlanabilir Tetiklerle Daha Derin Bir Deneyim.",
-        price: "2.899 ₺",
-        buttonText: "Satın Al",
-        buttonLink: "/shop",
-        modelPath: "/3D/playstation_5_controller.glb"
-    },
-    {
-        id: 3,
-        badge: "GÜÇLÜ",
-        badgeColor: "bg-zinc-700",
-        title: "PlayStation 4 Pro",
-        subtitle: "Dinamik 4K Oyun ve 4K Eğlence ile En Sevdiğiniz Oyunları Geliştirin.",
-        price: "9.490 ₺",
-        buttonText: "Keşfet",
-        buttonLink: "/shop",
-        modelPath: "/3D/playstation_4_pro.glb"
-    },
-    {
-        id: 4,
-        badge: "EFSANE",
-        badgeColor: "bg-indigo-600",
-        title: "PlayStation 4",
-        subtitle: "İnanılmaz Oyun Gücü ve Eğlence ile Tanışın.",
-        price: "7.999 ₺",
-        buttonText: "İncele",
-        buttonLink: "/shop",
-        modelPath: "/3D/playstation_4_original.glb"
-    },
-    {
-        id: 5,
-        badge: "İNCE",
-        badgeColor: "bg-slate-600",
-        title: "PlayStation 4 Slim",
-        subtitle: "Daha Hafif, Daha İnce ve İnanılmaz Oyun Gücü.",
-        price: "8.499 ₺",
-        buttonText: "Satın Al",
-        buttonLink: "/shop",
-        modelPath: "/3D/sony_playstation4_slim_ps4_slim.glb"
-    },
-    {
-        id: 6,
-        badge: "RETRO",
-        badgeColor: "bg-gray-700",
-        title: "PlayStation 3 Slim",
-        subtitle: "Efsanevi Oyun Kütüphanesi ve Blu-ray Oynatıcı.",
-        price: "4.499 ₺",
-        buttonText: "Keşfet",
-        buttonLink: "/shop",
-        modelPath: "/3D/ps3_slim.glb"
-    },
-    {
-        id: 7,
-        badge: "KONTROL",
-        badgeColor: "bg-red-600",
-        title: "DualShock 3",
-        subtitle: "PS3 İçin Klasik Kablosuz Kontrolcü.",
-        price: "1.299 ₺",
-        buttonText: "Satın Al",
-        buttonLink: "/shop",
-        modelPath: "/3D/gamepad_sony_dualshock_3.glb"
-    },
-    {
-        id: 8,
-        badge: "KONTROL",
-        badgeColor: "bg-blue-800",
-        title: "DualShock 4",
-        subtitle: "Hassas Kontrol ve Yenilikçi Özellikler.",
-        price: "1.899 ₺",
-        buttonText: "Satın Al",
-        buttonLink: "/shop",
-        modelPath: "/3D/dualshock_4_playstation_controller.glb"
-    },
-    {
-        id: 9,
-        badge: "XBOX",
-        badgeColor: "bg-green-600",
-        title: "Xbox Series X",
-        subtitle: "Şimdiye Kadarki En Hızlı ve En Güçlü Xbox.",
-        price: "21.999 ₺",
-        buttonText: "Hemen İncele",
-        buttonLink: "/shop",
-        modelPath: "/3D/xbox_series_x_free_3d_model.glb"
-    },
-    {
-        id: 10,
-        badge: "XBOX",
-        badgeColor: "bg-white text-black",
-        title: "Xbox Series S",
-        subtitle: "Tamamen Dijital, Yeni Nesil Performans.",
-        price: "13.499 ₺",
-        buttonText: "Keşfet",
-        buttonLink: "/shop",
-        modelPath: "/3D/xbox_series_s.glb"
-    },
-    {
-        id: 11,
-        badge: "XBOX",
-        badgeColor: "bg-green-700",
-        title: "Xbox One S",
-        subtitle: "Eğlence ve Oyunun Buluştuğu Nokta.",
-        price: "6.999 ₺",
-        buttonText: "Satın Al",
-        buttonLink: "/shop",
-        modelPath: "/3D/xbox_one_s.glb"
-    },
-    {
-        id: 12,
-        badge: "8-BIT",
-        badgeColor: "bg-purple-600",
-        title: "8-Bit Controller",
-        subtitle: "Klasik Oyun Deneyimi İçin Retro Tasarım.",
-        price: "899 ₺",
-        buttonText: "Satın Al",
-        buttonLink: "/shop",
-        modelPath: "/3D/xbox_8bit_controller.glb"
-    }
-];
-
-
+// Database driven hero slides
 import { getActiveHeroSlides } from "@/lib/actions/hero-actions";
+
 
 export default function HeroCarousel() {
     const [dynamicSlides, setDynamicSlides] = useState<any[]>([]);
     const [currentSlide, setCurrentSlide] = useState(0);
     const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+    const [loading, setLoading] = useState(true);
 
-    const activeSlides = dynamicSlides.length > 0 ? dynamicSlides : slides;
+    const activeSlides = dynamicSlides;
 
     useEffect(() => {
-        getActiveHeroSlides().then(res => {
+        const load = async () => {
+            setLoading(true);
+            const res = await getActiveHeroSlides();
             if (res.success && res.slides && res.slides.length > 0) {
                 setDynamicSlides(res.slides);
             }
-        });
+            setLoading(false);
+        };
+        load();
     }, []);
+
 
     // Tüm modelleri önden yüklüyoruz
     useEffect(() => {
@@ -197,9 +57,26 @@ export default function HeroCarousel() {
         setIsAutoPlaying(false);
     };
 
+    if (loading) {
+        return (
+            <div className="relative w-full h-[680px] bg-slate-900 rounded-2xl overflow-hidden animate-pulse flex">
+                <div className="w-1/2 h-full p-16 space-y-8 flex flex-col justify-center">
+                    <div className="h-6 bg-white/5 w-24 rounded-full" />
+                    <div className="h-12 bg-white/5 w-3/4 rounded-2xl" />
+                    <div className="h-20 bg-white/5 w-full rounded-2xl" />
+                    <div className="h-10 bg-white/5 w-40 rounded-xl" />
+                </div>
+                <div className="w-1/2 h-full bg-white/5" />
+            </div>
+        );
+    }
+
+    if (activeSlides.length === 0) return null;
+
     return (
         <div className="user-select-none relative w-full h-[680px] bg-linear-to-br from-slate-900 to-slate-800 rounded-2xl overflow-hidden group">
             <div className="relative w-full h-full flex">
+
                 
                 {/* Sol Taraf: Metin İçerikleri (Slaytlar) */}
                 <div className="w-1/2 h-full relative overflow-hidden">
