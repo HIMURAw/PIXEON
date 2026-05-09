@@ -3,7 +3,6 @@
 import { db } from "@/lib/db";
 import { banners } from "@/lib/db/schema";
 import { eq, desc } from "drizzle-orm";
-import { v4 as uuidv4 } from "uuid";
 import { revalidatePath } from "next/cache";
 
 export async function getBanners() {
@@ -34,7 +33,7 @@ export async function getActiveBannersByPosition(position: string) {
 
 export async function saveBanner(data: any) {
     try {
-        const id = data.id || uuidv4();
+        const id = data.id || crypto.randomUUID();
         const bannerData = {
             title: data.title,
             subtitle: data.subtitle,

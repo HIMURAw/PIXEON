@@ -13,6 +13,7 @@ import Products from "@/components/products/newProducts/newProducts";
 import NewProductsSidebar from "@/components/products/newProducts/NewProductsSidebar";
 import ReviewSection from "@/components/reviews/ReviewSection";
 import Footer from "@/components/footer/Footer";
+import BannerSection from "@/components/promo/BannerSection";
 
 import { getSession } from "@/lib/auth";
 import { db } from "@/lib/db";
@@ -53,7 +54,9 @@ export default async function Home() {
                 <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-16">
                     {/* SOL TARAF */}
                     <aside className="space-y-6">
+                        <BannerSection position="home-top" />
                         <PromoSection />
+                        <BannerSection position="products-sidebar" />
                         <PromoVertical />
                         <PromoVerticalSmall />
                     </aside>
@@ -61,9 +64,11 @@ export default async function Home() {
                     {/* SAĞ TARAF */}
                     <main className="space-y-24">
                         <BestSellers />
+                        <BannerSection position="home-middle" className="h-64" />
                         <InfoBanner />
                         <HotDeal />
                         <PromoBanner />
+                        <BannerSection position="home-bottom" />
                     </main>
                 </div>
 

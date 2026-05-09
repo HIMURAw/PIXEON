@@ -1,149 +1,342 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { 
-    Image as ImageIcon, 
     Plus, 
+    Save, 
     Trash2, 
-    Pencil, 
-    Eye, 
-    Calendar, 
+    Image as ImageIcon, 
     Layout, 
-    ExternalLink, 
-    MousePointer2, 
-    BarChart3,
-    MoreVertical,
-    Clock,
-    AlertCircle
+    ChevronRight,
+    Search,
+    Calendar,
+    Link as LinkIcon,
+    AlertCircle,
+    CheckCircle2
 } from "lucide-react";
+import { getBanners, saveBanner, deleteBanner } from "@/lib/actions/banner-actions";
 import { cn } from "@/lib/utils";
+import DeleteConfirmModal from "@/components/admin/DeleteConfirmModal";
+import { useNotification } from "@/context/NotificationContext";
 
 export default function AdminBanners() {
-    const banners = [
-        { id: 1, title: "PS5 Pro Ön Sipariş", position: "Ana Sayfa Hero", size: "1920x600", clicks: 4250, ctr: "8.4%", status: "Active", date: "12-30 Nisan" },
-        { id: 2, title: "Bahar İndirimleri", position: "Ürünler Sayfası Üst", size: "1200x200", clicks: 1120, ctr: "3.2%", status: "Scheduled", date: "1-15 Mayıs" },
-        { id: 3, title: "Ücretsiz Kargo Duyurusu", position: "Global Top Bar", size: "100%x40", clicks: 8400, ctr: "12.1%", status: "Active", date: "Süresiz" },
-        { id: 4, title: "FC 25 Turnuvası", position: "Blog Yan Menü", size: "300x250", clicks: 450, ctr: "1.8%", status: "Expired", date: "1-10 Nisan" },
-    ];
+    const { notify } = useNotification();
+    const [banners, setBanners] = useState<any[]>([]);
+    const [selectedBanner, setSelectedBanner] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+
+    // Modal states
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [bannerToDelete, setBannerToDelete] = useState<string | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
+
+    useEffect(() => {
+        loadBanners();
+    }, []);
+
+    const loadBanners = async () => {
+        setLoading(true);
+        const res = await getBanners();
+        if (res.success && res.banners) {
+            setBanners(res.banners);
+        }
+        setLoading(false);
+    };
+
+    const handleCreateBanner = () => {
+        setSelectedBanner({
+            title: "Yeni Kampanya",
+            subtitle: "Kampanya detayları...",
+            image: "",
+            link: "/shop",
+            position: "home-middle",
+            status: "ACTIVE"
+        });
+    };
+
+    const handleSave = async () => {
+        if (!selectedBanner.image) return notify("error", "Banner görseli gereklidir.");
+        setSaving(true);
+        const res = await saveBanner(selectedBanner);
+        if (res.success) {
+            notify("success", "Banner başarıyla kaydedildi.");
+            loadBanners();
+            setSelectedBanner(null);
+        } else {
+            notify("error", res.error || "Bir hata oluştu.");
+        }
+        setSaving(false);
+    };
+
+    const handleDelete = (id: string) => {
+        setBannerToDelete(id);
+        setIsDeleteModalOpen(true);
+    };
+
+    const confirmDelete = async () => {
+        if (!bannerToDelete) return;
+        setIsDeleting(true);
+        const res = await deleteBanner(bannerToDelete);
+        if (res.success) {
+            notify("success", "Banner başarıyla silindi.");
+            loadBanners();
+            if (selectedBanner?.id === bannerToDelete) setSelectedBanner(null);
+            setIsDeleteModalOpen(false);
+            setBannerToDelete(null);
+        } else {
+            notify("error", res.error || "Bir hata oluştu.");
+        }
+        setIsDeleting(false);
+    };
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-700">
-            {/* Page Header */}
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-                <div>
-                    <h1 className="text-3xl font-extrabold text-white tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
-                        Kampanya & Banner Yönetimi
-                    </h1>
-                    <p className="text-slate-500 mt-1 flex items-center gap-2">
-                        <ImageIcon className="text-blue-400" size={14} />
-                        Site genelindeki reklam alanlarını, kampanya görsellerini ve tıklanma oranlarını yönetin.
-                    </p>
+        <>
+            <div className="p-8 space-y-8 animate-in fade-in duration-500">
+                {/* Header */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div>
+                        <h1 className="text-3xl font-black text-white tracking-tight flex items-center gap-3">
+                            <ImageIcon className="text-blue-500" size={32} />
+                            Kampanya & Banner Yönetimi
+                        </h1>
+                        <p className="text-slate-500 font-medium mt-1">Sitedeki tüm reklam alanlarını ve kampanyaları buradan yönetin.</p>
+                    </div>
+                    <button 
+                        onClick={handleCreateBanner}
+                        className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 py-3 rounded-2xl transition-all shadow-lg shadow-blue-600/20 flex items-center gap-2"
+                    >
+                        <Plus size={20} />
+                        YENİ BANNER EKLE
+                    </button>
                 </div>
-                <button className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 py-2.5 rounded-xl flex items-center gap-2 transition-all shadow-lg shadow-blue-600/20 active:scale-95">
-                    <Plus size={20} />
-                    Yeni Banner Ekle
-                </button>
-            </div>
 
-            {/* Banner Grid */}
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-                {banners.map((banner) => (
-                    <div key={banner.id} className="bg-[#020617] border border-white/10 rounded-[40px] overflow-hidden shadow-2xl group flex flex-col md:flex-row relative">
-                        {/* Status Overlay for Expired */}
-                        {banner.status === "Expired" && (
-                            <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-[2px] z-20 flex items-center justify-center">
-                                <span className="bg-red-600/20 text-red-500 border border-red-500/30 px-6 py-2 rounded-full font-black uppercase tracking-widest text-xs">Süresi Doldu</span>
-                            </div>
-                        )}
-
-                        {/* Banner Preview Area */}
-                        <div className="md:w-56 h-48 md:h-auto bg-slate-900 flex items-center justify-center relative overflow-hidden group">
-                            <ImageIcon size={48} className="text-slate-700 group-hover:scale-110 transition-transform duration-700" />
-                            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 to-transparent flex items-end p-4">
-                                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{banner.size}</span>
-                            </div>
-                        </div>
-
-                        {/* Content Area */}
-                        <div className="flex-1 p-8 space-y-6">
-                            <div className="flex justify-between items-start">
-                                <div className="space-y-1">
-                                    <h3 className="text-xl font-black text-white tracking-tight group-hover:text-blue-400 transition-colors">{banner.title}</h3>
-                                    <p className="text-xs text-slate-500 font-medium flex items-center gap-2">
-                                        <Layout size={12} className="text-blue-500" />
-                                        {banner.position}
-                                    </p>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                    <span className={cn(
-                                        "px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border",
-                                        banner.status === "Active" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" :
-                                        banner.status === "Scheduled" ? "bg-blue-500/10 text-blue-400 border-blue-500/20" :
-                                        "bg-red-500/10 text-red-400 border-red-500/20"
-                                    )}>
-                                        {banner.status === "Active" ? "Yayında" :
-                                         banner.status === "Scheduled" ? "Planlandı" : "Pasif"}
-                                    </span>
-                                    <button className="p-2 text-slate-600 hover:text-white transition-colors">
-                                        <MoreVertical size={18} />
-                                    </button>
-                                </div>
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                    {/* Left: Banner List */}
+                    <div className="lg:col-span-4 space-y-4">
+                        <div className="bg-slate-900/50 border border-white/5 rounded-3xl p-6 shadow-xl">
+                            <div className="flex items-center justify-between mb-6">
+                                <h2 className="text-lg font-bold text-white">Aktif Bannerlar</h2>
+                                <span className="text-[10px] font-black bg-slate-800 text-slate-400 px-2 py-1 rounded-lg uppercase tracking-widest">
+                                    {banners.length} TOPLAM
+                                </span>
                             </div>
 
-                            {/* Stats */}
-                            <div className="grid grid-cols-3 gap-4 p-4 bg-white/[0.02] border border-white/5 rounded-2xl">
-                                <div className="text-center">
-                                    <p className="text-[9px] font-bold text-slate-600 uppercase tracking-widest mb-1">Tıklama</p>
-                                    <p className="text-sm font-black text-white">{banner.clicks.toLocaleString()}</p>
+                            {loading ? (
+                                <div className="space-y-3">
+                                    {[1, 2, 3].map(i => <div key={i} className="h-20 bg-white/5 animate-pulse rounded-2xl" />)}
                                 </div>
-                                <div className="text-center border-x border-white/5">
-                                    <p className="text-[9px] font-bold text-slate-600 uppercase tracking-widest mb-1">CTR</p>
-                                    <p className="text-sm font-black text-emerald-400">{banner.ctr}</p>
+                            ) : (
+                                <div className="space-y-3">
+                                    {banners.map(banner => (
+                                        <div 
+                                            key={banner.id}
+                                            onClick={() => setSelectedBanner(banner)}
+                                            className={cn(
+                                                "group p-4 rounded-2xl border transition-all cursor-pointer flex items-center gap-4",
+                                                selectedBanner?.id === banner.id 
+                                                    ? "bg-blue-600/10 border-blue-500/50" 
+                                                    : "bg-white/5 border-white/5 hover:border-white/10"
+                                            )}
+                                        >
+                                            <div className="w-16 h-12 bg-slate-800 rounded-lg overflow-hidden flex-shrink-0">
+                                                {banner.image ? (
+                                                    <img src={banner.image} className="w-full h-full object-cover" alt="" />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center text-slate-600">
+                                                        <ImageIcon size={16} />
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <h3 className="text-xs font-bold text-white truncate">{banner.title || "İsimsiz Banner"}</h3>
+                                                <p className="text-[9px] text-slate-500 font-black uppercase tracking-wider mt-0.5">{banner.position}</p>
+                                            </div>
+                                            <ChevronRight size={16} className={cn("text-slate-600 group-hover:text-white transition-all", selectedBanner?.id === banner.id && "translate-x-1 text-blue-500")} />
+                                        </div>
+                                    ))}
                                 </div>
-                                <div className="text-center">
-                                    <p className="text-[9px] font-bold text-slate-600 uppercase tracking-widest mb-1">Dönüşüm</p>
-                                    <p className="text-sm font-black text-white">-%</p>
-                                </div>
-                            </div>
-
-                            <div className="flex items-center justify-between pt-2">
-                                <div className="flex items-center gap-2 text-[10px] text-slate-500 font-bold uppercase tracking-widest">
-                                    <Calendar size={12} className="text-blue-500" />
-                                    {banner.date}
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <button className="p-2.5 bg-white/5 border border-white/5 rounded-xl text-slate-500 hover:text-white transition-all">
-                                        <Pencil size={18} />
-                                    </button>
-                                    <button className="p-2.5 bg-white/5 border border-white/5 rounded-xl text-slate-500 hover:text-blue-400 transition-all">
-                                        <Eye size={18} />
-                                    </button>
-                                    <button className="p-2.5 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 hover:bg-red-500 hover:text-white transition-all">
-                                        <Trash2 size={18} />
-                                    </button>
-                                </div>
-                            </div>
+                            )}
                         </div>
                     </div>
-                ))}
+
+                    {/* Right: Editor */}
+                    <div className="lg:col-span-8">
+                        {selectedBanner ? (
+                            <div className="bg-slate-900 border border-white/5 rounded-[32px] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300">
+                                <div className="p-8 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
+                                    <div>
+                                        <h2 className="text-xl font-bold text-white tracking-tight">Banner Düzenle</h2>
+                                        <p className="text-xs text-slate-500 font-medium mt-1">Banner bilgilerini aşağıdan güncelleyebilirsiniz.</p>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        {selectedBanner.id && (
+                                            <button 
+                                                onClick={() => handleDelete(selectedBanner.id)}
+                                                className="p-3 text-red-500 hover:bg-red-500/10 rounded-2xl transition-colors"
+                                            >
+                                                <Trash2 size={20} />
+                                            </button>
+                                        )}
+                                        <button 
+                                            disabled={saving}
+                                            onClick={handleSave}
+                                            className="bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-bold px-6 py-3 rounded-2xl transition-all shadow-lg shadow-emerald-600/20 flex items-center gap-2"
+                                        >
+                                            <Save size={20} />
+                                            {saving ? "KAYDEDİLİYOR..." : "KAYDET"}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className="p-8 space-y-8">
+                                    {/* Preview & Image Upload */}
+                                    <div className="space-y-4">
+                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">BANNER GÖRSELİ</label>
+                                        <div className="relative group aspect-video lg:aspect-[21/9] bg-slate-950 rounded-3xl border-2 border-dashed border-white/5 overflow-hidden flex items-center justify-center">
+                                            {selectedBanner.image ? (
+                                                <>
+                                                    <img src={selectedBanner.image} className="w-full h-full object-cover opacity-60 group-hover:opacity-40 transition-opacity" alt="" />
+                                                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <label htmlFor="banner-upload" className="bg-white text-black px-6 py-3 rounded-2xl font-black text-xs cursor-pointer hover:scale-105 transition-transform">
+                                                            GÖRSELİ DEĞİŞTİR
+                                                        </label>
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <label htmlFor="banner-upload" className="flex flex-col items-center gap-4 cursor-pointer hover:text-blue-400 transition-colors">
+                                                    <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center">
+                                                        <Plus size={32} />
+                                                    </div>
+                                                    <span className="text-xs font-bold uppercase tracking-widest text-slate-500">Görsel Seçin veya Yükleyin</span>
+                                                </label>
+                                            )}
+                                            <input 
+                                                type="file" 
+                                                id="banner-upload" 
+                                                className="hidden" 
+                                                accept="image/*"
+                                                onChange={async (e) => {
+                                                    const file = e.target.files?.[0];
+                                                    if (!file) return;
+                                                    const formData = new FormData();
+                                                    formData.append("file", file);
+                                                    const res = await fetch("/api/admin/upload", { method: "POST", body: formData });
+                                                    const data = await res.json();
+                                                    if (data.success) {
+                                                        setSelectedBanner({ ...selectedBanner, image: data.url });
+                                                        notify("success", "Görsel yüklendi.");
+                                                    } else {
+                                                        notify("error", "Yükleme hatası: " + data.error);
+                                                    }
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Text Fields */}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">KAMPANYA BAŞLIĞI</label>
+                                            <input 
+                                                type="text"
+                                                value={selectedBanner.title || ""}
+                                                onChange={(e) => setSelectedBanner({ ...selectedBanner, title: e.target.value })}
+                                                className="w-full bg-slate-950 border border-white/5 rounded-2xl px-5 py-4 text-sm text-white focus:border-blue-500/50 outline-none transition-all"
+                                                placeholder="Örn: %50 Yaz İndirimi"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">BANNER POZİSYONU</label>
+                                            <select 
+                                                value={selectedBanner.position}
+                                                onChange={(e) => setSelectedBanner({ ...selectedBanner, position: e.target.value })}
+                                                className="w-full bg-slate-950 border border-white/5 rounded-2xl px-5 py-4 text-sm text-white focus:border-blue-500/50 outline-none transition-all appearance-none"
+                                            >
+                                                <option value="home-top">Ana Sayfa Üst</option>
+                                                <option value="home-middle">Ana Sayfa Orta</option>
+                                                <option value="home-bottom">Ana Sayfa Alt</option>
+                                                <option value="promo-vertical">Yan Menü Büyük (VR2 Yeri)</option>
+                                                <option value="products-sidebar">Ürünler Yan Menü</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">ALT BAŞLIK / AÇIKLAMA</label>
+                                        <textarea 
+                                            value={selectedBanner.subtitle || ""}
+                                            onChange={(e) => setSelectedBanner({ ...selectedBanner, subtitle: e.target.value })}
+                                            className="w-full bg-slate-950 border border-white/5 rounded-2xl px-5 py-4 text-sm text-white focus:border-blue-500/50 outline-none transition-all h-24 resize-none"
+                                            placeholder="Kampanya hakkında kısa bilgi..."
+                                        />
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">TIKLAMA LİNKİ (URL)</label>
+                                            <div className="relative">
+                                                <LinkIcon size={14} className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500" />
+                                                <input 
+                                                    type="text"
+                                                    value={selectedBanner.link || ""}
+                                                    onChange={(e) => setSelectedBanner({ ...selectedBanner, link: e.target.value })}
+                                                    className="w-full bg-slate-950 border border-white/5 rounded-2xl pl-12 pr-5 py-4 text-sm text-white focus:border-blue-500/50 outline-none transition-all font-mono"
+                                                    placeholder="/kategori/kampanyali-urunler"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">DURUM</label>
+                                            <div className="flex gap-2">
+                                                {["ACTIVE", "INACTIVE"].map(status => (
+                                                    <button
+                                                        key={status}
+                                                        onClick={() => setSelectedBanner({ ...selectedBanner, status })}
+                                                        className={cn(
+                                                            "flex-1 py-4 rounded-2xl text-[10px] font-black transition-all border",
+                                                            selectedBanner.status === status 
+                                                                ? "bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-600/20" 
+                                                                : "bg-slate-950 border-white/5 text-slate-500 hover:border-white/10"
+                                                        )}
+                                                    >
+                                                        {status === "ACTIVE" ? "YAYINDA" : "PASİF"}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="h-full min-h-[500px] border-2 border-dashed border-white/5 rounded-[48px] flex flex-col items-center justify-center space-y-6 text-center p-12">
+                                <div className="w-24 h-24 bg-white/5 rounded-[32px] flex items-center justify-center text-slate-700">
+                                    <ImageIcon size={48} />
+                                </div>
+                                <div className="max-w-xs">
+                                    <h3 className="text-xl font-bold text-white">Banner Seçin</h3>
+                                    <p className="text-slate-500 text-sm mt-2">Sol taraftan bir banner seçerek düzenlemeye başlayın veya yeni bir tane oluşturun.</p>
+                                </div>
+                                <button 
+                                    onClick={handleCreateBanner}
+                                    className="bg-slate-800 hover:bg-slate-700 text-white font-bold px-8 py-3 rounded-2xl transition-all border border-white/5"
+                                >
+                                    İlk Banner'ını Oluştur
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
             </div>
 
-            {/* Guidelines Card */}
-            <div className="bg-[#0b1220]/50 border border-white/10 rounded-[32px] p-10 flex flex-col md:flex-row items-center gap-10">
-                <div className="w-20 h-20 bg-blue-600/10 text-blue-400 rounded-3xl flex items-center justify-center shrink-0">
-                    <BarChart3 size={40} />
-                </div>
-                <div className="flex-1 space-y-4 text-center md:text-left">
-                    <h3 className="text-xl font-bold text-white tracking-tight">Performans İpuçları</h3>
-                    <p className="text-slate-500 text-sm leading-relaxed max-w-2xl">
-                        Bannerlarınızın tıklanma oranlarını artırmak için görsellerde parlak renkler ve net "Call to Action" butonları kullanın. 
-                        Mobil cihazlar için özel boyutlarda (300x250) bannerlar eklemeyi unutmayın.
-                    </p>
-                </div>
-                <button className="px-8 py-4 bg-slate-900 border border-white/10 text-white font-black uppercase tracking-widest text-[10px] rounded-2xl hover:bg-slate-800 transition-all shadow-xl">
-                    Tüm Analizler
-                </button>
-            </div>
-        </div>
+            <DeleteConfirmModal 
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={confirmDelete}
+                loading={isDeleting}
+                title="Banner'ı Sil"
+                description="Bu kampanya banner'ı siteden kalıcı olarak kaldırılacaktır."
+            />
+        </>
     );
 }

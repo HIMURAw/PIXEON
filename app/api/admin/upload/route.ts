@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
-import { v4 as uuidv4 } from "uuid"; // I'll use crypto.randomUUID() instead
 import { getSession } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
@@ -26,7 +25,7 @@ export async function POST(request: NextRequest) {
     const filename = `${crypto.randomUUID()}${ext}`;
     
     // Directory path
-    const uploadDir = path.join(process.cwd(), "public", "3D", "uploads");
+    const uploadDir = path.join(process.cwd(), "public", "uploads");
     
     // Ensure directory exists
     try {
@@ -36,7 +35,7 @@ export async function POST(request: NextRequest) {
     const filePath = path.join(uploadDir, filename);
     await writeFile(filePath, buffer);
 
-    const publicPath = `/3D/uploads/${filename}`;
+    const publicPath = `/uploads/${filename}`;
 
     return NextResponse.json({ success: true, url: publicPath });
   } catch (error: any) {
