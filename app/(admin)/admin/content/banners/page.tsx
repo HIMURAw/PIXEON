@@ -50,7 +50,7 @@ export default function AdminBanners() {
             subtitle: "Kampanya detayları...",
             image: "",
             link: "/shop",
-            position: "home-middle",
+            position: "promo-vertical",
             status: "ACTIVE"
         });
     };
@@ -253,11 +253,9 @@ export default function AdminBanners() {
                                                 onChange={(e) => setSelectedBanner({ ...selectedBanner, position: e.target.value })}
                                                 className="w-full bg-slate-950 border border-white/5 rounded-2xl px-5 py-4 text-sm text-white focus:border-blue-500/50 outline-none transition-all appearance-none"
                                             >
-                                                <option value="home-top">Ana Sayfa Üst</option>
-                                                <option value="home-middle">Ana Sayfa Orta</option>
-                                                <option value="home-bottom">Ana Sayfa Alt</option>
                                                 <option value="promo-vertical">Yan Menü Büyük (VR2 Yeri)</option>
-                                                <option value="products-sidebar">Ürünler Yan Menü</option>
+                                                <option value="promo-vertical-2">Sol Yan Menü (DualSense Yeri)</option>
+                                                <option value="promo-vertical-3">Alt Sağ Yan Menü (PS5 Pro Yeri)</option>
                                             </select>
                                         </div>
                                     </div>

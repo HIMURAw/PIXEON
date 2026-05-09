@@ -1,29 +1,70 @@
+"use client";
+
 import Link from "next/link";
+import React, { useEffect, useState } from "react";
+import { getActiveBannersByPosition } from "@/lib/actions/banner-actions";
 
 export default function NewProductsSidebar() {
+    const [banner, setBanner] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        getActiveBannersByPosition("promo-vertical-3").then(res => {
+            if (res.success && res.banners && res.banners.length > 0) {
+                setBanner(res.banners[0]);
+            }
+            setLoading(false);
+        });
+    }, []);
+
     return (
         <div className="space-y-5">
             {/* Günün Fırsatı Kartı */}
-            <div className="relative rounded-xl overflow-hidden group cursor-pointer">
-                <img
-                    src="/products/ps5-pro-sidebar.png"
-                    alt="Günün Fırsatı"
-                    className="w-full h-[260px] object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-4">
-                    <span className="inline-block text-[10px] uppercase tracking-widest text-blue-300 font-semibold mb-1">
-                        Geleceğin Gücü
-                    </span>
-                    <h4 className="text-white text-sm font-bold leading-tight">
-                        PlayStation 5 Pro <br />
-                        <span className="text-blue-400">Şimdi Stoklarımızda</span>
-                    </h4>
-                    <button className="cursor-pointer mt-3 bg-blue-500 hover:bg-blue-600 text-white text-xs px-4 py-1.5 rounded-full transition-colors font-bold">
-                        Hemen İncele
-                    </button>
+            {loading ? (
+                <div className="w-full h-[260px] bg-slate-900 animate-pulse rounded-xl border border-white/5" />
+            ) : banner ? (
+                <Link href={banner.link || "#"} className="block relative rounded-xl overflow-hidden group cursor-pointer border border-white/5">
+                    <img
+                        src={banner.image}
+                        alt={banner.title || ""}
+                        className="w-full h-[260px] object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                    <div className="absolute bottom-0 left-0 right-0 p-4">
+                        {banner.title && (
+                            <span className="inline-block text-[10px] uppercase tracking-widest text-blue-300 font-black mb-1">
+                                {banner.title}
+                            </span>
+                        )}
+                        {banner.subtitle && (
+                            <h4 className="text-white text-sm font-black leading-tight line-clamp-2">
+                                {banner.subtitle}
+                            </h4>
+                        )}
+                    </div>
+                </Link>
+            ) : (
+                <div className="relative rounded-xl overflow-hidden group cursor-pointer">
+                    <img
+                        src="/products/ps5-pro-sidebar.png"
+                        alt="Günün Fırsatı"
+                        className="w-full h-[260px] object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                    <div className="absolute bottom-0 left-0 right-0 p-4">
+                        <span className="inline-block text-[10px] uppercase tracking-widest text-blue-300 font-semibold mb-1">
+                            Geleceğin Gücü
+                        </span>
+                        <h4 className="text-white text-sm font-bold leading-tight">
+                            PlayStation 5 Pro <br />
+                            <span className="text-blue-400">Şimdi Stoklarımızda</span>
+                        </h4>
+                        <button className="cursor-pointer mt-3 bg-blue-500 hover:bg-blue-600 text-white text-xs px-4 py-1.5 rounded-full transition-colors font-bold">
+                            Hemen İncele
+                        </button>
+                    </div>
                 </div>
-            </div>
+            )}
 
             {/* Hızlı Kategoriler */}
             <div className="bg-[#0b1220] border border-white/10 rounded-xl p-4">
