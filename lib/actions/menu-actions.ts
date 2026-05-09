@@ -1,13 +1,12 @@
-"use client"; // Wait, server actions shouldn't have "use client".
-
 "use server";
 
 import { db } from "@/lib/db";
 import { navMenus, navMenuItems } from "@/lib/db/schema";
 import { eq, asc } from "drizzle-orm";
-import { v4 as uuidv4 } from "uuid";
 import { getSession } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
+import { randomUUID } from "crypto";
+
 
 export async function getMenus() {
   const session = await getSession();
@@ -63,28 +62,28 @@ export async function saveMenu(data: any) {
   }
 
   const { id, name, description, items } = data;
-  const menuId = id || uuidv4();
+  const menuId = id || randomUUID();
 
   try {
     // Check if name exists for other menus
     const existing = await db.query.navMenus.findFirst({
-        where: eq(navMenus.name, name)
+      where: eq(navMenus.name, name)
     });
 
     if (existing && existing.id !== menuId) {
-        return { success: false, error: "Bu isimde bir menü zaten var." };
+      return { success: false, error: "Bu isimde bir menü zaten var." };
     }
 
     if (id) {
-        await db.update(navMenus)
-            .set({ name, description, updatedAt: new Date() })
-            .where(eq(navMenus.id, menuId));
+      await db.update(navMenus)
+        .set({ name, description, updatedAt: new Date() })
+        .where(eq(navMenus.id, menuId));
     } else {
-        await db.insert(navMenus).values({
-            id: menuId,
-            name,
-            description,
-        });
+      await db.insert(navMenus).values({
+        id: menuId,
+        name,
+        description,
+      });
     }
 
     // Update items: delete and re-insert for simplicity
@@ -92,7 +91,7 @@ export async function saveMenu(data: any) {
 
     if (items && items.length > 0) {
       const itemsToInsert = items.map((item: any) => ({
-        id: item.id || uuidv4(),
+        id: item.id || randomUUID(),
         menuId,
         parentId: item.parentId || null,
         title: item.title,
@@ -100,7 +99,7 @@ export async function saveMenu(data: any) {
         order: parseInt(item.order) || 0,
         target: item.target || "_self",
       }));
-      
+
       await db.insert(navMenuItems).values(itemsToInsert);
     }
 
@@ -112,17 +111,17 @@ export async function saveMenu(data: any) {
 }
 
 export async function deleteMenu(id: string) {
-    const session = await getSession();
-    if (session?.user?.role !== "ADMIN") {
-      return { success: false, error: "Unauthorized" };
-    }
+  const session = await getSession();
+  if (session?.user?.role !== "ADMIN") {
+    return { success: false, error: "Unauthorized" };
+  }
 
-    try {
-        await db.delete(navMenuItems).where(eq(navMenuItems.menuId, id));
-        await db.delete(navMenus).where(eq(navMenus.id, id));
-        revalidatePath("/");
-        return { success: true };
-    } catch (error: any) {
-        return { success: false, error: error.message };
-    }
+  try {
+    await db.delete(navMenuItems).where(eq(navMenuItems.menuId, id));
+    await db.delete(navMenus).where(eq(navMenus.id, id));
+    revalidatePath("/");
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
 }

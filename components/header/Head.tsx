@@ -1,3 +1,6 @@
+"use client";
+
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -13,7 +16,30 @@ import CategoriesSection from "../categories/CategoriesSection";
 import NotificationBell from "./NotificationBell";
 import UserMenu from "./UserMenu";
 
+const DEFAULT_LINKS = [
+    { title: "ANA SAYFA", url: "/" },
+    { title: "KONSOLLAR", url: "/konsollar" },
+    { title: "PS5 OYUNLARI", url: "/oyunlar/ps5" },
+    { title: "PS4 OYUNLARI", url: "/oyunlar/ps4" },
+    { title: "AKSESUARLAR", url: "/aksesuarlar" },
+    { title: "DİJİTAL KODLAR", url: "/dijital-kodlar" },
+    { title: "İLETİŞİM", url: "/iletisim" }
+];
+
 export default function Head() {
+    const [navLinks, setNavLinks] = useState(DEFAULT_LINKS);
+
+    useEffect(() => {
+        fetch("/api/menus/header-main")
+            .then(res => res.json())
+            .then(data => {
+                if (data.success && data.menu?.items?.length > 0) {
+                    setNavLinks(data.menu.items);
+                }
+            })
+            .catch(() => {});
+    }, []);
+
     return (
         <header className="w-full bg-[#0c1022] border-b border-slate-800">
             <div className="w-full px-4 sm:px-6 lg:px-8">
@@ -62,17 +88,14 @@ export default function Head() {
                 <nav className="hidden md:flex items-center gap-6 py-3 text-sm font-extrabold text-slate-200">
                     <CategoriesSection />
                     <div className="flex-1 flex justify-end gap-2">
-                        {[
-                            { name: "ANA SAYFA", href: "/" },
-                            { name: "KONSOLLAR", href: "/konsollar" },
-                            { name: "PS5 OYUNLARI", href: "/oyunlar/ps5" },
-                            { name: "PS4 OYUNLARI", href: "/oyunlar/ps4" },
-                            { name: "AKSESUARLAR", href: "/aksesuarlar" },
-                            { name: "DİJİTAL KODLAR", href: "/dijital-kodlar" },
-                            { name: "İLETİŞİM", href: "/iletisim" }
-                        ].map((item) => (
-                            <Link key={item.name} href={item.href} className="px-4 h-[44px] flex items-center justify-center rounded-xl hover:bg-slate-800 hover:text-sky-400 transition">
-                                {item.name}
+                        {navLinks.map((item: any) => (
+                            <Link 
+                                key={item.id || item.title} 
+                                href={item.url} 
+                                target={item.target || "_self"}
+                                className="px-4 h-[44px] flex items-center justify-center rounded-xl hover:bg-slate-800 hover:text-sky-400 transition uppercase tracking-wider"
+                            >
+                                {item.title}
                             </Link>
                         ))}
                     </div>
@@ -81,3 +104,4 @@ export default function Head() {
         </header>
     );
 }
+
