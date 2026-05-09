@@ -267,15 +267,50 @@ export default function SliderPage() {
                                     <div className="space-y-6">
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">3D MODEL YOLU (.glb)</label>
-                                            <div className="relative">
-                                                <Box size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600" />
-                                                <input 
-                                                    type="text"
-                                                    value={selectedSlide.modelPath}
-                                                    onChange={(e) => setSelectedSlide({ ...selectedSlide, modelPath: e.target.value })}
-                                                    className="w-full bg-slate-950 border border-white/5 rounded-2xl pl-12 pr-5 py-4 text-sm text-white focus:border-blue-500/50 outline-none transition-all font-mono"
-                                                    placeholder="/3D/ps5.glb"
-                                                />
+                                            <div className="flex gap-2">
+                                                <div className="relative flex-1">
+                                                    <Box size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600" />
+                                                    <input 
+                                                        type="text"
+                                                        value={selectedSlide.modelPath}
+                                                        onChange={(e) => setSelectedSlide({ ...selectedSlide, modelPath: e.target.value })}
+                                                        className="w-full bg-slate-950 border border-white/5 rounded-2xl pl-12 pr-5 py-4 text-sm text-white focus:border-blue-500/50 outline-none transition-all font-mono"
+                                                        placeholder="/3D/ps5.glb"
+                                                    />
+                                                </div>
+                                                <div className="relative">
+                                                    <input 
+                                                        type="file" 
+                                                        accept=".glb" 
+                                                        className="hidden" 
+                                                        id="model-upload"
+                                                        onChange={async (e) => {
+                                                            const file = e.target.files?.[0];
+                                                            if (!file) return;
+                                                            
+                                                            const formData = new FormData();
+                                                            formData.append("file", file);
+                                                            
+                                                            const res = await fetch("/api/admin/upload", {
+                                                                method: "POST",
+                                                                body: formData
+                                                            });
+                                                            
+                                                            const data = await res.json();
+                                                            if (data.success) {
+                                                                setSelectedSlide({ ...selectedSlide, modelPath: data.url });
+                                                            } else {
+                                                                alert("Yükleme başarısız: " + data.error);
+                                                            }
+                                                        }}
+                                                    />
+                                                    <label 
+                                                        htmlFor="model-upload"
+                                                        className="h-full bg-slate-800 hover:bg-slate-700 text-white px-6 rounded-2xl flex items-center justify-center cursor-pointer transition-all border border-white/5 whitespace-nowrap text-xs font-bold"
+                                                    >
+                                                        MODEL YÜKLE
+                                                    </label>
+                                                </div>
                                             </div>
                                         </div>
                                         <div className="grid grid-cols-2 gap-4">
