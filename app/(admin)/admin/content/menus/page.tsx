@@ -16,8 +16,10 @@ import {
 import { getMenus, saveMenu, deleteMenu } from "@/lib/actions/menu-actions";
 import { cn } from "@/lib/utils";
 import DeleteConfirmModal from "@/components/admin/DeleteConfirmModal";
+import { useNotification } from "@/context/NotificationContext";
 
 export default function MenusPage() {
+    const { notify } = useNotification();
     const [menus, setMenus] = useState<any[]>([]);
     const [selectedMenu, setSelectedMenu] = useState<any>(null);
     const [loading, setLoading] = useState(true);
@@ -78,15 +80,15 @@ export default function MenusPage() {
     };
 
     const handleSave = async () => {
-        if (!selectedMenu.name) return alert("Menü ismi gereklidir.");
+        if (!selectedMenu.name) return notify("error", "Menü ismi gereklidir.");
         setSaving(true);
         const res = await saveMenu(selectedMenu);
         if (res.success) {
-            alert("Menü kaydedildi!");
+            notify("success", "Menü başarıyla kaydedildi.");
             loadMenus();
             setSelectedMenu(null);
         } else {
-            alert(res.error);
+            notify("error", res.error || "Bir hata oluştu.");
         }
         setSaving(false);
     };
@@ -105,8 +107,9 @@ export default function MenusPage() {
             if (selectedMenu?.id === menuToDelete) setSelectedMenu(null);
             setIsDeleteModalOpen(false);
             setMenuToDelete(null);
+            notify("success", "Menü başarıyla silindi.");
         } else {
-            alert(res.error);
+            notify("error", res.error || "Bir hata oluştu.");
         }
         setIsDeleting(false);
     };

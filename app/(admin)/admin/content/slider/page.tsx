@@ -17,9 +17,12 @@ import {
 import { getHeroSlides, saveHeroSlide, deleteHeroSlide } from "@/lib/actions/hero-actions";
 import { cn } from "@/lib/utils";
 import DeleteConfirmModal from "@/components/admin/DeleteConfirmModal";
+import { useNotification } from "@/context/NotificationContext";
 
 export default function SliderPage() {
+    const { notify } = useNotification();
     const [slides, setSlides] = useState<any[]>([]);
+
     const [selectedSlide, setSelectedSlide] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -59,15 +62,15 @@ export default function SliderPage() {
     };
 
     const handleSave = async () => {
-        if (!selectedSlide.title) return alert("Başlık gereklidir.");
+        if (!selectedSlide.title) return notify("error", "Başlık gereklidir.");
         setSaving(true);
         const res = await saveHeroSlide(selectedSlide);
         if (res.success) {
-            alert("Slayt kaydedildi!");
+            notify("success", "Slayt başarıyla kaydedildi.");
             loadSlides();
             setSelectedSlide(null);
         } else {
-            alert(res.error);
+            notify("error", res.error || "Bir hata oluştu.");
         }
         setSaving(false);
     };
@@ -86,8 +89,9 @@ export default function SliderPage() {
             if (selectedSlide?.id === slideToDelete) setSelectedSlide(null);
             setIsDeleteModalOpen(false);
             setSlideToDelete(null);
+            notify("success", "Slayt başarıyla silindi.");
         } else {
-            alert(res.error);
+            notify("error", res.error || "Bir hata oluştu.");
         }
         setIsDeleting(false);
     };
@@ -317,8 +321,9 @@ export default function SliderPage() {
                                                                 const data = await res.json();
                                                                 if (data.success) {
                                                                     setSelectedSlide({ ...selectedSlide, modelPath: data.url });
+                                                                    notify("success", "Model başarıyla yüklendi.");
                                                                 } else {
-                                                                    alert("Yükleme başarısız: " + data.error);
+                                                                    notify("error", "Yükleme başarısız: " + data.error);
                                                                 }
                                                             }}
                                                         />

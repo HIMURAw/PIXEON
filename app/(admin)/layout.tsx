@@ -32,8 +32,10 @@ import {
     User
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { NotificationProvider } from "@/context/NotificationContext";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
+
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [user, setUser] = useState<any>(null);
 
@@ -106,7 +108,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return (
         <html lang="en">
             <body className="antialiased">
+                <NotificationProvider>
                 <div className="min-h-screen bg-slate-950 text-slate-200 flex">
+
 
                     {/* SIDEBAR */}
                     <aside className={cn(
@@ -217,7 +221,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                         </main>
                     </div>
                 </div>
+                </NotificationProvider>
             </body>
         </html>
     );
 }
+
