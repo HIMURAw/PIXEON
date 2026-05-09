@@ -2,16 +2,50 @@
 
 import { db } from "@/lib/db";
 import { products, categories } from "@/lib/db/schema";
-import { eq, desc, and, gte } from "drizzle-orm";
+import { eq, desc, and, gte, like, or } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import fs from "fs/promises";
 import path from "path";
 
 const UPLOAD_DIR = path.join(process.cwd(), "public/uploads/products");
 
+export async function searchProducts(query: string) {
+  try {
+    if (!query) return [];
+
+    const data = await db.select({
+      id: products.id,
+      name: products.name,
+      slug: products.slug,
+      price: products.price,
+      oldPrice: products.oldPrice,
+      image: products.image,
+      category: {
+        name: categories.name
+      }
+    })
+      .from(products)
+      .leftJoin(categories, eq(products.categoryId, categories.id))
+      .where(
+        and(
+          eq(products.status, "ACTIVE"),
+          or(
+            like(products.name, `%${query}%`),
+            like(products.sku, `%${query}%`)
+          )
+        )
+      )
+      .limit(8);
+
+    return JSON.parse(JSON.stringify(data));
+  } catch (error) {
+    console.error("Search error:", error);
+    return [];
+  }
+}
+
 export async function uploadImage(file: File, oldImageUrl?: string | null) {
   try {
-    // 1. Delete old image if exists
     if (oldImageUrl && oldImageUrl.startsWith("/uploads/products/")) {
       const oldPath = path.join(process.cwd(), "public", oldImageUrl);
       try {
@@ -23,7 +57,6 @@ export async function uploadImage(file: File, oldImageUrl?: string | null) {
 
     if (!file || file.size === 0) return null;
 
-    // 2. Save new image
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
@@ -65,7 +98,6 @@ export async function getProducts() {
       .leftJoin(categories, eq(products.categoryId, categories.id))
       .orderBy(desc(products.createdAt));
 
-    // Serialize dates for Next.js client components
     return JSON.parse(JSON.stringify(data));
   } catch (error) {
     console.error("Error fetching products:", error);
@@ -178,7 +210,6 @@ export async function deleteProduct(id: string) {
   try {
     const existing = await db.query.products.findFirst({ where: eq(products.id, id) });
 
-    // Delete image file
     if (existing?.image && existing.image.startsWith("/uploads/products/")) {
       const imgPath = path.join(process.cwd(), "public", existing.image);
       try {
