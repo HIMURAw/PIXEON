@@ -238,6 +238,16 @@ export const navMenuItems = mysqlTable("nav_menu_items", {
 
 
 // 10. Configuration
+export const cmsPages = mysqlTable("cms_pages", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  title: varchar("title", { length: 255 }).notNull(),
+  slug: varchar("slug", { length: 255 }).notNull().unique(),
+  content: text("content"),
+  status: mysqlEnum("status", ["DRAFT", "PUBLISHED"]).default("DRAFT").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
 export const settings = mysqlTable("settings", {
   key: varchar("key", { length: 100 }).primaryKey(),
   value: text("value"),
