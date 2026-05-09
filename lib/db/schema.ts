@@ -212,6 +212,27 @@ export const banners = mysqlTable("banners", {
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
 });
 
+export const navMenus = mysqlTable("nav_menus", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  name: varchar("name", { length: 255 }).notNull().unique(), // e.g., 'header-main', 'footer-links'
+  description: text("description"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export const navMenuItems = mysqlTable("nav_menu_items", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  menuId: varchar("menu_id", { length: 255 }).notNull().references(() => navMenus.id),
+  parentId: varchar("parent_id", { length: 255 }),
+  title: varchar("title", { length: 255 }).notNull(),
+  url: varchar("url", { length: 255 }).notNull(),
+  order: int("order").default(0).notNull(),
+  target: mysqlEnum("target", ["_self", "_blank"]).default("_self").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+
 // 10. Configuration
 export const settings = mysqlTable("settings", {
   key: varchar("key", { length: 100 }).primaryKey(),
@@ -357,3 +378,23 @@ export const cartItemsRelations = relations(cartItems, ({ one }) => ({
     references: [products.id],
   }),
 }));
+
+export const navMenusRelations = relations(navMenus, ({ many }) => ({
+  items: many(navMenuItems),
+}));
+
+export const navMenuItemsRelations = relations(navMenuItems, ({ one, many }) => ({
+  menu: one(navMenus, {
+    fields: [navMenuItems.menuId],
+    references: [navMenus.id],
+  }),
+  parent: one(navMenuItems, {
+    fields: [navMenuItems.parentId],
+    references: [navMenuItems.id],
+    relationName: "submenu",
+  }),
+  subitems: many(navMenuItems, {
+    relationName: "submenu",
+  }),
+}));
+

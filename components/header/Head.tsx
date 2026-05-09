@@ -11,6 +11,7 @@ import BurgerMenu from "./mobile/burgerMenu";
 import LocationButton from "./locationButton/locationButton";
 import CategoriesSection from "../categories/CategoriesSection";
 import NotificationBell from "./NotificationBell";
+import UserMenu from "./UserMenu";
 
 export default function Head() {
     return (
@@ -26,9 +27,7 @@ export default function Head() {
                     <div className="flex items-center gap-3">
                         <NotificationBell />
                         <ShoppingCart size={20} />
-                        <Link href="/hesabim" className="hover:text-sky-400 transition-colors">
-                            <User size={20} />
-                        </Link>
+                        <UserMenu mobile />
                     </div>
                 </div>
 
@@ -50,12 +49,7 @@ export default function Head() {
 
                     <div className="flex items-center gap-4">
                         <NotificationBell />
-                        <Link href="/hesabim" className="flex items-center gap-2 group">
-                            <div className="bg-slate-900 w-10 h-10 flex items-center justify-center border border-slate-700 rounded-full group-hover:border-sky-500/50 group-hover:bg-slate-800 transition-all">
-                                <User color="#E5E7EB" size={16} />
-                            </div>
-                            <span className="font-medium text-slate-200 group-hover:text-sky-400 transition-colors">Hesabım</span>
-                        </Link>
+                        <UserMenu />
                         <Link href="/sepet" className="flex items-center gap-2 group">
                             <div className="w-10 h-10 bg-slate-900 flex items-center justify-center border border-slate-700 rounded-full group-hover:border-sky-500/50 group-hover:bg-slate-800 transition-all">
                                 <ShoppingCart color="#E5E7EB" size={16} />

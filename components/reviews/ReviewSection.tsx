@@ -86,7 +86,7 @@ export default function ReviewSection({
 
                                 <div className="flex items-center justify-between pt-4 border-t border-white/5 mt-auto">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 bg-slate-800 rounded-lg overflow-hidden flex items-center justify-center text-blue-400 font-bold text-xs border border-white/5">
+                                        <div className="w-8 h-8 bg-slate-800 rounded-lg overflow-hidden flex items-center justify-center text-blue-400 font-bold text-xs border border-white/5 relative">
                                             {rv.user.image ? (
                                                 <Image src={rv.user.image} alt={rv.user.name} fill className="object-cover" />
                                             ) : (

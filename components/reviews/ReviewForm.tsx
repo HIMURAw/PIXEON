@@ -194,20 +194,6 @@ export default function ReviewForm({ userId, userName, userImage }: ReviewFormPr
                 )}
             </div>
 
-            {/* Comment */}
-            <div className="space-y-2">
-                <label className="text-[10px] text-slate-500 font-bold uppercase tracking-widest ml-1 block">
-                    Yorumunuz
-                </label>
-                <textarea
-                    required
-                    value={comment}
-                    onChange={(e) => setComment(e.target.value)}
-                    placeholder="Deneyiminizi anlatın..."
-                    className="w-full bg-slate-950 border border-white/5 rounded-xl p-4 text-sm text-white outline-none focus:border-blue-500/30 transition-all min-h-[120px] resize-none"
-                ></textarea>
-            </div>
-
             <button
                 type="submit"
                 disabled={loading || !comment.trim()}
