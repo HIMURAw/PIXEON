@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import TopBar from "@/components/header/TopBar";
 import MainBar from "@/components/header/MainBar";
@@ -8,8 +6,12 @@ import Footer from "@/components/footer/Footer";
 import Image from "next/image";
 import { Award, ShieldCheck, Truck, Zap, Gamepad2, Users, Rocket, Target, Heart, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getAboutUsContent } from "@/lib/actions/about-actions";
 
-export default function AboutUs() {
+export default async function AboutUs() {
+    const res = await getAboutUsContent();
+    const data = res.data;
+
     return (
         <div className="min-h-screen bg-slate-950 text-slate-200">
             <TopBar />
@@ -21,7 +23,7 @@ export default function AboutUs() {
                 <div className="absolute inset-0 z-0">
                     <div className="absolute inset-0 bg-[#020617]/60 z-10"></div>
                     <Image
-                        src="/slider/banner.jfif"
+                        src={data.hero.image || "/slider/banner.jfif"}
                         alt="PlayStation Hero"
                         fill
                         className="object-cover scale-110 animate-pulse-slow"
@@ -35,11 +37,15 @@ export default function AboutUs() {
                         <Zap size={14} className="text-blue-400" fill="currentColor" />
                         <span className="text-[10px] font-black text-white uppercase tracking-widest">Oyunun Geleceği</span>
                     </div>
-                    <h1 className="text-5xl md:text-8xl font-black tracking-tighter text-white animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-200">
-                        BİZ <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-sky-600">PIXEON'UZ</span>
+                    <h1 className="text-5xl md:text-8xl font-black tracking-tighter text-white animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-200 uppercase">
+                        {data.hero.title.split(' ').map((word: string, i: number) => (
+                            <React.Fragment key={i}>
+                                {word === "PIXEON'UZ" ? <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-sky-600">{word}</span> : word}{' '}
+                            </React.Fragment>
+                        ))}
                     </h1>
                     <p className="text-xl md:text-2xl text-slate-400 font-medium max-w-3xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-500">
-                        Türkiye'nin en seçkin PlayStation topluluğunu ve alışveriş deneyimini inşa ediyoruz.
+                        {data.hero.subtitle}
                     </p>
                 </div>
             </section>
@@ -50,26 +56,24 @@ export default function AboutUs() {
                 <section className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
                     <div className="space-y-10 order-2 lg:order-1">
                         <div className="space-y-4">
-                            <h2 className="text-4xl lg:text-5xl font-black text-white tracking-tight">Hikayemiz</h2>
+                            <h2 className="text-4xl lg:text-5xl font-black text-white tracking-tight">{data.story.title}</h2>
                             <div className="w-20 h-1.5 bg-blue-600 rounded-full"></div>
                         </div>
                         <p className="text-xl text-slate-400 leading-relaxed font-medium">
-                            PIXEON, 2024 yılında oyun tutkunları tarafından oyun tutkunları için kuruldu. 
-                            Sadece bir mağaza değil, PlayStation ekosisteminin kalbinde yer alan bir teknoloji ve eğlence merkeziyiz.
+                            {data.story.content1}
                         </p>
                         <p className="text-lg text-slate-500 leading-relaxed">
-                            En yeni konsolları, en heyecan verici oyunları ve özel aksesuarları en hızlı şekilde sizlere ulaştırmayı görev edindik. 
-                            Her paketimizde, bir oyuncunun heyecanını taşıyoruz.
+                            {data.story.content2}
                         </p>
                         
                         <div className="grid grid-cols-2 gap-10 pt-6">
                             <div className="space-y-2">
-                                <span className="text-5xl font-black text-white tracking-tighter">10K+</span>
-                                <p className="text-xs font-black text-blue-400 uppercase tracking-widest">Mutlu Oyuncu</p>
+                                <span className="text-5xl font-black text-white tracking-tighter">{data.story.stat1}</span>
+                                <p className="text-xs font-black text-blue-400 uppercase tracking-widest">{data.story.stat1Label}</p>
                             </div>
                             <div className="space-y-2">
-                                <span className="text-5xl font-black text-white tracking-tighter">5K+</span>
-                                <p className="text-xs font-black text-blue-400 uppercase tracking-widest">Ürün Çeşidi</p>
+                                <span className="text-5xl font-black text-white tracking-tighter">{data.story.stat2}</span>
+                                <p className="text-xs font-black text-blue-400 uppercase tracking-widest">{data.story.stat2Label}</p>
                             </div>
                         </div>
                     </div>
@@ -121,9 +125,9 @@ export default function AboutUs() {
 
                     <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
                         <div className="space-y-8">
-                            <h2 className="text-4xl lg:text-5xl font-black text-white tracking-tight">Misyonumuz</h2>
+                            <h2 className="text-4xl lg:text-5xl font-black text-white tracking-tight">{data.mission.title}</h2>
                             <p className="text-xl text-slate-400 leading-relaxed font-medium">
-                                Türkiye'deki PlayStation ekosistemini güçlendirmek ve her seviyeden oyuncuya kusursuz bir deneyim sunmak. Teknolojinin sınırlarını zorlayan ürünleri, samimi bir hizmet anlayışıyla birleştiriyoruz.
+                                {data.mission.content}
                             </p>
                             <button className="bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-widest px-10 py-5 rounded-2xl flex items-center gap-3 transition-all shadow-xl shadow-blue-600/20 active:scale-95 group">
                                 MAĞAZAYI KEŞFET
@@ -135,12 +139,12 @@ export default function AboutUs() {
                             <div className="p-10 bg-white/[0.03] backdrop-blur-xl border border-white/5 rounded-[40px] space-y-4">
                                 <div className="p-4 bg-blue-600/10 text-blue-400 rounded-2xl w-fit"><Target size={24} /></div>
                                 <h4 className="text-xl font-bold text-white">Vizyonumuz</h4>
-                                <p className="text-sm text-slate-500 font-medium leading-relaxed">Bölgenin en güvenilir ve yenilikçi oyun perakendecisi olarak sektöre yön vermek.</p>
+                                <p className="text-sm text-slate-500 font-medium leading-relaxed">{data.mission.vision}</p>
                             </div>
                             <div className="p-10 bg-white/[0.03] backdrop-blur-xl border border-white/5 rounded-[40px] space-y-4">
                                 <div className="p-4 bg-emerald-600/10 text-emerald-400 rounded-2xl w-fit"><Heart size={24} /></div>
                                 <h4 className="text-xl font-bold text-white">Değerlerimiz</h4>
-                                <p className="text-sm text-slate-500 font-medium leading-relaxed">Dürüstlük, tutku, mükemmeliyetçilik ve topluluk odaklı yaklaşım.</p>
+                                <p className="text-sm text-slate-500 font-medium leading-relaxed">{data.mission.values}</p>
                             </div>
                         </div>
                     </div>
@@ -148,22 +152,6 @@ export default function AboutUs() {
             </main>
 
             <Footer />
-
-            <style jsx>{`
-                .animate-pulse-slow {
-                    animation: pulse 12s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-                }
-                @keyframes pulse {
-                    0%, 100% {
-                        opacity: 0.6;
-                        transform: scale(1.1);
-                    }
-                    50% {
-                        opacity: 0.8;
-                        transform: scale(1.15);
-                    }
-                }
-            `}</style>
         </div>
     );
 }

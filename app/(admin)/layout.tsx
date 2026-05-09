@@ -29,10 +29,12 @@ import {
     FileText,
     PenTool,
     ShieldCheck,
-    User
+    User,
+    Info
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NotificationProvider } from "@/context/NotificationContext";
+import { Toaster } from "react-hot-toast";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
 
@@ -94,6 +96,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 { label: "Kampanya Bannerları", icon: Image, href: "/admin/content/banners" },
                 { label: "Sayfalar (CMS)", icon: FileText, href: "/admin/content/pages" },
                 { label: "Blog Yazıları", icon: PenTool, href: "/admin/content/blog" },
+                { label: "Hakkımızda", icon: Info, href: "/admin/content/about" },
             ]
         },
         {
@@ -109,6 +112,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <html lang="en">
             <body className="antialiased">
                 <NotificationProvider>
+                <Toaster position="top-right" />
                 <div className="min-h-screen bg-slate-950 text-slate-200 flex">
 
 

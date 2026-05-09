@@ -19,12 +19,12 @@ export default function Navbar() {
     }, []);
 
     return (
-        <div className="hidden md:flex items-center gap-6">
-            <Link href="/hakkimizda" className="hover:text-blue-400 text-[#696e7f] text-[11px] font-medium uppercase tracking-widest transition-colors">Hakkımızda</Link>
-            <Link href="/hesabim" className="hover:text-blue-400 text-[#696e7f] text-[11px] font-medium uppercase tracking-widest transition-colors">Hesabım</Link>
-            <Link href="/istek-listesi" className="hover:text-blue-400 text-[#696e7f] text-[11px] font-medium uppercase tracking-widest transition-colors">İstek Listesi</Link>
-            <Link href="/siparis-takibi" className="hover:text-blue-400 text-[#696e7f] text-[11px] font-medium uppercase tracking-widest transition-colors">Sipariş Takibi</Link>
-            <Link href="/support/my-tickets" className="hover:text-blue-400 text-[#696e7f] text-[11px] font-medium uppercase tracking-widest transition-colors">Destek Taleplerim</Link>
+        <div className="hidden md:flex items-center gap-4">
+            <Link href="/hakkimizda" className="hover:text-blue-400 text-[#696e7f] text-[10px] font-black uppercase tracking-widest transition-colors whitespace-nowrap">Hakkımızda</Link>
+            <Link href="/hesabim" className="hover:text-blue-400 text-[#696e7f] text-[10px] font-black uppercase tracking-widest transition-colors whitespace-nowrap">Hesabım</Link>
+            <Link href="/istek-listesi" className="hover:text-blue-400 text-[#696e7f] text-[10px] font-black uppercase tracking-widest transition-colors whitespace-nowrap">İstek Listesi</Link>
+            <Link href="/siparis-takibi" className="hover:text-blue-400 text-[#696e7f] text-[10px] font-black uppercase tracking-widest transition-colors whitespace-nowrap">Sipariş Takibi</Link>
+            <Link href="/support/my-tickets" className="hover:text-blue-400 text-[#696e7f] text-[10px] font-black uppercase tracking-widest transition-colors whitespace-nowrap">Destek Taleplerim</Link>
             
             {/* Bloglar Dropdown */}
             <div 
@@ -35,7 +35,7 @@ export default function Navbar() {
                 <Link 
                     href="/blog" 
                     className={cn(
-                        "flex items-center gap-1 text-[11px] font-medium uppercase tracking-widest transition-colors",
+                        "flex items-center gap-1 text-[10px] font-black uppercase tracking-widest transition-colors whitespace-nowrap",
                         isOpen ? "text-blue-400" : "text-[#696e7f] hover:text-blue-400"
                     )}
                 >
