@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { 
-    Plus, 
-    Save, 
-    Trash2, 
-    Image as ImageIcon, 
-    Layout, 
+import {
+    Plus,
+    Save,
+    Trash2,
+    Image as ImageIcon,
+    Layout,
     ChevronRight,
     Search,
     Calendar,
@@ -102,7 +102,7 @@ export default function AdminBanners() {
                         </h1>
                         <p className="text-slate-500 font-medium mt-1">Sitedeki tüm reklam alanlarını ve kampanyaları buradan yönetin.</p>
                     </div>
-                    <button 
+                    <button
                         onClick={handleCreateBanner}
                         className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 py-3 rounded-2xl transition-all shadow-lg shadow-blue-600/20 flex items-center gap-2"
                     >
@@ -129,13 +129,13 @@ export default function AdminBanners() {
                             ) : (
                                 <div className="space-y-3">
                                     {banners.map(banner => (
-                                        <div 
+                                        <div
                                             key={banner.id}
                                             onClick={() => setSelectedBanner(banner)}
                                             className={cn(
                                                 "group p-4 rounded-2xl border transition-all cursor-pointer flex items-center gap-4",
-                                                selectedBanner?.id === banner.id 
-                                                    ? "bg-blue-600/10 border-blue-500/50" 
+                                                selectedBanner?.id === banner.id
+                                                    ? "bg-blue-600/10 border-blue-500/50"
                                                     : "bg-white/5 border-white/5 hover:border-white/10"
                                             )}
                                         >
@@ -171,14 +171,14 @@ export default function AdminBanners() {
                                     </div>
                                     <div className="flex items-center gap-3">
                                         {selectedBanner.id && (
-                                            <button 
+                                            <button
                                                 onClick={() => handleDelete(selectedBanner.id)}
                                                 className="p-3 text-red-500 hover:bg-red-500/10 rounded-2xl transition-colors"
                                             >
                                                 <Trash2 size={20} />
                                             </button>
                                         )}
-                                        <button 
+                                        <button
                                             disabled={saving}
                                             onClick={handleSave}
                                             className="bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-bold px-6 py-3 rounded-2xl transition-all shadow-lg shadow-emerald-600/20 flex items-center gap-2"
@@ -211,10 +211,10 @@ export default function AdminBanners() {
                                                     <span className="text-xs font-bold uppercase tracking-widest text-slate-500">Görsel Seçin veya Yükleyin</span>
                                                 </label>
                                             )}
-                                            <input 
-                                                type="file" 
-                                                id="banner-upload" 
-                                                className="hidden" 
+                                            <input
+                                                type="file"
+                                                id="banner-upload"
+                                                className="hidden"
                                                 accept="image/*"
                                                 onChange={async (e) => {
                                                     const file = e.target.files?.[0];
@@ -238,7 +238,7 @@ export default function AdminBanners() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">KAMPANYA BAŞLIĞI</label>
-                                            <input 
+                                            <input
                                                 type="text"
                                                 value={selectedBanner.title || ""}
                                                 onChange={(e) => setSelectedBanner({ ...selectedBanner, title: e.target.value })}
@@ -248,21 +248,22 @@ export default function AdminBanners() {
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">BANNER POZİSYONU</label>
-                                            <select 
+                                            <select
                                                 value={selectedBanner.position}
                                                 onChange={(e) => setSelectedBanner({ ...selectedBanner, position: e.target.value })}
                                                 className="w-full bg-slate-950 border border-white/5 rounded-2xl px-5 py-4 text-sm text-white focus:border-blue-500/50 outline-none transition-all appearance-none"
                                             >
-                                                <option value="promo-vertical">Yan Menü Büyük (VR2 Yeri)</option>
-                                                <option value="promo-vertical-2">Sol Yan Menü (DualSense Yeri)</option>
-                                                <option value="promo-vertical-3">Alt Sağ Yan Menü (PS5 Pro Yeri)</option>
+                                                <option value="promo-vertical">Yan Menü Büyük (1.)</option>
+                                                <option value="promo-vertical-2">Sol Yan Menü (2.)</option>
+                                                <option value="promo-vertical-small">Sol Yan Menü Küçük (3.)</option>
+                                                <option value="promo-vertical-3">Alt Sağ Yan Menü (4.)</option>
                                             </select>
                                         </div>
                                     </div>
 
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">ALT BAŞLIK / AÇIKLAMA</label>
-                                        <textarea 
+                                        <textarea
                                             value={selectedBanner.subtitle || ""}
                                             onChange={(e) => setSelectedBanner({ ...selectedBanner, subtitle: e.target.value })}
                                             className="w-full bg-slate-950 border border-white/5 rounded-2xl px-5 py-4 text-sm text-white focus:border-blue-500/50 outline-none transition-all h-24 resize-none"
@@ -275,7 +276,7 @@ export default function AdminBanners() {
                                             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">TIKLAMA LİNKİ (URL)</label>
                                             <div className="relative">
                                                 <LinkIcon size={14} className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500" />
-                                                <input 
+                                                <input
                                                     type="text"
                                                     value={selectedBanner.link || ""}
                                                     onChange={(e) => setSelectedBanner({ ...selectedBanner, link: e.target.value })}
@@ -293,8 +294,8 @@ export default function AdminBanners() {
                                                         onClick={() => setSelectedBanner({ ...selectedBanner, status })}
                                                         className={cn(
                                                             "flex-1 py-4 rounded-2xl text-[10px] font-black transition-all border",
-                                                            selectedBanner.status === status 
-                                                                ? "bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-600/20" 
+                                                            selectedBanner.status === status
+                                                                ? "bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-600/20"
                                                                 : "bg-slate-950 border-white/5 text-slate-500 hover:border-white/10"
                                                         )}
                                                     >
@@ -315,7 +316,7 @@ export default function AdminBanners() {
                                     <h3 className="text-xl font-bold text-white">Banner Seçin</h3>
                                     <p className="text-slate-500 text-sm mt-2">Sol taraftan bir banner seçerek düzenlemeye başlayın veya yeni bir tane oluşturun.</p>
                                 </div>
-                                <button 
+                                <button
                                     onClick={handleCreateBanner}
                                     className="bg-slate-800 hover:bg-slate-700 text-white font-bold px-8 py-3 rounded-2xl transition-all border border-white/5"
                                 >
@@ -327,7 +328,7 @@ export default function AdminBanners() {
                 </div>
             </div>
 
-            <DeleteConfirmModal 
+            <DeleteConfirmModal
                 isOpen={isDeleteModalOpen}
                 onClose={() => setIsDeleteModalOpen(false)}
                 onConfirm={confirmDelete}
