@@ -29,7 +29,7 @@ export default function MenusPage() {
     const loadMenus = async () => {
         setLoading(true);
         const res = await getMenus();
-        if (res.success) {
+        if (res.success && res.menus) {
             setMenus(res.menus);
         }
         setLoading(false);

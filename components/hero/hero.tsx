@@ -151,23 +151,36 @@ const slides: Slide[] = [
 ];
 
 
+import { getActiveHeroSlides } from "@/lib/actions/hero-actions";
+
 export default function HeroCarousel() {
+    const [dynamicSlides, setDynamicSlides] = useState<any[]>([]);
     const [currentSlide, setCurrentSlide] = useState(0);
     const [isAutoPlaying, setIsAutoPlaying] = useState(true);
 
-    // Tüm modelleri önden yüklüyoruz
-    useEffect(() => {
-        const modelPaths = slides.map(s => s.modelPath);
-        preloadModels(modelPaths);
-    }, []);
+    const activeSlides = dynamicSlides.length > 0 ? dynamicSlides : slides;
 
     useEffect(() => {
-        if (!isAutoPlaying) return;
+        getActiveHeroSlides().then(res => {
+            if (res.success && res.slides && res.slides.length > 0) {
+                setDynamicSlides(res.slides);
+            }
+        });
+    }, []);
+
+    // Tüm modelleri önden yüklüyoruz
+    useEffect(() => {
+        const modelPaths = activeSlides.map(s => s.modelPath);
+        preloadModels(modelPaths);
+    }, [activeSlides]);
+
+    useEffect(() => {
+        if (!isAutoPlaying || activeSlides.length <= 1) return;
         const interval = setInterval(() => {
-            setCurrentSlide((prev) => (prev + 1) % slides.length);
+            setCurrentSlide((prev) => (prev + 1) % activeSlides.length);
         }, 8000);
         return () => clearInterval(interval);
-    }, [isAutoPlaying]);
+    }, [isAutoPlaying, activeSlides.length]);
 
     const goToSlide = (index: number) => {
         setCurrentSlide(index);
@@ -175,12 +188,12 @@ export default function HeroCarousel() {
     };
 
     const nextSlide = () => {
-        setCurrentSlide((prev) => (prev + 1) % slides.length);
+        setCurrentSlide((prev) => (prev + 1) % activeSlides.length);
         setIsAutoPlaying(false);
     };
 
     const prevSlide = () => {
-        setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+        setCurrentSlide((prev) => (prev - 1 + activeSlides.length) % activeSlides.length);
         setIsAutoPlaying(false);
     };
 
@@ -190,7 +203,7 @@ export default function HeroCarousel() {
                 
                 {/* Sol Taraf: Metin İçerikleri (Slaytlar) */}
                 <div className="w-1/2 h-full relative overflow-hidden">
-                    {slides.map((slide, index) => (
+                    {activeSlides.map((slide, index) => (
                         <div
                             key={slide.id}
                             className={`absolute inset-0 transition-all duration-700 ease-in-out flex items-center px-8 lg:px-16 ${index === currentSlide
@@ -234,7 +247,7 @@ export default function HeroCarousel() {
 
                 {/* Sağ Taraf: Sabit Tek 3D Görüntüleyici */}
                 <div className="w-1/2 h-full relative z-10 bg-gradient-to-l from-slate-900/20 to-transparent">
-                    <ModelViewer path={slides[currentSlide].modelPath} />
+                    <ModelViewer path={activeSlides[currentSlide]?.modelPath} />
                 </div>
             </div>
 
@@ -253,7 +266,7 @@ export default function HeroCarousel() {
             </button>
 
             <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-20">
-                {slides.map((_, index) => (
+                {activeSlides.map((_, index) => (
                     <button
                         key={index}
                         onClick={() => goToSlide(index)}

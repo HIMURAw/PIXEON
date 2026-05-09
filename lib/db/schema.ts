@@ -191,7 +191,10 @@ export const heroSlides = mysqlTable("hero_slides", {
   title: varchar("title", { length: 255 }).notNull(),
   subtitle: text("subtitle"),
   price: varchar("price", { length: 100 }),
-  image: varchar("image", { length: 255 }).notNull(),
+  image: varchar("image", { length: 255 }), // can be fallback for 3D
+  modelPath: varchar("model_path", { length: 255 }), // For 3D models
+  badge: varchar("badge", { length: 100 }),
+  badgeColor: varchar("badge_color", { length: 100 }),
   buttonText: varchar("button_text", { length: 50 }),
   buttonLink: varchar("button_link", { length: 255 }),
   order: int("order").default(0).notNull(),
@@ -199,6 +202,7 @@ export const heroSlides = mysqlTable("hero_slides", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
 });
+
 
 export const banners = mysqlTable("banners", {
   id: varchar("id", { length: 255 }).primaryKey(),
