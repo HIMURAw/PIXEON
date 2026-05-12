@@ -18,6 +18,7 @@ import {
     Lock,
     Loader2
 } from "lucide-react";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { getAdmins, addAdmin, updateAdmin, deleteAdmin, promoteToAdmin } from "@/lib/actions/admin-actions";
 import AdminModal from "@/components/admin/AdminModal";
@@ -226,9 +227,12 @@ export default function AdminUsers() {
                         </p>
                     </div>
                 </div>
-                <button className="bg-white text-blue-600 font-black px-10 py-4 rounded-2xl hover:bg-blue-50 transition-all shadow-xl active:scale-95 text-xs uppercase tracking-widest flex items-center gap-2">
+                <Link 
+                    href="/admin/settings/logs"
+                    className="bg-white text-blue-600 font-black px-10 py-4 rounded-2xl hover:bg-blue-50 transition-all shadow-xl active:scale-95 text-xs uppercase tracking-widest flex items-center gap-2"
+                >
                     Güvenlik Günlüğü
-                </button>
+                </Link>
             </div>
 
             {/* Modals */}

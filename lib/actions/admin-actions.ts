@@ -1,11 +1,40 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { users } from "@/lib/db/schema";
-import { eq, and } from "drizzle-orm";
+import { users, adminLogs } from "@/lib/db/schema";
+import { eq, and, desc } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
 import { randomUUID } from "crypto";
+import { getSession } from "@/lib/auth";
+
+export async function createLog(action: string, details: string) {
+  try {
+    const session = await getSession();
+    if (!session) return;
+
+    await db.insert(adminLogs).values({
+      id: randomUUID(),
+      adminId: session.user.id,
+      adminName: session.user.name || "Bilinmeyen",
+      action: action,
+      details: details,
+      createdAt: new Date(),
+    });
+  } catch (error) {
+    console.error("Error creating admin log:", error);
+  }
+}
+
+export async function getAdminLogs() {
+  try {
+    const logs = await db.select().from(adminLogs).orderBy(desc(adminLogs.createdAt)).limit(100);
+    return JSON.parse(JSON.stringify(logs));
+  } catch (error) {
+    console.error("Error fetching admin logs:", error);
+    return [];
+  }
+}
 
 export async function getAdmins() {
   try {
@@ -28,14 +57,17 @@ export async function addAdmin(data: { name: string; email: string; password?: s
     const password = data.password || "Pixeon123!"; // Default password if not provided
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    const id = randomUUID();
     await db.insert(users).values({
-      id: randomUUID(),
+      id: id,
       name: data.name,
       email: data.email,
       password: hashedPassword,
       role: "ADMIN",
       adminRole: data.adminRole,
     });
+
+    await createLog("Yönetici Eklendi", `${data.name} (${data.email}) yeni ${data.adminRole} olarak oluşturuldu.`);
 
     revalidatePath("/admin/settings/admins");
     return { success: true };
@@ -54,6 +86,8 @@ export async function updateAdmin(id: string, data: { name?: string; email?: str
     }
 
     await db.update(users).set(updateData).where(eq(users.id, id));
+
+    await createLog("Yönetici Güncellendi", `${data.name} bilgilerinde değişiklik yapıldı.`);
 
     revalidatePath("/admin/settings/admins");
     return { success: true };
@@ -77,10 +111,15 @@ export async function getAllUsers() {
 
 export async function promoteToAdmin(userId: string, adminRole: string) {
   try {
+    const user = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+    const userName = user[0]?.name || "Bilinmeyen";
+
     await db.update(users).set({
       role: "ADMIN",
       adminRole: adminRole
     }).where(eq(users.id, userId));
+
+    await createLog("Kullanıcı Yetkilendirildi", `${userName} adlı kullanıcı ${adminRole} yetkisi ile admin yapıldı.`);
 
     revalidatePath("/admin/settings/admins");
     return { success: true };
@@ -92,11 +131,16 @@ export async function promoteToAdmin(userId: string, adminRole: string) {
 
 export async function deleteAdmin(id: string) {
   try {
+    const user = await db.select().from(users).where(eq(users.id, id)).limit(1);
+    const userName = user[0]?.name || "Bilinmeyen";
+
     // Instead of deleting the user, we just revoke admin privileges
     await db.update(users).set({
       role: "USER",
       adminRole: null
     }).where(eq(users.id, id));
+
+    await createLog("Yönetici Yetkisi Kaldırıldı", `${userName} adlı yöneticinin yetkileri geri alındı.`);
 
     revalidatePath("/admin/settings/admins");
     return { success: true };
