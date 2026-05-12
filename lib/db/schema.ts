@@ -16,6 +16,16 @@ export const users = mysqlTable("users", {
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
 });
 
+export const adminLogs = mysqlTable("admin_logs", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  adminId: varchar("admin_id", { length: 255 }).notNull().references(() => users.id, { onDelete: "cascade" }),
+  adminName: varchar("admin_name", { length: 255 }).notNull(),
+  action: varchar("action", { length: 255 }).notNull(),
+  details: text("details"),
+  ipAddress: varchar("ip_address", { length: 45 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 export const userAddresses = mysqlTable("user_addresses", {
   id: varchar("id", { length: 255 }).primaryKey(),
   userId: varchar("user_id", { length: 255 }).notNull().references(() => users.id),
