@@ -108,6 +108,28 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         }
     ];
 
+    // Yetki Kontrolü
+    const filteredMenuGroups = menuGroups.filter(group => {
+        if (!user) return false;
+        const role = user.adminRole || user.role;
+        
+        if (role === "Süper Admin") return true; // Her şeyi görür
+        
+        if (role === "Editör") {
+            return ["GENEL", "KATALOG YÖNETİMİ", "SATIŞ & OPERASYON", "MÜŞTERİLER", "İÇERİK YÖNETİMİ"].includes(group.title);
+        }
+        
+        if (role === "Moderatör") {
+            return ["GENEL", "MÜŞTERİLER", "İÇERİK YÖNETİMİ"].includes(group.title);
+        }
+        
+        if (role === "Destek") {
+            return ["MÜŞTERİLER"].includes(group.title);
+        }
+        
+        return false;
+    });
+
     return (
         <html lang="en">
             <body className="antialiased">
@@ -133,7 +155,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
                         {/* Nav Links */}
                         <nav className="flex-1 py-6 px-3 space-y-8 overflow-y-auto custom-scrollbar">
-                            {menuGroups.map((group) => (
+                            {filteredMenuGroups.map((group) => (
                                 <div key={group.title} className="space-y-2">
                                     {isSidebarOpen && (
                                         <h3 className="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">
@@ -204,7 +226,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                                         <p className="text-sm font-bold text-white">
                                             {user?.name || "Yükleniyor..."}
                                         </p>
-                                        <p className="text-xs text-slate-500">Yetkili Yönetici</p>
+                                        <p className="text-xs text-slate-500">{user?.adminRole || "Yetkili Yönetici"}</p>
                                     </div>
                                     <div className="w-10 h-10 rounded-full bg-slate-900 border-2 border-[#020617] shadow-lg overflow-hidden">
                                         {user?.image ? (

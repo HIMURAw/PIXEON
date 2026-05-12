@@ -24,7 +24,7 @@ import { getApprovedReviews } from "@/lib/actions/review-actions";
 
 export default async function Home() {
     const session = await getSession();
-    
+
     let currentUser = null;
     if (session?.user) {
         currentUser = await db.query.users.findFirst({
@@ -88,10 +88,10 @@ export default async function Home() {
                     <ReviewSection currentUser={currentUser} reviews={reviews} />
                 </div>
 
-                {/* BLOG BÖLÜMÜ */}
+                {/* BLOG BÖLÜMÜ
                 <div className="pt-20 border-t border-white/5">
                     <BlogHomepageSection />
-                </div>
+                </div> */}
             </div>
             <Footer />
         </>
