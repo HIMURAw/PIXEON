@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { 
     Settings,
     Globe,
@@ -13,12 +13,78 @@ import {
     Save,
     Image as ImageIcon,
     Plus,
-    Trash2
+    Trash2,
+    Loader2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getSettings, updateSettings } from "@/lib/actions/settings-actions";
+import { toast } from "react-hot-toast";
 
 export default function AdminSettings() {
     const [activeTab, setActiveTab] = useState("genel");
+    const [isLoading, setIsLoading] = useState(true);
+    const [isSaving, setIsSaving] = useState(false);
+    const [formData, setFormData] = useState<any>({});
+
+    useEffect(() => {
+        fetchSettings();
+    }, []);
+
+    const fetchSettings = async () => {
+        setIsLoading(true);
+        const data = await getSettings();
+        setFormData(data);
+        setIsLoading(false);
+    };
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value, type } = e.target;
+        const val = type === "checkbox" ? (e.target as HTMLInputElement).checked : value;
+        setFormData((prev: any) => ({ ...prev, [name]: val }));
+    };
+
+    const handleToggle = (name: string, currentVal: boolean) => {
+        setFormData((prev: any) => ({ ...prev, [name]: !currentVal }));
+    };
+
+    const onSave = async () => {
+        setIsSaving(true);
+        const res = await updateSettings(formData);
+        if (res.success) {
+            toast.success("Ayarlar başarıyla kaydedildi.");
+        } else {
+            toast.error("Ayarlar kaydedilirken bir hata oluştu.");
+        }
+        setIsSaving(false);
+    };
+
+    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const toastId = toast.loading("Logo yükleniyor...");
+
+        try {
+            const res = await fetch("/api/admin/upload", {
+                method: "POST",
+                body: formData,
+            });
+
+            const data = await res.json();
+
+            if (data.success) {
+                setFormData((prev: any) => ({ ...prev, siteLogo: data.url }));
+                toast.success("Logo yüklendi. Kaydetmeyi unutmayın!", { id: toastId });
+            } else {
+                toast.error(data.message || "Yükleme başarısız.", { id: toastId });
+            }
+        } catch (error) {
+            toast.error("Bir hata oluştu.", { id: toastId });
+        }
+    };
 
     const tabs = [
         { id: "genel", label: "Genel Ayarlar", icon: Globe },
@@ -27,6 +93,15 @@ export default function AdminSettings() {
         { id: "bildirim", label: "Bildirimler", icon: Bell },
         { id: "guvenlik", label: "Güvenlik & API", icon: Lock },
     ];
+
+    if (isLoading) {
+        return (
+            <div className="h-[60vh] flex flex-col items-center justify-center gap-4">
+                <Loader2 className="animate-spin text-blue-500" size={40} />
+                <p className="text-xs font-black text-slate-500 uppercase tracking-widest">Ayarlar Yükleniyor...</p>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-8 animate-in fade-in duration-700">
@@ -41,8 +116,12 @@ export default function AdminSettings() {
                         Sitenizin genel yapılandırmasını, ödeme ve kargo tercihlerini yönetin.
                     </p>
                 </div>
-                <button className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-8 py-3 rounded-2xl flex items-center gap-2 transition-all shadow-lg shadow-blue-500/20 active:scale-95">
-                    <Save size={20} />
+                <button 
+                    onClick={onSave}
+                    disabled={isSaving}
+                    className="bg-blue-600 hover:bg-blue-500 disabled:bg-blue-900/50 text-white font-bold px-8 py-3 rounded-2xl flex items-center gap-2 transition-all shadow-lg shadow-blue-500/20 active:scale-95"
+                >
+                    {isSaving ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />}
                     Değişiklikleri Kaydet
                 </button>
             </div>
@@ -85,7 +164,9 @@ export default function AdminSettings() {
                                     <label className="block text-xs font-black text-slate-500 uppercase tracking-widest">Site Başlığı</label>
                                     <input 
                                         type="text" 
-                                        defaultValue="PIXEON - Yetkili PlayStation Satış Merkezi"
+                                        name="siteTitle"
+                                        value={formData.siteTitle || ""}
+                                        onChange={handleInputChange}
                                         className="w-full bg-slate-950 border border-white/10 rounded-2xl px-5 py-3.5 text-white outline-none focus:border-blue-500 transition-all font-bold"
                                     />
                                 </div>
@@ -93,19 +174,37 @@ export default function AdminSettings() {
                                     <label className="block text-xs font-black text-slate-500 uppercase tracking-widest">Destek E-posta</label>
                                     <input 
                                         type="email" 
-                                        defaultValue="destek@pixeon.com"
+                                        name="supportEmail"
+                                        value={formData.supportEmail || ""}
+                                        onChange={handleInputChange}
                                         className="w-full bg-slate-950 border border-white/10 rounded-2xl px-5 py-3.5 text-white outline-none focus:border-blue-500 transition-all font-bold"
                                     />
                                 </div>
                                 <div className="space-y-4 md:col-span-2">
                                     <label className="block text-xs font-black text-slate-500 uppercase tracking-widest">Site Logo</label>
                                     <div className="flex items-center gap-6 p-6 bg-slate-950 border border-dashed border-white/10 rounded-3xl">
-                                        <div className="w-20 h-20 bg-slate-900 rounded-2xl flex items-center justify-center border border-white/5">
-                                            <ImageIcon className="text-slate-700" size={32} />
+                                        <div className="w-20 h-20 bg-slate-900 rounded-2xl flex items-center justify-center border border-white/5 overflow-hidden">
+                                            {formData.siteLogo ? (
+                                                <img src={formData.siteLogo} alt="Logo" className="w-full h-full object-contain" />
+                                            ) : (
+                                                <ImageIcon className="text-slate-700" size={32} />
+                                            )}
                                         </div>
                                         <div className="space-y-2">
                                             <p className="text-xs font-bold text-slate-400">Yeni bir logo yükleyin (PNG, SVG, Max 2MB)</p>
-                                            <button className="bg-white text-black font-black text-[10px] px-4 py-2 rounded-lg uppercase tracking-widest hover:bg-slate-200 transition-all">Dosya Seç</button>
+                                            <input 
+                                                type="file" 
+                                                id="logo-upload" 
+                                                className="hidden" 
+                                                accept="image/*"
+                                                onChange={handleFileUpload}
+                                            />
+                                            <label 
+                                                htmlFor="logo-upload"
+                                                className="inline-block bg-white text-black font-black text-[10px] px-4 py-2 rounded-lg uppercase tracking-widest hover:bg-slate-200 transition-all cursor-pointer"
+                                            >
+                                                Dosya Seç
+                                            </label>
                                         </div>
                                     </div>
                                 </div>
@@ -113,7 +212,9 @@ export default function AdminSettings() {
                                     <label className="block text-xs font-black text-slate-500 uppercase tracking-widest">Meta Açıklaması</label>
                                     <textarea 
                                         rows={4}
-                                        defaultValue="PlayStation 5, PS4 ve en yeni oyunları en uygun fiyatlarla satın alın."
+                                        name="siteDescription"
+                                        value={formData.siteDescription || ""}
+                                        onChange={handleInputChange}
                                         className="w-full bg-slate-950 border border-white/10 rounded-2xl px-5 py-3.5 text-white outline-none focus:border-blue-500 transition-all font-bold resize-none"
                                     ></textarea>
                                 </div>
@@ -123,15 +224,15 @@ export default function AdminSettings() {
                         {activeTab === "odeme" && (
                             <div className="space-y-6">
                                 {[
-                                    { name: "Kredi / Banka Kartı (Iyzico)", status: true, info: "Mastercard, Visa, Troy desteği aktif" },
-                                    { name: "Havale / EFT", status: true, info: "Banka hesap bilgileriniz aktif" },
-                                    { name: "Kripto Ödeme", status: false, info: "Bitcoin, Ethereum ve USDT (Yakında)" },
-                                ].map((method, i) => (
-                                    <div key={i} className="flex items-center justify-between p-6 bg-slate-950 border border-white/5 rounded-3xl group hover:border-blue-500/20 transition-all">
+                                    { key: "iyzicoEnabled", name: "Kredi / Banka Kartı (Iyzico)", info: "Mastercard, Visa, Troy desteği aktif" },
+                                    { key: "bankTransferEnabled", name: "Havale / EFT", info: "Banka hesap bilgileriniz aktif" },
+                                    { key: "cryptoEnabled", name: "Kripto Ödeme", info: "Bitcoin, Ethereum ve USDT (Yakında)" },
+                                ].map((method) => (
+                                    <div key={method.key} className="flex items-center justify-between p-6 bg-slate-950 border border-white/5 rounded-3xl group hover:border-blue-500/20 transition-all">
                                         <div className="flex items-center gap-4">
                                             <div className={cn(
                                                 "w-12 h-12 rounded-2xl flex items-center justify-center border",
-                                                method.status ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" : "bg-slate-900 border-white/5 text-slate-600"
+                                                formData[method.key] ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" : "bg-slate-900 border-white/5 text-slate-600"
                                             )}>
                                                 <CreditCard size={24} />
                                             </div>
@@ -140,11 +241,14 @@ export default function AdminSettings() {
                                                 <p className="text-[10px] text-slate-500 font-bold uppercase tracking-tight mt-0.5">{method.info}</p>
                                             </div>
                                         </div>
-                                        <button className={cn(
-                                            "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
-                                            method.status ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" : "bg-white/5 text-slate-500 border border-white/5"
-                                        )}>
-                                            {method.status ? "Aktif" : "Devre Dışı"}
+                                        <button 
+                                            onClick={() => handleToggle(method.key, formData[method.key])}
+                                            className={cn(
+                                                "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                                                formData[method.key] ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" : "bg-white/5 text-slate-500 border border-white/5"
+                                            )}
+                                        >
+                                            {formData[method.key] ? "Aktif" : "Devre Dışı"}
                                         </button>
                                     </div>
                                 ))}
@@ -158,8 +262,10 @@ export default function AdminSettings() {
                                         <label className="block text-xs font-black text-slate-500 uppercase tracking-widest">Sabit Kargo Ücreti</label>
                                         <div className="relative">
                                             <input 
-                                                type="text" 
-                                                defaultValue="49.90"
+                                                type="number" 
+                                                name="shippingFee"
+                                                value={formData.shippingFee || 0}
+                                                onChange={handleInputChange}
                                                 className="w-full bg-slate-950 border border-white/10 rounded-2xl px-5 py-3.5 text-white outline-none focus:border-blue-500 transition-all font-bold"
                                             />
                                             <span className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-500 font-bold">₺</span>
@@ -169,8 +275,10 @@ export default function AdminSettings() {
                                         <label className="block text-xs font-black text-slate-500 uppercase tracking-widest">Ücretsiz Kargo Alt Limiti</label>
                                         <div className="relative">
                                             <input 
-                                                type="text" 
-                                                defaultValue="2500"
+                                                type="number" 
+                                                name="freeShippingLimit"
+                                                value={formData.freeShippingLimit || 0}
+                                                onChange={handleInputChange}
                                                 className="w-full bg-slate-950 border border-white/10 rounded-2xl px-5 py-3.5 text-white outline-none focus:border-blue-500 transition-all font-bold"
                                             />
                                             <span className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-500 font-bold">₺</span>
@@ -186,11 +294,27 @@ export default function AdminSettings() {
                                         {['Aras Kargo', 'Yurtiçi Kargo', 'MNG Kargo', 'Hepsijet'].map(k => (
                                             <div key={k} className="flex items-center justify-between p-4 bg-slate-950 border border-white/5 rounded-2xl">
                                                 <span className="text-xs font-bold text-slate-300">{k}</span>
-                                                <input type="checkbox" defaultChecked className="w-5 h-5 rounded border-white/10 bg-slate-900 text-blue-600 focus:ring-blue-500" />
+                                                <div className="w-5 h-5 rounded border border-white/10 bg-blue-600 flex items-center justify-center">
+                                                    <div className="w-2 h-2 bg-white rounded-full"></div>
+                                                </div>
                                             </div>
                                         ))}
                                     </div>
                                 </div>
+                            </div>
+                        )}
+
+                        {activeTab === "bildirim" && (
+                            <div className="p-8 text-center bg-slate-950/50 rounded-3xl border border-white/5 border-dashed">
+                                <Bell className="mx-auto text-slate-700 mb-4" size={48} />
+                                <p className="text-sm text-slate-500 font-bold uppercase tracking-widest">Bildirim ayarları çok yakında!</p>
+                            </div>
+                        )}
+
+                        {activeTab === "guvenlik" && (
+                            <div className="p-8 text-center bg-slate-950/50 rounded-3xl border border-white/5 border-dashed">
+                                <Lock className="mx-auto text-slate-700 mb-4" size={48} />
+                                <p className="text-sm text-slate-500 font-bold uppercase tracking-widest">Güvenlik ve API ayarları çok yakında!</p>
                             </div>
                         )}
                     </div>

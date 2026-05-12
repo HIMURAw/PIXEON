@@ -1,20 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
+import { writeFile } from "fs/promises";
 import path from "path";
-import { getSession } from "@/lib/auth";
+import { randomUUID } from "crypto";
 
-export async function POST(request: NextRequest) {
-  const session = await getSession();
-  if (session?.user?.role !== "ADMIN") {
-    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
-  }
-
+export async function POST(req: NextRequest) {
   try {
-    const formData = await request.formData();
+    const formData = await req.formData();
     const file = formData.get("file") as File;
 
     if (!file) {
-      return NextResponse.json({ success: false, error: "No file uploaded" }, { status: 400 });
+      return NextResponse.json(
+        { success: false, message: "Dosya bulunamadı" },
+        { status: 400 }
+      );
     }
 
     const bytes = await file.arrayBuffer();
@@ -22,23 +20,22 @@ export async function POST(request: NextRequest) {
 
     // Create unique filename
     const ext = path.extname(file.name);
-    const filename = `${crypto.randomUUID()}${ext}`;
-    
-    // Directory path
-    const uploadDir = path.join(process.cwd(), "public", "uploads");
-    
-    // Ensure directory exists
-    try {
-      await mkdir(uploadDir, { recursive: true });
-    } catch (err) {}
+    const filename = `${randomUUID()}${ext}`;
+    const filePath = path.join(process.cwd(), "public", "uploads", filename);
 
-    const filePath = path.join(uploadDir, filename);
     await writeFile(filePath, buffer);
 
-    const publicPath = `/uploads/${filename}`;
+    const fileUrl = `/uploads/${filename}`;
 
-    return NextResponse.json({ success: true, url: publicPath });
-  } catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    return NextResponse.json({ 
+      success: true, 
+      url: fileUrl 
+    });
+  } catch (error) {
+    console.error("Upload Error:", error);
+    return NextResponse.json(
+      { success: false, message: "Yükleme sırasında bir hata oluştu" },
+      { status: 500 }
+    );
   }
 }

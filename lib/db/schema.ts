@@ -26,6 +26,20 @@ export const adminLogs = mysqlTable("admin_logs", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const siteSettings = mysqlTable("site_settings", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  siteTitle: varchar("site_title", { length: 255 }).default("PIXEON"),
+  siteDescription: text("site_description"),
+  supportEmail: varchar("support_email", { length: 255 }),
+  siteLogo: varchar("site_logo", { length: 255 }),
+  iyzicoEnabled: boolean("iyzico_enabled").default(true).notNull(),
+  bankTransferEnabled: boolean("bank_transfer_enabled").default(true).notNull(),
+  cryptoEnabled: boolean("crypto_enabled").default(false).notNull(),
+  shippingFee: double("shipping_fee").default(0).notNull(),
+  freeShippingLimit: double("free_shipping_limit").default(0).notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow(),
+});
+
 export const userAddresses = mysqlTable("user_addresses", {
   id: varchar("id", { length: 255 }).primaryKey(),
   userId: varchar("user_id", { length: 255 }).notNull().references(() => users.id),
