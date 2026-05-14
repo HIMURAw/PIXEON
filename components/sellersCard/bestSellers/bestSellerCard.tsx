@@ -1,4 +1,5 @@
 import { Product } from "./bestSeller";
+import Link from "next/link";
 
 type BestSellerCardProps = {
     product: Product;
@@ -6,7 +7,7 @@ type BestSellerCardProps = {
 
 export default function BestSellerCard({ product }: BestSellerCardProps) {
     return (
-        <div className="bg-[#0b1220] border border-white/10 rounded-xl p-4 hover:shadow-lg transition flex flex-col h-full">
+        <div className="bg-[#0b1220] border border-white/10 rounded-xl p-4 hover:shadow-lg transition flex flex-col h-full group">
             <div className="flex gap-2 mb-3">
                 {product.discount && (
                     <span className="text-xs bg-blue-500 text-white px-2 py-0.5 rounded font-bold">
@@ -20,17 +21,19 @@ export default function BestSellerCard({ product }: BestSellerCardProps) {
                 )}
             </div>
 
-            <div className="h-36 flex items-center justify-center mb-4">
+            <Link href={`/product/${product.slug}`} className="h-36 flex items-center justify-center mb-4">
                 <img
                     src={product.image}
                     alt={product.name}
-                    className="max-h-full object-contain"
+                    className="max-h-full object-contain group-hover:scale-110 transition-transform duration-500"
                 />
-            </div>
+            </Link>
 
-            <h3 className="text-sm text-white leading-snug mb-1">
-                {product.name}
-            </h3>
+            <Link href={`/product/${product.slug}`}>
+                <h3 className="text-sm text-white font-bold leading-snug mb-1 hover:text-blue-400 transition-colors">
+                    {product.name}
+                </h3>
+            </Link>
 
             <span className="text-xs text-green-400 font-medium">
                 Stokta Var

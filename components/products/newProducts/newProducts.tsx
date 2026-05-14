@@ -11,6 +11,7 @@ export type Product = {
     oldPrice?: string;
     discount?: string | null;
     category?: string;
+    slug: string;
 };
 
 type ProductsProps = {
@@ -31,7 +32,8 @@ export default function Products({ limit }: ProductsProps) {
                 price: p.price.toString(),
                 oldPrice: p.oldPrice?.toString(),
                 discount: p.oldPrice ? Math.round((1 - p.price / p.oldPrice) * 100) + "%" : null,
-                category: "Yeni"
+                category: "Yeni",
+                slug: p.slug
             }));
             setDbProducts(mapped);
             setLoading(false);

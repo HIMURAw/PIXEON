@@ -11,6 +11,7 @@ export type Product = {
     oldPrice?: string;
     discount?: string | null;
     category?: string;
+    slug: string;
 };
 
 export default function BestSellers() {
@@ -29,7 +30,8 @@ export default function BestSellers() {
                 price: p.price.toString(),
                 oldPrice: p.oldPrice?.toString(),
                 discount: p.oldPrice ? Math.round((1 - p.price / p.oldPrice) * 100) + "%" : null,
-                category: "Ürün" // This can be expanded later to fetch category name
+                category: "Ürün",
+                slug: p.slug
             }));
             setDbProducts(mapped);
         };
