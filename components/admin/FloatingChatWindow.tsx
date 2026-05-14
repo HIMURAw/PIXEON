@@ -382,30 +382,34 @@ interface FloatingChatWindowProps {
     window: ChatWindow;
 }
 
-export const FloatingChatWindow = memo(({ window: win }: FloatingChatWindowProps) => {
-    const { closeWindow, focusWindow, updatePosition, toggleMinimize } = useChatWindows();
+const MIN_WIDTH = 300;
+const MIN_HEIGHT = 350;
 
-    // Drag state
+export const FloatingChatWindow = memo(({ window: win }: FloatingChatWindowProps) => {
+    const { closeWindow, focusWindow, updatePosition, updateSize, toggleMinimize } = useChatWindows();
+
+    // Drag & Resize state
     const isDragging = useRef(false);
-    const dragOffset = useRef({ x: 0, y: 0 });
+    const isResizing = useRef(false);
+    const startPoint = useRef({ x: 0, y: 0, w: 0, h: 0 });
     const windowRef = useRef<HTMLDivElement>(null);
 
     const handleMouseDown = useCallback(
         (e: React.MouseEvent<HTMLDivElement>) => {
-            // Don't drag if clicking buttons
             if ((e.target as HTMLElement).closest("button, input, form, label, a")) return;
 
             focusWindow(win.id);
             isDragging.current = true;
-            dragOffset.current = {
+            startPoint.current = {
                 x: e.clientX - win.position.x,
                 y: e.clientY - win.position.y,
+                w: 0, h: 0
             };
 
             const onMouseMove = (me: MouseEvent) => {
                 if (!isDragging.current) return;
-                const newX = Math.max(0, Math.min(me.clientX - dragOffset.current.x, globalThis.window.innerWidth - WINDOW_WIDTH));
-                const newY = Math.max(0, Math.min(me.clientY - dragOffset.current.y, globalThis.window.innerHeight - 60));
+                const newX = Math.max(0, Math.min(me.clientX - startPoint.current.x, globalThis.window.innerWidth - win.size.width));
+                const newY = Math.max(0, Math.min(me.clientY - startPoint.current.y, globalThis.window.innerHeight - 60));
                 updatePosition(win.id, { x: newX, y: newY });
             };
 
@@ -418,7 +422,48 @@ export const FloatingChatWindow = memo(({ window: win }: FloatingChatWindowProps
             document.addEventListener("mousemove", onMouseMove);
             document.addEventListener("mouseup", onMouseUp);
         },
-        [win.id, win.position.x, win.position.y, focusWindow, updatePosition]
+        [win.id, win.position.x, win.position.y, win.size.width, focusWindow, updatePosition]
+    );
+
+    const handleResizeMouseDown = useCallback(
+        (e: React.MouseEvent<HTMLDivElement>) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            focusWindow(win.id);
+            isResizing.current = true;
+            startPoint.current = {
+                x: e.clientX,
+                y: e.clientY,
+                w: win.size.width,
+                h: win.size.height
+            };
+
+            const onMouseMove = (me: MouseEvent) => {
+                if (!isResizing.current) return;
+
+                const deltaX = me.clientX - startPoint.current.x;
+                const deltaY = me.clientY - startPoint.current.y;
+
+                const newWidth = Math.max(MIN_WIDTH, startPoint.current.w + deltaX);
+                const newHeight = Math.max(MIN_HEIGHT, startPoint.current.h + deltaY);
+
+                updateSize(win.id, {
+                    width: Math.min(newWidth, globalThis.window.innerWidth - win.position.x - 20),
+                    height: Math.min(newHeight, globalThis.window.innerHeight - win.position.y - 20)
+                });
+            };
+
+            const onMouseUp = () => {
+                isResizing.current = false;
+                document.removeEventListener("mousemove", onMouseMove);
+                document.removeEventListener("mouseup", onMouseUp);
+            };
+
+            document.addEventListener("mousemove", onMouseMove);
+            document.addEventListener("mouseup", onMouseUp);
+        },
+        [win.id, win.size.width, win.size.height, win.position.x, win.position.y, focusWindow, updateSize]
     );
 
     const isLive = win.type === "live";
@@ -430,8 +475,8 @@ export const FloatingChatWindow = memo(({ window: win }: FloatingChatWindowProps
             style={{
                 left: win.position.x,
                 top: win.position.y,
-                width: WINDOW_WIDTH,
-                height: win.minimized ? "auto" : WINDOW_HEIGHT,
+                width: win.size.width,
+                height: win.minimized ? "auto" : win.size.height,
                 zIndex: win.zIndex,
             }}
             onClick={() => focusWindow(win.id)}
@@ -507,6 +552,17 @@ export const FloatingChatWindow = memo(({ window: win }: FloatingChatWindowProps
                         ) : (
                             <TicketChatContent ticket={win.data as Ticket} />
                         )}
+                    </div>
+                )}
+
+                {/* ── Resize Handle ── */}
+                {!win.minimized && (
+                    <div
+                        className="absolute bottom-0 right-0 w-6 h-6 cursor-nwse-resize flex items-end justify-end p-1 z-50 group/resize"
+                        onMouseDown={handleResizeMouseDown}
+                    >
+                        <div className="w-1.5 h-1.5 rounded-full bg-slate-700 group-hover/resize:bg-blue-500 transition-colors mr-0.5 mb-0.5" />
+                        <div className="absolute bottom-1 right-1 w-3 h-3 border-r-2 border-b-2 border-slate-800 rounded-br-sm opacity-50" />
                     </div>
                 )}
             </div>

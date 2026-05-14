@@ -39,6 +39,8 @@ export interface ChatWindow {
     subtitle?: string;
     /** Current position on screen */
     position: { x: number; y: number };
+    /** Current size */
+    size: { width: number; height: number };
     /** z-index order */
     zIndex: number;
     /** Whether window is minimized */
@@ -62,6 +64,7 @@ interface ChatWindowContextType {
     closeWindow: (id: string) => void;
     focusWindow: (id: string) => void;
     updatePosition: (id: string, position: { x: number; y: number }) => void;
+    updateSize: (id: string, size: { width: number; height: number }) => void;
     toggleMinimize: (id: string) => void;
     topZIndex: number;
 }
@@ -118,6 +121,7 @@ export function ChatWindowProvider({ children }: { children: React.ReactNode }) 
                     title,
                     subtitle,
                     position: defaultPos,
+                    size: { width: 380, height: 500 }, // Default size
                     zIndex: newZ,
                     minimized: false,
                     data,
@@ -151,6 +155,15 @@ export function ChatWindowProvider({ children }: { children: React.ReactNode }) 
         []
     );
 
+    const updateSize = useCallback(
+        (id: string, size: { width: number; height: number }) => {
+            setWindows((prev) =>
+                prev.map((w) => (w.id === id ? { ...w, size } : w))
+            );
+        },
+        []
+    );
+
     const toggleMinimize = useCallback((id: string) => {
         setWindows((prev) =>
             prev.map((w) =>
@@ -167,6 +180,7 @@ export function ChatWindowProvider({ children }: { children: React.ReactNode }) 
                 closeWindow,
                 focusWindow,
                 updatePosition,
+                updateSize,
                 toggleMinimize,
                 topZIndex: zCounter.current,
             }}

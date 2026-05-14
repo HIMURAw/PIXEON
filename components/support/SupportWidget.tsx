@@ -144,16 +144,38 @@ export default function SupportWidget() {
 
     // Initial load: handle sessionId, check live status, and check auth
     useEffect(() => {
-        // Handle Session ID
-        let sid = localStorage.getItem("pixeon_support_sid");
-        if (!sid) {
-            sid = `sid_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-            localStorage.setItem("pixeon_support_sid", sid);
-        }
-        setSessionId(sid);
+        const initSupport = async () => {
+            // 1. Check User Auth First
+            let currentUser = null;
+            try {
+                const res = await fetch("/api/auth/me");
+                if (res.ok) {
+                    const data = await res.json();
+                    currentUser = data.user;
+                    setUser(currentUser);
+                }
+            } catch (err) {
+                console.error("Auth check failed", err);
+            } finally {
+                setIsAuthLoading(false);
+            }
 
-        // Check Live Support Status
-        const checkStatus = async () => {
+            // 2. Handle Session ID based on Auth
+            let sid = "";
+            if (currentUser) {
+                // If logged in, use a session ID tied to user ID
+                sid = `user_${currentUser.id}`;
+            } else {
+                // If guest, use localStorage or generate one
+                sid = localStorage.getItem("pixeon_support_sid") || "";
+                if (!sid) {
+                    sid = `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+                    localStorage.setItem("pixeon_support_sid", sid);
+                }
+            }
+            setSessionId(sid);
+
+            // 3. Check Live Support Status
             try {
                 const res = await fetch("/api/support/status");
                 const data = await res.json();
@@ -162,23 +184,8 @@ export default function SupportWidget() {
                 console.error("Status check failed", err);
             }
         };
-        checkStatus();
 
-        // Check User Auth
-        const checkAuth = async () => {
-            try {
-                const res = await fetch("/api/auth/me");
-                if (res.ok) {
-                    const data = await res.json();
-                    setUser(data.user);
-                }
-            } catch (err) {
-                console.error("Auth check failed", err);
-            } finally {
-                setIsAuthLoading(false);
-            }
-        };
-        checkAuth();
+        initSupport();
     }, []);
 
     // Fetch live messages periodically if tab is "live" and isOpen
