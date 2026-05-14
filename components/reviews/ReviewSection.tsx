@@ -16,6 +16,12 @@ export default function ReviewSection({
     reviews: any[] 
 }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    
+    const reviewsPerPage = 6;
+    const totalPages = Math.ceil(initialReviews.length / reviewsPerPage);
+    const startIndex = (currentPage - 1) * reviewsPerPage;
+    const displayedReviews = initialReviews.slice(startIndex, startIndex + reviewsPerPage);
 
     return (
         <section className="py-20">
@@ -60,7 +66,7 @@ export default function ReviewSection({
                             <p className="text-slate-500 text-sm font-medium">Henüz bir yorum yapılmamış. İlk yorumu siz yapın!</p>
                         </div>
                     ) : (
-                        initialReviews.map((rv: any) => (
+                        displayedReviews.map((rv: any) => (
                             <div 
                                 key={rv.id} 
                                 className="bg-slate-900/20 border border-white/5 p-6 rounded-2xl hover:border-white/10 transition-all flex flex-col group h-full"
@@ -110,6 +116,44 @@ export default function ReviewSection({
                         ))
                     )}
                 </div>
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                    <div className="flex items-center justify-center gap-3 pt-12 border-t border-white/5">
+                        <button 
+                            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                            disabled={currentPage === 1}
+                            className="p-3 bg-slate-900 border border-white/5 rounded-xl text-slate-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                        >
+                            <X size={16} className="rotate-45" />
+                        </button>
+
+                        <div className="flex items-center gap-2">
+                            {[...Array(totalPages)].map((_, i) => (
+                                <button
+                                    key={i + 1}
+                                    onClick={() => setCurrentPage(i + 1)}
+                                    className={cn(
+                                        "w-10 h-10 rounded-xl font-bold text-xs transition-all",
+                                        currentPage === i + 1 
+                                            ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20" 
+                                            : "bg-slate-900 text-slate-500 border border-white/5 hover:text-white"
+                                    )}
+                                >
+                                    {i + 1}
+                                </button>
+                            ))}
+                        </div>
+
+                        <button 
+                            onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                            disabled={currentPage === totalPages}
+                            className="p-3 bg-slate-900 border border-white/5 rounded-xl text-slate-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                        >
+                            <X size={16} className="-rotate-[135deg]" />
+                        </button>
+                    </div>
+                )}
 
                 {/* Review Modal */}
                 {isModalOpen && (
