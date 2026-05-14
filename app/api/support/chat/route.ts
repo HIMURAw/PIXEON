@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { liveChatMessages } from "@/lib/db/schema";
+import { liveChatMessages, notifications } from "@/lib/db/schema";
 import { eq, asc, desc } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -48,6 +48,17 @@ export async function POST(req: NextRequest) {
         };
 
         await db.insert(liveChatMessages).values(newMessage);
+
+        // Create Notification for Admins
+        await db.insert(notifications).values({
+            id: `notif_chat_${Date.now()}`,
+            title: "Yeni Sohbet Mesajı",
+            message: `${senderName || "Bir kullanıcı"}: ${message.substring(0, 50)}${message.length > 50 ? "..." : ""}`,
+            link: "/admin/support",
+            type: "INFO",
+            isRead: false,
+            createdAt: new Date(),
+        });
 
         return NextResponse.json({ success: true, message: newMessage });
     } catch (error) {

@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { supportMessages, supportTickets } from "@/lib/db/schema";
+import { supportMessages, supportTickets, notifications } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
@@ -26,6 +26,17 @@ export async function POST(req: NextRequest) {
         await db.update(supportTickets)
             .set({ status: "OPEN", updatedAt: new Date() })
             .where(eq(supportTickets.id, ticketId));
+
+        // Create Notification for Admins
+        await db.insert(notifications).values({
+            id: `notif_ticket_${Date.now()}`,
+            title: "Destek Talebi Güncellendi",
+            message: `${session.user.name} bir cevap yazdı.`,
+            link: "/admin/support",
+            type: "INFO",
+            isRead: false,
+            createdAt: new Date(),
+        });
 
         return NextResponse.json({ success: true });
     } catch (error) {

@@ -86,6 +86,12 @@ export default function AdminSupport() {
 
     useEffect(() => {
         setMounted(true);
+        // Destek sayfasına girildiğinde ilgili bildirimleri okundu say
+        fetch("/api/admin/notifications", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ link: "/admin/support" })
+        }).catch(err => console.error("Notification mark read error:", err));
     }, []);
 
     // Dnd Kit Sensors
@@ -679,22 +685,22 @@ export default function AdminSupport() {
                                 </h3>
                                 <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">Geçmişte sonuçlandırılmış destek kayıtları</p>
                             </div>
-                            
+
                             <div className="flex flex-col sm:flex-row items-center gap-3">
                                 {/* Search */}
                                 <div className="relative w-full sm:w-64">
                                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={14} />
-                                    <input 
-                                        type="text" 
-                                        placeholder="Ara (İsim, Konu...)" 
+                                    <input
+                                        type="text"
+                                        placeholder="Ara (İsim, Konu...)"
                                         value={searchLogs}
                                         onChange={(e) => setSearchLogs(e.target.value)}
                                         className="w-full bg-slate-950 border border-white/10 rounded-xl pl-9 pr-4 py-2 text-xs text-white outline-none focus:border-blue-500/50 transition-all"
                                     />
                                 </div>
-                                
+
                                 {/* Category Filter */}
-                                <select 
+                                <select
                                     value={filterCategory}
                                     onChange={(e) => setFilterCategory(e.target.value)}
                                     className="bg-slate-950 border border-white/10 rounded-xl px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-400 outline-none focus:border-blue-500/50 transition-all cursor-pointer"
@@ -722,55 +728,55 @@ export default function AdminSupport() {
                                 <tbody className="divide-y divide-white/5">
                                     {closedTickets
                                         .filter(t => {
-                                            const matchesSearch = t.userName.toLowerCase().includes(searchLogs.toLowerCase()) || 
-                                                                t.subject.toLowerCase().includes(searchLogs.toLowerCase());
+                                            const matchesSearch = t.userName.toLowerCase().includes(searchLogs.toLowerCase()) ||
+                                                t.subject.toLowerCase().includes(searchLogs.toLowerCase());
                                             const matchesCategory = filterCategory === "ALL" || t.category === filterCategory;
                                             return matchesSearch && matchesCategory;
                                         })
                                         .map((t) => (
-                                        <tr
-                                            key={t.id}
-                                            className="hover:bg-white/[0.02] transition-colors group cursor-pointer"
-                                            onClick={() => {
-                                                if (t.type === "LIVE_CHAT") {
-                                                    setSelectedSessionId(t.id);
-                                                    setActiveTab("live");
-                                                } else {
-                                                    setSelectedTicket(t);
-                                                    setActiveTab("tickets");
-                                                }
-                                            }}
-                                        >
-                                            <td className="px-6 py-4">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-8 h-8 rounded-lg bg-slate-900 border border-white/10 flex items-center justify-center text-slate-500">
-                                                        <User size={14} />
+                                            <tr
+                                                key={t.id}
+                                                className="hover:bg-white/[0.02] transition-colors group cursor-pointer"
+                                                onClick={() => {
+                                                    if (t.type === "LIVE_CHAT") {
+                                                        setSelectedSessionId(t.id);
+                                                        setActiveTab("live");
+                                                    } else {
+                                                        setSelectedTicket(t);
+                                                        setActiveTab("tickets");
+                                                    }
+                                                }}
+                                            >
+                                                <td className="px-6 py-4">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-8 h-8 rounded-lg bg-slate-900 border border-white/10 flex items-center justify-center text-slate-500">
+                                                            <User size={14} />
+                                                        </div>
+                                                        <span className="text-sm font-bold text-slate-300">{t.userName}</span>
                                                     </div>
-                                                    <span className="text-sm font-bold text-slate-300">{t.userName}</span>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <span className="text-sm text-slate-400">{t.subject}</span>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-2 py-1 bg-white/5 rounded-md border border-white/5">{t.category}</span>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <div className="flex items-center gap-2 text-slate-500">
-                                                    <Calendar size={12} />
-                                                    <span className="text-xs">{new Date(t.createdAt).toLocaleDateString("tr-TR")}</span>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <button
-                                                    onClick={() => setTicketToDelete(t)}
-                                                    className="p-2 text-slate-600 hover:text-red-500 transition-colors"
-                                                >
-                                                    <Trash size={14} />
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <span className="text-sm text-slate-400">{t.subject}</span>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-2 py-1 bg-white/5 rounded-md border border-white/5">{t.category}</span>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <div className="flex items-center gap-2 text-slate-500">
+                                                        <Calendar size={12} />
+                                                        <span className="text-xs">{new Date(t.createdAt).toLocaleDateString("tr-TR")}</span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <button
+                                                        onClick={() => setTicketToDelete(t)}
+                                                        className="p-2 text-slate-600 hover:text-red-500 transition-colors"
+                                                    >
+                                                        <Trash size={14} />
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
                                     {closedTickets.length === 0 && !isLoadingLogs && (
                                         <tr>
                                             <td colSpan={5} className="px-6 py-24 text-center">

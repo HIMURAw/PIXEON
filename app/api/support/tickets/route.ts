@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { supportTickets, supportMessages } from "@/lib/db/schema";
+import { supportTickets, supportMessages, notifications } from "@/lib/db/schema";
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 
@@ -37,6 +37,17 @@ export async function POST(req: NextRequest) {
             senderId: session.user.id,
             message: message,
             imageUrl: imageUrl || null,
+            createdAt: new Date(),
+        });
+
+        // 3. Create Notification for Admins
+        await db.insert(notifications).values({
+            id: `notif_${Date.now()}`,
+            title: "Yeni Destek Talebi",
+            message: `${session.user.name}: ${subject}`,
+            link: "/admin/support",
+            type: "INFO",
+            isRead: false,
             createdAt: new Date(),
         });
 

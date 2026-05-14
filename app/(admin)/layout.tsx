@@ -36,6 +36,7 @@ import { cn } from "@/lib/utils";
 import { NotificationProvider } from "@/context/NotificationContext";
 import { ChatWindowProvider } from "@/context/ChatWindowContext";
 import { ChatWindowsContainer } from "@/components/admin/FloatingChatWindow";
+import { NotificationBell } from "@/components/admin/NotificationBell";
 import { Toaster } from "react-hot-toast";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -199,7 +200,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
 
                         {/* Header */}
-                        <header className="h-20 bg-[#020617]/50 backdrop-blur-md border-b border-white/10 flex items-center justify-between px-8 shrink-0">
+                        <header className="h-20 bg-[#020617]/50 backdrop-blur-md border-b border-white/10 flex items-center justify-between px-8 shrink-0 relative z-50">
                             <div className="flex items-center gap-4">
                                 <button
                                     onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -219,10 +220,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                             </div>
 
                             <div className="flex items-center gap-6">
-                                <button className="relative p-2 text-slate-400 hover:text-white transition-colors">
-                                    <Bell size={20} />
-                                    <span className="absolute top-1 right-1 w-2 h-2 bg-blue-500 rounded-full"></span>
-                                </button>
+                                <NotificationBell />
 
                                 <div className="flex items-center gap-3 border-l border-white/10 pl-6">
                                     <div className="text-right hidden sm:block">
