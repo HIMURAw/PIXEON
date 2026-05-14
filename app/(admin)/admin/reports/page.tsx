@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { 
     FileSpreadsheet, 
     TrendingUp, 
@@ -14,11 +14,63 @@ import {
     Filter,
     Users,
     ShoppingCart,
-    CreditCard
+    CreditCard,
+    Loader2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getReportStats } from "@/lib/actions/report-actions";
 
 export default function AdminReports() {
+    const [stats, setStats] = useState<any>(null);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        fetchStats();
+    }, []);
+
+    const fetchStats = async () => {
+        setIsLoading(true);
+        const data = await getReportStats();
+        setStats(data);
+        setIsLoading(false);
+    };
+
+    if (isLoading) {
+        return (
+            <div className="h-[60vh] flex flex-col items-center justify-center gap-4">
+                <Loader2 className="animate-spin text-blue-500" size={40} />
+                <p className="text-xs font-black text-slate-500 uppercase tracking-widest">Veriler Analiz Ediliyor...</p>
+            </div>
+        );
+    }
+
+    const performanceCards = [
+        { 
+            label: "Toplam Hasılat", 
+            value: `₺${stats?.totalRevenue?.toLocaleString('tr-TR')}`, 
+            info: "+12.5% geçen aya göre", 
+            icon: CreditCard, 
+            color: "text-emerald-400", 
+            bg: "bg-emerald-400/10" 
+        },
+        { 
+            label: "Toplam Müşteri", 
+            value: stats?.totalCustomers || "0", 
+            info: `+${stats?.newCustomersLastMonth || 0} yeni müşteri`, 
+            icon: Users, 
+            color: "text-blue-400", 
+            bg: "bg-blue-400/10" 
+        },
+        { 
+            label: "Sipariş Sayısı", 
+            value: stats?.totalOrders || "0", 
+            info: "Bekleyen 3 sipariş var", 
+            icon: ShoppingCart, 
+            color: "text-purple-400", 
+            bg: "bg-purple-400/10" 
+        },
+    ];
+
     return (
         <div className="space-y-8 animate-in fade-in duration-700">
             {/* Page Header */}
@@ -46,11 +98,7 @@ export default function AdminReports() {
 
             {/* Performance Overviews */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {[
-                    { label: "Yıllık Büyüme", value: "42.8%", info: "+12% geçen yıla göre", icon: TrendingUp, color: "text-emerald-400", bg: "bg-emerald-400/10" },
-                    { label: "Müşteri Edinme", value: "842", info: "+8.2% bu ay", icon: Users, color: "text-blue-400", bg: "bg-blue-400/10" },
-                    { label: "Dönüşüm Oranı", value: "3.24%", info: "-1.1% geçen haftaya göre", icon: TrendingDown, color: "text-red-400", bg: "bg-red-400/10" },
-                ].map((stat, i) => (
+                {performanceCards.map((stat, i) => (
                     <div key={i} className="bg-[#020617] border border-white/10 p-8 rounded-3xl group hover:border-blue-500/20 transition-all">
                         <div className="flex items-start justify-between">
                             <div className={cn("p-4 rounded-2xl", stat.bg, stat.color)}>
@@ -100,11 +148,11 @@ export default function AdminReports() {
                     </div>
                 </div>
 
-                {/* Sales by Category (Pie Chart Mock) */}
+                {/* Sales by Category */}
                 <div className="bg-[#020617] border border-white/10 rounded-[32px] p-8 flex flex-col items-center text-center justify-between">
                     <div className="w-full text-left mb-8">
                         <h2 className="text-xl font-bold text-white">Kategori Dağılımı</h2>
-                        <p className="text-xs text-slate-500 mt-1">En çok satan ürün grupları</p>
+                        <p className="text-xs text-slate-500 mt-1">Sistemdeki ürünlerin kategorilere göre sayısı</p>
                     </div>
                     
                     <div className="relative w-48 h-48 mb-8">
@@ -114,24 +162,19 @@ export default function AdminReports() {
                             <circle cx="50" cy="50" r="40" stroke="currentColor" strokeWidth="12" fill="transparent" className="text-emerald-500" strokeDasharray="251.2" strokeDashoffset="220" />
                         </svg>
                         <div className="absolute inset-0 flex flex-col items-center justify-center">
-                            <span className="text-2xl font-black text-white">100%</span>
-                            <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Toplam Satış</span>
+                            <span className="text-2xl font-black text-white">{stats?.categoryStats?.length || 0}</span>
+                            <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Kategori</span>
                         </div>
                     </div>
 
                     <div className="w-full grid grid-cols-2 gap-4">
-                        {[
-                            { name: "Konsollar", percent: "75%", color: "bg-blue-600" },
-                            { name: "Oyunlar", percent: "15%", color: "bg-purple-600" },
-                            { name: "Aksesuarlar", percent: "8%", color: "bg-emerald-500" },
-                            { name: "Diğer", percent: "2%", color: "bg-slate-700" },
-                        ].map((c) => (
-                            <div key={c.name} className="flex items-center justify-between p-3 bg-slate-950 border border-white/5 rounded-2xl">
+                        {stats?.categoryStats?.slice(0, 4).map((c: any, i: number) => (
+                            <div key={i} className="flex items-center justify-between p-3 bg-slate-950 border border-white/5 rounded-2xl">
                                 <div className="flex items-center gap-2">
-                                    <div className={cn("w-2 h-2 rounded-full", c.color)}></div>
-                                    <span className="text-[10px] font-bold text-slate-400">{c.name}</span>
+                                    <div className={cn("w-2 h-2 rounded-full", i === 0 ? "bg-blue-600" : i === 1 ? "bg-purple-600" : "bg-emerald-500")}></div>
+                                    <span className="text-[10px] font-bold text-slate-400 truncate max-w-[80px]">{c.name}</span>
                                 </div>
-                                <span className="text-xs font-black text-white">{c.percent}</span>
+                                <span className="text-xs font-black text-white">{c.count}</span>
                             </div>
                         ))}
                     </div>
@@ -143,7 +186,7 @@ export default function AdminReports() {
                 <div className="p-8 border-b border-white/5 flex items-center justify-between">
                     <div>
                         <h2 className="text-xl font-bold text-white">En Çok Satan Ürünler</h2>
-                        <p className="text-xs text-slate-500 font-medium mt-1">Bu ay en yüksek hacme ulaşan ilk 5 ürün</p>
+                        <p className="text-xs text-slate-500 font-medium mt-1">Sistemdeki satış adetlerine göre ilk 5 ürün</p>
                     </div>
                     <button className="p-3 bg-slate-900 border border-white/5 rounded-2xl text-slate-400 hover:text-white transition-all">
                         <Filter size={18} />
@@ -157,37 +200,27 @@ export default function AdminReports() {
                                 <th className="px-8 py-5">Kategori</th>
                                 <th className="px-8 py-5 text-center">Satış Adedi</th>
                                 <th className="px-8 py-5 text-center">Stok</th>
-                                <th className="px-8 py-5">Toplam Hasılat</th>
+                                <th className="px-8 py-5">Birim Fiyat</th>
                                 <th className="px-8 py-5 text-right">Trend</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-white/5">
-                            {[
-                                { name: "PS5 Slim Console", cat: "Konsollar", sales: 142, stock: 12, rev: "₺2.697.858", trend: "up" },
-                                { name: "DualSense Wireless", cat: "Aksesuarlar", sales: 512, stock: 45, rev: "₺1.484.288", trend: "up" },
-                                { name: "FC 25 - PS5 Edition", cat: "Oyunlar", sales: 842, stock: 156, rev: "₺1.598.958", trend: "down" },
-                                { name: "God of War Ragnarök", cat: "Oyunlar", sales: 320, stock: 84, rev: "₺399.680", trend: "up" },
-                                { name: "Pulse Elite Headset", cat: "Aksesuarlar", sales: 84, stock: 15, rev: "₺445.116", trend: "up" },
-                            ].map((p, i) => (
+                            {stats?.topProducts?.map((p: any, i: number) => (
                                 <tr key={i} className="hover:bg-white/[0.01] transition-all group">
                                     <td className="px-8 py-6 font-bold text-white text-sm">{p.name}</td>
                                     <td className="px-8 py-6">
-                                        <span className="px-3 py-1 bg-white/5 border border-white/5 rounded-full text-[9px] font-black uppercase text-slate-400">{p.cat}</span>
+                                        <span className="px-3 py-1 bg-white/5 border border-white/5 rounded-full text-[9px] font-black uppercase text-slate-400">{p.category || "Genel"}</span>
                                     </td>
                                     <td className="px-8 py-6 text-center font-black text-blue-400">{p.sales}</td>
                                     <td className="px-8 py-6 text-center">
                                         <div className="flex items-center justify-center gap-2">
-                                            <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
+                                            <div className={cn("w-1.5 h-1.5 rounded-full", p.stock > 10 ? "bg-emerald-500" : "bg-red-500")}></div>
                                             <span className="text-xs font-bold text-slate-300">{p.stock}</span>
                                         </div>
                                     </td>
-                                    <td className="px-8 py-6 font-black text-white">{p.rev}</td>
+                                    <td className="px-8 py-6 font-black text-white">₺{p.price.toLocaleString('tr-TR')}</td>
                                     <td className="px-8 py-6 text-right">
-                                        {p.trend === "up" ? (
-                                            <TrendingUp size={18} className="text-emerald-400 inline" />
-                                        ) : (
-                                            <TrendingDown size={18} className="text-red-400 inline" />
-                                        )}
+                                        <TrendingUp size={18} className="text-emerald-400 inline" />
                                     </td>
                                 </tr>
                             ))}
