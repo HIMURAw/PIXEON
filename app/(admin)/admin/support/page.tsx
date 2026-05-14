@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { createPortal } from "react-dom";
 import {
     LifeBuoy,
     Search,
@@ -22,11 +23,11 @@ import {
     TicketPlus
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { 
-    DndContext, 
-    useDraggable, 
-    PointerSensor, 
-    useSensor, 
+import {
+    DndContext,
+    useDraggable,
+    PointerSensor,
+    useSensor,
     useSensors,
     DragEndEvent,
     DragStartEvent,
@@ -65,6 +66,7 @@ export default function AdminSupport() {
     const [adminUser, setAdminUser] = useState<any>(null);
     const [previewImage, setPreviewImage] = useState<string | null>(null);
     const scrollRef = useRef<HTMLDivElement>(null);
+    const [mounted, setMounted] = useState(false);
 
     // Support Ticket States
     const [tickets, setTickets] = useState<any[]>([]);
@@ -76,6 +78,10 @@ export default function AdminSupport() {
 
     // Chat Window Context
     const { openWindow } = useChatWindows();
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     // Dnd Kit Sensors
     const sensors = useSensors(
@@ -95,7 +101,7 @@ export default function AdminSupport() {
 
     const handleDragEnd = (event: DragEndEvent) => {
         const { active, delta } = event;
-        
+
         // Treat as a drop if moved more than 10px
         if (Math.abs(delta.x) > 10 || Math.abs(delta.y) > 10) {
             const dragData = active.data.current;
@@ -120,7 +126,7 @@ export default function AdminSupport() {
                 openWindow(t.id, "ticket", t.subject, t.userName, t, dropPos);
             }
         }
-        
+
         setActiveDragItem(null);
     };
 
@@ -374,17 +380,17 @@ export default function AdminSupport() {
                 {activeTab === "live" ? (
                     <div className="grid grid-cols-1 lg:grid-cols-[350px_1fr] gap-8 h-[600px]">
                         <div className="bg-[#020617] border border-white/10 rounded-[32px] overflow-hidden flex flex-col shadow-xl">
-                        <div className="p-4 border-b border-white/5"><div className="relative group"><Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-600" size={14} /><input type="text" placeholder="Sohbet ara..." className="w-full bg-slate-950 border border-white/5 rounded-xl px-10 py-2.5 text-xs outline-none" /></div></div>
-                        <div className="flex-1 overflow-y-auto p-2 space-y-1 scrollbar-hide">
-                            {sessions.map((session) => (
-                                    <DraggableItem 
-                                        key={session.sessionId} 
-                                        id={session.sessionId} 
-                                        type="live" 
+                            <div className="p-4 border-b border-white/5"><div className="relative group"><Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-600" size={14} /><input type="text" placeholder="Sohbet ara..." className="w-full bg-slate-950 border border-white/5 rounded-xl px-10 py-2.5 text-xs outline-none" /></div></div>
+                            <div className="flex-1 overflow-y-auto p-2 space-y-1 scrollbar-hide">
+                                {sessions.map((session) => (
+                                    <DraggableItem
+                                        key={session.sessionId}
+                                        id={session.sessionId}
+                                        type="live"
                                         data={session}
                                     >
-                                        <button 
-                                            onClick={() => setSelectedSessionId(session.sessionId)} 
+                                        <button
+                                            onClick={() => setSelectedSessionId(session.sessionId)}
                                             className={cn("w-full text-left p-4 rounded-2xl transition-all group flex items-start gap-4", selectedSessionId === session.sessionId ? "bg-blue-600/10 border border-blue-500/20" : "hover:bg-white/5 border border-transparent")}
                                         >
                                             <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center border border-white/5 relative">
@@ -404,8 +410,8 @@ export default function AdminSupport() {
                                                 </div>
                                                 <div className="flex items-center justify-between gap-2">
                                                     <p className="text-xs text-slate-500 truncate flex-1">{session.lastMessage}</p>
-                                                    <button 
-                                                        onClick={(e) => { e.stopPropagation(); handleDeleteClick(session.sessionId); }} 
+                                                    <button
+                                                        onClick={(e) => { e.stopPropagation(); handleDeleteClick(session.sessionId); }}
                                                         className="opacity-0 group-hover:opacity-100 p-1.5 text-slate-600 hover:text-red-500 transition-all"
                                                     >
                                                         <Trash2 size={12} />
@@ -417,7 +423,7 @@ export default function AdminSupport() {
                                 ))}
                             </div>
                         </div>
-                        <div className="lg:col-span-2 bg-[#020617] border border-white/10 rounded-[32px] overflow-hidden flex flex-col shadow-xl">
+                        <div className="bg-[#020617] border border-white/10 rounded-[32px] overflow-hidden flex flex-col shadow-xl">
                             {selectedSessionId ? (
                                 <>
                                     <div className="p-5 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
@@ -459,7 +465,7 @@ export default function AdminSupport() {
                         </div>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-[350px_1fr] gap-8 h-[600px] animate-in fade-in duration-500">
                         <div className="bg-[#020617] border border-white/10 rounded-[32px] flex flex-col overflow-hidden shadow-xl">
                             <div className="p-4 border-b border-white/5 bg-white/[0.02]">
                                 <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
@@ -468,14 +474,14 @@ export default function AdminSupport() {
                             </div>
                             <div className="flex-1 overflow-y-auto p-2 space-y-2 scrollbar-hide">
                                 {tickets.map((t) => (
-                                    <DraggableItem 
-                                        key={t.id} 
-                                        id={t.id} 
-                                        type="ticket" 
+                                    <DraggableItem
+                                        key={t.id}
+                                        id={t.id}
+                                        type="ticket"
                                         data={t}
                                     >
-                                        <button 
-                                            onClick={() => setSelectedTicket(t)} 
+                                        <button
+                                            onClick={() => setSelectedTicket(t)}
                                             className={cn("w-full text-left p-4 rounded-2xl border transition-all", selectedTicket?.id === t.id ? "bg-blue-600 border-blue-500 shadow-lg shadow-blue-600/20" : "bg-slate-950/40 border-white/5 hover:border-white/10")}
                                         >
                                             <div className="flex justify-between items-start mb-2">
@@ -491,7 +497,7 @@ export default function AdminSupport() {
                                 ))}
                             </div>
                         </div>
-                        <div className="lg:col-span-2 bg-[#020617] border border-white/10 rounded-[32px] flex flex-col overflow-hidden shadow-xl relative">
+                        <div className="bg-[#020617] border border-white/10 rounded-[32px] flex flex-col overflow-hidden shadow-xl relative">
                             {selectedTicket ? (
                                 <>
                                     <div className="p-5 border-b border-white/5 bg-white/[0.02] flex items-center justify-between">
@@ -580,44 +586,60 @@ export default function AdminSupport() {
                 </DragOverlay>
             </DndContext>
 
-            {/* Ticket Delete Modal */}
-            {ticketToDelete && (
-                <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-[#020617]/80 backdrop-blur-md" onClick={() => setTicketToDelete(null)} />
-                    <div className="relative bg-[#0c1022] border border-white/10 rounded-[32px] w-full max-w-md p-8 shadow-2xl animate-in zoom-in-95">
-                        <div className="w-16 h-16 bg-red-500/10 rounded-[24px] flex items-center justify-center border border-red-500/20 mb-6 mx-auto"><Trash2 className="text-red-500" size={32} /></div>
-                        <h3 className="text-xl font-extrabold text-white text-center mb-2">Talebi Sil?</h3>
-                        <p className="text-slate-400 text-center text-sm leading-relaxed mb-2">Bu destek talebi ve tüm mesajları kalıcı olarak silinecektir.</p>
-                        <p className="text-red-500/50 text-center text-[10px] font-black uppercase mb-8">Bu işlem geri alınamaz!</p>
-                        <div className="flex gap-3">
-                            <button onClick={() => setTicketToDelete(null)} className="flex-1 px-6 py-3.5 bg-white/5 rounded-2xl text-xs font-black uppercase text-slate-400">İptal</button>
-                            <button onClick={handleDeleteTicket} disabled={isDeleting} className="flex-1 px-6 py-3.5 bg-red-600 rounded-2xl text-xs font-black uppercase text-white shadow-lg shadow-red-600/20">
-                                {isDeleting ? "SİLİNİYOR..." : "EVET, SİL"}
-                            </button>
+            {/* ── Portals for Modals ─────────────────────────────────────────────────── */}
+            {mounted && createPortal(
+                <>
+                    {/* Ticket Delete Modal */}
+                    {ticketToDelete && (
+                        <div className="fixed inset-0 z-[100000] flex items-center justify-center p-4">
+                            <div className="absolute inset-0 bg-slate-950/90 backdrop-blur-md" onClick={() => setTicketToDelete(null)} />
+                            <div className="relative bg-[#0c1022] border border-white/10 rounded-[32px] w-full max-w-md p-8 shadow-2xl animate-in zoom-in-95">
+                                <div className="w-16 h-16 bg-red-500/10 rounded-[24px] flex items-center justify-center border border-red-500/20 mb-6 mx-auto"><Trash2 className="text-red-500" size={32} /></div>
+                                <h3 className="text-xl font-extrabold text-white text-center mb-2">Talebi Sil?</h3>
+                                <p className="text-slate-400 text-center text-sm leading-relaxed mb-2">Bu destek talebi ve tüm mesajları kalıcı olarak silinecektir.</p>
+                                <p className="text-red-500/50 text-center text-[10px] font-black uppercase mb-8">Bu işlem geri alınamaz!</p>
+                                <div className="flex gap-3">
+                                    <button onClick={() => setTicketToDelete(null)} className="flex-1 px-6 py-3.5 bg-white/5 rounded-2xl text-xs font-black uppercase text-slate-400 hover:bg-white/10 transition-colors">İptal</button>
+                                    <button onClick={handleDeleteTicket} disabled={isDeleting} className="flex-1 px-6 py-3.5 bg-red-600 rounded-2xl text-xs font-black uppercase text-white shadow-lg shadow-red-600/20 hover:bg-red-500 transition-colors">
+                                        {isDeleting ? "SİLİNİYOR..." : "EVET, SİL"}
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
-            )}
-            {sessionToDelete && (
-                <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-[#020617]/80 backdrop-blur-md" onClick={() => setSessionToDelete(null)} />
-                    <div className="relative bg-[#0c1022] border border-white/10 rounded-[32px] w-full max-w-md p-8 shadow-2xl animate-in zoom-in-95">
-                        <div className="w-16 h-16 bg-red-500/10 rounded-[24px] flex items-center justify-center border border-red-500/20 mb-6 mx-auto"><Trash2 className="text-red-500" size={32} /></div>
-                        <h3 className="text-xl font-extrabold text-white text-center mb-2">Sohbeti Sil?</h3>
-                        <p className="text-slate-400 text-center text-sm leading-relaxed mb-8">Bu işlem geri alınamaz.</p>
-                        <div className="flex gap-3"><button onClick={() => setSessionToDelete(null)} className="flex-1 px-6 py-3.5 bg-white/5 rounded-2xl text-xs font-black uppercase text-slate-400">İptal</button><button onClick={confirmDelete} disabled={isDeleting} className="flex-1 px-6 py-3.5 bg-red-600 rounded-2xl text-xs font-black uppercase text-white shadow-lg shadow-red-600/20">{isDeleting ? "SİLİNİYOR..." : "EVET, SİL"}</button></div>
-                    </div>
-                </div>
-            )}
+                    )}
 
-            {previewImage && (
-                <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-black/90 backdrop-blur-xl" onClick={() => setPreviewImage(null)} />
-                    <div className="relative max-w-5xl max-h-full animate-in zoom-in-95">
-                        <img src={previewImage} alt="Preview" className="w-full h-auto max-h-[85vh] object-contain rounded-2xl shadow-2xl border border-white/10" />
-                        <button onClick={() => setPreviewImage(null)} className="absolute -top-12 right-0 p-2 text-white/60 hover:text-white"><X size={32} /></button>
-                    </div>
-                </div>
+                    {/* Session Delete Modal */}
+                    {sessionToDelete && (
+                        <div className="fixed inset-0 z-[100000] flex items-center justify-center p-4">
+                            <div className="absolute inset-0 bg-slate-950/90 backdrop-blur-md" onClick={() => setSessionToDelete(null)} />
+                            <div className="relative bg-[#0c1022] border border-white/10 rounded-[32px] w-full max-w-md p-8 shadow-2xl animate-in zoom-in-95">
+                                <div className="w-16 h-16 bg-red-500/10 rounded-[24px] flex items-center justify-center border border-red-500/20 mb-6 mx-auto"><Trash2 className="text-red-500" size={32} /></div>
+                                <h3 className="text-xl font-extrabold text-white text-center mb-2">Sohbeti Sil?</h3>
+                                <p className="text-slate-400 text-center text-sm leading-relaxed mb-8">Bu işlem geri alınamaz ve tüm mesaj geçmişi silinecektir.</p>
+                                <div className="flex gap-3">
+                                    <button onClick={() => setSessionToDelete(null)} className="flex-1 px-6 py-3.5 bg-white/5 rounded-2xl text-xs font-black uppercase text-slate-400 hover:bg-white/10 transition-colors">İptal</button>
+                                    <button onClick={confirmDelete} disabled={isDeleting} className="flex-1 px-6 py-3.5 bg-red-600 rounded-2xl text-xs font-black uppercase text-white shadow-lg shadow-red-600/20 hover:bg-red-500 transition-colors">
+                                        {isDeleting ? "SİLİNİYOR..." : "EVET, SİL"}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Global Image Preview Modal */}
+                    {previewImage && (
+                        <div className="fixed inset-0 z-[110000] flex items-center justify-center p-4">
+                            <div className="absolute inset-0 bg-black/95 backdrop-blur-xl animate-in fade-in duration-300" onClick={() => setPreviewImage(null)} />
+                            <div className="relative max-w-5xl max-h-full animate-in zoom-in-95 duration-300">
+                                <img src={previewImage} alt="Preview" className="w-full h-auto max-h-[85vh] object-contain rounded-2xl shadow-2xl border border-white/10" />
+                                <button onClick={() => setPreviewImage(null)} className="absolute -top-12 right-0 p-2 text-white/60 hover:text-white transition-colors">
+                                    <X size={32} />
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                </>,
+                document.body
             )}
         </div>
     );
