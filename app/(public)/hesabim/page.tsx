@@ -30,6 +30,8 @@ import { uploadProfilePicture, updateUserProfile, getUserAddresses, addAddress, 
 import { Camera, Plus } from "lucide-react";
 import { NotificationToast, ConfirmModal } from "@/components/ui/Feedback";
 import type { NotificationType } from "@/components/ui/Feedback";
+import { getWishlist, toggleWishlist } from "@/lib/actions/wishlist-actions";
+import toast from "react-hot-toast";
 
 type TabType = "dashboard" | "orders" | "addresses" | "profile" | "favorites";
 
@@ -49,16 +51,16 @@ export default function AccountPage() {
         // Remove 90 if it exists at the start to handle it cleanly
         let core = digits;
         if (digits.startsWith("90")) core = digits.slice(2);
-        
+
         // Limit to 10 digits (Turkish numbers are 10 digits after +90)
         core = core.slice(0, 10);
-        
+
         let formatted = "+90";
         if (core.length > 0) formatted += " " + core.slice(0, 3);
         if (core.length > 3) formatted += " " + core.slice(3, 6);
         if (core.length > 6) formatted += " " + core.slice(6, 8);
         if (core.length > 8) formatted += " " + core.slice(8, 10);
-        
+
         return formatted;
     };
 
@@ -202,7 +204,7 @@ export default function AccountPage() {
                             {activeTab === "orders" && <OrdersView />}
                             {activeTab === "addresses" && <AddressesView user={user} showNotification={showNotification} formatPhone={formatPhoneNumber} />}
                             {activeTab === "profile" && <ProfileView user={user} setUser={setUser} showNotification={showNotification} formatPhone={formatPhoneNumber} />}
-                            {activeTab === "favorites" && <FavoritesView />}
+                            {activeTab === "favorites" && <FavoritesView userId={user?.id} />}
                         </div>
                     </main>
                 </div>
@@ -232,7 +234,7 @@ function DashboardView({ user, setActiveTab }: { user: any, setActiveTab: (tab: 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {[
                     { label: "Siparişler", value: "12", icon: Package, color: "text-blue-400", bg: "bg-blue-400/10" },
-                    { label: "Favoriler", value: "5", icon: Heart, color: "text-red-400", bg: "bg-red-400/10" },
+                    { label: "Favoriler", value: user?.wishlistCount || "0", icon: Heart, color: "text-red-400", bg: "bg-red-400/10" },
                     { label: "Cüzdan", value: "₺250", icon: CreditCard, color: "text-emerald-400", bg: "bg-emerald-400/10" },
                 ].map((stat, i) => (
                     <div key={i} className="p-8 bg-white/[0.03] border border-white/5 rounded-[40px] hover:border-white/10 transition-all group">
@@ -393,7 +395,7 @@ function AddressesView({ user, showNotification, formatPhone }: { user: any, sho
                     <h2 className="text-3xl font-black text-white tracking-tight mb-3">Teslimat Adresleri</h2>
                     <p className="text-slate-500 font-medium leading-relaxed">Hızlı alışveriş için kayıtlı adreslerini yönet.</p>
                 </div>
-                <button 
+                <button
                     onClick={() => setShowModal(true)}
                     className="bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-widest px-8 py-4 rounded-2xl transition-all shadow-xl shadow-blue-600/20 active:scale-95 text-xs flex items-center gap-2"
                 >
@@ -407,8 +409,8 @@ function AddressesView({ user, showNotification, formatPhone }: { user: any, sho
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {addresses.map((addr) => (
-                        <div 
-                            key={addr.id} 
+                        <div
+                            key={addr.id}
                             className={cn(
                                 "p-10 bg-white/[0.03] border-2 rounded-[48px] relative group overflow-hidden transition-all",
                                 addr.isDefault ? "border-blue-500/20" : "border-white/5"
@@ -435,14 +437,14 @@ function AddressesView({ user, showNotification, formatPhone }: { user: any, sho
                                 </div>
                                 <div className="pt-8 flex gap-6">
                                     {!addr.isDefault && (
-                                        <button 
+                                        <button
                                             onClick={() => handleSetDefault(addr.id)}
                                             className="text-emerald-400 text-xs font-black uppercase tracking-widest hover:text-emerald-300 transition-colors"
                                         >
                                             Varsayılan Yap
                                         </button>
                                     )}
-                                    <button 
+                                    <button
                                         onClick={() => handleDelete(addr.id)}
                                         className="text-red-400 text-xs font-black uppercase tracking-widest hover:text-red-300 transition-colors"
                                     >
@@ -453,7 +455,7 @@ function AddressesView({ user, showNotification, formatPhone }: { user: any, sho
                         </div>
                     ))}
 
-                    <button 
+                    <button
                         onClick={() => setShowModal(true)}
                         className="p-10 bg-white/[0.02] border-2 border-dashed border-white/5 rounded-[48px] hover:border-blue-500/30 hover:bg-white/[0.05] transition-all duration-500 flex flex-col items-center justify-center gap-4 group min-h-[300px]"
                     >
@@ -489,23 +491,23 @@ function AddressesView({ user, showNotification, formatPhone }: { user: any, sho
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                     <div className="space-y-2 col-span-full">
                                         <label className="text-[10px] text-slate-600 font-black uppercase tracking-widest ml-1">Adres Başlığı (Ev, İş vb.)</label>
-                                        <input required value={newAddress.title} onChange={(e) => setNewAddress({...newAddress, title: e.target.value})} type="text" className="w-full bg-slate-950 border border-white/10 rounded-2xl px-6 py-4 outline-none focus:border-blue-500 transition-all text-white" />
+                                        <input required value={newAddress.title} onChange={(e) => setNewAddress({ ...newAddress, title: e.target.value })} type="text" className="w-full bg-slate-950 border border-white/10 rounded-2xl px-6 py-4 outline-none focus:border-blue-500 transition-all text-white" />
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-[10px] text-slate-600 font-black uppercase tracking-widest ml-1">Şehir</label>
-                                        <input required value={newAddress.city} onChange={(e) => setNewAddress({...newAddress, city: e.target.value})} type="text" className="w-full bg-slate-950 border border-white/10 rounded-2xl px-6 py-4 outline-none focus:border-blue-500 transition-all text-white" />
+                                        <input required value={newAddress.city} onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })} type="text" className="w-full bg-slate-950 border border-white/10 rounded-2xl px-6 py-4 outline-none focus:border-blue-500 transition-all text-white" />
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-[10px] text-slate-600 font-black uppercase tracking-widest ml-1">İlçe</label>
-                                        <input required value={newAddress.district} onChange={(e) => setNewAddress({...newAddress, district: e.target.value})} type="text" className="w-full bg-slate-950 border border-white/10 rounded-2xl px-6 py-4 outline-none focus:border-blue-500 transition-all text-white" />
+                                        <input required value={newAddress.district} onChange={(e) => setNewAddress({ ...newAddress, district: e.target.value })} type="text" className="w-full bg-slate-950 border border-white/10 rounded-2xl px-6 py-4 outline-none focus:border-blue-500 transition-all text-white" />
                                     </div>
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] text-slate-600 font-black uppercase tracking-widest ml-1">Adres Detayı</label>
-                                    <textarea required value={newAddress.addressDetail} onChange={(e) => setNewAddress({...newAddress, addressDetail: e.target.value})} className="w-full bg-slate-950 border border-white/10 rounded-2xl px-6 py-4 outline-none focus:border-blue-500 transition-all text-white min-h-[100px]"></textarea>
+                                    <textarea required value={newAddress.addressDetail} onChange={(e) => setNewAddress({ ...newAddress, addressDetail: e.target.value })} className="w-full bg-slate-950 border border-white/10 rounded-2xl px-6 py-4 outline-none focus:border-blue-500 transition-all text-white min-h-[100px]"></textarea>
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    <input type="checkbox" id="isDefault" checked={newAddress.isDefault} onChange={(e) => setNewAddress({...newAddress, isDefault: e.target.checked})} className="w-5 h-5 rounded border-white/10 bg-slate-950 text-blue-600" />
+                                    <input type="checkbox" id="isDefault" checked={newAddress.isDefault} onChange={(e) => setNewAddress({ ...newAddress, isDefault: e.target.checked })} className="w-5 h-5 rounded border-white/10 bg-slate-950 text-blue-600" />
                                     <label htmlFor="isDefault" className="text-sm text-slate-400 font-medium">Varsayılan adres olarak ayarla</label>
                                 </div>
                                 <button type="submit" className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-widest py-5 rounded-2xl transition-all shadow-xl shadow-blue-600/20 active:scale-95">
@@ -578,17 +580,17 @@ function ProfileView({ user, setUser, showNotification, formatPhone }: { user: a
                     <label className="inline-flex items-center gap-2 px-6 py-3 bg-white/5 border border-white/10 rounded-2xl text-xs font-black text-white hover:bg-blue-600 hover:border-blue-600 transition-all cursor-pointer uppercase tracking-widest active:scale-95 shadow-lg shadow-black/20">
                         <Camera size={16} />
                         FOTOĞRAF YÜKLE
-                        <input 
-                            type="file" 
-                            className="hidden" 
+                        <input
+                            type="file"
+                            className="hidden"
                             accept="image/*"
                             onChange={async (e) => {
                                 const file = e.target.files?.[0];
                                 if (!file) return;
-                                
+
                                 const formData = new FormData();
                                 formData.append("file", file);
-                                
+
                                 const result = await uploadProfilePicture(user.id, formData);
                                 if (result.success) {
                                     window.location.reload();
@@ -615,12 +617,12 @@ function ProfileView({ user, setUser, showNotification, formatPhone }: { user: a
 
                 <div className="space-y-3">
                     <label className="text-[10px] text-slate-600 font-black uppercase tracking-widest ml-1">Telefon Numarası</label>
-                    <input 
-                        type="tel" 
-                        value={phone} 
-                        onChange={(e) => setPhone(formatPhone(e.target.value))} 
-                        placeholder="+90 5XX XXX XX XX" 
-                        className="w-full bg-slate-950/50 border border-white/10 rounded-2xl px-6 py-4 outline-none focus:border-blue-500/50 transition-all text-sm font-medium text-white" 
+                    <input
+                        type="tel"
+                        value={phone}
+                        onChange={(e) => setPhone(formatPhone(e.target.value))}
+                        placeholder="+90 5XX XXX XX XX"
+                        className="w-full bg-slate-950/50 border border-white/10 rounded-2xl px-6 py-4 outline-none focus:border-blue-500/50 transition-all text-sm font-medium text-white"
                     />
                 </div>
 
@@ -652,7 +654,32 @@ function ProfileView({ user, setUser, showNotification, formatPhone }: { user: a
     );
 }
 
-function FavoritesView() {
+function FavoritesView({ userId }: { userId: string }) {
+    const [favorites, setFavorites] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    const fetchFavorites = async () => {
+        if (!userId) return;
+        setLoading(true);
+        const data = await getWishlist(userId);
+        setFavorites(data);
+        setLoading(false);
+    };
+
+    useEffect(() => {
+        fetchFavorites();
+    }, [userId]);
+
+    const handleRemove = async (productId: string) => {
+        const res = await toggleWishlist(userId, productId);
+        if (res.success) {
+            toast.success("Ürün favorilerden çıkarıldı.");
+            fetchFavorites();
+        }
+    };
+
+    if (loading) return <div className="flex justify-center py-20 text-blue-400 font-black">YÜKLENİYOR...</div>;
+
     return (
         <div className="space-y-12 animate-in fade-in duration-700 relative z-10">
             <div>
@@ -660,31 +687,57 @@ function FavoritesView() {
                 <p className="text-slate-500 font-medium leading-relaxed">En sevdiğin ürünleri buradan hızlıca sepete ekleyebilirsin.</p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8">
-                {[
-                    { id: 1, name: "Marvel's Spider-Man 2", price: "1.699 TL", img: "/products/spiderman-2.png", cat: "Oyun" },
-                    { id: 2, name: "DualSense Edge", price: "7.499 TL", img: "/products/dualsense-white.png", cat: "Aksesuar" }
-                ].map((item) => (
-                    <div key={item.id} className="group p-6 bg-white/[0.03] border border-white/5 rounded-[40px] hover:border-blue-500/30 transition-all duration-500 relative flex flex-col h-full">
-                        <div className="relative aspect-square bg-slate-950 rounded-[32px] mb-6 p-6 flex items-center justify-center overflow-hidden border border-white/5 shadow-2xl">
-                            <Image src={item.img} alt={item.name} width={180} height={180} className="object-contain group-hover:scale-110 transition-transform duration-700" />
-                            <button className="absolute top-4 right-4 p-3 bg-red-500 text-white rounded-2xl shadow-lg shadow-red-500/20 hover:scale-110 transition-all">
-                                <Heart size={18} fill="currentColor" />
-                            </button>
-                        </div>
-                        <div className="space-y-1 mb-6">
-                            <span className="text-[10px] text-blue-400 font-black uppercase tracking-widest">{item.cat}</span>
-                            <h3 className="font-black text-lg text-white tracking-tight leading-tight">{item.name}</h3>
-                        </div>
-                        <div className="mt-auto pt-6 border-t border-white/5 flex items-center justify-between">
-                            <div className="text-xl font-black text-white tracking-tighter">{item.price}</div>
-                            <button className="p-3 bg-blue-600 text-white rounded-2xl hover:bg-blue-500 transition-all shadow-lg shadow-blue-600/20 active:scale-95">
-                                <ShoppingCart size={18} />
-                            </button>
-                        </div>
+            {favorites.length === 0 ? (
+                <div className="py-20 text-center bg-white/[0.02] border-2 border-dashed border-white/5 rounded-[48px] space-y-6">
+                    <div className="w-20 h-20 bg-slate-900 rounded-3xl flex items-center justify-center mx-auto border border-white/5 text-slate-700">
+                        <Heart size={40} />
                     </div>
-                ))}
-            </div>
+                    <div className="space-y-2">
+                        <p className="text-xl font-black text-white">Favori listen boş</p>
+                        <p className="text-slate-500 font-medium">Beğendiğin ürünleri kalp ikonuna tıklayarak buraya ekleyebilirsin.</p>
+                    </div>
+                    <Link href="/" className="inline-block bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-widest px-8 py-4 rounded-2xl transition-all shadow-xl shadow-blue-600/20 active:scale-95 text-xs">
+                        ALIŞVERİŞE BAŞLA
+                    </Link>
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8">
+                    {favorites.map((product) => (
+                        <div key={product.id} className="group p-6 bg-white/[0.03] border border-white/5 rounded-[40px] hover:border-blue-500/30 transition-all duration-500 relative flex flex-col h-full">
+                            <div className="relative aspect-square bg-slate-950 rounded-[32px] mb-6 p-6 flex items-center justify-center overflow-hidden border border-white/5 shadow-2xl">
+                                <Link href={`/product/${product.slug}`} className="w-full h-full flex items-center justify-center">
+                                    <Image
+                                        src={product.image || "/placeholder.png"}
+                                        alt={product.name}
+                                        width={180}
+                                        height={180}
+                                        className="object-contain group-hover:scale-110 transition-transform duration-700"
+                                    />
+                                </Link>
+                                <button
+                                    onClick={() => handleRemove(product.id)}
+                                    className="absolute top-4 right-4 p-3 bg-red-500 text-white rounded-2xl shadow-lg shadow-red-500/20 hover:scale-110 transition-all"
+                                    title="Favorilerden Çıkar"
+                                >
+                                    <Heart size={18} fill="currentColor" />
+                                </button>
+                            </div>
+                            <div className="space-y-1 mb-6">
+                                <span className="text-[10px] text-blue-400 font-black uppercase tracking-widest">{product.category?.name || "Ürün"}</span>
+                                <Link href={`/product/${product.slug}`}>
+                                    <h3 className="font-black text-lg text-white tracking-tight leading-tight hover:text-blue-400 transition-colors line-clamp-2">{product.name}</h3>
+                                </Link>
+                            </div>
+                            <div className="mt-auto pt-6 border-t border-white/5 flex items-center justify-between">
+                                <div className="text-xl font-black text-white tracking-tighter">{product.price.toLocaleString('tr-TR')} ₺</div>
+                                <button className="p-3 bg-blue-600 text-white rounded-2xl hover:bg-blue-500 transition-all shadow-lg shadow-blue-600/20 active:scale-95">
+                                    <ShoppingCart size={18} />
+                                </button>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
         </div>
     );
 }

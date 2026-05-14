@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { products, reviews, users, categories } from "@/lib/db/schema";
+import { products, reviews, users, categories, wishlist } from "@/lib/db/schema";
 import { eq, and, desc } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import Image from "next/image";
@@ -21,6 +21,7 @@ import TopBar from "@/components/header/TopBar";
 import Head from "@/components/header/Head";
 import Footer from "@/components/footer/Footer";
 import ReviewSection from "@/components/reviews/ReviewSection";
+import WishlistButton from "@/components/products/WishlistButton";
 import { getSession } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
@@ -70,10 +71,21 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
     // 3. Current User
     let currentUser = null;
+    let isFavorited = false;
     if (session?.user) {
         currentUser = await db.query.users.findFirst({
             where: eq(users.id, session.user.id)
         });
+
+        if (currentUser) {
+            const fav = await db.query.wishlist.findFirst({
+                where: and(
+                    eq(wishlist.userId, currentUser.id),
+                    eq(wishlist.productId, product.id)
+                )
+            });
+            isFavorited = !!fav;
+        }
     }
 
     // Calculate Average Rating
@@ -207,9 +219,11 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                                     <button className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-2xl transition-all shadow-xl shadow-blue-600/20 flex items-center justify-center gap-3 text-sm uppercase italic tracking-tighter">
                                         <ShoppingCart size={20} /> SEPETE EKLE
                                     </button>
-                                    <button className="w-full bg-white/5 hover:bg-white/10 text-white font-black py-4 rounded-2xl transition-all border border-white/10 flex items-center justify-center gap-3 text-sm uppercase italic tracking-tighter">
-                                        <Heart size={20} /> FAVORİYE EKLE
-                                    </button>
+                                    <WishlistButton 
+                                        productId={product.id}
+                                        userId={currentUser?.id ?? null}
+                                        initialIsFavorited={isFavorited}
+                                    />
                                 </div>
 
                                 <div className="space-y-4 pt-6 border-t border-white/5">
