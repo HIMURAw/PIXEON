@@ -76,6 +76,8 @@ export default function AdminSupport() {
     const [ticketReply, setTicketReply] = useState("");
     const [ticketToDelete, setTicketToDelete] = useState<any>(null);
     const [closedTickets, setClosedTickets] = useState<any[]>([]);
+    const [searchLogs, setSearchLogs] = useState("");
+    const [filterCategory, setFilterCategory] = useState("ALL");
     const [isLoadingLogs, setIsLoadingLogs] = useState(false);
     const ticketScrollRef = useRef<HTMLDivElement>(null);
 
@@ -670,15 +672,40 @@ export default function AdminSupport() {
                     </div>
                 ) : (
                     <div className="bg-[#020617] border border-white/10 rounded-[32px] overflow-hidden shadow-xl animate-in fade-in duration-500">
-                        <div className="p-6 border-b border-white/5 bg-white/[0.02] flex items-center justify-between">
+                        <div className="p-6 border-b border-white/5 bg-white/[0.02] flex flex-col md:flex-row md:items-center justify-between gap-4">
                             <div>
                                 <h3 className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2">
                                     <History size={16} className="text-blue-500" /> Kapatılan Talepler Arşivi
                                 </h3>
                                 <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">Geçmişte sonuçlandırılmış destek kayıtları</p>
                             </div>
-                            <div className="text-[10px] font-black text-slate-600 uppercase tracking-widest bg-slate-900/50 px-3 py-1.5 rounded-lg border border-white/5">
-                                Toplam: {closedTickets.length} Kayıt
+                            
+                            <div className="flex flex-col sm:flex-row items-center gap-3">
+                                {/* Search */}
+                                <div className="relative w-full sm:w-64">
+                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={14} />
+                                    <input 
+                                        type="text" 
+                                        placeholder="Ara (İsim, Konu...)" 
+                                        value={searchLogs}
+                                        onChange={(e) => setSearchLogs(e.target.value)}
+                                        className="w-full bg-slate-950 border border-white/10 rounded-xl pl-9 pr-4 py-2 text-xs text-white outline-none focus:border-blue-500/50 transition-all"
+                                    />
+                                </div>
+                                
+                                {/* Category Filter */}
+                                <select 
+                                    value={filterCategory}
+                                    onChange={(e) => setFilterCategory(e.target.value)}
+                                    className="bg-slate-950 border border-white/10 rounded-xl px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-400 outline-none focus:border-blue-500/50 transition-all cursor-pointer"
+                                >
+                                    <option value="ALL">TÜMÜ</option>
+                                    <option value="CANLI DESTEK">CANLI DESTEK</option>
+                                    <option value="KARGO">KARGO</option>
+                                    <option value="IADE">İADE</option>
+                                    <option value="TEKNIK">TEKNİK</option>
+                                    <option value="DIGER">DİĞER</option>
+                                </select>
                             </div>
                         </div>
                         <div className="overflow-x-auto">
@@ -693,7 +720,14 @@ export default function AdminSupport() {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-white/5">
-                                    {closedTickets.map((t) => (
+                                    {closedTickets
+                                        .filter(t => {
+                                            const matchesSearch = t.userName.toLowerCase().includes(searchLogs.toLowerCase()) || 
+                                                                t.subject.toLowerCase().includes(searchLogs.toLowerCase());
+                                            const matchesCategory = filterCategory === "ALL" || t.category === filterCategory;
+                                            return matchesSearch && matchesCategory;
+                                        })
+                                        .map((t) => (
                                         <tr
                                             key={t.id}
                                             className="hover:bg-white/[0.02] transition-colors group cursor-pointer"
