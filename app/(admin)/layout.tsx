@@ -34,6 +34,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NotificationProvider } from "@/context/NotificationContext";
+import { ChatWindowProvider } from "@/context/ChatWindowContext";
+import { ChatWindowsContainer } from "@/components/admin/FloatingChatWindow";
 import { Toaster } from "react-hot-toast";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -133,6 +135,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return (
         <html lang="en">
             <body className="antialiased">
+                <ChatWindowProvider>
                 <NotificationProvider>
                 <Toaster position="top-right" />
                 <div className="min-h-screen bg-slate-950 text-slate-200 flex">
@@ -248,6 +251,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     </div>
                 </div>
                 </NotificationProvider>
+                <ChatWindowsContainer />
+                </ChatWindowProvider>
             </body>
         </html>
     );
