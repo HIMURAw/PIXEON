@@ -18,19 +18,30 @@ export async function GET(req: NextRequest) {
             });
             return NextResponse.json({ messages });
         } else {
-            // Get all unique sessions with latest message
-            const sessions = await db.select({
-                sessionId: liveChatMessages.sessionId,
-                senderName: liveChatMessages.senderName,
-                lastMessage: liveChatMessages.message,
-                createdAt: liveChatMessages.createdAt,
-                unreadCount: sql<number>`count(case when ${liveChatMessages.isRead} = false and ${liveChatMessages.senderRole} = 'USER' then 1 end)`,
-            })
-            .from(liveChatMessages)
-            .groupBy(liveChatMessages.sessionId)
-            .orderBy(desc(liveChatMessages.createdAt));
+            // Get all unique sessions with latest message and status
+            // Using a more robust SQL approach to avoid ONLY_FULL_GROUP_BY issues
+            const sessions = await db.execute(sql`
+                SELECT 
+                    m1.session_id as sessionId, 
+                    m1.sender_name as senderName, 
+                    m1.message as lastMessage, 
+                    m1.created_at as createdAt, 
+                    m1.status as status,
+                    (SELECT COUNT(*) FROM live_chat_messages m2 
+                     WHERE m2.session_id = m1.session_id 
+                     AND m2.is_read = false 
+                     AND m2.sender_role = 'USER') as unreadCount
+                FROM live_chat_messages m1
+                WHERE m1.id IN (
+                    SELECT MAX(id) 
+                    FROM live_chat_messages 
+                    GROUP BY session_id
+                )
+                ORDER BY m1.created_at DESC
+            `);
 
-            return NextResponse.json({ sessions });
+            // db.execute returns a raw result, formatting it for the frontend
+            return NextResponse.json({ sessions: sessions[0] });
         }
     } catch (error) {
         console.error("Admin chat error:", error);
@@ -55,6 +66,7 @@ export async function POST(req: NextRequest) {
             senderRole: "ADMIN" as const,
             message,
             imageUrl: imageUrl || null,
+            status: "ACTIVE" as const,
             createdAt: new Date(),
         };
 
@@ -69,6 +81,22 @@ export async function POST(req: NextRequest) {
     } catch (error) {
         console.error("Admin response error:", error);
         return NextResponse.json({ error: "Failed to send admin response" }, { status: 500 });
+    }
+}
+
+export async function PUT(req: NextRequest) {
+    try {
+        const { sessionId, status } = await req.json();
+        if (!sessionId || !status) return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+
+        await db.update(liveChatMessages)
+            .set({ status })
+            .where(eq(liveChatMessages.sessionId, sessionId));
+
+        return NextResponse.json({ success: true });
+    } catch (error) {
+        console.error("Update session status error:", error);
+        return NextResponse.json({ error: "Failed to update session" }, { status: 500 });
     }
 }
 

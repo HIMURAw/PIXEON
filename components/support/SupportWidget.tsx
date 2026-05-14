@@ -161,17 +161,14 @@ export default function SupportWidget() {
             }
 
             // 2. Handle Session ID based on Auth
-            let sid = "";
-            if (currentUser) {
-                // If logged in, use a session ID tied to user ID
-                sid = `user_${currentUser.id}`;
-            } else {
-                // If guest, use localStorage or generate one
-                sid = localStorage.getItem("pixeon_support_sid") || "";
-                if (!sid) {
+            let sid = localStorage.getItem("pixeon_support_sid") || "";
+            if (!sid) {
+                if (currentUser) {
+                    sid = `user_${currentUser.id}_${Date.now()}`;
+                } else {
                     sid = `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-                    localStorage.setItem("pixeon_support_sid", sid);
                 }
+                localStorage.setItem("pixeon_support_sid", sid);
             }
             setSessionId(sid);
 
@@ -196,6 +193,15 @@ export default function SupportWidget() {
             try {
                 const res = await fetch(`/api/support/chat?sessionId=${sessionId}`);
                 const data = await res.json();
+
+                if (data.status === "ARCHIVED") {
+                    // Session ended by admin
+                    localStorage.removeItem("pixeon_support_sid");
+                    setSessionId(null);
+                    setLiveMessages([]);
+                    return;
+                }
+
                 if (data.messages) {
                     const mapped: Message[] = data.messages.map((m: any) => ({
                         id: m.id,
@@ -310,7 +316,20 @@ export default function SupportWidget() {
     // ── Live Send ─────────────────────────────────────────────────────────────
     const handleLiveSend = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!liveInput.trim() || !sessionId || !user) return;
+        
+        let currentSid = sessionId;
+        if (!currentSid) {
+            // Generate a new one if it was cleared
+            if (user) {
+                currentSid = `user_${user.id}_${Date.now()}`;
+            } else {
+                currentSid = `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+            }
+            localStorage.setItem("pixeon_support_sid", currentSid);
+            setSessionId(currentSid);
+        }
+
+        if (!liveInput.trim() || !currentSid || !user) return;
 
         const msgText = liveInput;
         setLiveInput("");
@@ -319,7 +338,7 @@ export default function SupportWidget() {
             const res = await fetch("/api/support/chat", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ sessionId, message: msgText, senderName: user.name }),
+                body: JSON.stringify({ sessionId: currentSid, message: msgText, senderName: user.name }),
             });
 
             if (res.ok) {

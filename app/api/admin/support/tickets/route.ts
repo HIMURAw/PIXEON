@@ -78,6 +78,25 @@ export async function POST(req: NextRequest) {
     }
 }
 
+export async function PUT(req: NextRequest) {
+    try {
+        const { ticketId, status } = await req.json();
+        
+        if (!ticketId || !status) {
+            return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+        }
+
+        await db.update(supportTickets)
+            .set({ status, updatedAt: new Date() })
+            .where(eq(supportTickets.id, ticketId));
+
+        return NextResponse.json({ success: true });
+    } catch (error) {
+        console.error("Admin ticket update error:", error);
+        return NextResponse.json({ error: "Failed to update ticket" }, { status: 500 });
+    }
+}
+
 export async function DELETE(req: NextRequest) {
     try {
         const ticketId = req.nextUrl.searchParams.get("ticketId");

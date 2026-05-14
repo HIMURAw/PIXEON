@@ -1,11 +1,11 @@
 import { db } from "@/lib/db";
 import { liveChatMessages } from "@/lib/db/schema";
-import { eq, asc } from "drizzle-orm";
+import { eq, asc, desc } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
     const sessionId = req.nextUrl.searchParams.get("sessionId");
-    if (!sessionId) return NextResponse.json({ messages: [] });
+    if (!sessionId) return NextResponse.json({ messages: [], status: "ACTIVE" });
 
     try {
         const messages = await db.query.liveChatMessages.findMany({
@@ -13,7 +13,16 @@ export async function GET(req: NextRequest) {
             orderBy: [asc(liveChatMessages.createdAt)],
         });
 
-        return NextResponse.json({ messages });
+        // Get the current status from the latest message or any message in the session
+        const lastMessage = await db.query.liveChatMessages.findFirst({
+            where: eq(liveChatMessages.sessionId, sessionId),
+            orderBy: [desc(liveChatMessages.createdAt)],
+        });
+
+        return NextResponse.json({ 
+            messages, 
+            status: lastMessage?.status || "ACTIVE" 
+        });
     } catch (error) {
         return NextResponse.json({ error: "Failed to fetch messages" }, { status: 500 });
     }
@@ -34,6 +43,7 @@ export async function POST(req: NextRequest) {
             senderRole: "USER" as const,
             message,
             imageUrl: imageUrl || null,
+            status: "ACTIVE" as const,
             createdAt: new Date(),
         };
 

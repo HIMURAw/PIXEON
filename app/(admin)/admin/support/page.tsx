@@ -35,6 +35,7 @@ import {
     defaultDropAnimationSideEffects
 } from "@dnd-kit/core";
 import { useChatWindows, LiveSession, Ticket } from "@/context/ChatWindowContext";
+import { History, FileText, Calendar, Trash } from "lucide-react";
 
 interface ChatSession {
     sessionId: string;
@@ -55,7 +56,7 @@ interface Message {
 }
 
 export default function AdminSupport() {
-    const [activeTab, setActiveTab] = useState<"tickets" | "live">("live");
+    const [activeTab, setActiveTab] = useState<"tickets" | "live" | "logs">("live");
     const [liveEnabled, setLiveEnabled] = useState(false);
     const [sessions, setSessions] = useState<ChatSession[]>([]);
     const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
@@ -74,6 +75,8 @@ export default function AdminSupport() {
     const [ticketMessages, setTicketMessages] = useState<any[]>([]);
     const [ticketReply, setTicketReply] = useState("");
     const [ticketToDelete, setTicketToDelete] = useState<any>(null);
+    const [closedTickets, setClosedTickets] = useState<any[]>([]);
+    const [isLoadingLogs, setIsLoadingLogs] = useState(false);
     const ticketScrollRef = useRef<HTMLDivElement>(null);
 
     // Chat Window Context
@@ -159,7 +162,9 @@ export default function AdminSupport() {
     const fetchSessions = async () => {
         const sessionsRes = await fetch("/api/admin/support/chat");
         const sessionsData = await sessionsRes.json();
-        setSessions(sessionsData.sessions || []);
+        // Sadece aktif (arşivlenmemiş) sohbetleri ana listede göster
+        const activeSessions = sessionsData.sessions?.filter((s: any) => s.status !== "ARCHIVED") || [];
+        setSessions(activeSessions);
     };
 
     useEffect(() => {
@@ -184,6 +189,8 @@ export default function AdminSupport() {
     useEffect(() => {
         if (activeTab === "tickets") {
             fetchTickets();
+        } else if (activeTab === "logs") {
+            fetchClosedTickets();
         }
     }, [activeTab]);
 
@@ -203,9 +210,39 @@ export default function AdminSupport() {
         try {
             const res = await fetch("/api/admin/support/tickets");
             const data = await res.json();
-            setTickets(data.tickets || []);
+            // Filter only non-closed tickets for the main tickets tab
+            setTickets(data.tickets?.filter((t: any) => t.status !== "CLOSED") || []);
         } catch (err) {
             console.error("Fetch tickets error:", err);
+        }
+    };
+
+    const fetchClosedTickets = async () => {
+        setIsLoadingLogs(true);
+        try {
+            // Fetch both tickets and sessions for a complete log
+            const [tRes, sRes] = await Promise.all([
+                fetch("/api/admin/support/tickets"),
+                fetch("/api/admin/support/chat")
+            ]);
+            const tData = await tRes.json();
+            const sData = await sRes.json();
+
+            const closedT = tData.tickets?.filter((t: any) => t.status === "CLOSED") || [];
+            const archivedS = sData.sessions?.filter((s: any) => s.status === "ARCHIVED") || []; // Assuming status field exists
+
+            setClosedTickets([...closedT, ...archivedS.map((s: any) => ({
+                id: s.sessionId,
+                userName: s.senderName,
+                subject: "Canlı Sohbet Geçmişi",
+                category: "CANLI DESTEK",
+                createdAt: s.createdAt,
+                type: "LIVE_CHAT"
+            }))].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
+        } catch (err) {
+            console.error("Fetch logs error:", err);
+        } finally {
+            setIsLoadingLogs(false);
         }
     };
 
@@ -237,21 +274,69 @@ export default function AdminSupport() {
         }
     };
 
-    const handleDeleteTicket = async () => {
-        if (!ticketToDelete) return;
+    const handleCloseSession = async (sid: string) => {
         setIsDeleting(true);
         try {
-            const res = await fetch(`/api/admin/support/tickets?ticketId=${ticketToDelete.id}`, { method: "DELETE" });
+            const res = await fetch("/api/admin/support/chat", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ sessionId: sid, status: "ARCHIVED" })
+            });
             if (res.ok) {
-                setTickets(tickets.filter(t => t.id !== ticketToDelete.id));
-                setSelectedTicket(null);
-                setTicketToDelete(null);
+                if (sid === selectedSessionId) setSelectedSessionId(null);
+                fetchSessions();
+                fetchClosedTickets();
             }
         } catch (err) {
-            console.error("Delete ticket error:", err);
+            console.error("Close session error:", err);
         } finally {
             setIsDeleting(false);
         }
+    };
+
+    const handleCloseTicket = async (ticketId: string) => {
+        setIsDeleting(true);
+        try {
+            const res = await fetch("/api/admin/support/tickets", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ ticketId, status: "CLOSED" })
+            });
+            if (res.ok) {
+                setTickets(tickets.filter(t => t.id !== ticketId));
+                setSelectedTicket(null);
+                fetchClosedTickets();
+            }
+        } catch (err) {
+            console.error("Close ticket error:", err);
+        } finally {
+            setIsDeleting(false);
+        }
+    };
+
+    const handleDeleteTicket = async () => {
+        if (!ticketToDelete) return;
+
+        // If it's already closed, we delete it permanently
+        if (ticketToDelete.status === "CLOSED") {
+            setIsDeleting(true);
+            try {
+                const res = await fetch(`/api/admin/support/tickets?ticketId=${ticketToDelete.id}`, { method: "DELETE" });
+                if (res.ok) {
+                    setClosedTickets(closedTickets.filter(t => t.id !== ticketToDelete.id));
+                    setTicketToDelete(null);
+                }
+            } catch (err) {
+                console.error("Delete permanent error:", err);
+            } finally {
+                setIsDeleting(false);
+            }
+            return;
+        }
+
+        // Otherwise, we archive it
+        handleCloseTicket(ticketToDelete.id);
+        setTicketToDelete(null);
     };
 
     useEffect(() => {
@@ -300,14 +385,23 @@ export default function AdminSupport() {
 
     const confirmDelete = async () => {
         if (!sessionToDelete) return;
-        setIsDeleting(true);
-        const res = await fetch(`/api/admin/support/chat?sessionId=${sessionToDelete}`, { method: "DELETE" });
-        if (res.ok) {
-            if (sessionToDelete === selectedSessionId) setSelectedSessionId(null);
-            fetchSessions();
+
+        // Check if it's already in logs (using current sessions state is tricky, better to just archive)
+        const session = sessions.find(s => s.sessionId === sessionToDelete);
+
+        if (!session) {
+            // If not found in active sessions, it might be in logs, do permanent delete
+            setIsDeleting(true);
+            await fetch(`/api/admin/support/chat?sessionId=${sessionToDelete}`, { method: "DELETE" });
+            setClosedTickets(closedTickets.filter(t => t.id !== sessionToDelete));
             setSessionToDelete(null);
+            setIsDeleting(false);
+            return;
         }
-        setIsDeleting(false);
+
+        // Archive active session
+        handleCloseSession(sessionToDelete);
+        setSessionToDelete(null);
     };
 
     const handleDeleteClick = (sid: string) => setSessionToDelete(sid);
@@ -372,8 +466,18 @@ export default function AdminSupport() {
 
             {/* Tabs */}
             <div className="flex gap-4 border-b border-white/5 pb-px">
-                <button onClick={() => setActiveTab("live")} className={cn("px-6 py-4 text-xs font-black uppercase tracking-widest relative", activeTab === "live" ? "text-blue-400" : "text-slate-500")}>Canlı Sohbetler {activeTab === "live" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-500" />}</button>
-                <button onClick={() => setActiveTab("tickets")} className={cn("px-6 py-4 text-xs font-black uppercase tracking-widest relative", activeTab === "tickets" ? "text-blue-400" : "text-slate-500")}>Destek Talepleri {activeTab === "tickets" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-500" />}</button>
+                <button onClick={() => setActiveTab("live")} className={cn("px-6 py-4 text-xs font-black uppercase tracking-widest relative", activeTab === "live" ? "text-blue-400" : "text-slate-500")}>
+                    Canlı Sohbetler {activeTab === "live" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-500" />}
+                </button>
+                <button onClick={() => setActiveTab("tickets")} className={cn("px-6 py-4 text-xs font-black uppercase tracking-widest relative", activeTab === "tickets" ? "text-blue-400" : "text-slate-500")}>
+                    Destek Talepleri {activeTab === "tickets" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-500" />}
+                </button>
+                <button onClick={() => setActiveTab("logs")} className={cn("px-6 py-4 text-xs font-black uppercase tracking-widest relative", activeTab === "logs" ? "text-blue-400" : "text-slate-500")}>
+                    <div className="flex items-center gap-2">
+                        <History size={14} /> Arşiv (Log)
+                    </div>
+                    {activeTab === "logs" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-500" />}
+                </button>
             </div>
 
             <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
@@ -428,7 +532,10 @@ export default function AdminSupport() {
                                 <>
                                     <div className="p-5 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
                                         <div className="flex items-center gap-4"><div className="w-10 h-10 bg-blue-600/10 rounded-xl flex items-center justify-center border border-blue-500/20"><User size={18} className="text-blue-400" /></div><div><h3 className="font-bold text-white text-sm">{sessions.find(s => s.sessionId === selectedSessionId)?.senderName || "Misafir"}</h3><div className="flex items-center gap-1.5 mt-0.5"><Circle size={8} className="text-green-500 fill-green-500 animate-pulse" /><span className="text-[9px] text-slate-500 font-black uppercase tracking-widest">Çevrimiçi</span></div></div></div>
-                                        <div className="flex items-center gap-2"><button onClick={() => handleDeleteClick(selectedSessionId)} className="p-2.5 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 hover:text-white hover:bg-red-500 transition-all"><Trash2 size={18} /></button><button onClick={() => setSelectedSessionId(null)} className="p-2.5 bg-white/5 border border-white/5 rounded-xl text-slate-500 hover:text-white transition-all"><X size={18} /></button></div>
+                                        <div className="flex items-center gap-2">
+                                            <button onClick={() => handleDeleteClick(selectedSessionId)} className="p-2.5 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 hover:text-white hover:bg-red-500 transition-all"><Trash2 size={18} /></button>
+                                            <button onClick={() => setSelectedSessionId(null)} className="p-2.5 bg-white/5 border border-white/5 rounded-xl text-slate-500 hover:text-white transition-all"><X size={18} /></button>
+                                        </div>
                                     </div>
                                     <div ref={scrollRef} className="flex-1 p-6 overflow-y-auto space-y-4 scrollbar-hide">
                                         {messages.map((msg) => (
@@ -464,7 +571,7 @@ export default function AdminSupport() {
                             )}
                         </div>
                     </div>
-                ) : (
+                ) : activeTab === "tickets" ? (
                     <div className="grid grid-cols-1 lg:grid-cols-[350px_1fr] gap-8 h-[600px] animate-in fade-in duration-500">
                         <div className="bg-[#020617] border border-white/10 rounded-[32px] flex flex-col overflow-hidden shadow-xl">
                             <div className="p-4 border-b border-white/5 bg-white/[0.02]">
@@ -495,6 +602,12 @@ export default function AdminSupport() {
                                         </button>
                                     </DraggableItem>
                                 ))}
+                                {tickets.length === 0 && (
+                                    <div className="p-12 text-center opacity-20">
+                                        <FileText className="mx-auto mb-4" size={32} />
+                                        <p className="text-xs font-bold uppercase tracking-widest">Aktif talep yok</p>
+                                    </div>
+                                )}
                             </div>
                         </div>
                         <div className="bg-[#020617] border border-white/10 rounded-[32px] flex flex-col overflow-hidden shadow-xl relative">
@@ -510,7 +623,7 @@ export default function AdminSupport() {
                                                 onClick={() => setTicketToDelete(selectedTicket)}
                                                 className="px-4 py-2 bg-red-500/10 border border-red-500/20 rounded-xl text-[10px] font-black text-red-500 hover:text-white hover:bg-red-500 transition-all uppercase tracking-widest"
                                             >
-                                                Talebi Sil
+                                                Sil
                                             </button>
                                             <button
                                                 onClick={() => setSelectedTicket(null)}
@@ -553,6 +666,87 @@ export default function AdminSupport() {
                                     <p className="text-sm mt-3 max-w-xs font-bold text-slate-500">Yanıtlamak istediğiniz destek talebini soldan seçin.</p>
                                 </div>
                             )}
+                        </div>
+                    </div>
+                ) : (
+                    <div className="bg-[#020617] border border-white/10 rounded-[32px] overflow-hidden shadow-xl animate-in fade-in duration-500">
+                        <div className="p-6 border-b border-white/5 bg-white/[0.02] flex items-center justify-between">
+                            <div>
+                                <h3 className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2">
+                                    <History size={16} className="text-blue-500" /> Kapatılan Talepler Arşivi
+                                </h3>
+                                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">Geçmişte sonuçlandırılmış destek kayıtları</p>
+                            </div>
+                            <div className="text-[10px] font-black text-slate-600 uppercase tracking-widest bg-slate-900/50 px-3 py-1.5 rounded-lg border border-white/5">
+                                Toplam: {closedTickets.length} Kayıt
+                            </div>
+                        </div>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left border-collapse">
+                                <thead>
+                                    <tr className="border-b border-white/5 bg-slate-900/20">
+                                        <th className="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Kullanıcı</th>
+                                        <th className="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Konu</th>
+                                        <th className="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Kategori</th>
+                                        <th className="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Tarih</th>
+                                        <th className="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">İşlem</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-white/5">
+                                    {closedTickets.map((t) => (
+                                        <tr
+                                            key={t.id}
+                                            className="hover:bg-white/[0.02] transition-colors group cursor-pointer"
+                                            onClick={() => {
+                                                if (t.type === "LIVE_CHAT") {
+                                                    setSelectedSessionId(t.id);
+                                                    setActiveTab("live");
+                                                } else {
+                                                    setSelectedTicket(t);
+                                                    setActiveTab("tickets");
+                                                }
+                                            }}
+                                        >
+                                            <td className="px-6 py-4">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-8 h-8 rounded-lg bg-slate-900 border border-white/10 flex items-center justify-center text-slate-500">
+                                                        <User size={14} />
+                                                    </div>
+                                                    <span className="text-sm font-bold text-slate-300">{t.userName}</span>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <span className="text-sm text-slate-400">{t.subject}</span>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-2 py-1 bg-white/5 rounded-md border border-white/5">{t.category}</span>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex items-center gap-2 text-slate-500">
+                                                    <Calendar size={12} />
+                                                    <span className="text-xs">{new Date(t.createdAt).toLocaleDateString("tr-TR")}</span>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <button
+                                                    onClick={() => setTicketToDelete(t)}
+                                                    className="p-2 text-slate-600 hover:text-red-500 transition-colors"
+                                                >
+                                                    <Trash size={14} />
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                    {closedTickets.length === 0 && !isLoadingLogs && (
+                                        <tr>
+                                            <td colSpan={5} className="px-6 py-24 text-center">
+                                                <History size={48} className="mx-auto text-slate-800 mb-4" />
+                                                <p className="text-sm font-bold text-slate-600 uppercase tracking-widest">Henüz arşivlenmiş talep bulunmuyor.</p>
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 )}

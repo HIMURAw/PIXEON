@@ -289,6 +289,7 @@ export const liveChatMessages = mysqlTable("live_chat_messages", {
   message: text("message").notNull(),
   imageUrl: varchar("image_url", { length: 255 }), // Chat images
   isRead: boolean("is_read").default(false).notNull(),
+  status: mysqlEnum("status", ["ACTIVE", "ARCHIVED"]).default("ACTIVE").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
