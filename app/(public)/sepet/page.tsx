@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import TopBar from "@/components/header/TopBar";
 import MainBar from "@/components/header/MainBar";
 import Head from "@/components/header/Head";
@@ -16,45 +16,39 @@ import {
     ShoppingBag,
     ArrowRight,
     Zap,
-    Ticket
+    Ticket,
+    Loader2
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { useCart } from "@/context/CartContext";
 
 export default function CartPage() {
-    const [cartItems, setCartItems] = useState([
-        { 
-            id: 1, 
-            name: "PlayStation 5 Slim Standart Edition", 
-            price: 18999, 
-            quantity: 1, 
-            image: "/products/ps5-slim.png",
-            category: "Konsollar"
-        },
-        { 
-            id: 2, 
-            name: "DualSense Kablosuz Kontrolcü - Beyaz", 
-            price: 2899, 
-            quantity: 2, 
-            image: "/products/dualsense-white.png",
-            category: "Aksesuarlar"
-        }
-    ]);
+    const { 
+        cartItems, 
+        loading, 
+        updateQuantity, 
+        removeFromCart, 
+        subtotal, 
+        shipping, 
+        total 
+    } = useCart();
 
-    const subtotal = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-    const shipping = subtotal > 5000 ? 0 : 99;
-    const total = subtotal + shipping;
-
-    const updateQuantity = (id: number, delta: number) => {
-        setCartItems(prev => prev.map(item => 
-            item.id === id ? { ...item, quantity: Math.max(1, item.quantity + delta) } : item
-        ));
-    };
-
-    const removeItem = (id: number) => {
-        setCartItems(prev => prev.filter(item => item.id !== id));
-    };
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-slate-950 text-slate-200">
+                <TopBar />
+                <MainBar />
+                <Head />
+                <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20 flex flex-col items-center justify-center min-h-[400px]">
+                    <Loader2 size={48} className="animate-spin text-blue-500 mb-4" />
+                    <p className="text-slate-500 font-bold uppercase tracking-widest text-sm">Sepetiniz Yükleniyor...</p>
+                </main>
+                <Footer />
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-slate-950 text-slate-200">
@@ -91,17 +85,17 @@ export default function CartPage() {
                                     <div className="relative z-10 flex flex-col sm:flex-row items-center gap-10">
                                         {/* Image */}
                                         <div className="w-40 h-40 bg-slate-950 rounded-[32px] border border-white/5 flex items-center justify-center p-6 group-hover:scale-105 transition-transform duration-700 shadow-2xl">
-                                            <Image src={item.image} alt={item.name} width={120} height={120} className="object-contain drop-shadow-2xl shadow-blue-500/20" />
+                                            <Image src={item.product.image || "/placeholder.png"} alt={item.product.name} width={120} height={120} className="object-contain drop-shadow-2xl shadow-blue-500/20" />
                                         </div>
 
                                         {/* Details */}
                                         <div className="flex-1 text-center sm:text-left space-y-2">
                                             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-400">
-                                                {item.category}
+                                                {item.product.category || "Ürün"}
                                             </span>
-                                            <h3 className="text-xl lg:text-2xl font-black text-white leading-tight group-hover:text-blue-400 transition-colors">{item.name}</h3>
+                                            <h3 className="text-xl lg:text-2xl font-black text-white leading-tight group-hover:text-blue-400 transition-colors">{item.product.name}</h3>
                                             <div className="text-2xl font-black text-white tracking-tighter pt-2">
-                                                ₺{item.price.toLocaleString("tr-TR")}
+                                                ₺{item.product.price.toLocaleString("tr-TR")}
                                             </div>
                                         </div>
 
@@ -109,24 +103,24 @@ export default function CartPage() {
                                         <div className="flex flex-col sm:items-end gap-6">
                                             <div className="flex items-center bg-slate-950 border border-white/5 rounded-2xl p-1.5 shadow-inner">
                                                 <button 
-                                                    onClick={() => updateQuantity(item.id, -1)}
-                                                    className="w-10 h-10 flex items-center justify-center hover:text-blue-400 transition-colors disabled:opacity-20"
+                                                    onClick={() => updateQuantity(item.productId, item.quantity - 1)}
+                                                    className="w-10 h-10 flex items-center justify-center hover:text-blue-400 transition-colors disabled:opacity-20 cursor-pointer"
                                                     disabled={item.quantity <= 1}
                                                 >
                                                     <Minus size={18} />
                                                 </button>
                                                 <span className="w-10 text-center font-black text-xl text-white">{item.quantity}</span>
                                                 <button 
-                                                    onClick={() => updateQuantity(item.id, 1)}
-                                                    className="w-10 h-10 flex items-center justify-center hover:text-blue-400 transition-colors"
+                                                    onClick={() => updateQuantity(item.productId, item.quantity + 1)}
+                                                    className="w-10 h-10 flex items-center justify-center hover:text-blue-400 transition-colors cursor-pointer"
                                                 >
                                                     <Plus size={18} />
                                                 </button>
                                             </div>
 
                                             <button 
-                                                onClick={() => removeItem(item.id)}
-                                                className="flex items-center gap-2 px-4 py-2 text-red-400 hover:text-red-300 transition-colors font-black text-[10px] uppercase tracking-widest"
+                                                onClick={() => removeFromCart(item.productId)}
+                                                className="flex items-center gap-2 px-4 py-2 text-red-400 hover:text-red-300 transition-colors font-black text-[10px] uppercase tracking-widest cursor-pointer"
                                             >
                                                 <Trash2 size={16} />
                                                 Ürünü Kaldır
@@ -194,7 +188,7 @@ export default function CartPage() {
                                     </div>
                                 </div>
 
-                                <button className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-widest py-6 rounded-3xl flex items-center justify-center gap-3 transition-all shadow-xl shadow-blue-600/30 active:scale-95 group">
+                                <button className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-widest py-6 rounded-3xl flex items-center justify-center gap-3 transition-all shadow-xl shadow-blue-600/30 active:scale-95 group cursor-pointer">
                                     <CreditCard size={22} />
                                     Güvenle Öde
                                     <ArrowRight size={20} className="group-hover:translate-x-1.5 transition-transform" />

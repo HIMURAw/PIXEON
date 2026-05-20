@@ -22,6 +22,7 @@ import Head from "@/components/header/Head";
 import Footer from "@/components/footer/Footer";
 import ReviewSection from "@/components/reviews/ReviewSection";
 import WishlistButton from "@/components/products/WishlistButton";
+import ProductAddToCartButton from "@/components/products/ProductAddToCartButton";
 import { getSession } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
@@ -216,9 +217,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                                 </div>
 
                                 <div className="space-y-4 pt-4 border-t border-white/5">
-                                    <button className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-2xl transition-all shadow-xl shadow-blue-600/20 flex items-center justify-center gap-3 text-sm uppercase italic tracking-tighter">
-                                        <ShoppingCart size={20} /> SEPETE EKLE
-                                    </button>
+                                    <ProductAddToCartButton product={product} />
                                     <WishlistButton 
                                         productId={product.id}
                                         userId={currentUser?.id ?? null}

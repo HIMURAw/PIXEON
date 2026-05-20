@@ -12,6 +12,7 @@ import {
     Tag
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useCart } from "@/context/CartContext";
 
 import BurgerMenu from "./mobile/burgerMenu";
 import LocationButton from "./locationButton/locationButton";
@@ -31,6 +32,7 @@ const DEFAULT_LINKS = [
 
 export default function Head() {
     const router = useRouter();
+    const { totalItems } = useCart();
     const [navLinks, setNavLinks] = useState(DEFAULT_LINKS);
     const [query, setQuery] = useState("");
     const [results, setResults] = useState<any[]>([]);
@@ -116,7 +118,14 @@ export default function Head() {
                     </Link>
                     <div className="flex items-center gap-3">
                         <NotificationBell />
-                        <ShoppingCart size={20} />
+                        <Link href="/sepet" className="relative p-1 text-slate-200 hover:text-sky-400 transition-colors">
+                            <ShoppingCart size={20} />
+                            {totalItems > 0 && (
+                                <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-[9px] font-black w-4 h-4 flex items-center justify-center rounded-full border border-[#0c1022] animate-in zoom-in duration-300">
+                                    {totalItems}
+                                </span>
+                            )}
+                        </Link>
                         <UserMenu mobile />
                     </div>
                 </div>
@@ -227,8 +236,13 @@ export default function Head() {
                         <NotificationBell />
                         <UserMenu />
                         <Link href="/sepet" className="flex items-center gap-2 group">
-                            <div className="w-10 h-10 bg-slate-900 flex items-center justify-center border border-slate-700 rounded-full group-hover:border-sky-500/50 group-hover:bg-slate-800 transition-all">
+                            <div className="w-10 h-10 bg-slate-900 flex items-center justify-center border border-slate-700 rounded-full group-hover:border-sky-500/50 group-hover:bg-slate-800 transition-all relative">
                                 <ShoppingCart color="#E5E7EB" size={16} />
+                                {totalItems > 0 && (
+                                    <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-[9px] font-black w-4.5 h-4.5 flex items-center justify-center rounded-full border-2 border-[#0c1022] animate-in zoom-in duration-300">
+                                        {totalItems}
+                                    </span>
+                                )}
                             </div>
                             <span className="font-medium text-slate-200 group-hover:text-sky-400 transition-colors">Sepetim</span>
                         </Link>

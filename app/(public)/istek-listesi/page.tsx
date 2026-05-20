@@ -5,8 +5,11 @@ import MainBar from "@/components/header/MainBar";
 import Head from "@/components/header/Head";
 import { Heart, ShoppingCart, X } from "lucide-react";
 import Link from "next/link";
+import { useCart } from "@/context/CartContext";
 
 export default function WishlistPage() {
+    const { addToCart } = useCart();
+    
     const wishlistItems = [
         {
             id: 1,
@@ -37,6 +40,19 @@ export default function WishlistPage() {
             inStock: false
         },
     ];
+
+    const handleAddToCart = (product: any) => {
+        addToCart({
+            id: product.id.toString(),
+            name: product.name,
+            slug: product.name.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+            price: parseFloat(product.price.replace(/\./g, "")),
+            oldPrice: product.oldPrice ? parseFloat(product.oldPrice.replace(/\./g, "")) : null,
+            image: product.image,
+            category: product.category,
+            stock: product.inStock ? 99 : 0
+        });
+    };
 
     return (
         <div className="min-h-screen bg-[#020617] text-slate-200">
@@ -113,6 +129,7 @@ export default function WishlistPage() {
                                 </div>
 
                                 <button
+                                    onClick={() => handleAddToCart(product)}
                                     disabled={!product.inStock}
                                     className={`cursor-pointer w-full border py-1.5 rounded-full text-sm transition flex items-center justify-center gap-2 ${product.inStock
                                             ? "border-blue-400 text-blue-400 hover:bg-blue-400 hover:text-white"
@@ -138,6 +155,7 @@ export default function WishlistPage() {
                     </div>
                 )}
             </div>
+
 
             {/* Simple Footer/Info */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">

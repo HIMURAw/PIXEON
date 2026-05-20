@@ -1,11 +1,30 @@
+"use client";
+
 import { Product } from "./newProducts";
 import Link from "next/link";
+import { useCart } from "@/context/CartContext";
 
 type BestSellerCardProps = {
     product: Product;
 };
 
 export default function ProductsCard({ product }: BestSellerCardProps) {
+    const { addToCart } = useCart();
+
+    const handleAddToCart = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        addToCart({
+            id: product.id,
+            name: product.name,
+            slug: product.slug,
+            price: parseFloat(product.price),
+            oldPrice: product.oldPrice ? parseFloat(product.oldPrice) : null,
+            image: product.image,
+            category: product.category
+        });
+    };
+
     return (
         <div className="bg-[#0b1220] border border-white/10 rounded-xl p-4 hover:shadow-lg transition group">
             <div className="flex gap-2 mb-3">
@@ -56,9 +75,13 @@ export default function ProductsCard({ product }: BestSellerCardProps) {
                 </span>
             </div>
 
-            <button className="cursor-pointer w-full border border-blue-400 text-blue-400 py-1.5 rounded-full text-sm hover:bg-blue-400 hover:text-white transition">
+            <button 
+                onClick={handleAddToCart}
+                className="cursor-pointer w-full border border-blue-400 text-blue-400 py-1.5 rounded-full text-sm hover:bg-blue-400 hover:text-white transition font-bold"
+            >
                 Sepete Ekle
             </button>
         </div>
     );
 }
+
