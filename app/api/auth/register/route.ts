@@ -3,9 +3,26 @@ import { db } from "@/lib/db";
 import { users } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
+import fs from "fs/promises";
+import path from "path";
 
 export async function POST(request: NextRequest) {
   try {
+    // Check if new registrations are allowed
+    const settingsPath = path.join(process.cwd(), "public", "settings", "verification.json");
+    try {
+      const settingsData = await fs.readFile(settingsPath, "utf-8");
+      const settings = JSON.parse(settingsData);
+      if (settings && settings.allowNewRegistrations === false) {
+        return NextResponse.json(
+          { success: false, message: "Yeni kullanıcı kayıtları geçici olarak devre dışı bırakılmıştır." },
+          { status: 403 }
+        );
+      }
+    } catch (e) {
+      // ignore
+    }
+
     const { name, email, password } = await request.json();
 
     // 1. Kullanıcı var mı kontrol et

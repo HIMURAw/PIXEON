@@ -1,12 +1,14 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { users, adminLogs, userAddresses, orders } from "@/lib/db/schema";
+import { users, adminLogs, userAddresses, orders, orderItems, products } from "@/lib/db/schema";
 import { eq, and, desc, count, gte, inArray, or, like, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
 import { randomUUID } from "crypto";
 import { getSession } from "@/lib/auth";
+import fs from "fs/promises";
+import path from "path";
 
 export async function createLog(action: string, details: string) {
   try {
@@ -336,6 +338,210 @@ export async function deleteUser(userId: string) {
   } catch (error) {
     console.error("Error deleting user:", error);
     return { success: false, error: "Kullanıcı silinemedi." };
+  }
+}
+
+const SETTINGS_DIR = path.join(process.cwd(), "public", "settings");
+const SETTINGS_FILE = path.join(SETTINGS_DIR, "verification.json");
+
+export async function getCustomerDetails(userId: string) {
+  try {
+    const userResult = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+    if (userResult.length === 0) {
+      return { success: false, error: "Kullanıcı bulunamadı." };
+    }
+    const user = userResult[0];
+    const { password, ...userWithoutPassword } = user;
+
+    const addresses = await db.select().from(userAddresses).where(eq(userAddresses.userId, userId));
+
+    const orderRows = await db
+      .select({
+        id: orders.id,
+        orderNumber: orders.orderNumber,
+        totalAmount: orders.totalAmount,
+        status: orders.status,
+        paymentStatus: orders.paymentStatus,
+        paymentMethod: orders.paymentMethod,
+        shippingAddress: orders.shippingAddress,
+        shippingProvider: orders.shippingProvider,
+        trackingNumber: orders.trackingNumber,
+        createdAt: orders.createdAt,
+        orderItemId: orderItems.id,
+        quantity: orderItems.quantity,
+        price: orderItems.price,
+        productName: products.name,
+      })
+      .from(orders)
+      .leftJoin(orderItems, eq(orderItems.orderId, orders.id))
+      .leftJoin(products, eq(products.id, orderItems.productId))
+      .where(eq(orders.userId, userId))
+      .orderBy(desc(orders.createdAt));
+
+    const ordersMap = new Map<string, any>();
+    for (const row of orderRows) {
+      if (!ordersMap.has(row.id)) {
+        ordersMap.set(row.id, {
+          id: row.id,
+          orderNumber: row.orderNumber,
+          totalAmount: row.totalAmount,
+          status: row.status,
+          paymentStatus: row.paymentStatus,
+          paymentMethod: row.paymentMethod,
+          shippingAddress: row.shippingAddress,
+          shippingProvider: row.shippingProvider,
+          trackingNumber: row.trackingNumber,
+          createdAt: row.createdAt,
+          items: [],
+        });
+      }
+      if (row.orderItemId) {
+        ordersMap.get(row.id).items.push({
+          id: row.orderItemId,
+          quantity: row.quantity,
+          price: row.price,
+          productName: row.productName || "Bilinmeyen Ürün",
+        });
+      }
+    }
+
+    return {
+      success: true,
+      user: userWithoutPassword,
+      addresses: JSON.parse(JSON.stringify(addresses)),
+      orders: JSON.parse(JSON.stringify(Array.from(ordersMap.values()))),
+    };
+  } catch (error) {
+    console.error("Error in getCustomerDetails:", error);
+    return { success: false, error: "Müşteri detayları yüklenemedi." };
+  }
+}
+
+export async function resetUserPassword(userId: string) {
+  try {
+    const session = await getSession();
+    if (!session || session.user.role !== "ADMIN") {
+      return { success: false, error: "Yetkisiz işlem." };
+    }
+
+    const userResult = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+    if (userResult.length === 0) {
+      return { success: false, error: "Kullanıcı bulunamadı." };
+    }
+    const user = userResult[0];
+
+    const defaultPassword = "Pixeon123!";
+    const hashedPassword = await bcrypt.hash(defaultPassword, 10);
+
+    await db.update(users).set({ password: hashedPassword }).where(eq(users.id, userId));
+
+    await createLog(
+      "Şifre Sıfırlandı",
+      `Yönetici ${session.user.name}, ${user.name} (${user.email}) adlı müşterinin şifresini "${defaultPassword}" olarak sıfırladı.`
+    );
+
+    return { success: true, message: `Müşteri şifresi başarıyla "${defaultPassword}" olarak sıfırlandı.` };
+  } catch (error) {
+    console.error("Error in resetUserPassword:", error);
+    return { success: false, error: "Şifre sıfırlanamadı." };
+  }
+}
+
+export async function getVerificationSettings() {
+  try {
+    await fs.mkdir(SETTINGS_DIR, { recursive: true });
+    
+    let fileExists = false;
+    try {
+      await fs.access(SETTINGS_FILE);
+      fileExists = true;
+    } catch {
+      // ignore
+    }
+
+    if (!fileExists) {
+      const defaultSettings = {
+        emailVerificationRequired: false,
+        phoneVerificationRequired: false,
+        allowNewRegistrations: true
+      };
+      await fs.writeFile(SETTINGS_FILE, JSON.stringify(defaultSettings, null, 2), "utf-8");
+      return defaultSettings;
+    }
+
+    const data = await fs.readFile(SETTINGS_FILE, "utf-8");
+    return JSON.parse(data);
+  } catch (error) {
+    console.error("Error in getVerificationSettings:", error);
+    return {
+      emailVerificationRequired: false,
+      phoneVerificationRequired: false,
+      allowNewRegistrations: true
+    };
+  }
+}
+
+export async function updateVerificationSettings(data: {
+  emailVerificationRequired: boolean;
+  phoneVerificationRequired: boolean;
+  allowNewRegistrations: boolean;
+}) {
+  try {
+    const session = await getSession();
+    if (!session || session.user.role !== "ADMIN") {
+      return { success: false, error: "Yetkisiz işlem." };
+    }
+
+    await fs.mkdir(SETTINGS_DIR, { recursive: true });
+    await fs.writeFile(SETTINGS_FILE, JSON.stringify(data, null, 2), "utf-8");
+
+    await createLog(
+      "Doğrulama Ayarları Güncellendi",
+      `E-posta doğrulaması: ${data.emailVerificationRequired ? "Açık" : "Kapalı"}, ` +
+      `Telefon doğrulaması: ${data.phoneVerificationRequired ? "Açık" : "Kapalı"}, ` +
+      `Yeni kayıt: ${data.allowNewRegistrations ? "Açık" : "Kapalı"}`
+    );
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error in updateVerificationSettings:", error);
+    return { success: false, error: "Ayarlar kaydedilemedi." };
+  }
+}
+
+export async function toggleUserRole(userId: string, makeAdmin: boolean, adminRole: string = "Editor") {
+  try {
+    const session = await getSession();
+    if (!session || session.user.role !== "ADMIN") {
+      return { success: false, error: "Yetkisiz işlem." };
+    }
+
+    const userResult = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+    if (userResult.length === 0) {
+      return { success: false, error: "Kullanıcı bulunamadı." };
+    }
+    const user = userResult[0];
+
+    if (makeAdmin) {
+      await db.update(users).set({
+        role: "ADMIN",
+        adminRole: adminRole
+      }).where(eq(users.id, userId));
+      await createLog("Kullanıcı Yetkilendirildi", `${user.name} adlı kullanıcı ${adminRole} yetkisi ile admin yapıldı.`);
+    } else {
+      await db.update(users).set({
+        role: "USER",
+        adminRole: null
+      }).where(eq(users.id, userId));
+      await createLog("Kullanıcı Yetkisi Kaldırıldı", `${user.name} adlı kullanıcının admin yetkileri geri alındı.`);
+    }
+
+    revalidatePath("/admin/customers");
+    revalidatePath("/admin/settings/admins");
+    return { success: true };
+  } catch (error) {
+    console.error("Error toggling user role:", error);
+    return { success: false, error: "Kullanıcı yetkisi değiştirilemedi." };
   }
 }
 
