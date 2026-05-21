@@ -66,3 +66,49 @@ export async function deleteCoupon(id: string) {
     return { success: false, error: "Kupon silinemedi." };
   }
 }
+
+export async function validateCoupon(code: string, subtotal: number) {
+  try {
+    if (!code) {
+      return { success: false, error: "Lütfen bir kupon kodu girin." };
+    }
+    const codeClean = code.trim().toUpperCase();
+    const data = await db.select().from(coupons).where(eq(coupons.code, codeClean)).limit(1);
+    
+    if (data.length === 0) {
+      return { success: false, error: "Geçersiz kupon kodu." };
+    }
+    
+    const coupon = data[0];
+    
+    // Check expiry
+    if (coupon.expiryDate && new Date(coupon.expiryDate) < new Date()) {
+      return { success: false, error: "Kuponun kullanım süresi dolmuş." };
+    }
+    
+    // Check usage limits
+    if (coupon.usageLimit !== null && coupon.usageLimit !== undefined && coupon.usageCount >= coupon.usageLimit) {
+      return { success: false, error: "Bu kupon maksimum kullanım limitine ulaşmış." };
+    }
+    
+    // Check minimum purchase amount
+    if (coupon.minPurchase !== null && coupon.minPurchase !== undefined && subtotal < coupon.minPurchase) {
+      return { success: false, error: `Bu kuponu kullanabilmek için minimum sepet tutarı ₺${coupon.minPurchase.toLocaleString("tr-TR")} olmalıdır.` };
+    }
+    
+    return {
+      success: true,
+      coupon: {
+        id: coupon.id,
+        code: coupon.code,
+        discountType: coupon.discountType,
+        discountValue: coupon.discountValue,
+        minPurchase: coupon.minPurchase,
+      }
+    };
+  } catch (error) {
+    console.error("Error validating coupon:", error);
+    return { success: false, error: "Kupon doğrulanırken bir hata oluştu." };
+  }
+}
+

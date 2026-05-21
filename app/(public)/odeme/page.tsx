@@ -36,7 +36,7 @@ interface Address {
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { cartItems, loading: cartLoading, subtotal, shipping, total, totalItems, clearCart } = useCart();
+  const { cartItems, loading: cartLoading, subtotal, shipping, total, totalItems, clearCart, coupon, discountAmount } = useCart();
 
   // Authentication & Address States
   const [user, setUser] = useState<any>(null);
@@ -204,7 +204,8 @@ export default function CheckoutPage() {
       const res = await createOrder({
         userId: user.id,
         addressId: selectedAddressId,
-        paymentMethod
+        paymentMethod,
+        couponCode: coupon?.code
       });
 
       if (res.success && res.orderNumber) {
@@ -685,6 +686,12 @@ export default function CheckoutPage() {
                   <span>Toplam Ürün ({totalItems})</span>
                   <span className="text-white font-bold">₺{subtotal.toLocaleString("tr-TR")}</span>
                 </div>
+                {coupon && (
+                  <div className="flex justify-between items-center text-green-400">
+                    <span>Kupon İndirimi ({coupon.code})</span>
+                    <span className="font-bold">-₺{discountAmount.toLocaleString("tr-TR")}</span>
+                  </div>
+                )}
                 <div className="flex justify-between items-center text-slate-400">
                   <span>Kargo Ücreti</span>
                   <span className={`font-bold ${shipping === 0 ? "text-green-400" : "text-white"}`}>

@@ -88,10 +88,12 @@ export const orders = mysqlTable("orders", {
   userId: varchar("user_id", { length: 255 }).references(() => users.id).notNull(),
   orderNumber: varchar("order_number", { length: 50 }).notNull().unique(),
   totalAmount: double("total_amount").notNull(),
-  status: mysqlEnum("status", ["PENDING", "PREPARING", "COMPLETED", "CANCELLED"]).default("PENDING").notNull(),
+  status: mysqlEnum("status", ["PENDING", "PREPARING", "SHIPPED", "COMPLETED", "CANCELLED"]).default("PENDING").notNull(),
   paymentStatus: mysqlEnum("payment_status", ["PENDING", "PAID", "FAILED"]).default("PENDING").notNull(),
   paymentMethod: varchar("payment_method", { length: 50 }),
   shippingAddress: text("shipping_address").notNull(),
+  shippingProvider: varchar("shipping_provider", { length: 100 }),
+  trackingNumber: varchar("tracking_number", { length: 100 }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
 });

@@ -10,6 +10,7 @@ import {
   clearCartDb, 
   syncCartDb 
 } from "@/lib/actions/cart-actions";
+import { validateCoupon } from "@/lib/actions/coupon-actions";
 
 export interface CartItem {
   id: string;
@@ -38,6 +39,16 @@ interface CartContextType {
   subtotal: number;
   shipping: number;
   total: number;
+  coupon: {
+    id: string;
+    code: string;
+    discountType: "PERCENTAGE" | "FIXED";
+    discountValue: number;
+    minPurchase: number | null;
+  } | null;
+  discountAmount: number;
+  applyCoupon: (code: string) => Promise<{ success: boolean; error?: string }>;
+  removeCoupon: () => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -46,6 +57,37 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [coupon, setCoupon] = useState<any | null>(null);
+
+  // Derived states
+  const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+  const subtotal = cartItems.reduce((acc, item) => acc + (item.product.price * item.quantity), 0);
+
+  // Calculate discount amount
+  let discountAmount = 0;
+  if (coupon && subtotal > 0) {
+    if (coupon.discountType === "PERCENTAGE") {
+      discountAmount = (subtotal * coupon.discountValue) / 100;
+    } else {
+      discountAmount = coupon.discountValue;
+    }
+    discountAmount = Math.min(discountAmount, subtotal);
+  }
+
+  const shipping = subtotal === 0 ? 0 : subtotal > 5000 ? 0 : 99;
+  const total = Math.max(0, subtotal - discountAmount) + shipping;
+
+  // Load coupon from sessionStorage on mount
+  useEffect(() => {
+    const saved = sessionStorage.getItem("tuger_applied_coupon");
+    if (saved) {
+      try {
+        setCoupon(JSON.parse(saved));
+      } catch (e) {
+        console.error("Failed to parse saved coupon", e);
+      }
+    }
+  }, []);
 
   // 1. Fetch user session and load/sync cart
   useEffect(() => {
@@ -236,6 +278,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         setLoading(true);
         const res = await clearCartDb(user.id);
         if (res.success) {
+          setCoupon(null);
+          sessionStorage.removeItem("tuger_applied_coupon");
           await refreshDbCart(user.id);
           return true;
         } else {
@@ -244,6 +288,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         }
       } else {
         setCartItems([]);
+        setCoupon(null);
+        sessionStorage.removeItem("tuger_applied_coupon");
         return true;
       }
     } catch (error) {
@@ -254,11 +300,40 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  // Derived states
-  const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
-  const subtotal = cartItems.reduce((acc, item) => acc + (item.product.price * item.quantity), 0);
-  const shipping = subtotal === 0 ? 0 : subtotal > 5000 ? 0 : 99;
-  const total = subtotal + shipping;
+  // Apply Coupon
+  const applyCoupon = async (code: string) => {
+    try {
+      const res = await validateCoupon(code, subtotal);
+      if (res.success && res.coupon) {
+        setCoupon(res.coupon);
+        sessionStorage.setItem("tuger_applied_coupon", JSON.stringify(res.coupon));
+        return { success: true };
+      } else {
+        return { success: false, error: res.error || "Kupon uygulanamadı." };
+      }
+    } catch (error) {
+      console.error("applyCoupon error:", error);
+      return { success: false, error: "Kupon uygulanırken bir hata oluştu." };
+    }
+  };
+
+  // Remove Coupon
+  const removeCoupon = () => {
+    setCoupon(null);
+    sessionStorage.removeItem("tuger_applied_coupon");
+    toast.success("Kupon kaldırıldı.");
+  };
+
+  // Monitor subtotal to auto-remove coupon if it falls below threshold
+  useEffect(() => {
+    if (coupon && coupon.minPurchase !== null && coupon.minPurchase !== undefined && subtotal < coupon.minPurchase) {
+      setCoupon(null);
+      sessionStorage.removeItem("tuger_applied_coupon");
+      toast.error(`Kupon için gereken minimum sepet tutarı (₺${coupon.minPurchase.toLocaleString("tr-TR")}) sağlanmadığı için kupon kaldırıldı.`);
+    }
+  }, [subtotal, coupon]);
+
+
 
   return (
     <CartContext.Provider value={{
@@ -271,7 +346,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       totalItems,
       subtotal,
       shipping,
-      total
+      total,
+      coupon,
+      discountAmount,
+      applyCoupon,
+      removeCoupon
     }}>
       {children}
     </CartContext.Provider>

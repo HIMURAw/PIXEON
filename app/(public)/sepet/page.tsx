@@ -23,6 +23,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/context/CartContext";
 import { getDatabaseProductCount } from "@/lib/actions/product-actions";
+import toast from "react-hot-toast";
 
 export default function CartPage() {
     const { 
@@ -33,10 +34,35 @@ export default function CartPage() {
         subtotal, 
         shipping, 
         total,
-        totalItems
+        totalItems,
+        coupon,
+        discountAmount,
+        applyCoupon,
+        removeCoupon
     } = useCart();
 
     const [dbProductCount, setDbProductCount] = React.useState<number>(0);
+    const [couponInput, setCouponInput] = React.useState("");
+    const [applyingCoupon, setApplyingCoupon] = React.useState(false);
+
+    const handleApplyCoupon = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!couponInput.trim()) return;
+        setApplyingCoupon(true);
+        try {
+            const res = await applyCoupon(couponInput);
+            if (res.success) {
+                toast.success("Kupon başarıyla uygulandı!");
+                setCouponInput("");
+            } else {
+                toast.error(res.error || "Kupon uygulanamadı.");
+            }
+        } catch (error) {
+            toast.error("Kupon doğrulanırken bir hata oluştu.");
+        } finally {
+            setApplyingCoupon(false);
+        }
+    };
 
     React.useEffect(() => {
         async function fetchCount() {
@@ -184,15 +210,47 @@ export default function CartPage() {
                                     
                                     {/* Coupon Input */}
                                     <div className="pt-2">
-                                        <div className="relative group">
-                                            <Ticket size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-400 transition-colors" />
-                                            <input 
-                                                type="text" 
-                                                placeholder="İndirim Kuponu" 
-                                                className="w-full bg-[#020617] border border-white/10 rounded-full py-2 pl-10 pr-4 text-xs font-medium outline-none focus:border-blue-400 transition-all placeholder:text-slate-600 text-white"
-                                            />
-                                        </div>
+                                        {coupon ? (
+                                            <div className="flex items-center justify-between bg-green-500/10 border border-green-500/20 rounded-xl p-3.5 text-xs">
+                                                <div className="flex items-center gap-2 text-green-400 font-bold">
+                                                    <Ticket size={14} />
+                                                    <span>{coupon.code} Uygulandı</span>
+                                                </div>
+                                                <button 
+                                                    onClick={removeCoupon}
+                                                    className="text-red-400 hover:text-red-300 font-bold cursor-pointer text-[10px] uppercase bg-red-500/10 hover:bg-red-500/20 px-2.5 py-1 rounded-full border border-red-500/10 transition-all"
+                                                >
+                                                    Kaldır
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <form onSubmit={handleApplyCoupon} className="relative group">
+                                                <Ticket size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-400 transition-colors" />
+                                                <input 
+                                                    type="text" 
+                                                    placeholder="İndirim Kuponu" 
+                                                    value={couponInput}
+                                                    onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+                                                    className="w-full bg-[#020617] border border-white/10 rounded-full py-2.5 pl-10 pr-20 text-xs font-medium outline-none focus:border-blue-400 transition-all placeholder:text-slate-600 text-white"
+                                                />
+                                                <button 
+                                                    type="submit"
+                                                    disabled={applyingCoupon || !couponInput.trim()}
+                                                    className="absolute right-1.5 top-1/2 -translate-y-1/2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-[10px] font-bold px-3 py-1.5 rounded-full transition cursor-pointer"
+                                                >
+                                                    {applyingCoupon ? "..." : "Uygula"}
+                                                </button>
+                                            </form>
+                                        )}
                                     </div>
+
+                                    {/* Coupon Discount Row */}
+                                    {coupon && (
+                                        <div className="flex justify-between items-center text-green-400">
+                                            <span>Kupon İndirimi ({coupon.code})</span>
+                                            <span className="font-bold">-₺{discountAmount.toLocaleString("tr-TR")}</span>
+                                        </div>
+                                    )}
 
                                     <div className="pt-4 border-t border-white/5 flex justify-between items-end">
                                         <div>

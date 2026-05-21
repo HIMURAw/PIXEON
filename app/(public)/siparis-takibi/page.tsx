@@ -12,12 +12,39 @@ import PromoVerticalSmall from "@/components/promo/PromoVerticalSmall";
 import BannerSection from "@/components/promo/BannerSection";
 import { Search, Package, Truck, CheckCircle2, AlertCircle, ArrowRight, ShieldCheck, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { trackOrder } from "@/lib/actions/order-actions";
 
 function OrderTrackingContent() {
     const searchParams = useSearchParams();
     const [orderId, setOrderId] = useState("");
     const [email, setEmail] = useState("");
     const [showStatus, setShowStatus] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [order, setOrder] = useState<any>(null);
+
+    const performTracking = async (ordNo: string, mailAddr: string) => {
+        if (!ordNo || !mailAddr) return;
+        setLoading(true);
+        setError(null);
+        setOrder(null);
+        try {
+            const res = await trackOrder(ordNo, mailAddr);
+            if (res.success) {
+                setOrder(res.order);
+                setShowStatus(true);
+            } else {
+                setError(res.error || "Sipariş bilgisi bulunamadı.");
+                setShowStatus(false);
+            }
+        } catch (err: any) {
+            console.error(err);
+            setError("Bir sistem hatası oluştu, lütfen daha sonra tekrar deneyin.");
+            setShowStatus(false);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
         const orderNumberParam = searchParams.get("orderNumber");
@@ -32,10 +59,11 @@ function OrderTrackingContent() {
             .then((res) => res.json())
             .then((data) => {
                 if (data.success && data.user?.email) {
-                    setEmail(data.user.email);
+                    const mail = data.user.email;
+                    setEmail(mail);
                     const orderNumberParam = searchParams.get("orderNumber");
                     if (orderNumberParam) {
-                        setShowStatus(true);
+                        performTracking(orderNumberParam, mail);
                     }
                 }
             })
@@ -44,16 +72,74 @@ function OrderTrackingContent() {
 
     const handleTrack = (e: React.FormEvent) => {
         e.preventDefault();
-        if (orderId && email) {
-            setShowStatus(true);
+        performTracking(orderId, email);
+    };
+
+    const getStatusInfo = (status: string) => {
+        switch (status) {
+            case "PENDING":
+                return { label: "Onay Bekliyor", color: "text-amber-400", badgeColor: "bg-amber-500" };
+            case "PREPARING":
+                return { label: "Hazırlanıyor", color: "text-blue-400", badgeColor: "bg-blue-500" };
+            case "SHIPPED":
+                return { label: "Kargoya Verildi", color: "text-purple-400", badgeColor: "bg-purple-500" };
+            case "COMPLETED":
+                return { label: "Teslim Edildi", color: "text-emerald-400", badgeColor: "bg-emerald-500" };
+            case "CANCELLED":
+                return { label: "İptal Edildi", color: "text-red-400", badgeColor: "bg-red-500" };
+            default:
+                return { label: "Bilinmiyor", color: "text-slate-400", badgeColor: "bg-slate-500" };
         }
     };
+
+    const statusInfo = order ? getStatusInfo(order.status) : null;
+
+    const steps = order ? [
+        {
+            title: "Sipariş Alındı",
+            date: new Date(order.createdAt).toLocaleString("tr-TR", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit"
+            }),
+            active: true,
+            done: true,
+            icon: Package
+        },
+        {
+            title: "Sipariş Hazırlanıyor",
+            date: (order.status === "PREPARING" || order.status === "SHIPPED" || order.status === "COMPLETED")
+                ? "Siparişiniz hazırlanma aşamasında."
+                : "Bekleniyor...",
+            active: order.status === "PREPARING" || order.status === "SHIPPED" || order.status === "COMPLETED",
+            done: order.status === "PREPARING" || order.status === "SHIPPED" || order.status === "COMPLETED",
+            icon: Package
+        },
+        {
+            title: "Kargoya Verildi",
+            date: (order.status === "SHIPPED" || order.status === "COMPLETED")
+                ? (order.shippingProvider ? `${order.shippingProvider} ile kargoya teslim edildi.` : "Kargoya teslim edildi.")
+                : "Henüz kargoya verilmedi.",
+            active: order.status === "SHIPPED" || order.status === "COMPLETED",
+            done: order.status === "SHIPPED" || order.status === "COMPLETED",
+            icon: Truck
+        },
+        {
+            title: "Teslim Edildi",
+            date: order.status === "COMPLETED" ? "Teslimat tamamlandı." : "Henüz teslim edilmedi.",
+            active: order.status === "COMPLETED",
+            done: order.status === "COMPLETED",
+            icon: CheckCircle2
+        }
+    ] : [];
 
     return (
         <div className="w-full px-4 sm:px-6 lg:px-8 pt-1 pb-16 space-y-24">
             <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-16">
                 
-                {/* SOL TARAF - Sidebar (Anasayfaya benzer şekilde) */}
+                {/* SOL TARAF - Sidebar */}
                 <aside className="space-y-6 hidden lg:block">
                     <BannerSection position="home-top" />
                     <PromoSection />
@@ -102,7 +188,7 @@ function OrderTrackingContent() {
                                         <Package size={16} className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-400 transition-colors" />
                                         <input
                                             type="text"
-                                            placeholder="Örn: PX-12345"
+                                            placeholder="Örn: PX-20260522-1234"
                                             required
                                             value={orderId}
                                             onChange={(e) => setOrderId(e.target.value)}
@@ -128,16 +214,34 @@ function OrderTrackingContent() {
 
                             <button
                                 type="submit"
-                                className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-widest py-4 rounded-2xl flex items-center justify-center gap-3 transition-all shadow-xl shadow-blue-600/30 active:scale-95 group text-xs cursor-pointer"
+                                disabled={loading}
+                                className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-widest py-4 rounded-2xl flex items-center justify-center gap-3 transition-all shadow-xl shadow-blue-600/30 active:scale-95 group text-xs cursor-pointer disabled:opacity-50"
                             >
-                                SORGULA VE TAKİP ET
-                                <ArrowRight size={18} className="group-hover:translate-x-1.5 transition-transform" />
+                                {loading ? (
+                                    <>
+                                        <Loader2 className="animate-spin" size={18} />
+                                        SORGULANIYOR...
+                                    </>
+                                ) : (
+                                    <>
+                                        SORGULA VE TAKİP ET
+                                        <ArrowRight size={18} className="group-hover:translate-x-1.5 transition-transform" />
+                                    </>
+                                )}
                             </button>
                         </form>
                     </div>
 
+                    {/* Error Message */}
+                    {error && (
+                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-300 p-6 bg-red-500/10 border border-red-500/20 rounded-3xl flex items-center gap-4 text-red-400">
+                            <AlertCircle size={24} />
+                            <div className="text-sm font-bold">{error}</div>
+                        </div>
+                    )}
+
                     {/* Result Card */}
-                    {showStatus && (
+                    {showStatus && order && (
                         <div className="animate-in fade-in slide-in-from-bottom-8 duration-700">
                             <div className="bg-[#0b1220]/80 backdrop-blur-2xl border border-blue-500/20 rounded-[40px] p-8 lg:p-10 shadow-2xl relative overflow-hidden">
                                 <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/5 blur-[120px] rounded-full -mr-48 -mt-48 pointer-events-none"></div>
@@ -145,45 +249,73 @@ function OrderTrackingContent() {
                                 <div className="flex flex-col md:flex-row items-center justify-between mb-8 border-b border-white/5 pb-8 gap-6">
                                     <div className="text-center md:text-left">
                                         <div className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1.5">Güncel Durum</div>
-                                        <div className="text-xl font-black text-emerald-400 flex items-center justify-center md:justify-start gap-2.5">
-                                            <div className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse shadow-lg shadow-emerald-500/20"></div>
-                                            Kargoya Verildi
+                                        <div className={cn("text-xl font-black flex items-center justify-center md:justify-start gap-2.5", statusInfo?.color)}>
+                                            <div className={cn("w-2.5 h-2.5 rounded-full animate-pulse shadow-lg", statusInfo?.badgeColor === "bg-emerald-500" ? "bg-emerald-500 shadow-emerald-500/20" : statusInfo?.badgeColor === "bg-amber-500" ? "bg-amber-500 shadow-amber-500/20" : statusInfo?.badgeColor === "bg-blue-500" ? "bg-blue-500 shadow-blue-500/20" : statusInfo?.badgeColor === "bg-purple-500" ? "bg-purple-500 shadow-purple-500/20" : "bg-red-500 shadow-red-500/20")}></div>
+                                            {statusInfo?.label}
                                         </div>
                                     </div>
                                     <div className="text-center md:text-right">
-                                        <div className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1.5">Tahmini Teslimat</div>
-                                        <div className="text-xl font-black text-white tracking-tighter">21 Nisan 2024</div>
+                                        <div className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1.5">Sipariş Numarası</div>
+                                        <div className="text-xl font-black text-white tracking-tighter">{order.orderNumber}</div>
                                     </div>
                                 </div>
 
-                                {/* Tracking Timeline */}
-                                <div className="relative pl-10 space-y-10">
-                                    {/* Vertical Line */}
-                                    <div className="absolute left-[11px] top-2 bottom-2 w-1 bg-white/[0.03] rounded-full"></div>
-                                    
-                                    {[
-                                        { title: "Sipariş Hazırlanıyor", date: "18 Nisan 2024, 09:45", active: true, done: true, icon: Package },
-                                        { title: "Kargoya Verildi", date: "19 Nisan 2024, 14:20", active: true, done: true, icon: Truck },
-                                        { title: "Yolda", date: "Siparişiniz transfer merkezinde.", active: true, done: false, icon: Truck },
-                                        { title: "Teslim Edildi", date: "Henüz ulaşmadı.", active: false, done: false, icon: CheckCircle2 },
-                                    ].map((step, i) => (
-                                        <div key={i} className={cn("relative group transition-all duration-500", step.active ? 'opacity-100' : 'opacity-20')}>
-                                            {/* Dot / Icon */}
-                                            <div className={cn(
-                                                "absolute -left-[10px] top-0 w-6 h-6 rounded-full border-4 flex items-center justify-center transition-all duration-500 z-10 shadow-2xl",
-                                                step.done ? "bg-emerald-500 border-slate-950 text-white" : 
-                                                step.active ? "bg-slate-950 border-emerald-500 text-emerald-400" : "bg-slate-950 border-white/10 text-slate-700"
-                                            )}>
-                                                {step.done ? <CheckCircle2 size={10} /> : <div className="w-1 h-1 bg-current rounded-full" />}
-                                            </div>
-                                            
-                                            <div className="pl-6">
-                                                <h3 className={cn("text-base font-black tracking-tight transition-colors", step.active ? "text-white" : "text-slate-600")}>{step.title}</h3>
-                                                <p className="text-xs text-slate-500 font-medium mt-1">{step.date}</p>
-                                            </div>
+                                {order.status === "CANCELLED" ? (
+                                    <div className="p-6 bg-red-500/10 border border-red-500/20 rounded-3xl flex items-center gap-4 text-red-400">
+                                        <AlertCircle size={24} />
+                                        <div>
+                                            <h3 className="font-black text-sm uppercase tracking-wider">Sipariş İptal Edildi</h3>
+                                            <p className="text-xs text-slate-400 mt-1">Bu sipariş iptal edilmiştir. İade veya sorularınız için destek ekibimizle iletişime geçebilirsiniz.</p>
                                         </div>
-                                    ))}
-                                </div>
+                                    </div>
+                                ) : (
+                                    <>
+                                        {/* Tracking Timeline */}
+                                        <div className="relative pl-10 space-y-10">
+                                            {/* Vertical Line */}
+                                            <div className="absolute left-[11px] top-2 bottom-2 w-1 bg-white/[0.03] rounded-full"></div>
+                                            
+                                            {steps.map((step, i) => (
+                                                <div key={i} className={cn("relative group transition-all duration-500", step.active ? 'opacity-100' : 'opacity-20')}>
+                                                    {/* Dot / Icon */}
+                                                    <div className={cn(
+                                                        "absolute -left-[10px] top-0 w-6 h-6 rounded-full border-4 flex items-center justify-center transition-all duration-500 z-10 shadow-2xl",
+                                                        step.done ? "bg-emerald-500 border-slate-950 text-white" : 
+                                                        step.active ? "bg-slate-950 border-emerald-500 text-emerald-400" : "bg-slate-950 border-white/10 text-slate-700"
+                                                    )}>
+                                                        {step.done ? <CheckCircle2 size={10} /> : <div className="w-1 h-1 bg-current rounded-full" />}
+                                                    </div>
+                                                    
+                                                    <div className="pl-6">
+                                                        <h3 className={cn("text-base font-black tracking-tight transition-colors", step.active ? "text-white" : "text-slate-600")}>{step.title}</h3>
+                                                        <p className="text-xs text-slate-500 font-medium mt-1">{step.date}</p>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        {/* Shipping Details Box */}
+                                        {(order.shippingProvider || order.trackingNumber) && (
+                                            <div className="mt-10 p-6 bg-white/[0.02] border border-white/5 rounded-3xl flex flex-col sm:flex-row gap-6 justify-between items-start sm:items-center animate-in zoom-in-95 duration-200">
+                                                <div>
+                                                    <h4 className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1">Kargo Firması</h4>
+                                                    <p className="text-sm font-bold text-white">{order.shippingProvider || "Belirtilmemiş"}</p>
+                                                </div>
+                                                <div>
+                                                    <h4 className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-1">Kargo Takip No</h4>
+                                                    <p className="text-sm font-bold text-blue-400 font-mono tracking-wider">{order.trackingNumber || "Bekleniyor"}</p>
+                                                </div>
+                                                {order.trackingNumber && (
+                                                    <div className="w-full sm:w-auto text-right">
+                                                        <span className="inline-block text-[9px] font-black text-blue-400 uppercase tracking-widest px-4 py-2 border border-blue-500/20 bg-blue-500/10 rounded-xl hover:bg-blue-600 hover:text-white transition-all cursor-pointer select-none">
+                                                            Kargo Takip Sayfası
+                                                        </span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+                                    </>
+                                )}
                             </div>
                         </div>
                     )}

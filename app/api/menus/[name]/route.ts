@@ -10,18 +10,30 @@ export async function GET(
   try {
     const { name } = await params;
 
-    const menu = await db.query.navMenus.findFirst({
-      where: eq(navMenus.name, name),
-      with: {
-        items: {
-          orderBy: [asc(navMenuItems.order)],
-        },
-      },
-    });
+    const rows = await db
+      .select({
+        menu: navMenus,
+        item: navMenuItems,
+      })
+      .from(navMenus)
+      .leftJoin(navMenuItems, eq(navMenus.id, navMenuItems.menuId))
+      .where(eq(navMenus.name, name))
+      .orderBy(asc(navMenuItems.order));
 
-    if (!menu) {
+    if (rows.length === 0) {
       return NextResponse.json({ success: false, message: "Menu not found" }, { status: 404 });
     }
+
+    const menu = {
+      ...rows[0].menu,
+      items: [] as any[],
+    };
+
+    rows.forEach((row) => {
+      if (row.item) {
+        menu.items.push(row.item);
+      }
+    });
 
     // Organize items into a tree structure
     const itemMap = new Map();

@@ -14,27 +14,56 @@ export async function getMenus() {
     return { success: false, error: "Unauthorized" };
   }
 
-  const menus = await db.query.navMenus.findMany({
-    with: {
-      items: {
-        orderBy: [asc(navMenuItems.order)],
-      },
-    },
-  });
+  const rows = await db
+    .select({
+      menu: navMenus,
+      item: navMenuItems,
+    })
+    .from(navMenus)
+    .leftJoin(navMenuItems, eq(navMenus.id, navMenuItems.menuId))
+    .orderBy(asc(navMenuItems.order));
+
+  const menusMap = new Map<string, any>();
+  for (const row of rows) {
+    const menuId = row.menu.id;
+    if (!menusMap.has(menuId)) {
+      menusMap.set(menuId, {
+        ...row.menu,
+        items: [],
+      });
+    }
+    if (row.item) {
+      menusMap.get(menuId).items.push(row.item);
+    }
+  }
+
+  const menus = Array.from(menusMap.values());
   return { success: true, menus };
 }
 
 export async function getPublicMenu(name: string) {
-  const menu = await db.query.navMenus.findFirst({
-    where: eq(navMenus.name, name),
-    with: {
-      items: {
-        orderBy: [asc(navMenuItems.order)],
-      },
-    },
-  });
+  const rows = await db
+    .select({
+      menu: navMenus,
+      item: navMenuItems,
+    })
+    .from(navMenus)
+    .leftJoin(navMenuItems, eq(navMenus.id, navMenuItems.menuId))
+    .where(eq(navMenus.name, name))
+    .orderBy(asc(navMenuItems.order));
 
-  if (!menu) return null;
+  if (rows.length === 0) return null;
+
+  const menu = {
+    ...rows[0].menu,
+    items: [] as any[],
+  };
+
+  rows.forEach((row) => {
+    if (row.item) {
+      menu.items.push(row.item);
+    }
+  });
 
   // Organize into tree
   const itemMap = new Map();
