@@ -82,8 +82,8 @@ export default function CartPage() {
                             <h1 className="text-xl font-semibold text-white">Alışveriş Sepeti</h1>
                             <p className="text-sm text-gray-400 mt-0.5 flex flex-wrap items-center gap-2">
                                 <span>Sepetinizde <span className="text-white font-bold">{totalItems}</span> ürün bulunuyor.</span>
-                                {/* <span className="text-slate-600">|</span> */}
-                                {/* <span className="text-slate-400 font-medium">TOPLAM <span className="text-sky-400 font-bold">{dbProductCount}</span> ÜRÜN</span> */}
+                                <span className="text-slate-600">|</span>
+                                <span className="text-slate-400 font-medium">TOPLAM <span className="text-sky-400 font-bold">{dbProductCount}</span> ÜRÜN</span>
                             </p>
                         </div>
                     </div>
@@ -203,11 +203,14 @@ export default function CartPage() {
                                     </div>
                                 </div>
 
-                                <button className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-full flex items-center justify-center gap-2 transition active:scale-98 group cursor-pointer text-sm uppercase">
+                                <Link 
+                                    href="/odeme"
+                                    className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-full flex items-center justify-center gap-2 transition active:scale-98 group cursor-pointer text-sm uppercase"
+                                >
                                     <CreditCard size={18} />
                                     Güvenle Öde
                                     <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-                                </button>
+                                </Link>
 
                                 <div className="mt-6 flex items-center justify-center gap-2 text-slate-500 text-xs">
                                     <ShieldCheck size={16} className="text-slate-400" />

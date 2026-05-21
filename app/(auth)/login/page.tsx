@@ -61,7 +61,8 @@ export default function LoginPage() {
         if (result.user.role === "ADMIN") {
           router.push("/admin/dashboard");
         } else {
-          router.push("/");
+          const callbackUrl = searchParams.get("callbackUrl") || "/";
+          router.push(callbackUrl);
         }
         router.refresh();
       } else {

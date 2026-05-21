@@ -105,6 +105,8 @@ export async function addAddress(userId: string, data: any) {
             id,
             userId,
             title: data.title,
+            name: data.name,
+            phone: data.phone,
             city: data.city,
             district: data.district,
             addressDetail: data.addressDetail,
