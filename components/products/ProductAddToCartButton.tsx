@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { ShoppingCart, Loader2 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
+import { useCartAnimation } from "@/context/CartAnimationContext";
 
 interface ProductAddToCartButtonProps {
   product: {
@@ -19,17 +20,20 @@ interface ProductAddToCartButtonProps {
 
 export default function ProductAddToCartButton({ product }: ProductAddToCartButtonProps) {
   const { addToCart } = useCart();
+  const { animateAddToCart } = useCartAnimation();
   const [isAdding, setIsAdding] = useState(false);
 
-  const handleAddToCart = async () => {
-    setIsAdding(true);
-    try {
-      await addToCart(product, 1);
-    } catch (error) {
-      console.error("Error adding to cart button:", error);
-    } finally {
-      setIsAdding(false);
-    }
+  const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement>) => {
+    animateAddToCart(e, async () => {
+      setIsAdding(true);
+      try {
+        await addToCart(product, 1);
+      } catch (error) {
+        console.error("Error adding to cart button:", error);
+      } finally {
+        setIsAdding(false);
+      }
+    });
   };
 
   const isOutOfStock = product.stock <= 0;

@@ -3,6 +3,7 @@
 import { Product } from "./newProducts";
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
+import { useCartAnimation } from "@/context/CartAnimationContext";
 
 type BestSellerCardProps = {
     product: Product;
@@ -10,18 +11,21 @@ type BestSellerCardProps = {
 
 export default function ProductsCard({ product }: BestSellerCardProps) {
     const { addToCart } = useCart();
+    const { animateAddToCart } = useCartAnimation();
 
     const handleAddToCart = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        addToCart({
-            id: product.id,
-            name: product.name,
-            slug: product.slug,
-            price: parseFloat(product.price),
-            oldPrice: product.oldPrice ? parseFloat(product.oldPrice) : null,
-            image: product.image,
-            category: product.category
+        animateAddToCart(e, () => {
+            addToCart({
+                id: product.id,
+                name: product.name,
+                slug: product.slug,
+                price: parseFloat(product.price),
+                oldPrice: product.oldPrice ? parseFloat(product.oldPrice) : null,
+                image: product.image,
+                category: product.category
+            });
         });
     };
 

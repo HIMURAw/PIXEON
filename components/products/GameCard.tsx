@@ -3,6 +3,7 @@
 import React from "react";
 import { ShoppingCart } from "lucide-react";
 import { useCart } from "@/context/CartContext";
+import { useCartAnimation } from "@/context/CartAnimationContext";
 
 export type Game = {
     id: number;
@@ -27,19 +28,22 @@ function Stars({ count }: { count: number }) {
 
 export default function GameCard({ g }: { g: Game }) {
     const { addToCart } = useCart();
+    const { animateAddToCart } = useCartAnimation();
 
     const handleAddToCart = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
         
-        addToCart({
-            id: `game_${g.id}`,
-            name: g.name,
-            slug: g.name.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
-            price: parseFloat(g.price.replace(/\./g, "")),
-            oldPrice: g.oldPrice ? parseFloat(g.oldPrice.replace(/\./g, "")) : null,
-            image: g.image,
-            category: g.category
+        animateAddToCart(e, () => {
+            addToCart({
+                id: `game_${g.id}`,
+                name: g.name,
+                slug: g.name.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+                price: parseFloat(g.price.replace(/\./g, "")),
+                oldPrice: g.oldPrice ? parseFloat(g.oldPrice.replace(/\./g, "")) : null,
+                image: g.image,
+                category: g.category
+            });
         });
     };
 

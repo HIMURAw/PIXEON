@@ -20,6 +20,7 @@ export const metadata: Metadata = {
 import Footer from "@/components/footer/Footer";
 import { SupportProvider } from "@/context/SupportContext";
 import { CartProvider } from "@/context/CartContext";
+import { CartAnimationProvider } from "@/context/CartAnimationContext";
 import { Toaster } from "react-hot-toast";
 import SupportWidget from "@/components/support/SupportWidget";
 
@@ -34,10 +35,12 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <CartProvider>
-          <SupportProvider>
-            {children}
-            <SupportWidget />
-          </SupportProvider>
+          <CartAnimationProvider>
+            <SupportProvider>
+              {children}
+              <SupportWidget />
+            </SupportProvider>
+          </CartAnimationProvider>
           <Toaster 
             position="top-right" 
             toastOptions={{
