@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import "../globals.css";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
     LayoutDashboard,
     Package,
@@ -30,7 +31,8 @@ import {
     PenTool,
     ShieldCheck,
     User,
-    Info
+    Info,
+    ChevronDown
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NotificationProvider } from "@/context/NotificationContext";
@@ -39,10 +41,68 @@ import { ChatWindowsContainer } from "@/components/admin/FloatingChatWindow";
 import { NotificationBell } from "@/components/admin/NotificationBell";
 import { Toaster } from "react-hot-toast";
 
+const menuGroups = [
+    {
+        title: "GENEL",
+        items: [
+            { label: "Dashboard", icon: LayoutDashboard, href: "/admin/dashboard" },
+            { label: "Bildirimler", icon: Bell, href: "/admin/notifications" },
+            { label: "Raporlar & Analiz", icon: FileSpreadsheet, href: "/admin/reports" },
+        ]
+    },
+    {
+        title: "KATALOG YÖNETİMİ",
+        items: [
+            { label: "Tüm Ürünler", icon: Package, href: "/admin/products" },
+            { label: "Konsollar", icon: Gamepad2, href: "/admin/products?category=konsollar" },
+            { label: "Oyunlar", icon: Disc, href: "/admin/products?category=oyunlar" },
+            { label: "Aksesuarlar", icon: Headset, href: "/admin/products?category=aksesuarlar" },
+            { label: "Dijital Kodlar", icon: CreditCard, href: "/admin/products?category=dijital-kodlar" },
+            { label: "Kategoriler", icon: Layers, href: "/admin/categories" },
+        ]
+    },
+    {
+        title: "SATIŞ & OPERASYON",
+        items: [
+            { label: "Siparişler", icon: ShoppingCart, href: "/admin/orders" },
+            { label: "Ödemeler", icon: Wallet, href: "/admin/payments" },
+            { label: "Kuponlar", icon: TicketPlus, href: "/admin/coupons" },
+            { label: "Kargo Ayarları", icon: Truck, href: "/admin/shipping" },
+        ]
+    },
+    {
+        title: "MÜŞTERİLER",
+        items: [
+            { label: "Müşteri Listesi", icon: Users, href: "/admin/customers" },
+            { label: "Yorum & Değerlendirme", icon: MessageSquare, href: "/admin/reviews" },
+            { label: "Destek Talepleri", icon: LifeBuoy, href: "/admin/support" },
+        ]
+    },
+    {
+        title: "İÇERİK YÖNETİMİ",
+        items: [
+            { label: "Slider / Hero", icon: MonitorPlay, href: "/admin/content/slider" },
+            { label: "Kampanya Bannerları", icon: Image, href: "/admin/content/banners" },
+            { label: "Sayfalar (CMS)", icon: FileText, href: "/admin/content/pages" },
+            { label: "Blog Yazıları", icon: PenTool, href: "/admin/content/blog" },
+            { label: "Hakkımızda", icon: Info, href: "/admin/content/about" },
+        ]
+    },
+    {
+        title: "AYARLAR",
+        items: [
+            { label: "Genel Ayarlar", icon: Settings, href: "/admin/settings" },
+            { label: "Admin Kullanıcıları", icon: ShieldCheck, href: "/admin/settings/admins" },
+        ]
+    }
+];
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
 
+    const pathname = usePathname();
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [user, setUser] = useState<any>(null);
+    const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -55,61 +115,30 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         fetchUser();
     }, []);
 
-    const menuGroups = [
-        {
-            title: "GENEL",
-            items: [
-                { label: "Dashboard", icon: LayoutDashboard, href: "/admin/dashboard" },
-                { label: "Bildirimler", icon: Bell, href: "/admin/notifications" },
-                { label: "Raporlar & Analiz", icon: FileSpreadsheet, href: "/admin/reports" },
-            ]
-        },
-        {
-            title: "KATALOG YÖNETİMİ",
-            items: [
-                { label: "Tüm Ürünler", icon: Package, href: "/admin/products" },
-                { label: "Konsollar", icon: Gamepad2, href: "/admin/products?category=konsollar" },
-                { label: "Oyunlar", icon: Disc, href: "/admin/products?category=oyunlar" },
-                { label: "Aksesuarlar", icon: Headset, href: "/admin/products?category=aksesuarlar" },
-                { label: "Dijital Kodlar", icon: CreditCard, href: "/admin/products?category=dijital-kodlar" },
-                { label: "Kategoriler", icon: Layers, href: "/admin/categories" },
-            ]
-        },
-        {
-            title: "SATIŞ & OPERASYON",
-            items: [
-                { label: "Siparişler", icon: ShoppingCart, href: "/admin/orders" },
-                { label: "Ödemeler", icon: Wallet, href: "/admin/payments" },
-                { label: "Kuponlar", icon: TicketPlus, href: "/admin/coupons" },
-                { label: "Kargo Ayarları", icon: Truck, href: "/admin/shipping" },
-            ]
-        },
-        {
-            title: "MÜŞTERİLER",
-            items: [
-                { label: "Müşteri Listesi", icon: Users, href: "/admin/customers" },
-                { label: "Yorum & Değerlendirme", icon: MessageSquare, href: "/admin/reviews" },
-                { label: "Destek Talepleri", icon: LifeBuoy, href: "/admin/support" },
-            ]
-        },
-        {
-            title: "İÇERİK YÖNETİMİ",
-            items: [
-                { label: "Slider / Hero", icon: MonitorPlay, href: "/admin/content/slider" },
-                { label: "Kampanya Bannerları", icon: Image, href: "/admin/content/banners" },
-                { label: "Sayfalar (CMS)", icon: FileText, href: "/admin/content/pages" },
-                { label: "Blog Yazıları", icon: PenTool, href: "/admin/content/blog" },
-                { label: "Hakkımızda", icon: Info, href: "/admin/content/about" },
-            ]
-        },
-        {
-            title: "AYARLAR",
-            items: [
-                { label: "Genel Ayarlar", icon: Settings, href: "/admin/settings" },
-                { label: "Admin Kullanıcıları", icon: ShieldCheck, href: "/admin/settings/admins" },
-            ]
+    useEffect(() => {
+        if (pathname && user) {
+            const activeGroup = menuGroups.find(group =>
+                group.items.some(item => {
+                    const itemPath = item.href.split("?")[0];
+                    const currentPath = pathname.split("?")[0];
+                    return currentPath === itemPath || currentPath.startsWith(itemPath + "/");
+                })
+            );
+            if (activeGroup) {
+                setOpenGroups(prev => ({
+                    ...prev,
+                    [activeGroup.title]: true
+                }));
+            }
         }
-    ];
+    }, [pathname, user]);
+
+    const toggleGroup = (title: string) => {
+        setOpenGroups(prev => ({
+            ...prev,
+            [title]: !prev[title]
+        }));
+    };
 
     // Yetki Kontrolü
     const filteredMenuGroups = menuGroups.filter(group => {
@@ -158,33 +187,49 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                         </div>
 
                         {/* Nav Links */}
-                        <nav className="flex-1 py-6 px-3 space-y-8 overflow-y-auto custom-scrollbar">
-                            {filteredMenuGroups.map((group) => (
-                                <div key={group.title} className="space-y-2">
-                                    {isSidebarOpen && (
-                                        <h3 className="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">
-                                            {group.title}
-                                        </h3>
-                                    )}
-                                    <div className="space-y-1">
-                                        {group.items.map((item) => (
-                                            <Link
-                                                key={item.label}
-                                                href={item.href}
-                                                className="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-400 hover:bg-white/5 hover:text-white transition-all group relative"
+                        <nav className="flex-1 py-6 px-3 space-y-6 overflow-y-auto custom-scrollbar">
+                            {filteredMenuGroups.map((group) => {
+                                const isOpen = !isSidebarOpen || !!openGroups[group.title];
+                                return (
+                                    <div key={group.title} className="space-y-2">
+                                        {isSidebarOpen && (
+                                            <button
+                                                onClick={() => toggleGroup(group.title)}
+                                                className="w-full flex items-center justify-between px-3 text-[10px] font-bold text-slate-500 hover:text-slate-200 uppercase tracking-widest transition-colors select-none text-left focus:outline-none group/btn"
                                             >
-                                                <item.icon size={18} className="group-hover:text-blue-400 transition-colors" />
-                                                {isSidebarOpen && <span className="font-medium text-xs">{item.label}</span>}
-                                                {!isSidebarOpen && (
-                                                    <div className="absolute left-full ml-2 px-2 py-1 bg-slate-900 border border-white/10 rounded text-[10px] whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50">
-                                                        {item.label}
-                                                    </div>
-                                                )}
-                                            </Link>
-                                        ))}
+                                                <span>{group.title}</span>
+                                                <ChevronDown
+                                                    size={12}
+                                                    className={cn(
+                                                        "transition-transform duration-200 text-slate-600 group-hover/btn:text-slate-300",
+                                                        isOpen ? "rotate-0" : "-rotate-90"
+                                                    )}
+                                                />
+                                            </button>
+                                        )}
+                                        <div className={cn(
+                                            "space-y-1 transition-all duration-300 ease-in-out overflow-hidden",
+                                            isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0 pointer-events-none"
+                                        )}>
+                                            {group.items.map((item) => (
+                                                <Link
+                                                    key={item.label}
+                                                    href={item.href}
+                                                    className="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-400 hover:bg-white/5 hover:text-white transition-all group relative"
+                                                >
+                                                    <item.icon size={18} className="group-hover:text-blue-400 transition-colors" />
+                                                    {isSidebarOpen && <span className="font-medium text-xs">{item.label}</span>}
+                                                    {!isSidebarOpen && (
+                                                        <div className="absolute left-full ml-2 px-2 py-1 bg-slate-900 border border-white/10 rounded text-[10px] whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50">
+                                                            {item.label}
+                                                        </div>
+                                                    )}
+                                                </Link>
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </nav>
 
                         {/* Logout / Footer */}
