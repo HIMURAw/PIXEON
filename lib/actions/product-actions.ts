@@ -2,7 +2,7 @@
 
 import { db } from "@/lib/db";
 import { products, categories } from "@/lib/db/schema";
-import { eq, desc, and, gte, like, or } from "drizzle-orm";
+import { eq, desc, and, gte, like, or, count } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import fs from "fs/promises";
 import path from "path";
@@ -226,5 +226,15 @@ export async function deleteProduct(id: string) {
   } catch (error) {
     console.error("Error deleting product:", error);
     return { success: false, error: "Product could not be deleted." };
+  }
+}
+
+export async function getDatabaseProductCount() {
+  try {
+    const result = await db.select({ value: count(products.id) }).from(products);
+    return Number(result[0]?.value || 0);
+  } catch (error) {
+    console.error("Error fetching database product count:", error);
+    return 0;
   }
 }

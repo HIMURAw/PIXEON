@@ -1,12 +1,28 @@
 "use client";
+import React from "react";
 import { Menu, ChevronDown } from "lucide-react";
+import { getDatabaseProductCount } from "@/lib/actions/product-actions";
 
 interface CategoriesButtonProps {
     isOpen: boolean;
     onToggle: () => void;
 }
 
+
 export default function CategoriesButton({ isOpen, onToggle }: CategoriesButtonProps) {
+    const [dbProductCount, setDbProductCount] = React.useState<number>(0);
+
+    React.useEffect(() => {
+        async function fetchCount() {
+            try {
+                const count = await getDatabaseProductCount();
+                setDbProductCount(count);
+            } catch (error) {
+                console.error("Error loading product count:", error);
+            }
+        }
+        fetchCount();
+    }, []);
     return (
         <div className="relative">
             <button
@@ -27,7 +43,7 @@ export default function CategoriesButton({ isOpen, onToggle }: CategoriesButtonP
             <span className="absolute left-1/2 -translate-x-1/2 -bottom-3
                              bg-slate-800 text-sky-400 text-[10px] font-extrabold
                              px-3 py-1 rounded-full whitespace-nowrap shadow-md">
-                TOPLAM 63 ÜRÜN
+                TOPLAM {dbProductCount} ÜRÜN
             </span>
         </div>
     );

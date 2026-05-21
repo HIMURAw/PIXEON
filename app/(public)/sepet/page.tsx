@@ -22,6 +22,7 @@ import {
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/context/CartContext";
+import { getDatabaseProductCount } from "@/lib/actions/product-actions";
 
 export default function CartPage() {
     const { 
@@ -31,8 +32,23 @@ export default function CartPage() {
         removeFromCart, 
         subtotal, 
         shipping, 
-        total 
+        total,
+        totalItems
     } = useCart();
+
+    const [dbProductCount, setDbProductCount] = React.useState<number>(0);
+
+    React.useEffect(() => {
+        async function fetchCount() {
+            try {
+                const count = await getDatabaseProductCount();
+                setDbProductCount(count);
+            } catch (error) {
+                console.error("Error loading product count:", error);
+            }
+        }
+        fetchCount();
+    }, []);
 
     if (loading) {
         return (
@@ -64,8 +80,10 @@ export default function CartPage() {
                         </Link>
                         <div>
                             <h1 className="text-xl font-semibold text-white">Alışveriş Sepeti</h1>
-                            <p className="text-sm text-gray-400 mt-0.5">
-                                Sepetinizde <span className="text-white font-bold">{cartItems.length}</span> ürün bulunuyor.
+                            <p className="text-sm text-gray-400 mt-0.5 flex flex-wrap items-center gap-2">
+                                <span>Sepetinizde <span className="text-white font-bold">{totalItems}</span> ürün bulunuyor.</span>
+                                {/* <span className="text-slate-600">|</span> */}
+                                {/* <span className="text-slate-400 font-medium">TOPLAM <span className="text-sky-400 font-bold">{dbProductCount}</span> ÜRÜN</span> */}
                             </p>
                         </div>
                     </div>
