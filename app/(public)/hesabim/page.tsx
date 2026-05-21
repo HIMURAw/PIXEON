@@ -32,6 +32,48 @@ import { NotificationToast, ConfirmModal } from "@/components/ui/Feedback";
 import type { NotificationType } from "@/components/ui/Feedback";
 import { getWishlist, toggleWishlist } from "@/lib/actions/wishlist-actions";
 import toast from "react-hot-toast";
+import { getUserOrders } from "@/lib/actions/order-actions";
+
+const getStatusInfo = (status: string) => {
+    switch (status) {
+        case "PENDING":
+            return { 
+                label: "Onay Bekliyor", 
+                color: "text-amber-400", 
+                bulletBg: "bg-amber-500 shadow-amber-500/20" 
+            };
+        case "PREPARING":
+            return { 
+                label: "Hazırlanıyor", 
+                color: "text-blue-400", 
+                bulletBg: "bg-blue-500 shadow-blue-500/20" 
+            };
+        case "SHIPPED":
+            return { 
+                label: "Kargoya Verildi", 
+                color: "text-purple-400", 
+                bulletBg: "bg-purple-500 shadow-purple-500/20" 
+            };
+        case "COMPLETED":
+            return { 
+                label: "Teslim Edildi", 
+                color: "text-emerald-400", 
+                bulletBg: "bg-emerald-500 shadow-emerald-500/20" 
+            };
+        case "CANCELLED":
+            return { 
+                label: "İptal Edildi", 
+                color: "text-red-400", 
+                bulletBg: "bg-red-500 shadow-red-500/20" 
+            };
+        default:
+            return { 
+                label: "Bilinmiyor", 
+                color: "text-slate-400", 
+                bulletBg: "bg-slate-500 shadow-slate-500/20" 
+            };
+    }
+};
 
 type TabType = "dashboard" | "orders" | "addresses" | "profile" | "favorites";
 
@@ -39,6 +81,8 @@ export default function AccountPage() {
     const [activeTab, setActiveTab] = useState<TabType>("dashboard");
     const [user, setUser] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    const [orders, setOrders] = useState<any[]>([]);
+    const [ordersLoading, setOrdersLoading] = useState(true);
     const [notification, setNotification] = useState<{ message: string; type: NotificationType } | null>(null);
     const router = useRouter();
 
@@ -64,6 +108,20 @@ export default function AccountPage() {
         return formatted;
     };
 
+    const fetchOrders = async (userId: string) => {
+        setOrdersLoading(true);
+        try {
+            const res = await getUserOrders(userId);
+            if (res.success && res.orders) {
+                setOrders(res.orders);
+            }
+        } catch (err) {
+            console.error("Error fetching orders:", err);
+        } finally {
+            setOrdersLoading(false);
+        }
+    };
+
     useEffect(() => {
         const fetchUser = async () => {
             try {
@@ -71,6 +129,7 @@ export default function AccountPage() {
                 const data = await res.json();
                 if (data.success) {
                     setUser(data.user);
+                    fetchOrders(data.user.id);
                 } else {
                     router.push("/login");
                 }
@@ -200,8 +259,20 @@ export default function AccountPage() {
                         <div className="bg-[#0b1220]/30 backdrop-blur-md border border-white/5 rounded-[48px] p-8 lg:p-12 min-h-[700px] shadow-2xl relative overflow-hidden">
                             <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-blue-600/5 blur-[120px] rounded-full -mr-48 -mt-48 pointer-events-none"></div>
 
-                            {activeTab === "dashboard" && <DashboardView user={user} setActiveTab={setActiveTab} />}
-                            {activeTab === "orders" && <OrdersView />}
+                            {activeTab === "dashboard" && (
+                                <DashboardView 
+                                    user={user} 
+                                    orders={orders} 
+                                    loading={ordersLoading} 
+                                    setActiveTab={setActiveTab} 
+                                />
+                            )}
+                            {activeTab === "orders" && (
+                                <OrdersView 
+                                    orders={orders} 
+                                    loading={ordersLoading} 
+                                />
+                            )}
                             {activeTab === "addresses" && <AddressesView user={user} showNotification={showNotification} formatPhone={formatPhoneNumber} />}
                             {activeTab === "profile" && <ProfileView user={user} setUser={setUser} showNotification={showNotification} formatPhone={formatPhoneNumber} />}
                             {activeTab === "favorites" && <FavoritesView userId={user?.id} />}
@@ -223,7 +294,17 @@ export default function AccountPage() {
     );
 }
 
-function DashboardView({ user, setActiveTab }: { user: any, setActiveTab: (tab: TabType) => void }) {
+function DashboardView({ 
+    user, 
+    orders, 
+    loading, 
+    setActiveTab 
+}: { 
+    user: any; 
+    orders: any[]; 
+    loading: boolean; 
+    setActiveTab: (tab: TabType) => void; 
+}) {
     return (
         <div className="space-y-12 animate-in fade-in duration-700 relative z-10">
             <div>
@@ -233,7 +314,7 @@ function DashboardView({ user, setActiveTab }: { user: any, setActiveTab: (tab: 
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {[
-                    { label: "Siparişler", value: "12", icon: Package, color: "text-blue-400", bg: "bg-blue-400/10" },
+                    { label: "Siparişler", value: loading ? "..." : orders.length.toString(), icon: Package, color: "text-blue-400", bg: "bg-blue-400/10" },
                     { label: "Favoriler", value: user?.wishlistCount || "0", icon: Heart, color: "text-red-400", bg: "bg-red-400/10" },
                     { label: "Cüzdan", value: "₺250", icon: CreditCard, color: "text-emerald-400", bg: "bg-emerald-400/10" },
                 ].map((stat, i) => (
@@ -255,33 +336,104 @@ function DashboardView({ user, setActiveTab }: { user: any, setActiveTab: (tab: 
                     <button onClick={() => setActiveTab("orders")} className="text-blue-400 text-xs font-black uppercase tracking-widest hover:text-blue-300 transition-colors">Tümünü Gör →</button>
                 </div>
 
-                <div className="group p-8 bg-white/[0.03] border border-white/5 rounded-[40px] hover:border-blue-500/30 transition-all duration-500 flex flex-col md:flex-row items-center gap-10">
-                    <div className="w-32 h-32 bg-slate-950 rounded-[32px] overflow-hidden border border-white/5 flex items-center justify-center p-4 shadow-2xl group-hover:scale-105 transition-transform duration-500">
-                        <Image src="/products/ps5-slim.png" alt="Product" width={100} height={100} className="object-contain" />
+                {loading ? (
+                    <div className="p-8 bg-white/[0.03] border border-white/5 rounded-[40px] text-center text-slate-400 font-bold uppercase tracking-wider text-xs">
+                        Sipariş yükleniyor...
                     </div>
-                    <div className="flex-1 text-center md:text-left space-y-2">
-                        <div className="flex items-center justify-center md:justify-start gap-2 mb-2">
-                            <span className="px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full text-[10px] font-black uppercase tracking-widest">Teslim Edildi</span>
-                        </div>
-                        <h3 className="font-black text-xl text-white tracking-tight">PlayStation 5 Slim Standart Edition</h3>
-                        <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">Sipariş No: #PX-98231 • 12 Nisan 2024</p>
+                ) : orders.length === 0 ? (
+                    <div className="p-8 bg-white/[0.03] border border-white/5 rounded-[40px] text-center text-slate-500 font-medium">
+                        Henüz siparişiniz bulunmamaktadır.
                     </div>
-                    <div className="flex flex-col items-center md:items-end gap-2">
-                        <div className="text-2xl font-black text-white tracking-tighter">₺18.999</div>
-                        <button className="text-[10px] font-black text-blue-400 uppercase tracking-widest hover:underline">Detayları Gör</button>
-                    </div>
-                </div>
+                ) : (
+                    (() => {
+                        const lastOrder = orders[0];
+                        const dateFormatted = new Date(lastOrder.createdAt).toLocaleDateString("tr-TR", {
+                            day: "numeric",
+                            month: "long",
+                            year: "numeric"
+                        });
+                        const totalFormatted = lastOrder.totalAmount.toLocaleString("tr-TR", {
+                            style: "currency",
+                            currency: "TRY"
+                        });
+                        const statusInfo = getStatusInfo(lastOrder.status);
+                        
+                        const firstItem = lastOrder.items?.[0];
+                        const productImage = firstItem?.productImage || "/products/placeholder.png";
+                        const productName = firstItem?.productName || "Sipariş Ögeleri";
+                        const otherItemsCount = (lastOrder.items?.length || 1) - 1;
+                        const displayName = otherItemsCount > 0 ? `${productName} (+${otherItemsCount} ürün)` : productName;
+
+                        return (
+                            <div className="group p-8 bg-white/[0.03] border border-white/5 rounded-[40px] hover:border-blue-500/30 transition-all duration-500 flex flex-col md:flex-row items-center gap-10">
+                                <div className="w-32 h-32 bg-slate-950 rounded-[32px] overflow-hidden border border-white/5 flex items-center justify-center p-4 shadow-2xl group-hover:scale-105 transition-transform duration-500 relative">
+                                    <img src={productImage} alt={productName} className="object-contain max-h-full max-w-full" />
+                                </div>
+                                <div className="flex-1 text-center md:text-left space-y-2">
+                                    <div className="flex items-center justify-center md:justify-start gap-2 mb-2">
+                                        <span className={cn("px-3 py-1 border rounded-full text-[10px] font-black uppercase tracking-widest", 
+                                            lastOrder.status === "COMPLETED" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" :
+                                            lastOrder.status === "PENDING" ? "bg-amber-500/10 text-amber-400 border-amber-500/20" :
+                                            lastOrder.status === "PREPARING" ? "bg-blue-500/10 text-blue-400 border-blue-500/20" :
+                                            lastOrder.status === "SHIPPED" ? "bg-purple-500/10 text-purple-400 border-purple-500/20" :
+                                            "bg-red-500/10 text-red-400 border-red-500/20"
+                                        )}>
+                                            {statusInfo.label}
+                                        </span>
+                                    </div>
+                                    <h3 className="font-black text-xl text-white tracking-tight">{displayName}</h3>
+                                    <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">Sipariş No: #{lastOrder.orderNumber} • {dateFormatted}</p>
+                                </div>
+                                <div className="flex flex-col items-center md:items-end gap-2">
+                                    <div className="text-2xl font-black text-white tracking-tighter">{totalFormatted}</div>
+                                    <Link href={`/siparis-takibi?orderNumber=${lastOrder.orderNumber}`} className="text-[10px] font-black text-blue-400 uppercase tracking-widest hover:underline">
+                                        Detayları Gör
+                                    </Link>
+                                </div>
+                            </div>
+                        );
+                    })()
+                )}
             </div>
         </div>
     );
 }
 
-function OrdersView() {
-    const orders = [
-        { id: "#PX-98231", date: "12 Nisan 2024", total: "18.999 TL", status: "Teslim Edildi", items: "1 Ürün", type: "Console" },
-        { id: "#PX-97512", date: "05 Mart 2024", total: "1.249 TL", status: "Teslim Edildi", items: "1 Ürün", type: "Game" },
-        { id: "#PX-96104", date: "22 Ocak 2024", total: "3.499 TL", status: "Teslim Edildi", items: "1 Ürün", type: "Accessory" },
-    ];
+function OrdersView({ orders, loading }: { orders: any[]; loading: boolean }) {
+    if (loading) {
+        return (
+            <div className="space-y-12 animate-in fade-in duration-700 relative z-10">
+                <div>
+                    <h2 className="text-3xl font-black text-white tracking-tight mb-3">Sipariş Geçmişi</h2>
+                    <p className="text-slate-500 font-medium leading-relaxed">Geçmişten bugüne tüm satın alımlarını buradan takip edebilirsin.</p>
+                </div>
+                <div className="text-center py-12 text-slate-400 font-bold uppercase tracking-wider text-xs">Siparişler yükleniyor...</div>
+            </div>
+        );
+    }
+
+    if (orders.length === 0) {
+        return (
+            <div className="space-y-12 animate-in fade-in duration-700 relative z-10">
+                <div>
+                    <h2 className="text-3xl font-black text-white tracking-tight mb-3">Sipariş Geçmişi</h2>
+                    <p className="text-slate-500 font-medium leading-relaxed">Geçmişten bugüne tüm satın alımlarını buradan takip edebilirsin.</p>
+                </div>
+                <div className="py-20 text-center bg-white/[0.02] border-2 border-dashed border-white/5 rounded-[48px] space-y-6">
+                    <div className="w-20 h-20 bg-slate-900 rounded-3xl flex items-center justify-center mx-auto border border-white/5 text-slate-700">
+                        <ShoppingBag size={40} />
+                    </div>
+                    <div className="max-w-md mx-auto space-y-2">
+                        <h3 className="text-xl font-black text-white">Henüz Siparişiniz Yok</h3>
+                        <p className="text-xs text-slate-500 leading-relaxed">Harika oyun ve donanımları keşfetmek için hemen alışverişe başla!</p>
+                    </div>
+                    <Link href="/" className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-black text-xs uppercase tracking-widest px-8 py-4 rounded-2xl shadow-xl shadow-blue-600/20 active:scale-95 transition-all">
+                        Alışverişe Başla
+                    </Link>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-12 animate-in fade-in duration-700 relative z-10">
@@ -291,39 +443,55 @@ function OrdersView() {
             </div>
 
             <div className="space-y-6">
-                {orders.map((order) => (
-                    <div key={order.id} className="group p-8 bg-white/[0.02] border border-white/5 rounded-[40px] hover:bg-white/[0.04] hover:border-white/10 transition-all duration-500 flex flex-col md:flex-row md:items-center justify-between gap-8">
-                        <div className="flex items-center gap-6">
-                            <div className="w-16 h-16 bg-slate-950 rounded-2xl border border-white/5 flex items-center justify-center text-slate-600 group-hover:text-blue-400 transition-colors shadow-2xl">
-                                <Package size={32} />
-                            </div>
-                            <div>
-                                <div className="text-lg font-black text-white tracking-tight">{order.id}</div>
-                                <div className="text-xs text-slate-500 font-bold uppercase tracking-widest mt-1">{order.date}</div>
-                            </div>
-                        </div>
-                        <div className="flex flex-wrap items-center gap-12 lg:gap-20">
-                            <div className="hidden sm:block">
-                                <div className="text-[10px] text-slate-600 uppercase font-black tracking-widest mb-2">Miktar</div>
-                                <div className="text-sm font-bold text-slate-300">{order.items}</div>
-                            </div>
-                            <div>
-                                <div className="text-[10px] text-slate-600 uppercase font-black tracking-widest mb-2">Durum</div>
-                                <div className="flex items-center gap-2 text-emerald-400 text-xs font-black uppercase tracking-widest">
-                                    <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-lg shadow-emerald-500/20"></div>
-                                    {order.status}
+                {orders.map((order) => {
+                    const dateFormatted = new Date(order.createdAt).toLocaleDateString("tr-TR", {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric"
+                    });
+                    
+                    const totalFormatted = order.totalAmount.toLocaleString("tr-TR", {
+                        style: "currency",
+                        currency: "TRY"
+                    });
+
+                    const statusInfo = getStatusInfo(order.status);
+                    const itemCount = (order.items || []).reduce((acc: number, item: any) => acc + item.quantity, 0);
+
+                    return (
+                        <div key={order.id} className="group p-8 bg-white/[0.02] border border-white/5 rounded-[40px] hover:bg-white/[0.04] hover:border-white/10 transition-all duration-500 flex flex-col md:flex-row md:items-center justify-between gap-8">
+                            <div className="flex items-center gap-6">
+                                <div className="w-16 h-16 bg-slate-950 rounded-2xl border border-white/5 flex items-center justify-center text-slate-600 group-hover:text-blue-400 transition-colors shadow-2xl">
+                                    <Package size={32} />
+                                </div>
+                                <div>
+                                    <div className="text-lg font-black text-white tracking-tight">{order.orderNumber}</div>
+                                    <div className="text-xs text-slate-500 font-bold uppercase tracking-widest mt-1">{dateFormatted}</div>
                                 </div>
                             </div>
-                            <div className="md:text-right">
-                                <div className="text-[10px] text-slate-600 uppercase font-black tracking-widest mb-2">Toplam Tutar</div>
-                                <div className="text-xl font-black text-white tracking-tighter">{order.total}</div>
+                            <div className="flex flex-wrap items-center gap-12 lg:gap-20">
+                                <div className="hidden sm:block">
+                                    <div className="text-[10px] text-slate-600 uppercase font-black tracking-widest mb-2">Miktar</div>
+                                    <div className="text-sm font-bold text-slate-300">{itemCount} Ürün</div>
+                                </div>
+                                <div>
+                                    <div className="text-[10px] text-slate-600 uppercase font-black tracking-widest mb-2">Durum</div>
+                                    <div className={cn("flex items-center gap-2 text-xs font-black uppercase tracking-widest", statusInfo.color)}>
+                                        <div className={cn("w-2 h-2 rounded-full animate-pulse shadow-lg", statusInfo.bulletBg)}></div>
+                                        {statusInfo.label}
+                                    </div>
+                                </div>
+                                <div className="md:text-right">
+                                    <div className="text-[10px] text-slate-600 uppercase font-black tracking-widest mb-2">Toplam Tutar</div>
+                                    <div className="text-xl font-black text-white tracking-tighter">{totalFormatted}</div>
+                                </div>
                             </div>
+                            <Link href={`/siparis-takibi?orderNumber=${order.orderNumber}`} className="p-3 bg-white/5 border border-white/5 rounded-2xl text-slate-500 hover:text-white hover:bg-blue-600 transition-all flex items-center justify-center">
+                                <ChevronRight size={20} />
+                            </Link>
                         </div>
-                        <button className="p-3 bg-white/5 border border-white/5 rounded-2xl text-slate-500 hover:text-white hover:bg-blue-600 transition-all">
-                            <ChevronRight size={20} />
-                        </button>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
         </div>
     );
