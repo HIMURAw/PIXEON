@@ -63,6 +63,28 @@ export default function AdminCustomers() {
     });
     const [settingsSaving, setSettingsSaving] = useState(false);
 
+    // Custom Confirmation State
+    const [confirmModal, setConfirmModal] = useState<{
+        isOpen: boolean;
+        title: string;
+        message: string;
+        confirmText: string;
+        cancelText: string;
+        type: "danger" | "warning" | "info" | "prompt";
+        placeholder?: string;
+        defaultValue?: string;
+        onConfirm: (inputValue?: string) => void;
+    }>({
+        isOpen: false,
+        title: "",
+        message: "",
+        confirmText: "Onayla",
+        cancelText: "İptal",
+        type: "info",
+        onConfirm: () => {}
+    });
+    const [promptValue, setPromptValue] = useState("");
+
     useEffect(() => {
         const timer = setTimeout(() => {
             setDebouncedSearch(search);
@@ -130,69 +152,113 @@ export default function AdminCustomers() {
 
     const handleResetPassword = async () => {
         if (!selectedCustomerId || !customerDetails?.user) return;
-        if (!confirm(`"${customerDetails.user.name}" adlı kullanıcının şifresini sıfırlamak istediğinize emin misiniz?`)) {
-            return;
-        }
-        const res = await resetUserPassword(selectedCustomerId);
-        if (res.success) {
-            toast.success(res.message || "Şifre başarıyla sıfırlandı.");
-        } else {
-            toast.error(res.error || "Şifre sıfırlanamadı.");
-        }
+        setConfirmModal({
+            isOpen: true,
+            title: "Şifre Sıfırlama",
+            message: `"${customerDetails.user.name}" adlı kullanıcının şifresini sıfırlamak istediğinize emin misiniz?`,
+            confirmText: "Şifreyi Sıfırla",
+            cancelText: "İptal",
+            type: "warning",
+            onConfirm: async () => {
+                const res = await resetUserPassword(selectedCustomerId);
+                if (res.success) {
+                    toast.success(res.message || "Şifre başarıyla sıfırlandı.");
+                } else {
+                    toast.error(res.error || "Şifre sıfırlanamadı.");
+                }
+            }
+        });
     };
 
     const handleToggleRole = async (makeAdmin: boolean) => {
         if (!selectedCustomerId || !customerDetails?.user) return;
         
-        let adminRole = "Editor";
         if (makeAdmin) {
-            const roleInput = prompt("Yönetici rolünü girin (örn: Editor, Admin, Manager):", "Editor");
-            if (roleInput === null) return; // cancelled
-            if (roleInput.trim()) adminRole = roleInput.trim();
+            setPromptValue("Editor");
+            setConfirmModal({
+                isOpen: true,
+                title: "Yönetici Rolü Tanımla",
+                message: `"${customerDetails.user.name}" kullanıcısını yönetici yapmaktasınız. Lütfen rol tanımını girin (örn: Editor, Admin, Manager):`,
+                confirmText: "Yetkilendir",
+                cancelText: "İptal",
+                type: "prompt",
+                placeholder: "Rol adı",
+                onConfirm: async (val) => {
+                    const adminRole = val?.trim() || "Editor";
+                    const res = await toggleUserRole(selectedCustomerId, true, adminRole);
+                    if (res.success) {
+                        toast.success("Kullanıcı yönetici yapıldı.");
+                        fetchCustomers();
+                        handleOpenDetails(selectedCustomerId);
+                    } else {
+                        toast.error(res.error || "İşlem başarısız.");
+                    }
+                }
+            });
         } else {
-            if (!confirm(`"${customerDetails.user.name}" adlı yöneticinin yetkilerini kaldırmak istediğinize emin misiniz?`)) {
-                return;
-            }
-        }
-
-        const res = await toggleUserRole(selectedCustomerId, makeAdmin, adminRole);
-        if (res.success) {
-            toast.success(makeAdmin ? "Kullanıcı yönetici yapıldı." : "Yönetici yetkileri kaldırıldı.");
-            fetchCustomers();
-            handleOpenDetails(selectedCustomerId);
-        } else {
-            toast.error(res.error || "İşlem başarısız.");
+            setConfirmModal({
+                isOpen: true,
+                title: "Yetki Kaldırma",
+                message: `"${customerDetails.user.name}" adlı yöneticinin yetkilerini kaldırmak istediğinize emin misiniz?`,
+                confirmText: "Yetkileri Kaldır",
+                cancelText: "İptal",
+                type: "danger",
+                onConfirm: async () => {
+                    const res = await toggleUserRole(selectedCustomerId, false, "Editor");
+                    if (res.success) {
+                        toast.success("Yönetici yetkileri kaldırıldı.");
+                        fetchCustomers();
+                        handleOpenDetails(selectedCustomerId);
+                    } else {
+                        toast.error(res.error || "İşlem başarısız.");
+                    }
+                }
+            });
         }
     };
 
     const handleDeleteFromModal = async () => {
         if (!selectedCustomerId || !customerDetails?.user) return;
         const name = customerDetails.user.name;
-        if (!confirm(`"${name}" adlı müşteriyi silmek istediğinize emin misiniz?`)) {
-            return;
-        }
-        const res = await deleteUser(selectedCustomerId);
-        if (res.success) {
-            toast.success("Müşteri başarıyla silindi.");
-            setSelectedCustomerId(null);
-            setCustomerDetails(null);
-            fetchCustomers();
-        } else {
-            toast.error(res.error || "Müşteri silinemedi.");
-        }
+        setConfirmModal({
+            isOpen: true,
+            title: "Müşteriyi Sil",
+            message: `"${name}" adlı müşteriyi silmek istediğinize emin misiniz? Bu işlem geri alınamaz.`,
+            confirmText: "Kullanıcıyı Sil",
+            cancelText: "İptal",
+            type: "danger",
+            onConfirm: async () => {
+                const res = await deleteUser(selectedCustomerId);
+                if (res.success) {
+                    toast.success("Müşteri başarıyla silindi.");
+                    setSelectedCustomerId(null);
+                    setCustomerDetails(null);
+                    fetchCustomers();
+                } else {
+                    toast.error(res.error || "Müşteri silinemedi.");
+                }
+            }
+        });
     };
 
     const handleDeleteCustomer = async (userId: string, name: string) => {
-        if (!confirm(`"${name}" adlı müşteriyi silmek istediğinize emin misiniz?`)) {
-            return;
-        }
-        const res = await deleteUser(userId);
-        if (res.success) {
-            toast.success("Müşteri başarıyla silindi.");
-            fetchCustomers();
-        } else {
-            toast.error(res.error || "Müşteri silinemedi.");
-        }
+        setConfirmModal({
+            isOpen: true,
+            title: "Müşteriyi Sil",
+            message: `"${name}" adlı müşteriyi silmek istediğinize emin misiniz? Bu işlem geri alınamaz.`,
+            confirmText: "Müşteriyi Sil",
+            cancelText: "İptal",
+            type: "danger",
+            onConfirm: async () => {
+                const res = await deleteUser(userId);
+                if (res.success) {
+                    toast.success("Müşteri başarıyla silindi.");
+                    fetchCustomers();
+                } else {
+                    toast.error(res.error || "Müşteri silinemedi.");
+                }
+            }
+        });
     };
 
     const renderPageButtons = () => {
@@ -813,6 +879,69 @@ export default function AdminCustomers() {
                                 className="px-5 py-2.5 bg-slate-900 border border-white/10 rounded-xl text-sm font-bold text-slate-300 hover:text-white transition-all shadow-lg active:scale-95"
                             >
                                 Kapat
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Custom Confirmation Modal */}
+            {confirmModal.isOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
+                    <div className="bg-[#020617] border border-white/10 rounded-3xl max-w-md w-full overflow-hidden shadow-2xl animate-in scale-in duration-300 p-6 space-y-6">
+                        <div className="flex items-start gap-4">
+                            <div className={cn(
+                                "p-3 rounded-2xl flex-shrink-0",
+                                confirmModal.type === "danger" && "bg-red-500/10 text-red-400 border border-red-500/20",
+                                confirmModal.type === "warning" && "bg-amber-500/10 text-amber-400 border border-amber-500/20",
+                                confirmModal.type === "prompt" && "bg-blue-500/10 text-blue-400 border border-blue-500/20",
+                                confirmModal.type === "info" && "bg-slate-500/10 text-slate-400 border border-slate-500/20"
+                            )}>
+                                {confirmModal.type === "danger" && <Trash2 size={24} />}
+                                {confirmModal.type === "warning" && <Lock size={24} />}
+                                {confirmModal.type === "prompt" && <Shield size={24} />}
+                                {confirmModal.type === "info" && <ShieldCheck size={24} />}
+                            </div>
+                            <div className="flex-1 space-y-1">
+                                <h3 className="font-extrabold text-white text-lg leading-tight">{confirmModal.title}</h3>
+                                <p className="text-sm text-slate-400 leading-normal">{confirmModal.message}</p>
+                            </div>
+                        </div>
+
+                        {confirmModal.type === "prompt" && (
+                            <div className="space-y-2">
+                                <input
+                                    type="text"
+                                    value={promptValue}
+                                    onChange={(e) => setPromptValue(e.target.value)}
+                                    placeholder={confirmModal.placeholder || "Değer girin..."}
+                                    className="w-full bg-slate-950 border border-white/10 rounded-2xl px-4 py-3 text-sm text-white outline-none focus:border-blue-500/50 transition-all placeholder:text-slate-600"
+                                    autoFocus
+                                />
+                            </div>
+                        )}
+
+                        <div className="flex items-center justify-end gap-3 pt-2">
+                            <button
+                                onClick={() => setConfirmModal(prev => ({ ...prev, isOpen: false }))}
+                                className="px-5 py-2.5 rounded-xl text-sm font-bold text-slate-400 hover:text-white transition-all hover:bg-white/5 active:scale-95"
+                            >
+                                {confirmModal.cancelText}
+                            </button>
+                            <button
+                                onClick={() => {
+                                    confirmModal.onConfirm(confirmModal.type === "prompt" ? promptValue : undefined);
+                                    setConfirmModal(prev => ({ ...prev, isOpen: false }));
+                                }}
+                                className={cn(
+                                    "font-bold px-6 py-2.5 rounded-xl text-sm transition-all shadow-lg active:scale-95",
+                                    confirmModal.type === "danger" && "bg-red-600 hover:bg-red-500 text-white shadow-red-500/10",
+                                    confirmModal.type === "warning" && "bg-amber-600 hover:bg-amber-500 text-white shadow-amber-500/10",
+                                    confirmModal.type === "prompt" && "bg-blue-600 hover:bg-blue-500 text-white shadow-blue-500/10",
+                                    confirmModal.type === "info" && "bg-slate-700 hover:bg-slate-600 text-white shadow-slate-500/10"
+                                )}
+                            >
+                                {confirmModal.confirmText}
                             </button>
                         </div>
                     </div>
