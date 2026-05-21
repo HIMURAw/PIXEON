@@ -11,9 +11,6 @@ import {
   ShieldCheck, 
   ChevronLeft, 
   ArrowRight, 
-  Building2, 
-  Copy, 
-  Check, 
   ShoppingBag,
   Info
 } from "lucide-react";
@@ -61,9 +58,8 @@ export default function CheckoutPage() {
   const [addingAddress, setAddingAddress] = useState(false);
 
   // Checkout & Payment States
-  const [paymentMethod, setPaymentMethod] = useState<"Credit Card" | "Bank Transfer">("Credit Card");
+  const paymentMethod = "Credit Card";
   const [submittingOrder, setSubmittingOrder] = useState(false);
-  const [copiedText, setCopiedText] = useState<string | null>(null);
 
   // Credit Card Interactive Form States
   const [cardDetails, setCardDetails] = useState({
@@ -126,13 +122,7 @@ export default function CheckoutPage() {
     setCardDetails(prev => ({ ...prev, cvv: value }));
   };
 
-  // Clipboard Copier
-  const copyToClipboard = (text: string, type: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedText(type);
-    toast.success("Kopyalandı!");
-    setTimeout(() => setCopiedText(null), 2000);
-  };
+
 
   // Handle Add Address Submit
   const handleAddAddress = async (e: React.FormEvent) => {
@@ -511,221 +501,150 @@ export default function CheckoutPage() {
             <div className="bg-[#0b1220] border border-white/10 rounded-2xl p-6 space-y-6">
               <h3 className="text-base font-bold text-white flex items-center gap-2 border-b border-white/5 pb-4">
                 <CardIcon size={18} className="text-blue-400" />
-                Ödeme Yöntemi Seçin
+                Ödeme Bilgileri (Kredi / Banka Kartı)
               </h3>
 
-              {/* Payment Tabs */}
-              <div className="grid grid-cols-2 gap-4">
-                <button 
-                  onClick={() => setPaymentMethod("Credit Card")}
-                  className={`p-4 rounded-xl border flex flex-col items-center justify-center gap-2 transition-all cursor-pointer ${
-                    paymentMethod === "Credit Card" 
-                      ? "bg-blue-600/10 border-blue-500 shadow-[0_0_15px_rgba(37,99,235,0.1)] text-white" 
-                      : "bg-[#020617] border-white/5 text-slate-400 hover:text-slate-200"
-                  }`}
-                >
-                  <CardIcon size={20} />
-                  <span className="text-xs font-bold uppercase tracking-wider">Kredi / Banka Kartı</span>
-                </button>
-
-                <button 
-                  onClick={() => setPaymentMethod("Bank Transfer")}
-                  className={`p-4 rounded-xl border flex flex-col items-center justify-center gap-2 transition-all cursor-pointer ${
-                    paymentMethod === "Bank Transfer" 
-                      ? "bg-blue-600/10 border-blue-500 shadow-[0_0_15px_rgba(37,99,235,0.1)] text-white" 
-                      : "bg-[#020617] border-white/5 text-slate-400 hover:text-slate-200"
-                  }`}
-                >
-                  <Building2 size={20} />
-                  <span className="text-xs font-bold uppercase tracking-wider">Havale / EFT</span>
-                </button>
-              </div>
-
-              {/* Tab Contents */}
-              {paymentMethod === "Credit Card" ? (
-                /* CREDIT CARD VIEW */
-                <div className="space-y-8 pt-4">
-                  {/* Dynamic Credit Card Visualizer */}
-                  <div className="flex justify-center perspective-1000">
-                    <div 
-                      className={`relative w-80 h-48 rounded-2xl text-white transition-transform duration-500 transform-style-3d shadow-2xl cursor-pointer ${
-                        isCardFlipped ? "rotate-y-180" : ""
-                      }`}
-                      style={{
-                        backgroundImage: "linear-gradient(135deg, #1e293b 0%, #0f172a 100%)",
-                        border: "1px solid rgba(255, 255, 255, 0.1)"
-                      }}
-                      onClick={() => setIsCardFlipped(!isCardFlipped)}
-                    >
-                      {/* CARD FRONT FACE */}
-                      <div className="absolute inset-0 w-full h-full p-6 flex flex-col justify-between backface-hidden">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <p className="text-[8px] text-slate-400 font-bold uppercase tracking-widest">TUGER SECURE</p>
-                            <div className="w-10 h-7 bg-amber-500/80 rounded-md border border-amber-600 mt-2 shadow flex items-center justify-center overflow-hidden">
-                              {/* Chip Lines */}
-                              <div className="w-full h-full opacity-30 grid grid-cols-3 divide-x divide-y divide-black/30" />
-                            </div>
-                          </div>
-                          <span className="text-xs font-black tracking-widest bg-gradient-to-r from-blue-400 to-sky-400 bg-clip-text text-transparent">PayTR MOCK</span>
-                        </div>
+              <div className="space-y-8">
+                {/* Dynamic Credit Card Visualizer */}
+                <div className="flex justify-center perspective-1000">
+                  <div 
+                    className={`relative w-80 h-48 rounded-2xl text-white transition-transform duration-500 transform-style-3d shadow-2xl cursor-pointer ${
+                      isCardFlipped ? "rotate-y-180" : ""
+                    }`}
+                    style={{
+                      backgroundImage: "linear-gradient(135deg, #1e293b 0%, #0f172a 100%)",
+                      border: "1px solid rgba(255, 255, 255, 0.1)"
+                    }}
+                    onClick={() => setIsCardFlipped(!isCardFlipped)}
+                  >
+                    {/* CARD FRONT FACE */}
+                    <div className="absolute inset-0 w-full h-full p-6 flex flex-col justify-between backface-hidden">
+                      <div className="flex justify-between items-start">
                         <div>
-                          <p className="text-base font-bold font-mono tracking-widest text-slate-200">
-                            {cardDetails.number || "•••• •••• •••• ••••"}
+                          <p className="text-[8px] text-slate-400 font-bold uppercase tracking-widest">TUGER SECURE</p>
+                          <div className="w-10 h-7 bg-amber-500/80 rounded-md border border-amber-600 mt-2 shadow flex items-center justify-center overflow-hidden">
+                            {/* Chip Lines */}
+                            <div className="w-full h-full opacity-30 grid grid-cols-3 divide-x divide-y divide-black/30" />
+                          </div>
+                        </div>
+                        <span className="text-xs font-black tracking-widest bg-gradient-to-r from-blue-400 to-sky-400 bg-clip-text text-transparent">PayTR MOCK</span>
+                      </div>
+                      <div>
+                        <p className="text-base font-bold font-mono tracking-widest text-slate-200">
+                          {cardDetails.number || "•••• •••• •••• ••••"}
+                        </p>
+                      </div>
+                      <div className="flex justify-between items-end">
+                        <div>
+                          <p className="text-[7px] text-slate-400 font-bold uppercase tracking-widest">KART SAHİBİ</p>
+                          <p className="text-xs font-bold uppercase tracking-wider truncate w-44">
+                            {cardDetails.name || "KART SAHİBİ ADI"}
                           </p>
                         </div>
-                        <div className="flex justify-between items-end">
-                          <div>
-                            <p className="text-[7px] text-slate-400 font-bold uppercase tracking-widest">KART SAHİBİ</p>
-                            <p className="text-xs font-bold uppercase tracking-wider truncate w-44">
-                              {cardDetails.name || "KART SAHİBİ ADI"}
-                            </p>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-[7px] text-slate-400 font-bold uppercase tracking-widest">S.K.T</p>
-                            <p className="text-xs font-bold font-mono">
-                              {cardDetails.expiry || "AA/YY"}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* CARD BACK FACE */}
-                      <div className="absolute inset-0 w-full h-full rounded-2xl flex flex-col justify-between backface-hidden rotate-y-180"
-                        style={{
-                          backgroundImage: "linear-gradient(135deg, #0f172a 0%, #020617 100%)",
-                          border: "1px solid rgba(255, 255, 255, 0.1)"
-                        }}
-                      >
-                        <div className="w-full h-10 bg-slate-950 mt-6" />
-                        <div className="px-6 flex flex-col gap-2">
-                          <p className="text-[7px] text-slate-400 font-bold uppercase tracking-widest text-right">GÜVENLİK KODU</p>
-                          <div className="flex items-center justify-between">
-                            <div className="w-44 h-8 bg-slate-800 rounded flex items-center justify-end px-3 font-mono text-sm line-through decoration-slate-400 text-slate-500">
-                              xxxx xxxx xxxx
-                            </div>
-                            <div className="w-12 h-8 bg-white text-slate-900 font-bold rounded flex items-center justify-center font-mono text-xs shadow-inner">
-                              {cardDetails.cvv || "•••"}
-                            </div>
-                          </div>
-                        </div>
-                        <div className="p-4 flex items-center justify-between text-[7px] text-slate-500">
-                          <span>PayTR Sandbox Mode</span>
-                          <span>🔒 256-Bit SSL Secured</span>
+                        <div className="text-right">
+                          <p className="text-[7px] text-slate-400 font-bold uppercase tracking-widest">S.K.T</p>
+                          <p className="text-xs font-bold font-mono">
+                            {cardDetails.expiry || "AA/YY"}
+                          </p>
                         </div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Card Form Inputs */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Kart Numarası</label>
-                      <div className="relative">
-                        <input 
-                          type="text" 
-                          required
-                          placeholder="0000 0000 0000 0000"
-                          value={cardDetails.number}
-                          onChange={handleCardNumberChange}
-                          onFocus={() => setIsCardFlipped(false)}
-                          className="w-full bg-[#020617] border border-white/10 rounded-xl py-3.5 px-4 text-xs font-medium text-white outline-none focus:border-blue-500 transition-all font-mono tracking-wider"
-                        />
+                    {/* CARD BACK FACE */}
+                    <div className="absolute inset-0 w-full h-full rounded-2xl flex flex-col justify-between backface-hidden rotate-y-180"
+                      style={{
+                        backgroundImage: "linear-gradient(135deg, #0f172a 0%, #020617 100%)",
+                        border: "1px solid rgba(255, 255, 255, 0.1)"
+                      }}
+                    >
+                      <div className="w-full h-10 bg-slate-950 mt-6" />
+                      <div className="px-6 flex flex-col gap-2">
+                        <p className="text-[7px] text-slate-400 font-bold uppercase tracking-widest text-right">GÜVENLİK KODU</p>
+                        <div className="flex items-center justify-between">
+                          <div className="w-44 h-8 bg-slate-800 rounded flex items-center justify-end px-3 font-mono text-sm line-through decoration-slate-400 text-slate-500">
+                            xxxx xxxx xxxx
+                          </div>
+                          <div className="w-12 h-8 bg-white text-slate-900 font-bold rounded flex items-center justify-center font-mono text-xs shadow-inner">
+                            {cardDetails.cvv || "•••"}
+                          </div>
+                        </div>
                       </div>
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Kart Sahibi</label>
-                      <input 
-                        type="text" 
-                        required
-                        placeholder="Ad Soyad"
-                        value={cardDetails.name}
-                        onChange={e => setCardDetails(prev => ({ ...prev, name: e.target.value }))}
-                        onFocus={() => setIsCardFlipped(false)}
-                        className="w-full bg-[#020617] border border-white/10 rounded-xl py-3.5 px-4 text-xs font-medium text-white outline-none focus:border-blue-500 transition-all"
-                      />
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Son Kullanma (AA/YY)</label>
-                      <input 
-                        type="text" 
-                        required
-                        placeholder="AA/YY"
-                        value={cardDetails.expiry}
-                        onChange={handleExpiryChange}
-                        onFocus={() => setIsCardFlipped(false)}
-                        className="w-full bg-[#020617] border border-white/10 rounded-xl py-3.5 px-4 text-xs font-medium text-white outline-none focus:border-blue-500 transition-all font-mono"
-                      />
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">CVC / CVV</label>
-                      <input 
-                        type="password" 
-                        required
-                        placeholder="•••"
-                        value={cardDetails.cvv}
-                        onChange={handleCvvChange}
-                        onFocus={() => setIsCardFlipped(true)}
-                        onBlur={() => setIsCardFlipped(false)}
-                        className="w-full bg-[#020617] border border-white/10 rounded-xl py-3.5 px-4 text-xs font-medium text-white outline-none focus:border-blue-500 transition-all font-mono"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="p-4 bg-blue-600/5 border border-blue-500/10 rounded-xl flex gap-3 text-xs text-blue-300">
-                    <Info size={16} className="shrink-0 mt-0.5" />
-                    <div>
-                      <h5 className="font-bold">PayTR Test Ortamı Simülasyonu</h5>
-                      <p className="text-[11px] text-slate-400 mt-1">
-                        Sistem PayTR entegrasyonu hazırlığı kapsamında mock moddadır. Kart bilgileriniz kaydedilmez, test etmek için rastgele değerler girebilirsiniz.
-                      </p>
+                      <div className="p-4 flex items-center justify-between text-[7px] text-slate-500">
+                        <span>PayTR Sandbox Mode</span>
+                        <span>🔒 256-Bit SSL Secured</span>
+                      </div>
                     </div>
                   </div>
                 </div>
-              ) : (
-                /* BANK TRANSFER VIEW */
-                <div className="space-y-6 pt-4">
-                  <div className="p-4 bg-[#020617] border border-white/5 rounded-xl space-y-4">
-                    <div className="flex justify-between items-center border-b border-white/5 pb-2">
-                      <span className="text-xs font-bold text-slate-300">İş Bankası</span>
-                      <span className="text-[9px] font-bold text-blue-400 uppercase tracking-widest">TUGER TEKNOLOJİ A.Ş.</span>
-                    </div>
-                    
-                    <div className="space-y-3">
-                      <div>
-                        <p className="text-[8px] text-slate-500 font-bold uppercase tracking-widest">Hesap Sahibi</p>
-                        <p className="text-xs font-bold text-white">Tuger Teknoloji Pazarlama A.Ş.</p>
-                      </div>
-                      
-                      <div>
-                        <p className="text-[8px] text-slate-500 font-bold uppercase tracking-widest">IBAN</p>
-                        <div className="flex items-center justify-between gap-4 mt-0.5 bg-[#0b1220] p-2.5 rounded-lg border border-white/5">
-                          <code className="text-xs font-bold font-mono text-white select-all">TR56 0006 2000 0001 2345 6789 01</code>
-                          <button 
-                            onClick={() => copyToClipboard("TR560006200000012345678901", "IBAN")}
-                            className="text-slate-400 hover:text-white transition-colors cursor-pointer"
-                          >
-                            {copiedText === "IBAN" ? <Check size={14} className="text-green-400" /> : <Copy size={14} />}
-                          </button>
-                        </div>
-                      </div>
+
+                {/* Card Form Inputs */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Kart Numarası</label>
+                    <div className="relative">
+                      <input 
+                        type="text" 
+                        required
+                        placeholder="0000 0000 0000 0000"
+                        value={cardDetails.number}
+                        onChange={handleCardNumberChange}
+                        onFocus={() => setIsCardFlipped(false)}
+                        className="w-full bg-[#020617] border border-white/10 rounded-xl py-3.5 px-4 text-xs font-medium text-white outline-none focus:border-blue-500 transition-all font-mono tracking-wider"
+                      />
                     </div>
                   </div>
 
-                  <div className="p-4 bg-amber-600/5 border border-amber-500/10 rounded-xl flex gap-3 text-xs text-amber-300">
-                    <Info size={16} className="shrink-0 mt-0.5" />
-                    <div>
-                      <h5 className="font-bold">Önemli Havale/EFT Kuralları</h5>
-                      <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
-                        Ödeme gönderirken lütfen **Açıklama** alanına sipariş verdikten sonra oluşacak **Sipariş Numarasını** ekleyin. Ödemeniz onaylandıktan sonra siparişiniz kargoya verilir.
-                      </p>
-                    </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Kart Sahibi</label>
+                    <input 
+                      type="text" 
+                      required
+                      placeholder="Ad Soyad"
+                      value={cardDetails.name}
+                      onChange={e => setCardDetails(prev => ({ ...prev, name: e.target.value }))}
+                      onFocus={() => setIsCardFlipped(false)}
+                      className="w-full bg-[#020617] border border-white/10 rounded-xl py-3.5 px-4 text-xs font-medium text-white outline-none focus:border-blue-500 transition-all"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Son Kullanma (AA/YY)</label>
+                    <input 
+                      type="text" 
+                      required
+                      placeholder="AA/YY"
+                      value={cardDetails.expiry}
+                      onChange={handleExpiryChange}
+                      onFocus={() => setIsCardFlipped(false)}
+                      className="w-full bg-[#020617] border border-white/10 rounded-xl py-3.5 px-4 text-xs font-medium text-white outline-none focus:border-blue-500 transition-all font-mono"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">CVC / CVV</label>
+                    <input 
+                      type="password" 
+                      required
+                      placeholder="•••"
+                      value={cardDetails.cvv}
+                      onChange={handleCvvChange}
+                      onFocus={() => setIsCardFlipped(true)}
+                      onBlur={() => setIsCardFlipped(false)}
+                      className="w-full bg-[#020617] border border-white/10 rounded-xl py-3.5 px-4 text-xs font-medium text-white outline-none focus:border-blue-500 transition-all font-mono"
+                    />
                   </div>
                 </div>
-              )}
+
+                <div className="p-4 bg-blue-600/5 border border-blue-500/10 rounded-xl flex gap-3 text-xs text-blue-300">
+                  <Info size={16} className="shrink-0 mt-0.5" />
+                  <div>
+                    <h5 className="font-bold">PayTR Test Ortamı Simülasyonu</h5>
+                    <p className="text-[11px] text-slate-400 mt-1">
+                      Sistem PayTR entegrasyonu hazırlığı kapsamında mock moddadır. Kart bilgileriniz kaydedilmez, test etmek için rastgele değerler girebilirsiniz.
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* 3. ORDER ITEMS REVIEW */}
