@@ -5,7 +5,7 @@ import { eq, asc } from "drizzle-orm";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { name: string } }
+  { params }: { params: Promise<{ name: string }> }
 ) {
   try {
     const { name } = await params;

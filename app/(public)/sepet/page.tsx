@@ -19,7 +19,6 @@ import {
     Ticket,
     Loader2
 } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/context/CartContext";
@@ -37,13 +36,13 @@ export default function CartPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-slate-950 text-slate-200">
+            <div className="min-h-screen bg-[#020617] text-slate-200">
                 <TopBar />
                 <MainBar />
                 <Head />
-                <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20 flex flex-col items-center justify-center min-h-[400px]">
-                    <Loader2 size={48} className="animate-spin text-blue-500 mb-4" />
-                    <p className="text-slate-500 font-bold uppercase tracking-widest text-sm">Sepetiniz Yükleniyor...</p>
+                <main className="w-full px-4 sm:px-6 lg:px-8 py-20 flex flex-col items-center justify-center min-h-[400px]">
+                    <Loader2 size={40} className="animate-spin text-blue-500 mb-4" />
+                    <p className="text-slate-400 font-bold uppercase tracking-wider text-xs">Sepetiniz Yükleniyor...</p>
                 </main>
                 <Footer />
             </div>
@@ -51,152 +50,150 @@ export default function CartPage() {
     }
 
     return (
-        <div className="min-h-screen bg-slate-950 text-slate-200">
+        <div className="min-h-screen bg-[#020617] text-slate-200">
             <TopBar />
             <MainBar />
             <Head />
 
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
+            <main className="w-full px-4 sm:px-6 lg:px-8 py-10 space-y-12">
                 {/* Cart Header */}
-                <div className="mb-12 flex flex-col md:flex-row md:items-center justify-between gap-8">
-                    <div className="flex items-center gap-6">
-                        <Link href="/" className="group p-4 bg-white/5 border border-white/5 rounded-3xl text-slate-400 hover:text-white transition-all hover:bg-blue-600 hover:border-blue-500 shadow-xl">
-                            <ChevronLeft size={24} className="group-hover:-translate-x-1 transition-transform" />
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 border-b border-white/5 pb-6">
+                    <div className="flex items-center gap-4">
+                        <Link href="/" className="group p-2 bg-[#0b1220] border border-white/10 rounded-full text-slate-400 hover:text-white transition-all hover:bg-blue-400/10">
+                            <ChevronLeft size={20} className="group-hover:-translate-x-0.5 transition-transform" />
                         </Link>
                         <div>
-                            <h1 className="text-4xl lg:text-5xl font-black text-white tracking-tight">Alışveriş Sepeti</h1>
-                            <p className="text-slate-500 font-medium mt-2 flex items-center gap-2">
-                                <ShoppingBag size={14} className="text-blue-400" />
-                                {cartItems.length} ürün hazır ve sizi bekliyor.
+                            <h1 className="text-xl font-semibold text-white">Alışveriş Sepeti</h1>
+                            <p className="text-sm text-gray-400 mt-0.5">
+                                Sepetinizde <span className="text-white font-bold">{cartItems.length}</span> ürün bulunuyor.
                             </p>
                         </div>
                     </div>
                 </div>
 
                 {cartItems.length > 0 ? (
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+                    <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8 items-start">
                         
-                        {/* LEFT: Items List (8 cols) */}
-                        <div className="lg:col-span-8 space-y-6">
+                        {/* LEFT: Items List */}
+                        <div className="space-y-4">
                             {cartItems.map((item) => (
-                                <div key={item.id} className="group bg-[#0b1220]/50 backdrop-blur-xl border border-white/5 rounded-[40px] p-8 hover:border-blue-500/20 transition-all duration-500 shadow-2xl relative overflow-hidden">
-                                    <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 blur-[100px] rounded-full -mr-32 -mt-32 pointer-events-none group-hover:bg-blue-500/10 transition-all duration-500"></div>
-                                    
-                                    <div className="relative z-10 flex flex-col sm:flex-row items-center gap-10">
-                                        {/* Image */}
-                                        <div className="w-40 h-40 bg-slate-950 rounded-[32px] border border-white/5 flex items-center justify-center p-6 group-hover:scale-105 transition-transform duration-700 shadow-2xl">
-                                            <Image src={item.product.image || "/placeholder.png"} alt={item.product.name} width={120} height={120} className="object-contain drop-shadow-2xl shadow-blue-500/20" />
+                                <div key={item.id} className="bg-[#0b1220] border border-white/10 rounded-xl p-5 hover:shadow-lg transition flex flex-col sm:flex-row items-center gap-6 relative group">
+                                    {/* Image */}
+                                    <div className="w-24 h-24 bg-[#020617] rounded-lg border border-white/5 flex items-center justify-center p-3 shrink-0">
+                                        <img src={item.product.image || "/placeholder.png"} alt={item.product.name} className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300" />
+                                    </div>
+
+                                    {/* Details */}
+                                    <div className="flex-1 text-center sm:text-left space-y-1">
+                                        <span className="text-[10px] text-blue-400 font-semibold uppercase tracking-wider block">
+                                            {item.product.category || "Ürün"}
+                                        </span>
+                                        <Link href={`/product/${item.product.slug}`} className="block">
+                                            <h3 className="text-sm font-bold text-white leading-snug hover:text-blue-400 transition-colors">
+                                                {item.product.name}
+                                            </h3>
+                                        </Link>
+                                        <span className="text-xs text-green-400 font-medium block">Stokta Var</span>
+                                        <div className="text-lg font-bold text-red-500 pt-1">
+                                            ₺{item.product.price.toLocaleString("tr-TR")}
                                         </div>
+                                    </div>
 
-                                        {/* Details */}
-                                        <div className="flex-1 text-center sm:text-left space-y-2">
-                                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-400">
-                                                {item.product.category || "Ürün"}
-                                            </span>
-                                            <h3 className="text-xl lg:text-2xl font-black text-white leading-tight group-hover:text-blue-400 transition-colors">{item.product.name}</h3>
-                                            <div className="text-2xl font-black text-white tracking-tighter pt-2">
-                                                ₺{item.product.price.toLocaleString("tr-TR")}
-                                            </div>
-                                        </div>
-
-                                        {/* Controls */}
-                                        <div className="flex flex-col sm:items-end gap-6">
-                                            <div className="flex items-center bg-slate-950 border border-white/5 rounded-2xl p-1.5 shadow-inner">
-                                                <button 
-                                                    onClick={() => updateQuantity(item.productId, item.quantity - 1)}
-                                                    className="w-10 h-10 flex items-center justify-center hover:text-blue-400 transition-colors disabled:opacity-20 cursor-pointer"
-                                                    disabled={item.quantity <= 1}
-                                                >
-                                                    <Minus size={18} />
-                                                </button>
-                                                <span className="w-10 text-center font-black text-xl text-white">{item.quantity}</span>
-                                                <button 
-                                                    onClick={() => updateQuantity(item.productId, item.quantity + 1)}
-                                                    className="w-10 h-10 flex items-center justify-center hover:text-blue-400 transition-colors cursor-pointer"
-                                                >
-                                                    <Plus size={18} />
-                                                </button>
-                                            </div>
-
+                                    {/* Controls */}
+                                    <div className="flex flex-col sm:items-end gap-4 shrink-0 w-full sm:w-auto">
+                                        <div className="flex items-center justify-center bg-[#020617] border border-white/10 rounded-full p-1 w-fit mx-auto sm:mx-0">
                                             <button 
-                                                onClick={() => removeFromCart(item.productId)}
-                                                className="flex items-center gap-2 px-4 py-2 text-red-400 hover:text-red-300 transition-colors font-black text-[10px] uppercase tracking-widest cursor-pointer"
+                                                onClick={() => updateQuantity(item.productId, item.quantity - 1)}
+                                                className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-white rounded-full hover:bg-white/5 transition disabled:opacity-20 cursor-pointer"
+                                                disabled={item.quantity <= 1}
                                             >
-                                                <Trash2 size={16} />
-                                                Ürünü Kaldır
+                                                <Minus size={16} />
+                                            </button>
+                                            <span className="w-8 text-center font-bold text-sm text-white">{item.quantity}</span>
+                                            <button 
+                                                onClick={() => updateQuantity(item.productId, item.quantity + 1)}
+                                                className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-white rounded-full hover:bg-white/5 transition cursor-pointer"
+                                            >
+                                                <Plus size={16} />
                                             </button>
                                         </div>
+
+                                        <button 
+                                            onClick={() => removeFromCart(item.productId)}
+                                            className="flex items-center justify-center gap-1.5 px-3 py-1.5 text-red-400 hover:text-white hover:bg-red-500/20 border border-red-500/20 rounded-full transition-all text-xs font-semibold cursor-pointer w-fit mx-auto sm:mx-0"
+                                        >
+                                            <Trash2 size={14} />
+                                            Kaldır
+                                        </button>
                                     </div>
                                 </div>
                             ))}
 
                             {/* Cart Features */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-6">
                                 {[
                                     { icon: Zap, title: "Anında Onay", desc: "Siparişin saniyeler içinde işleme alınır." },
                                     { icon: ShieldCheck, title: "Resmi Garanti", desc: "Tüm ürünler 2 yıl Sony Türkiye garantilidir." },
                                     { icon: Truck, title: "Hızlı Kargo", desc: "Bugün saat 16:00'ya kadar aynı gün kargo." },
                                 ].map((feat, i) => (
-                                    <div key={i} className="p-6 bg-white/[0.02] border border-white/5 rounded-3xl flex items-center gap-4">
-                                        <div className="p-3 bg-blue-600/10 text-blue-400 rounded-xl"><feat.icon size={20} /></div>
+                                    <div key={i} className="p-4 bg-[#0b1220] border border-white/10 rounded-xl flex items-center gap-4">
+                                        <div className="p-2.5 bg-blue-600/10 text-blue-400 rounded-lg"><feat.icon size={18} /></div>
                                         <div>
-                                            <h4 className="text-xs font-black text-white uppercase tracking-tight">{feat.title}</h4>
-                                            <p className="text-[10px] text-slate-500 font-medium mt-1">{feat.desc}</p>
+                                            <h4 className="text-xs font-bold text-white">{feat.title}</h4>
+                                            <p className="text-[10px] text-slate-400 mt-0.5">{feat.desc}</p>
                                         </div>
                                     </div>
                                 ))}
                             </div>
                         </div>
 
-                        {/* RIGHT: Order Summary (4 cols) */}
-                        <div className="lg:col-span-4 space-y-6">
-                            <div className="bg-[#0b1220]/80 backdrop-blur-2xl border border-white/10 rounded-[48px] p-10 shadow-2xl sticky top-8 relative overflow-hidden">
-                                <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/10 blur-[100px] rounded-full -mr-32 -mt-32 pointer-events-none"></div>
+                        {/* RIGHT: Order Summary */}
+                        <div className="space-y-6">
+                            <div className="bg-[#0b1220] border border-white/10 rounded-xl p-6 hover:shadow-lg transition sticky top-8">
+                                <h2 className="text-base font-bold text-white mb-6">Sipariş Özeti</h2>
                                 
-                                <h2 className="text-2xl font-black text-white tracking-tight mb-8">Sipariş Özeti</h2>
-                                
-                                <div className="space-y-5 mb-10">
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-slate-500 font-bold">Ara Toplam</span>
-                                        <span className="text-white font-black">₺{subtotal.toLocaleString("tr-TR")}</span>
+                                <div className="space-y-4 mb-6 text-sm">
+                                    <div className="flex justify-between items-center text-slate-400">
+                                        <span>Ara Toplam</span>
+                                        <span className="text-white font-bold">₺{subtotal.toLocaleString("tr-TR")}</span>
                                     </div>
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-slate-500 font-bold">Kargo Bedeli</span>
-                                        <span className={cn("font-black", shipping === 0 ? "text-emerald-400" : "text-white")}>
+                                    <div className="flex justify-between items-center text-slate-400">
+                                        <span>Kargo Bedeli</span>
+                                        <span className={cn("font-bold", shipping === 0 ? "text-green-400" : "text-white")}>
                                             {shipping === 0 ? "Ücretsiz" : `₺${shipping}`}
                                         </span>
                                     </div>
                                     
                                     {/* Coupon Input */}
-                                    <div className="pt-4">
+                                    <div className="pt-2">
                                         <div className="relative group">
-                                            <Ticket size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-blue-400 transition-colors" />
+                                            <Ticket size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-400 transition-colors" />
                                             <input 
                                                 type="text" 
                                                 placeholder="İndirim Kuponu" 
-                                                className="w-full bg-slate-950 border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-xs font-bold outline-none focus:border-blue-500/50 transition-all placeholder:text-slate-700"
+                                                className="w-full bg-[#020617] border border-white/10 rounded-full py-2 pl-10 pr-4 text-xs font-medium outline-none focus:border-blue-400 transition-all placeholder:text-slate-600 text-white"
                                             />
                                         </div>
                                     </div>
 
-                                    <div className="pt-8 border-t border-white/5 flex justify-between items-end">
+                                    <div className="pt-4 border-t border-white/5 flex justify-between items-end">
                                         <div>
-                                            <span className="text-xs text-slate-500 font-black uppercase tracking-widest">Ödenecek Tutar</span>
-                                            <div className="text-4xl font-black text-white tracking-tighter mt-1">₺{total.toLocaleString("tr-TR")}</div>
+                                            <span className="text-xs text-slate-400">Ödenecek Tutar</span>
+                                            <div className="text-2xl font-bold text-red-500 mt-0.5">₺{total.toLocaleString("tr-TR")}</div>
                                         </div>
-                                        <p className="text-[10px] text-slate-600 font-black tracking-widest pb-1 uppercase">KDV DAHİL</p>
+                                        <p className="text-[10px] text-slate-500 font-semibold tracking-wider pb-1 uppercase">KDV DAHİL</p>
                                     </div>
                                 </div>
 
-                                <button className="w-full bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-widest py-6 rounded-3xl flex items-center justify-center gap-3 transition-all shadow-xl shadow-blue-600/30 active:scale-95 group cursor-pointer">
-                                    <CreditCard size={22} />
+                                <button className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-full flex items-center justify-center gap-2 transition active:scale-98 group cursor-pointer text-sm uppercase">
+                                    <CreditCard size={18} />
                                     Güvenle Öde
-                                    <ArrowRight size={20} className="group-hover:translate-x-1.5 transition-transform" />
+                                    <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
                                 </button>
 
-                                <div className="mt-10 flex items-center justify-center gap-3 opacity-40">
-                                    <ShieldCheck size={20} />
-                                    <span className="text-[10px] font-black uppercase tracking-widest">256-Bit SSL Güvenlik</span>
+                                <div className="mt-6 flex items-center justify-center gap-2 text-slate-500 text-xs">
+                                    <ShieldCheck size={16} className="text-slate-400" />
+                                    <span>256-Bit SSL Güvenlik</span>
                                 </div>
                             </div>
                         </div>
@@ -204,40 +201,27 @@ export default function CartPage() {
                     </div>
                 ) : (
                     /* EMPTY STATE */
-                    <div className="bg-[#0b1220]/50 backdrop-blur-xl border border-white/5 rounded-[60px] p-24 text-center space-y-10 animate-in fade-in zoom-in duration-1000 shadow-2xl relative overflow-hidden">
-                        <div className="absolute inset-0 bg-gradient-to-b from-blue-500/5 to-transparent pointer-events-none" />
-                        <div className="relative z-10 space-y-8">
-                            <div className="w-32 h-32 bg-slate-950 border border-white/5 rounded-[40px] flex items-center justify-center mx-auto mb-8 shadow-2xl group animate-bounce-slow">
-                                <ShoppingBag size={56} className="text-slate-700 group-hover:text-blue-500 transition-colors" />
-                            </div>
-                            <div className="space-y-4">
-                                <h2 className="text-4xl font-black text-white tracking-tight">Sepetin Bomboş...</h2>
-                                <p className="text-xl text-slate-500 font-medium max-w-md mx-auto">
-                                    En yeni maceralar ve güçlü donanımlar sizi bekliyor. Hemen keşfetmeye başlayın!
-                                </p>
-                            </div>
-                            <div className="pt-6">
-                                <Link href="/" className="inline-flex items-center gap-4 bg-blue-600 hover:bg-blue-500 text-white font-black px-12 py-5 rounded-[2rem] transition-all shadow-2xl shadow-blue-600/30 active:scale-95 uppercase tracking-widest text-sm group">
-                                    Alışverişe Başla
-                                    <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
-                                </Link>
-                            </div>
+                    <div className="bg-[#0b1220] border border-white/10 rounded-xl p-16 text-center space-y-8 shadow-lg">
+                        <div className="w-20 h-20 bg-[#020617] border border-white/10 rounded-full flex items-center justify-center mx-auto shadow-inner">
+                            <ShoppingBag size={36} className="text-slate-500" />
+                        </div>
+                        <div className="space-y-2">
+                            <h2 className="text-xl font-bold text-white">Sepetiniz Boş</h2>
+                            <p className="text-slate-400 text-sm max-w-sm mx-auto">
+                                En yeni maceralar ve güçlü donanımlar sizi bekliyor. Hemen keşfetmeye başlayın!
+                            </p>
+                        </div>
+                        <div className="pt-2">
+                            <Link href="/" className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 py-2.5 rounded-full transition text-sm group">
+                                Alışverişe Başla
+                                <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                            </Link>
                         </div>
                     </div>
                 )}
             </main>
 
             <Footer />
-
-            <style jsx>{`
-                @keyframes bounceSlow {
-                    0%, 100% { transform: translateY(0); }
-                    50% { transform: translateY(-20px); }
-                }
-                .animate-bounce-slow {
-                    animation: bounceSlow 4s ease-in-out infinite;
-                }
-            `}</style>
         </div>
     );
 }
