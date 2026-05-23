@@ -24,16 +24,31 @@ const CATEGORIES = [
     { id: "a5855599-55ee-4a9a-b544-0f3adcdcd7f1", name: "Dijital Kodlar" }
 ];
 
-export default function FilteredProductsSection() {
+interface FilteredProductsSectionProps {
+    initialCategory?: string;
+    hideCategoryFilter?: boolean;
+    hideHeader?: boolean;
+}
+
+export default function FilteredProductsSection({
+    initialCategory = "all",
+    hideCategoryFilter = false,
+    hideHeader = false,
+}: FilteredProductsSectionProps) {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     
     // Filter states
-    const [selectedCategory, setSelectedCategory] = useState("all");
+    const [selectedCategory, setSelectedCategory] = useState(initialCategory);
     const [minPrice, setMinPrice] = useState<string>("");
     const [maxPrice, setMaxPrice] = useState<string>("");
     const [stockOnly, setStockOnly] = useState(false);
     const [sortBy, setSortBy] = useState("newest");
+
+    // Reset selected category if initialCategory changes
+    useEffect(() => {
+        setSelectedCategory(initialCategory);
+    }, [initialCategory]);
 
     useEffect(() => {
         const fetchFiltered = async () => {
@@ -78,38 +93,44 @@ export default function FilteredProductsSection() {
     return (
         <section className="space-y-8">
             {/* Header */}
-            <div>
-                <h2 className="text-xl font-semibold text-white">
-                    Ürünlerimizi Keşfedin
-                </h2>
-                <p className="text-sm text-gray-400">
-                    Kategorileri filtreleyerek dilediğiniz PlayStation ürününe anında ulaşın.
-                </p>
-            </div>
+            {!hideHeader && (
+                <div>
+                    <h2 className="text-xl font-semibold text-white">
+                        Ürünlerimizi Keşfedin
+                    </h2>
+                    <p className="text-sm text-gray-400">
+                        Kategorileri filtreleyerek dilediğiniz PlayStation ürününe anında ulaşın.
+                    </p>
+                </div>
+            )}
 
             {/* Filter controls row */}
             <div className="bg-[#0b1220]/60 backdrop-blur-md border border-white/5 p-6 rounded-2xl space-y-6">
                 <div className="flex flex-col xl:flex-row gap-6 justify-between items-start xl:items-center">
                     
                     {/* Category tabs */}
-                    <div className="flex flex-wrap gap-2">
-                        {CATEGORIES.map((cat) => (
-                            <button
-                                key={cat.id}
-                                onClick={() => setSelectedCategory(cat.id)}
-                                className={`cursor-pointer px-4 py-2 rounded-xl text-xs font-bold transition-all border ${
-                                    selectedCategory === cat.id
-                                        ? "bg-sky-500 text-white border-sky-400/30 shadow-lg shadow-sky-500/20"
-                                        : "bg-slate-900/60 text-slate-400 border-white/5 hover:text-white hover:bg-slate-800"
-                                }`}
-                            >
-                                {cat.name}
-                            </button>
-                        ))}
-                    </div>
+                    {!hideCategoryFilter && (
+                        <div className="flex flex-wrap gap-2">
+                            {CATEGORIES.map((cat) => (
+                                <button
+                                    key={cat.id}
+                                    onClick={() => setSelectedCategory(cat.id)}
+                                    className={`cursor-pointer px-4 py-2 rounded-xl text-xs font-bold transition-all border ${
+                                        selectedCategory === cat.id
+                                            ? "bg-sky-500 text-white border-sky-400/30 shadow-lg shadow-sky-500/20"
+                                            : "bg-slate-900/60 text-slate-400 border-white/5 hover:text-white hover:bg-slate-800"
+                                    }`}
+                                >
+                                    {cat.name}
+                                </button>
+                            ))}
+                        </div>
+                    )}
 
                     {/* Quick Filters */}
-                    <div className="flex flex-wrap gap-4 items-center w-full xl:w-auto justify-between xl:justify-end">
+                    <div className={`flex flex-wrap gap-4 items-center w-full justify-between ${
+                        !hideCategoryFilter ? "xl:w-auto xl:justify-end" : ""
+                    }`}>
                         {/* Stock Checkbox */}
                         <label className="flex items-center gap-2 cursor-pointer text-xs text-slate-400 hover:text-white transition-colors">
                             <input

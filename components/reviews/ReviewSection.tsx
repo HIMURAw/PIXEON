@@ -25,7 +25,7 @@ export default function ReviewSection({
 
     return (
         <section className="py-20">
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+            <div className="w-full space-y-12">
                 
                 {/* Header Section */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 border-b border-white/5 pb-10">

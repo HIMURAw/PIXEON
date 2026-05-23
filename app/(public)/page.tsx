@@ -10,8 +10,7 @@ import HotDeal from "@/components/sellersCard/hotDeals/HotDeal";
 import PromoVertical from "@/components/promo/PromoVertical";
 import PromoVerticalSmall from "@/components/promo/PromoVerticalSmall";
 import PromoBanner from "@/components/promo/PromoBanner";
-import FilteredProductsSection from "@/components/products/FilteredProductsSection";
-import NewProductsSidebar from "@/components/products/newProducts/NewProductsSidebar";
+
 import ReviewSection from "@/components/reviews/ReviewSection";
 import Footer from "@/components/footer/Footer";
 import BannerSection from "@/components/promo/BannerSection";
@@ -64,21 +63,14 @@ export default async function Home() {
                         <BannerSection position="home-middle" className="h-64" />
                         <InfoBanner />
                         <HotDeal />
-                        <PromoBanner />
-                        <BestSellers />
-                        <BannerSection position="home-bottom" />
                     </main>
                 </div>
 
-                {/* ÜRÜNLER / FİLTRELEME BÖLÜMÜ */}
-                <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6 lg:gap-16 !-mt-14">
-                    <aside className="order-2 lg:order-1">
-                        <NewProductsSidebar />
-                    </aside>
-                    <main className="order-1 lg:order-2 min-w-0">
-                        <FilteredProductsSection />
-                    </main>
-                </div>
+                <PromoBanner />
+                <BestSellers />
+                <BannerSection position="home-bottom" />
+
+
 
                 {/* YORUMLAR BÖLÜMÜ */}
                 <div className="pt-20 border-t border-white/5">
