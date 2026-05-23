@@ -28,12 +28,14 @@ interface FilteredProductsSectionProps {
     initialCategory?: string;
     hideCategoryFilter?: boolean;
     hideHeader?: boolean;
+    keywordFilter?: string;
 }
 
 export default function FilteredProductsSection({
     initialCategory = "all",
     hideCategoryFilter = false,
     hideHeader = false,
+    keywordFilter,
 }: FilteredProductsSectionProps) {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
@@ -57,13 +59,22 @@ export default function FilteredProductsSection({
                 const min = minPrice ? parseFloat(minPrice) : undefined;
                 const max = maxPrice ? parseFloat(maxPrice) : undefined;
 
-                const data = await getFilteredProducts({
+                let data = await getFilteredProducts({
                     categoryId: selectedCategory,
                     minPrice: min,
                     maxPrice: max,
                     stockOnly: stockOnly,
                     sortBy: sortBy
                 });
+
+                if (keywordFilter) {
+                    const kw = keywordFilter.toLowerCase();
+                    data = data.filter((p: any) => 
+                        p.name.toLowerCase().includes(kw) || 
+                        p.sku?.toLowerCase().includes(kw) ||
+                        p.slug?.toLowerCase().includes(kw)
+                    );
+                }
 
                 const mapped = data.map((p: any) => ({
                     id: p.id,

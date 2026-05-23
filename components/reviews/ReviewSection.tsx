@@ -10,10 +10,12 @@ import { cn } from "@/lib/utils";
 
 export default function ReviewSection({ 
     currentUser, 
-    reviews: initialReviews 
+    reviews: initialReviews,
+    productId
 }: { 
-    currentUser: any, 
-    reviews: any[] 
+    currentUser: any;
+    reviews: any[];
+    productId?: string;
 }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
@@ -181,6 +183,7 @@ export default function ReviewSection({
                                         userId={currentUser.id}
                                         userName={currentUser.name}
                                         userImage={currentUser.image ?? undefined}
+                                        productId={productId}
                                     />
                                 ) : (
                                     <div className="text-center py-10 space-y-6">

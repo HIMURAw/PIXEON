@@ -10,15 +10,16 @@ interface ReviewFormProps {
     userId: string;
     userName: string;
     userImage?: string;
+    productId?: string;
 }
 
 const GENERAL_OPTION = { id: "general", name: "Genel Yorum (Mağaza Deneyimi)" };
 
-export default function ReviewForm({ userId, userName, userImage }: ReviewFormProps) {
+export default function ReviewForm({ userId, userName, userImage, productId: initialProductId }: ReviewFormProps) {
     const [rating, setRating] = useState(5);
     const [hover, setHover] = useState(0);
     const [comment, setComment] = useState("");
-    const [productId, setProductId] = useState<string>("general");
+    const [productId, setProductId] = useState<string>(initialProductId || "general");
     const [selectedLabel, setSelectedLabel] = useState(GENERAL_OPTION.name);
     const [products, setProducts] = useState<{ id: string; name: string }[]>([]);
     const [search, setSearch] = useState("");
@@ -28,8 +29,14 @@ export default function ReviewForm({ userId, userName, userImage }: ReviewFormPr
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        getProductsForReview().then(setProducts);
-    }, []);
+        if (!initialProductId) {
+            getProductsForReview().then(setProducts);
+        }
+    }, [initialProductId]);
+
+    useEffect(() => {
+        setProductId(initialProductId || "general");
+    }, [initialProductId]);
 
     // Close dropdown on outside click
     useEffect(() => {
@@ -71,7 +78,7 @@ export default function ReviewForm({ userId, userName, userImage }: ReviewFormPr
         if (result.success) {
             setSubmitted(true);
             setComment("");
-            setProductId("general");
+            setProductId(initialProductId || "general");
             setSelectedLabel(GENERAL_OPTION.name);
             setRating(5);
         } else {
@@ -139,60 +146,62 @@ export default function ReviewForm({ userId, userName, userImage }: ReviewFormPr
             </div>
 
             {/* Product Dropdown */}
-            <div className="relative z-20" ref={dropdownRef}>
-                <label className="text-[10px] text-slate-500 font-bold uppercase tracking-widest ml-1 block mb-2">
-                    Yorum Konusu
-                </label>
+            {!initialProductId && (
+                <div className="relative z-20" ref={dropdownRef}>
+                    <label className="text-[10px] text-slate-500 font-bold uppercase tracking-widest ml-1 block mb-2">
+                        Yorum Konusu
+                    </label>
 
-                <button
-                    type="button"
-                    onClick={() => { setDropdownOpen(prev => !prev); setSearch(""); }}
-                    className="w-full bg-slate-950 border border-white/5 rounded-xl px-4 py-3 text-sm text-white flex items-center justify-between gap-3 hover:border-white/10 transition-all outline-none"
-                >
-                    <span className="flex items-center gap-2 truncate text-slate-300">
-                        {productId === "general"
-                            ? <><span className="text-base">🌐</span><span className="truncate">Genel Mağaza Deneyimi</span></>
-                            : <><Package size={14} className="text-blue-500 shrink-0" /><span className="truncate">{selectedLabel}</span></>
-                        }
-                    </span>
-                    <ChevronDown size={16} className={cn("text-slate-500 transition-transform duration-300", dropdownOpen && "rotate-180")} />
-                </button>
+                    <button
+                        type="button"
+                        onClick={() => { setDropdownOpen(prev => !prev); setSearch(""); }}
+                        className="w-full bg-slate-950 border border-white/5 rounded-xl px-4 py-3 text-sm text-white flex items-center justify-between gap-3 hover:border-white/10 transition-all outline-none"
+                    >
+                        <span className="flex items-center gap-2 truncate text-slate-300">
+                            {productId === "general"
+                                ? <><span className="text-base">🌐</span><span className="truncate">Genel Mağaza Deneyimi</span></>
+                                : <><Package size={14} className="text-blue-500 shrink-0" /><span className="truncate">{selectedLabel}</span></>
+                            }
+                        </span>
+                        <ChevronDown size={16} className={cn("text-slate-500 transition-transform duration-300", dropdownOpen && "rotate-180")} />
+                    </button>
 
-                {dropdownOpen && (
-                    <div className="absolute top-full left-0 right-0 mt-2 bg-slate-900 border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                        <div className="p-2 border-b border-white/5">
-                            <div className="flex items-center gap-2 bg-slate-950 border border-white/10 rounded-lg px-3 py-2">
-                                <Search size={14} className="text-slate-600" />
-                                <input
-                                    autoFocus
-                                    type="text"
-                                    value={search}
-                                    onChange={(e) => setSearch(e.target.value)}
-                                    placeholder="Ara..."
-                                    className="bg-transparent text-sm text-white outline-none w-full"
-                                />
+                    {dropdownOpen && (
+                        <div className="absolute top-full left-0 right-0 mt-2 bg-slate-900 border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                            <div className="p-2 border-b border-white/5">
+                                <div className="flex items-center gap-2 bg-slate-950 border border-white/10 rounded-lg px-3 py-2">
+                                    <Search size={14} className="text-slate-600" />
+                                    <input
+                                        autoFocus
+                                        type="text"
+                                        value={search}
+                                        onChange={(e) => setSearch(e.target.value)}
+                                        placeholder="Ara..."
+                                        className="bg-transparent text-sm text-white outline-none w-full"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="max-h-52 overflow-y-auto">
+                                {filtered.map(p => (
+                                    <button
+                                        key={p.id}
+                                        type="button"
+                                        onClick={() => handleSelect(p.id, p.name)}
+                                        className={cn(
+                                            "w-full text-left px-4 py-3 text-xs font-bold uppercase tracking-widest flex items-center gap-3 hover:bg-blue-600/10 transition-colors",
+                                            productId === p.id ? "text-blue-400" : "text-slate-400"
+                                        )}
+                                    >
+                                        {p.id === "general" ? "🌐" : <Package size={12} />}
+                                        <span className="truncate">{p.name}</span>
+                                    </button>
+                                ))}
                             </div>
                         </div>
-
-                        <div className="max-h-52 overflow-y-auto">
-                            {filtered.map(p => (
-                                <button
-                                    key={p.id}
-                                    type="button"
-                                    onClick={() => handleSelect(p.id, p.name)}
-                                    className={cn(
-                                        "w-full text-left px-4 py-3 text-xs font-bold uppercase tracking-widest flex items-center gap-3 hover:bg-blue-600/10 transition-colors",
-                                        productId === p.id ? "text-blue-400" : "text-slate-400"
-                                    )}
-                                >
-                                    {p.id === "general" ? "🌐" : <Package size={12} />}
-                                    <span className="truncate">{p.name}</span>
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-                )}
-            </div>
+                    )}
+                </div>
+            )}
 
             <button
                 type="submit"

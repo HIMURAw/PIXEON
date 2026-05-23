@@ -251,6 +251,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                     <ReviewSection
                         currentUser={currentUser}
                         reviews={reviewsData}
+                        productId={product.id}
                     />
                 </div>
             </div>
