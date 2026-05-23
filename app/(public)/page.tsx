@@ -40,7 +40,7 @@ export default async function Home() {
             <MainBar />
             <Head />
 
-            <div className="w-full px-4 sm:px-6 lg:px-8 pt-1 pb-10 space-y-24">
+            <div className="w-full px-4 sm:px-6 lg:px-8 pt-1 pb-10 space-y-24 mt-1">
                 {/* HERO */}
                 <div className="flex gap-16">
                     <aside className="hidden lg:block w-72 shrink-0">

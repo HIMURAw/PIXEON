@@ -11,7 +11,7 @@ import * as THREE from "three";
 // ---------------------------------------------------------------------------
 const ModelScene = ({ path }: { path: string }) => {
   const { scene } = useGLTF(path);
-  const { camera } = useThree();
+  const { camera, size: canvasSize } = useThree();
 
   // GLB sahnesinin klonu — paylaşılan cache'i kirletmemek için
   const clonedScene = useRef<THREE.Object3D>(scene.clone(true));
@@ -26,7 +26,7 @@ const ModelScene = ({ path }: { path: string }) => {
     pivot.rotation.y += 0.005;
 
     // İlk frame'de bounding box hesapla ve kamerayı/pivotu ayarla
-    if (!fitted.current) {
+    if (!fitted.current && canvasSize.width > 0 && canvasSize.height > 0) {
       const box = new THREE.Box3().setFromObject(pivot);
       if (!box.isEmpty()) {
         fitted.current = true;
@@ -40,7 +40,10 @@ const ModelScene = ({ path }: { path: string }) => {
         // Kamera mesafesini hesapla
         const maxDim = Math.max(size.x, size.y, size.z);
         const fov = ((camera as THREE.PerspectiveCamera).fov * Math.PI) / 180;
-        const dist = (maxDim / 2 / Math.tan(fov / 2)) * 2.2;
+        
+        // Mobil görünümde modeli daha yakınlaştırarak büyük görünmesini sağlıyoruz
+        const multiplier = canvasSize.width < 640 ? 1.3 : 2.2;
+        const dist = (maxDim / 2 / Math.tan(fov / 2)) * multiplier;
 
         camera.position.set(0, 0, dist);
         camera.near = Math.max(0.001, dist / 500);
