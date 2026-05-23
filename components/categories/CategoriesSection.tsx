@@ -11,7 +11,7 @@ export default function CategoriesSection() {
     const [open, setOpen] = useState(false);
 
     useEffect(() => {
-        setOpen(pathname === "/");
+        setOpen(false);
     }, [pathname]);
 
     return (

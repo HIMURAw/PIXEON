@@ -100,7 +100,7 @@ export default function HeroCarousel() {
 
                                 <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-tight">
                                     {slide.title}
-                                </h1>
+                               </h1>
 
                                 <p className="text-xs sm:text-sm text-gray-300 max-w-md">
                                     {slide.subtitle}

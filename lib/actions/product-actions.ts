@@ -2,7 +2,7 @@
 
 import { db } from "@/lib/db";
 import { products, categories } from "@/lib/db/schema";
-import { eq, desc, and, gte, like, or, count } from "drizzle-orm";
+import { eq, desc, asc, and, gte, lte, like, or, count, inArray, not } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import fs from "fs/promises";
 import path from "path";
@@ -236,5 +236,151 @@ export async function getDatabaseProductCount() {
   } catch (error) {
     console.error("Error fetching database product count:", error);
     return 0;
+  }
+}
+
+export async function getFilteredProducts(filters: {
+  categoryId?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  stockOnly?: boolean;
+  sortBy?: string;
+}) {
+  try {
+    const conditions = [eq(products.status, "ACTIVE")];
+
+    if (filters.categoryId && filters.categoryId !== "all") {
+      conditions.push(eq(products.categoryId, filters.categoryId));
+    }
+    if (filters.minPrice !== undefined && !isNaN(filters.minPrice)) {
+      conditions.push(gte(products.price, filters.minPrice));
+    }
+    if (filters.maxPrice !== undefined && !isNaN(filters.maxPrice)) {
+      conditions.push(lte(products.price, filters.maxPrice));
+    }
+    if (filters.stockOnly) {
+      conditions.push(gte(products.stock, 1));
+    }
+
+    let query = db.select({
+      id: products.id,
+      name: products.name,
+      slug: products.slug,
+      sku: products.sku,
+      price: products.price,
+      oldPrice: products.oldPrice,
+      stock: products.stock,
+      salesCount: products.salesCount,
+      image: products.image,
+      status: products.status,
+      categoryId: products.categoryId,
+      category: {
+        name: categories.name,
+        slug: categories.slug
+      },
+      createdAt: products.createdAt,
+      updatedAt: products.updatedAt
+    })
+      .from(products)
+      .leftJoin(categories, eq(products.categoryId, categories.id))
+      .where(and(...conditions));
+
+    if (filters.sortBy === "price-asc") {
+      query = query.orderBy(asc(products.price));
+    } else if (filters.sortBy === "price-desc") {
+      query = query.orderBy(desc(products.price));
+    } else if (filters.sortBy === "sales-desc") {
+      query = query.orderBy(desc(products.salesCount));
+    } else {
+      // default: newest
+      query = query.orderBy(desc(products.createdAt));
+    }
+
+    const data = await query;
+    return JSON.parse(JSON.stringify(data));
+  } catch (error) {
+    console.error("Error fetching filtered products:", error);
+    return [];
+  }
+}
+
+export async function getRecommendedProducts(categorySlugs: string[]) {
+  try {
+    let data: any[] = [];
+    const activeSlugs = categorySlugs.filter(Boolean);
+
+    if (activeSlugs.length > 0) {
+      data = await db.select({
+        id: products.id,
+        name: products.name,
+        slug: products.slug,
+        sku: products.sku,
+        price: products.price,
+        oldPrice: products.oldPrice,
+        stock: products.stock,
+        salesCount: products.salesCount,
+        image: products.image,
+        status: products.status,
+        categoryId: products.categoryId,
+        category: {
+          name: categories.name,
+          slug: categories.slug
+        },
+        createdAt: products.createdAt,
+        updatedAt: products.updatedAt
+      })
+        .from(products)
+        .leftJoin(categories, eq(products.categoryId, categories.id))
+        .where(
+          and(
+            eq(products.status, "ACTIVE"),
+            inArray(categories.slug, activeSlugs)
+          )
+        )
+        .orderBy(desc(products.salesCount))
+        .limit(8);
+    }
+
+    if (data.length < 8) {
+      const remainingLimit = 8 - data.length;
+      const excludedIds = data.map(p => p.id);
+      const fallbackConditions = [eq(products.status, "ACTIVE")];
+
+      if (excludedIds.length > 0) {
+        fallbackConditions.push(not(inArray(products.id, excludedIds)));
+      }
+
+      const fallbackData = await db.select({
+        id: products.id,
+        name: products.name,
+        slug: products.slug,
+        sku: products.sku,
+        price: products.price,
+        oldPrice: products.oldPrice,
+        stock: products.stock,
+        salesCount: products.salesCount,
+        image: products.image,
+        status: products.status,
+        categoryId: products.categoryId,
+        category: {
+          name: categories.name,
+          slug: categories.slug
+        },
+        createdAt: products.createdAt,
+        updatedAt: products.updatedAt
+      })
+        .from(products)
+        .leftJoin(categories, eq(products.categoryId, categories.id))
+        .where(and(...fallbackConditions))
+        .orderBy(desc(products.salesCount))
+        .limit(remainingLimit);
+
+      data = [...data, ...fallbackData];
+    }
+
+    return JSON.parse(JSON.stringify(data));
+  } catch (error) {
+    console.error("Error fetching recommended products:", error);
+    return [];
   }
 }
