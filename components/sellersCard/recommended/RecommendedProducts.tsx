@@ -50,6 +50,8 @@ export default function RecommendedProducts() {
     }, []);
 
     useEffect(() => {
+        if (loading || !sectionRef.current) return;
+
         const observer = new IntersectionObserver(
             ([entry]) => {
                 if (entry.isIntersecting) {
@@ -60,12 +62,10 @@ export default function RecommendedProducts() {
             { threshold: 0.1 }
         );
 
-        if (sectionRef.current) {
-            observer.observe(sectionRef.current);
-        }
+        observer.observe(sectionRef.current);
 
         return () => observer.disconnect();
-    }, []);
+    }, [loading]);
 
     if (loading) {
         return (

@@ -41,9 +41,9 @@ export default async function Home() {
             <MainBar />
             <Head />
 
-            <div className="w-full px-4 sm:px-6 lg:px-8 pt-1 pb-10 space-y-24 mt-1">
+            <div className="w-full px-4 sm:px-6 lg:px-8 pt-1 pb-10 space-y-8 md:space-y-24 mt-1">
                 {/* HERO */}
-                <div className="flex gap-16">
+                <div className="flex gap-6 lg:gap-16">
                     <aside className="hidden lg:block w-72 shrink-0">
                         <StaticCategoriesMenu />
                     </aside>
@@ -53,7 +53,7 @@ export default async function Home() {
                 </div>
 
                 {/* ALT CONTENT */}
-                <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-16">
+                <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6 lg:gap-16">
                     {/* SOL TARAF */}
                     <aside className="space-y-6 order-2 lg:order-1">
                         <BannerSection position="home-top" />
@@ -64,7 +64,7 @@ export default async function Home() {
                     </aside>
 
                     {/* SAĞ TARAF */}
-                    <main className="space-y-24 order-1 lg:order-2 min-w-0">
+                    <main className="space-y-8 md:space-y-24 order-1 lg:order-2 min-w-0">
                         <RecommendedProducts />
                         <BannerSection position="home-middle" className="h-64" />
                         <InfoBanner />
@@ -76,7 +76,7 @@ export default async function Home() {
                 </div>
 
                 {/* ÜRÜNLER / FİLTRELEME BÖLÜMÜ */}
-                <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-16 !-mt-14">
+                <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6 lg:gap-16 !-mt-14">
                     <aside className="order-2 lg:order-1">
                         <NewProductsSidebar />
                     </aside>

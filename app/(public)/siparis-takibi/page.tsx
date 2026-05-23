@@ -136,8 +136,8 @@ function OrderTrackingContent() {
     ] : [];
 
     return (
-        <div className="w-full px-4 sm:px-6 lg:px-8 pt-1 pb-16 space-y-24">
-            <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-16">
+        <div className="w-full px-4 sm:px-6 lg:px-8 pt-1 pb-16 space-y-12 md:space-y-24">
+            <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8 lg:gap-16">
                 
                 {/* SOL TARAF - Sidebar */}
                 <aside className="space-y-6 hidden lg:block">

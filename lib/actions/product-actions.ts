@@ -125,7 +125,7 @@ export async function getNewProducts(limit: number = 6) {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    const data = await db.select()
+    let data = await db.select()
       .from(products)
       .where(and(
         eq(products.status, "ACTIVE"),
@@ -133,6 +133,15 @@ export async function getNewProducts(limit: number = 6) {
       ))
       .orderBy(desc(products.createdAt))
       .limit(limit);
+
+    // Eğer son 30 günde eklenmiş yeni ürün yoksa, veritabanındaki en yeni aktif ürünleri getir
+    if (data.length === 0) {
+      data = await db.select()
+        .from(products)
+        .where(eq(products.status, "ACTIVE"))
+        .orderBy(desc(products.createdAt))
+        .limit(limit);
+    }
 
     return JSON.parse(JSON.stringify(data));
   } catch (error) {
