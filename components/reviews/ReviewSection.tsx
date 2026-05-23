@@ -20,7 +20,7 @@ export default function ReviewSection({
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     
-    const reviewsPerPage = 6;
+    const reviewsPerPage = 3;
     const totalPages = Math.ceil(initialReviews.length / reviewsPerPage);
     const startIndex = (currentPage - 1) * reviewsPerPage;
     const displayedReviews = initialReviews.slice(startIndex, startIndex + reviewsPerPage);

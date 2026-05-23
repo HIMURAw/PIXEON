@@ -19,6 +19,7 @@ export default function RecommendedProducts() {
     const [dbProducts, setDbProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [isVisible, setIsVisible] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
     const sectionRef = useRef<HTMLElement>(null);
 
     useEffect(() => {
@@ -47,6 +48,15 @@ export default function RecommendedProducts() {
             }
         };
         fetchRecommendations();
+    }, []);
+
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+        checkMobile();
+        window.addEventListener("resize", checkMobile);
+        return () => window.removeEventListener("resize", checkMobile);
     }, []);
 
     useEffect(() => {
@@ -85,6 +95,8 @@ export default function RecommendedProducts() {
 
     if (dbProducts.length === 0) return null;
 
+    const displayedProducts = isMobile ? dbProducts.slice(0, 4) : dbProducts;
+
     return (
         <section
             ref={sectionRef}
@@ -104,7 +116,7 @@ export default function RecommendedProducts() {
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-                {dbProducts.map(product => (
+                {displayedProducts.map(product => (
                     <BestSellerCard key={product.id} product={product} />
                 ))}
             </div>

@@ -2,6 +2,8 @@
 import { useEffect, useRef, useState } from "react";
 import BestSellerCard from "./bestSellerCard";
 import { getBestSellers } from "@/lib/actions/product-actions";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export type Product = {
     id: string;
@@ -17,6 +19,7 @@ export type Product = {
 export default function BestSellers() {
     const [dbProducts, setDbProducts] = useState<Product[]>([]);
     const [isVisible, setIsVisible] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
     const sectionRef = useRef<HTMLElement>(null);
 
     useEffect(() => {
@@ -56,6 +59,11 @@ export default function BestSellers() {
         return () => observer.disconnect();
     }, []);
 
+    const productsPerPage = 4;
+    const totalPages = Math.ceil(dbProducts.length / productsPerPage);
+    const startIndex = (currentPage - 1) * productsPerPage;
+    const displayedProducts = dbProducts.slice(startIndex, startIndex + productsPerPage);
+
     return (
         <section
             ref={sectionRef}
@@ -78,10 +86,51 @@ export default function BestSellers() {
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-                {dbProducts.map(product => (
+                {displayedProducts.map(product => (
                     <BestSellerCard key={product.id} product={product} />
                 ))}
             </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+                <div className="flex items-center justify-center gap-3 pt-6 border-t border-white/5">
+                    <button 
+                        onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                        disabled={currentPage === 1}
+                        className="p-2.5 bg-slate-900 border border-white/5 rounded-xl text-slate-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                    >
+                        <ChevronLeft size={16} />
+                    </button>
+
+                    <div className="flex items-center gap-2">
+                        {[...Array(totalPages)].map((_, i) => (
+                            <button
+                                key={i + 1}
+                                onClick={() => {
+                                    setCurrentPage(i + 1);
+                                    sectionRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+                                }}
+                                className={cn(
+                                    "w-9 h-9 rounded-xl font-bold text-xs transition-all",
+                                    currentPage === i + 1 
+                                        ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20" 
+                                        : "bg-slate-900 text-slate-500 border border-white/5 hover:text-white"
+                                )}
+                            >
+                                {i + 1}
+                            </button>
+                        ))}
+                    </div>
+
+                    <button 
+                        onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                        disabled={currentPage === totalPages}
+                        className="p-2.5 bg-slate-900 border border-white/5 rounded-xl text-slate-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                    >
+                        <ChevronRight size={16} />
+                    </button>
+                </div>
+            )}
         </section>
     );
 }
