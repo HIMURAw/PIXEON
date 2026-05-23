@@ -263,27 +263,29 @@ export default function AdminProducts() {
             {/* Page Header */}
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                 <div>
-                    <h1 className="text-3xl font-extrabold text-white tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
+                    <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
                         {currentCategory ? `${currentCategory.name} Yönetimi` : "Ürün Yönetimi"}
                     </h1>
-                    <p className="text-slate-500 mt-1 flex items-center gap-2">
-                        <Package2 className="text-blue-400" size={14} />
-                        {currentCategory 
-                            ? `${currentCategory.name} kategorisindeki ürünlerin stok, fiyat ve durumlarını yönetin.`
-                            : "Katalogdaki ürünlerin stok, fiyat ve durumlarını yönetin."}
+                    <p className="text-xs sm:text-slate-500 mt-1 flex items-center gap-2">
+                        <Package2 className="text-blue-400 shrink-0" size={14} />
+                        <span className="truncate sm:not-truncate">
+                            {currentCategory 
+                                ? `${currentCategory.name} kategorisindeki ürünlerin stok, fiyat ve durumlarını yönetin.`
+                                : "Katalogdaki ürünlerin stok, fiyat ve durumlarını yönetin."}
+                        </span>
                     </p>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 w-full sm:w-auto">
                     <button 
                         onClick={handleExport}
-                        className="bg-slate-900 border border-white/10 text-slate-300 px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-slate-800 transition-all active:scale-95"
+                        className="bg-slate-900 border border-white/10 text-slate-300 px-4 py-2.5 rounded-xl text-sm font-bold flex-1 sm:flex-initial flex items-center justify-center gap-2 hover:bg-slate-800 transition-all active:scale-95"
                     >
                         <Download size={18} />
                         Dışa Aktar
                     </button>
                     <button
                         onClick={handleAdd}
-                        className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 py-2.5 rounded-xl flex items-center gap-2 transition-all shadow-lg shadow-blue-600/20 active:scale-95"
+                        className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 py-2.5 rounded-xl flex-1 sm:flex-initial flex items-center justify-center gap-2 transition-all shadow-lg shadow-blue-600/20 active:scale-95"
                     >
                         <Plus size={20} />
                         Yeni Ürün Ekle
@@ -292,7 +294,7 @@ export default function AdminProducts() {
             </div>
 
             {/* Quick Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:grid-cols-3 md:gap-6">
                 {[
                     { 
                         label: currentCategory ? `${currentCategory.name} Sayısı` : "Toplam Ürün", 
@@ -316,7 +318,7 @@ export default function AdminProducts() {
                         bg: "bg-emerald-400/10" 
                     },
                 ].map((stat, i) => (
-                    <div key={i} className="bg-[#020617] border border-white/10 p-6 rounded-2xl flex items-center gap-4">
+                    <div key={i} className="bg-[#020617] border border-white/10 p-4 sm:p-6 rounded-2xl flex items-center gap-4">
                         <div className={cn("p-3 rounded-xl", stat.bg, stat.color)}>
                             <stat.icon size={24} />
                         </div>
@@ -340,8 +342,8 @@ export default function AdminProducts() {
                         className="w-full bg-slate-950 border border-white/5 rounded-2xl px-12 py-3 text-sm outline-none focus:border-blue-500/50 transition-all placeholder:text-slate-600"
                     />
                 </div>
-                <div className="flex items-center gap-3 w-full lg:w-auto">
-                    <div className="flex bg-slate-900/50 border border-white/5 p-1 rounded-xl">
+                <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+                    <div className="flex bg-slate-900/50 border border-white/5 p-1 rounded-xl shrink-0">
                         <button
                             onClick={() => setViewMode("list")}
                             className={cn("p-2 rounded-lg transition-all", viewMode === "list" ? "bg-blue-600 text-white" : "text-slate-500 hover:text-white")}
@@ -358,7 +360,7 @@ export default function AdminProducts() {
                     <button 
                         onClick={() => setShowFilters(!showFilters)}
                         className={cn(
-                            "flex items-center gap-2 px-5 py-3 rounded-2xl text-sm font-bold transition-all border",
+                            "flex items-center justify-center gap-2 px-4 sm:px-5 py-3 rounded-2xl text-sm font-bold transition-all border flex-1 sm:flex-initial",
                             showFilters ? "bg-blue-600 text-white border-blue-500 shadow-lg shadow-blue-600/20" : "bg-slate-900 border-white/5 text-slate-400 hover:text-white"
                         )}
                     >
@@ -368,7 +370,7 @@ export default function AdminProducts() {
                     {(searchQuery || categoryFilter || stockFilter !== "all" || sortOrder !== "newest") && (
                         <button 
                             onClick={resetFilters}
-                            className="px-5 py-3 bg-red-500/10 text-red-400 border border-red-500/20 rounded-2xl text-sm font-bold hover:bg-red-500 hover:text-white transition-all active:scale-95"
+                            className="px-4 sm:px-5 py-3 bg-red-500/10 text-red-400 border border-red-500/20 rounded-2xl text-sm font-bold hover:bg-red-500 hover:text-white transition-all active:scale-95 flex-1 sm:flex-initial"
                         >
                             Sıfırla
                         </button>
@@ -376,7 +378,7 @@ export default function AdminProducts() {
                     <select
                         value={categoryFilter || "all"}
                         onChange={(e) => handleCategoryChange(e.target.value)}
-                        className="bg-slate-900 border border-white/5 rounded-2xl px-5 py-3 text-sm font-bold text-slate-400 outline-none focus:border-blue-500/50 transition-all cursor-pointer min-w-[160px]"
+                        className="bg-slate-900 border border-white/5 rounded-2xl px-4 py-3 text-sm font-bold text-slate-400 outline-none focus:border-blue-500/50 transition-all cursor-pointer flex-1 lg:flex-initial min-w-[140px]"
                     >
                         <option value="all">Tüm Kategoriler</option>
                         {dbCategories.map(cat => (
@@ -446,8 +448,8 @@ export default function AdminProducts() {
                 ) : null}
 
                 {viewMode === "list" ? (
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left text-sm">
+                    <div className="overflow-x-auto w-full">
+                        <table className="w-full text-left text-sm min-w-[800px]">
                             <thead>
                                 <tr className="bg-white/[0.01] text-slate-500 font-bold uppercase tracking-widest text-[10px]">
                                     <th className="px-8 py-5">
@@ -601,27 +603,27 @@ export default function AdminProducts() {
 
                 {/* Pagination Controls moved outside the list container to stay fixed at bottom */}
                 <div className={cn(
-                    "p-8 mt-6",
+                    "p-4 sm:p-8 mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4",
                     viewMode === "list" ? "border-t border-white/5" : "bg-[#020617] border border-white/10 rounded-3xl shadow-2xl"
                 )}>
                     <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">
                         {filteredProducts.length} üründen {paginatedProducts.length} tanesi gösteriliyor. (Sayfa {currentPage}/{totalPages || 1})
                     </p>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 justify-center sm:justify-start">
                         <button
                             onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                             disabled={currentPage === 1}
-                            className="p-3 bg-slate-950 border border-white/10 rounded-xl text-slate-500 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                            className="p-2 sm:p-3 bg-slate-950 border border-white/10 rounded-xl text-slate-500 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                         >
-                            <ChevronLeft size={20} />
+                            <ChevronLeft size={16} />
                         </button>
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide max-w-[180px] sm:max-w-none py-1">
                             {Array.from({ length: totalPages }, (_, i) => i + 1).map(i => (
                                 <button
                                     key={i}
                                     onClick={() => setCurrentPage(i)}
                                     className={cn(
-                                        "w-10 h-10 rounded-xl text-xs font-black transition-all border border-transparent",
+                                        "w-8 h-8 sm:w-10 sm:h-10 rounded-xl text-xs font-black transition-all border border-transparent shrink-0",
                                         i === currentPage ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" : "text-slate-500 hover:bg-white/5 hover:border-white/10"
                                     )}
                                 >
@@ -632,9 +634,9 @@ export default function AdminProducts() {
                         <button
                             onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                             disabled={currentPage === totalPages || totalPages === 0}
-                            className="p-3 bg-slate-950 border border-white/10 rounded-xl text-slate-500 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                            className="p-2 sm:p-3 bg-slate-950 border border-white/10 rounded-xl text-slate-500 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                         >
-                            <ChevronRight size={20} />
+                            <ChevronRight size={16} />
                         </button>
                     </div>
                 </div>

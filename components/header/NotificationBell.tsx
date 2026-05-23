@@ -109,10 +109,10 @@ export default function NotificationBell() {
             {isOpen && (
                 <>
                     <div className="fixed inset-0 z-40 bg-black/20 backdrop-blur-[2px]" onClick={() => setIsOpen(false)} />
-                    <div className="absolute right-0 mt-4 w-[380px] bg-[#0c1022]/95 border border-white/10 rounded-[40px] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] z-50 overflow-hidden backdrop-blur-2xl animate-in fade-in slide-in-from-top-4 duration-500">
+                    <div className="fixed md:absolute top-20 md:top-auto md:mt-4 right-4 md:right-0 left-4 md:left-auto w-auto md:w-[380px] bg-[#0c1022]/95 border border-white/10 rounded-[28px] md:rounded-[40px] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] z-50 overflow-hidden backdrop-blur-2xl animate-in fade-in slide-in-from-top-4 duration-500">
                         
                         {/* Header */}
-                        <div className="p-8 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
+                        <div className="p-6 md:p-8 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
                             <div className="flex items-center gap-3">
                                 <div className="w-8 h-8 bg-blue-600/10 rounded-xl flex items-center justify-center text-blue-500">
                                     <Bell size={16} />
@@ -125,12 +125,12 @@ export default function NotificationBell() {
                         </div>
 
                         {/* List */}
-                        <div className="max-h-[450px] overflow-y-auto scrollbar-hide py-2">
+                        <div className="max-h-[380px] md:max-h-[450px] overflow-y-auto scrollbar-hide py-2">
                             {notifications.length > 0 ? (
                                 notifications.map((notif, index) => (
                                     <div 
                                         key={notif.id}
-                                        className="px-8 py-6 border-b border-white/[0.03] last:border-0 hover:bg-white/[0.02] transition-colors group relative overflow-hidden"
+                                        className="px-6 py-5 md:px-8 md:py-6 border-b border-white/[0.03] last:border-0 hover:bg-white/[0.02] transition-colors group relative overflow-hidden"
                                     >
                                         <div className="flex gap-5">
                                             {/* Type Icon */}

@@ -100,9 +100,15 @@ const menuGroups = [
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
 
     const pathname = usePathname();
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [user, setUser] = useState<any>(null);
     const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
+
+    useEffect(() => {
+        if (window.innerWidth >= 768) {
+            setIsSidebarOpen(true);
+        }
+    }, []);
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -129,6 +135,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     ...prev,
                     [activeGroup.title]: true
                 }));
+            }
+            if (window.innerWidth < 768) {
+                setIsSidebarOpen(false);
             }
         }
     }, [pathname, user]);
@@ -169,15 +178,22 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <NotificationProvider>
                 <Toaster position="top-right" />
                 <div className="min-h-screen bg-slate-950 text-slate-200 flex">
-
+                    {/* MOBILE SIDEBAR BACKDROP */}
+                    {isSidebarOpen && (
+                        <div 
+                            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[45] md:hidden animate-in fade-in duration-200"
+                            onClick={() => setIsSidebarOpen(false)}
+                        />
+                    )}
 
                     {/* SIDEBAR */}
                     <aside className={cn(
-                        "bg-[#020617] border-r border-white/10 transition-all duration-300 flex flex-col",
-                        isSidebarOpen ? "w-64" : "w-20"
+                        "bg-[#020617] border-r border-white/10 transition-all duration-300 flex flex-col z-50",
+                        "fixed inset-y-0 left-0 w-64 md:static md:translate-x-0",
+                        isSidebarOpen ? "translate-x-0 md:w-64" : "-translate-x-full md:w-20"
                     )}>
                         {/* Logo Section */}
-                        <div className="h-20 flex items-center px-6 border-b border-white/10">
+                        <div className="h-16 md:h-20 flex items-center px-6 border-b border-white/10 shrink-0">
                             <div className="w-8 h-8 bg-blue-600 rounded-lg flex-shrink-0 flex items-center justify-center font-bold text-white">
                                 P
                             </div>
@@ -187,9 +203,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                         </div>
 
                         {/* Nav Links */}
-                        <nav className="flex-1 py-6 px-3 space-y-6 overflow-y-auto custom-scrollbar">
+                        <nav className="flex-1 py-4 md:py-6 px-3 space-y-4 md:space-y-6 overflow-y-auto custom-scrollbar">
                             {filteredMenuGroups.map((group) => {
-                                const isOpen = !isSidebarOpen || !!openGroups[group.title];
+                                const isOpen = isSidebarOpen || !!openGroups[group.title];
                                 return (
                                     <div key={group.title} className="space-y-2">
                                         {isSidebarOpen && (
@@ -215,7 +231,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                                                 <Link
                                                     key={item.label}
                                                     href={item.href}
-                                                    className="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-400 hover:bg-white/5 hover:text-white transition-all group relative"
+                                                    className="flex items-center gap-3 px-3 py-1.5 md:py-2 rounded-lg text-slate-400 hover:bg-white/5 hover:text-white transition-all group relative"
                                                 >
                                                     <item.icon size={18} className="group-hover:text-blue-400 transition-colors" />
                                                     {isSidebarOpen && <span className="font-medium text-xs">{item.label}</span>}
@@ -233,9 +249,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                         </nav>
 
                         {/* Logout / Footer */}
-                        <div className="p-4 border-t border-white/10">
-                            <button className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-red-400 hover:bg-red-400/10 transition-all">
-                                <LogOut size={20} />
+                        <div className="p-4 border-t border-white/10 shrink-0">
+                            <button className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-red-400 hover:bg-red-400/10 transition-all text-xs font-semibold">
+                                <LogOut size={18} />
                                 {isSidebarOpen && <span className="font-medium text-sm">Çıkış Yap</span>}
                             </button>
                         </div>
@@ -245,11 +261,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
 
                         {/* Header */}
-                        <header className="h-20 bg-[#020617]/50 backdrop-blur-md border-b border-white/10 flex items-center justify-between px-8 shrink-0 relative z-50">
+                        <header className="h-16 md:h-20 bg-[#020617]/50 backdrop-blur-md border-b border-white/10 flex items-center justify-between px-4 md:px-8 shrink-0 relative z-40">
                             <div className="flex items-center gap-4">
                                 <button
                                     onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                                     className="p-2 hover:bg-white/5 rounded-lg text-slate-400"
+                                    aria-label="Menü"
                                 >
                                     <Menu size={20} />
                                 </button>
@@ -264,22 +281,22 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-6">
+                            <div className="flex items-center gap-4 md:gap-6">
                                 <NotificationBell />
 
-                                <div className="flex items-center gap-3 border-l border-white/10 pl-6">
+                                <div className="flex items-center gap-2 md:gap-3 border-l border-white/10 pl-4 md:pl-6">
                                     <div className="text-right hidden sm:block">
                                         <p className="text-sm font-bold text-white">
                                             {user?.name || "Yükleniyor..."}
                                         </p>
                                         <p className="text-xs text-slate-500">{user?.adminRole || "Yetkili Yönetici"}</p>
                                     </div>
-                                    <div className="w-10 h-10 rounded-full bg-slate-900 border-2 border-[#020617] shadow-lg overflow-hidden">
+                                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-slate-900 border-2 border-[#020617] shadow-lg overflow-hidden shrink-0">
                                         {user?.image ? (
                                             <img src={user.image} alt={user.name} className="w-full h-full object-cover" />
                                         ) : (
                                             <div className="w-full h-full flex items-center justify-center bg-blue-600/10 text-blue-400">
-                                                <User size={18} />
+                                                <User size={16} />
                                             </div>
                                         )}
                                     </div>
@@ -288,7 +305,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                         </header>
 
                         {/* Content Area (Scrollable) */}
-                        <main className="flex-1 overflow-y-auto p-8 bg-slate-950/50">
+                        <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-slate-950/50">
                             {children}
                         </main>
                     </div>

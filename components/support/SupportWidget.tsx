@@ -359,7 +359,7 @@ export default function SupportWidget() {
         <div className="fixed bottom-6 right-6 z-[9999]">
             {isOpen && (
                 <div
-                    className="absolute bottom-20 right-0 w-[390px] h-[560px] bg-[#0c1022] border border-white/10 rounded-[28px] shadow-2xl flex flex-col overflow-hidden"
+                    className="fixed md:absolute bottom-24 md:bottom-20 right-4 md:right-0 left-4 md:left-auto top-4 md:top-auto w-auto md:w-[390px] h-auto md:h-[560px] bg-[#0c1022] border border-white/10 rounded-[24px] md:rounded-[28px] shadow-2xl flex flex-col overflow-hidden"
                     style={{ animation: "slideUp 0.25s cubic-bezier(0.34,1.56,0.64,1)" }}
                 >
                     {/* Header */}
