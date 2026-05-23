@@ -59,14 +59,14 @@ export default function HeroCarousel() {
 
     if (loading) {
         return (
-            <div className="relative w-full h-[680px] bg-slate-900 rounded-2xl overflow-hidden animate-pulse flex">
-                <div className="w-1/2 h-full p-16 space-y-8 flex flex-col justify-center">
+            <div className="relative w-full h-[380px] sm:h-[480px] lg:h-[680px] bg-slate-900 rounded-2xl overflow-hidden animate-pulse flex">
+                <div className="w-full lg:w-1/2 h-full p-8 lg:p-16 space-y-6 lg:space-y-8 flex flex-col justify-center">
                     <div className="h-6 bg-white/5 w-24 rounded-full" />
                     <div className="h-12 bg-white/5 w-3/4 rounded-2xl" />
                     <div className="h-20 bg-white/5 w-full rounded-2xl" />
                     <div className="h-10 bg-white/5 w-40 rounded-xl" />
                 </div>
-                <div className="w-1/2 h-full bg-white/5" />
+                <div className="hidden lg:block lg:w-1/2 h-full bg-white/5" />
             </div>
         );
     }
@@ -74,21 +74,21 @@ export default function HeroCarousel() {
     if (activeSlides.length === 0) return null;
 
     return (
-        <div className="user-select-none relative w-full h-[680px] bg-linear-to-br from-slate-900 to-slate-800 rounded-2xl overflow-hidden group">
-            <div className="relative w-full h-full flex">
+        <div className="user-select-none relative w-full h-[380px] sm:h-[480px] lg:h-[680px] bg-linear-to-br from-slate-900 to-slate-800 rounded-2xl overflow-hidden group">
+            <div className="relative w-full h-full flex flex-col lg:flex-row">
 
                 
                 {/* Sol Taraf: Metin İçerikleri (Slaytlar) */}
-                <div className="w-1/2 h-full relative overflow-hidden">
+                <div className="w-full lg:w-1/2 h-full relative overflow-hidden">
                     {activeSlides.map((slide, index) => (
                         <div
                             key={slide.id}
-                            className={`absolute inset-0 transition-all duration-700 ease-in-out flex items-center px-8 lg:px-16 ${index === currentSlide
+                            className={`absolute inset-0 transition-all duration-700 ease-in-out flex items-center px-6 sm:px-8 lg:px-16 ${index === currentSlide
                                 ? "opacity-100 translate-x-0 z-10"
                                 : "opacity-0 -translate-x-10 z-0"
                                 }`}
                         >
-                            <div className="space-y-6 pr-4">
+                            <div className="space-y-4 lg:space-y-6 pr-4">
                                 <div className="inline-block">
                                     <span className="text-[9px] font-bold text-gray-300 bg-gray-700 px-2 py-0.5 rounded-full mr-1">
                                         ÖZEL TEKLİF
@@ -98,22 +98,22 @@ export default function HeroCarousel() {
                                     </span>
                                 </div>
 
-                                <h1 className="text-3xl lg:text-4xl font-bold text-white leading-tight">
+                                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-tight">
                                     {slide.title}
-                                </h1>
+                               </h1>
 
-                                <p className="text-sm text-gray-300 max-w-md">
+                                <p className="text-xs sm:text-sm text-gray-300 max-w-md">
                                     {slide.subtitle}
                                 </p>
 
                                 <div className="flex items-center gap-1.5">
                                     <span className="text-[10px] text-gray-300">'dan itibaren</span>
-                                    <span className="text-3xl font-bold text-red-400">
+                                    <span className="text-2xl sm:text-3xl font-bold text-red-400">
                                         {slide.price}
                                     </span>
                                 </div>
 
-                                <button className="cursor-pointer bg-sky-400 hover:bg-sky-500 text-white font-bold px-6 py-2.5 rounded-full transition-all duration-300 flex items-center gap-1.5 text-sm active:scale-95 shadow-lg shadow-sky-400/20">
+                                <button className="cursor-pointer bg-sky-400 hover:bg-sky-500 text-white font-bold px-5 lg:px-6 py-2 sm:py-2.5 rounded-full transition-all duration-300 flex items-center gap-1.5 text-xs sm:text-sm active:scale-95 shadow-lg shadow-sky-400/20">
                                     {slide.buttonText}
                                     <span className="group-hover/btn:translate-x-1 transition-transform">→</span>
                                 </button>
@@ -123,7 +123,7 @@ export default function HeroCarousel() {
                 </div>
 
                 {/* Sağ Taraf: Sabit Tek 3D Görüntüleyici */}
-                <div className="w-1/2 h-full relative z-10 bg-gradient-to-l from-slate-900/20 to-transparent">
+                <div className="hidden lg:block lg:w-1/2 h-full relative z-10 bg-gradient-to-l from-slate-900/20 to-transparent">
                     <ModelViewer path={activeSlides[currentSlide]?.modelPath} />
                 </div>
             </div>

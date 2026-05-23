@@ -23,6 +23,7 @@ import Footer from "@/components/footer/Footer";
 import ReviewSection from "@/components/reviews/ReviewSection";
 import WishlistButton from "@/components/products/WishlistButton";
 import ProductAddToCartButton from "@/components/products/ProductAddToCartButton";
+import ProductViewTracker from "@/components/products/ProductViewTracker";
 import { getSession } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
@@ -96,6 +97,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
     return (
         <div className="min-h-screen bg-slate-950">
+            <ProductViewTracker categorySlug={category?.slug} />
             <TopBar />
             <MainBar />
             <Head />

@@ -4,17 +4,18 @@ import Head from "@/components/header/Head";
 import HeroCarousel from "@/components/hero/hero";
 import PromoSection from "@/components/promo/promoSection";
 import BestSellers from "@/components/sellersCard/bestSellers/bestSeller";
+import RecommendedProducts from "@/components/sellersCard/recommended/RecommendedProducts";
 import InfoBanner from "@/components/hero/InfoBanner";
 import HotDeal from "@/components/sellersCard/hotDeals/HotDeal";
 import PromoVertical from "@/components/promo/PromoVertical";
 import PromoVerticalSmall from "@/components/promo/PromoVerticalSmall";
 import PromoBanner from "@/components/promo/PromoBanner";
-import Products from "@/components/products/newProducts/newProducts";
+import FilteredProductsSection from "@/components/products/FilteredProductsSection";
 import NewProductsSidebar from "@/components/products/newProducts/NewProductsSidebar";
 import ReviewSection from "@/components/reviews/ReviewSection";
 import Footer from "@/components/footer/Footer";
 import BannerSection from "@/components/promo/BannerSection";
-import BlogHomepageSection from "@/components/blog/BlogHomepageSection";
+import StaticCategoriesMenu from "@/components/categories/StaticCategoriesMenu";
 
 import { getSession } from "@/lib/auth";
 import { db } from "@/lib/db";
@@ -40,13 +41,13 @@ export default async function Home() {
             <MainBar />
             <Head />
 
-            <div className="w-full px-4 sm:px-6 lg:px-8 pt-1 pb-10 space-y-24">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-1 pb-10 space-y-24">
                 {/* HERO */}
                 <div className="flex gap-16">
                     <aside className="hidden lg:block w-72 shrink-0">
-                        {/* Categories buraya gelecek */}
+                        <StaticCategoriesMenu />
                     </aside>
-                    <main className="flex-1">
+                    <main className="flex-1 min-w-0">
                         <HeroCarousel />
                     </main>
                 </div>
@@ -54,7 +55,7 @@ export default async function Home() {
                 {/* ALT CONTENT */}
                 <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-16">
                     {/* SOL TARAF */}
-                    <aside className="space-y-6">
+                    <aside className="space-y-6 order-2 lg:order-1">
                         <BannerSection position="home-top" />
                         <PromoSection />
                         <BannerSection position="products-sidebar" />
@@ -63,23 +64,24 @@ export default async function Home() {
                     </aside>
 
                     {/* SAĞ TARAF */}
-                    <main className="space-y-24">
-                        <BestSellers />
+                    <main className="space-y-24 order-1 lg:order-2 min-w-0">
+                        <RecommendedProducts />
                         <BannerSection position="home-middle" className="h-64" />
                         <InfoBanner />
                         <HotDeal />
                         <PromoBanner />
+                        <BestSellers />
                         <BannerSection position="home-bottom" />
                     </main>
                 </div>
 
-                {/* YENİ ÜRÜNLER BÖLÜMÜ */}
+                {/* ÜRÜNLER / FİLTRELEME BÖLÜMÜ */}
                 <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-16 !-mt-14">
-                    <aside>
+                    <aside className="order-2 lg:order-1">
                         <NewProductsSidebar />
                     </aside>
-                    <main>
-                        <Products limit={6} />
+                    <main className="order-1 lg:order-2 min-w-0">
+                        <FilteredProductsSection />
                     </main>
                 </div>
 
@@ -87,11 +89,6 @@ export default async function Home() {
                 <div className="pt-20 border-t border-white/5">
                     <ReviewSection currentUser={currentUser} reviews={reviews} />
                 </div>
-
-                {/* BLOG BÖLÜMÜ
-                <div className="pt-20 border-t border-white/5">
-                    <BlogHomepageSection />
-                </div> */}
             </div>
             <Footer />
         </>
