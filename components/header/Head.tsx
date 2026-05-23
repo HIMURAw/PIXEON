@@ -43,6 +43,7 @@ export default function Head() {
     const [isOpen, setIsOpen] = useState(false);
     const wrapperRef = useRef<HTMLDivElement>(null);
     const debounceRef = useRef<NodeJS.Timeout | null>(null);
+    const [showMobileSearch, setShowMobileSearch] = useState(false);
 
     // Load nav links
     useEffect(() => {
@@ -115,10 +116,15 @@ export default function Head() {
 
                 {/* MOBILE */}
                 <div className="flex md:hidden items-center justify-between py-3 text-slate-200">
-                    <BurgerMenu />
-                    <Link href="/" className="shrink-0">
-                        <Image src="/logo-nobg.png" alt="Logo" width={48} height={48} />
-                    </Link>
+                    {/* Left: Burger + Logo */}
+                    <div className="flex items-center gap-3">
+                        <BurgerMenu />
+                        <Link href="/" className="shrink-0">
+                            <Image src="/logo-nobg.png" alt="Logo" width={40} height={40} />
+                        </Link>
+                    </div>
+
+                    {/* Right: Icons + Search */}
                     <div className="flex items-center gap-3">
                         <NotificationBell />
                         <motion.div
@@ -149,8 +155,96 @@ export default function Head() {
                             </Link>
                         </motion.div>
                         <UserMenu mobile />
+                        <button 
+                            onClick={() => setShowMobileSearch(prev => !prev)}
+                            className="p-1 text-slate-200 hover:text-sky-400 transition-colors"
+                            aria-label="Ara"
+                        >
+                            <Search size={20} />
+                        </button>
                     </div>
                 </div>
+
+                {/* MOBILE SEARCH BAR */}
+                {showMobileSearch && (
+                    <div className="md:hidden py-3 border-t border-slate-800" ref={wrapperRef}>
+                        <form onSubmit={handleSubmit} className="relative">
+                            <input
+                                type="text"
+                                placeholder="Oyun, Konsol veya Aksesuar ara..."
+                                value={query}
+                                onChange={e => setQuery(e.target.value)}
+                                onFocus={() => results.length > 0 && setIsOpen(true)}
+                                className="w-full bg-[#020617] text-slate-200 rounded-xl px-4 py-2.5 pr-12 outline-none border border-slate-700 focus:border-sky-500 text-xs"
+                            />
+                            <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                                {loading && <Loader2 size={12} className="animate-spin text-slate-500" />}
+                                {query && !loading && (
+                                    <button type="button" onClick={() => { setQuery(""); setResults([]); setIsOpen(false); }} className="text-slate-600 hover:text-white transition-colors">
+                                        <X size={12} />
+                                    </button>
+                                )}
+                                <button type="submit" className="text-slate-500 hover:text-sky-400 transition-colors">
+                                    <Search size={14} />
+                                </button>
+                            </div>
+
+                            {/* MOBILE DROPDOWN RESULTS */}
+                            {isOpen && (
+                                <div className="absolute top-full left-0 right-0 mt-2 bg-[#0c1022] border border-white/10 rounded-2xl shadow-2xl z-[200] overflow-hidden">
+                                    {results.length > 0 ? (
+                                        <>
+                                            <div className="px-4 py-2 border-b border-white/5 flex items-center justify-between">
+                                                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{results.length} sonuç bulundu</span>
+                                                <button
+                                                    type="submit"
+                                                    className="text-[10px] font-black text-sky-500 hover:text-sky-400 uppercase tracking-widest flex items-center gap-1 transition-colors"
+                                                >
+                                                    Tümünü Gör <ArrowRight size={10} />
+                                                </button>
+                                            </div>
+                                            <div className="max-h-64 overflow-y-auto divide-y divide-white/5">
+                                                {results.map((product) => (
+                                                    <button
+                                                        key={product.id}
+                                                        type="button"
+                                                        onClick={() => handleSelect(product.slug)}
+                                                        className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-white/5 transition-colors group text-left"
+                                                    >
+                                                        <div className="w-10 h-10 rounded-lg overflow-hidden border border-white/5 bg-slate-900 shrink-0">
+                                                            {product.image ? (
+                                                                <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
+                                                            ) : (
+                                                                <div className="w-full h-full flex items-center justify-center text-slate-600">
+                                                                    <Tag size={14} />
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className="text-xs font-bold text-white group-hover:text-sky-400 transition-colors truncate">
+                                                                {product.name}
+                                                            </p>
+                                                            <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest mt-0.5">
+                                                                {product.category?.name || "Ürün"}
+                                                            </p>
+                                                        </div>
+                                                        <div className="text-right shrink-0">
+                                                            <p className="text-xs font-black text-sky-400">{formatPrice(product.price)}</p>
+                                                        </div>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <div className="px-4 py-6 text-center">
+                                            <p className="text-xs text-slate-600 font-bold">"{query}" için sonuç bulunamadı.</p>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </form>
+                    </div>
+                )}
 
                 {/* DESKTOP */}
                 <div className="hidden md:flex items-center justify-between py-6 text-slate-200">
