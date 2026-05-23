@@ -2,6 +2,7 @@ import MainBar from "@/components/header/MainBar";
 import TopBar from "@/components/header/TopBar";
 import Head from "@/components/header/Head";
 import Products from "@/components/products/newProducts/newProducts";
+import SidebarLayout from "@/components/categories/SidebarLayout";
 
 export default function YeniUrunlerPage() {
     return (
@@ -11,9 +12,9 @@ export default function YeniUrunlerPage() {
             <Head />
 
             <div className="w-full px-4 sm:px-6 lg:px-8 pt-6 pb-10">
-                <div className="ml-0 lg:ml-[calc(280px+4rem)]">
+                <SidebarLayout>
                     <Products />
-                </div>
+                </SidebarLayout>
             </div>
         </>
     );

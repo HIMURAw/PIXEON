@@ -15,7 +15,7 @@ import NewProductsSidebar from "@/components/products/newProducts/NewProductsSid
 import ReviewSection from "@/components/reviews/ReviewSection";
 import Footer from "@/components/footer/Footer";
 import BannerSection from "@/components/promo/BannerSection";
-import StaticCategoriesMenu from "@/components/categories/StaticCategoriesMenu";
+import SidebarLayout from "@/components/categories/SidebarLayout";
 
 import { getSession } from "@/lib/auth";
 import { db } from "@/lib/db";
@@ -43,14 +43,9 @@ export default async function Home() {
 
             <div className="w-full px-4 sm:px-6 lg:px-8 pt-1 pb-10 space-y-8 md:space-y-24 mt-1">
                 {/* HERO */}
-                <div className="flex gap-6 lg:gap-16">
-                    <aside className="hidden lg:block w-72 shrink-0">
-                        <StaticCategoriesMenu />
-                    </aside>
-                    <main className="flex-1 min-w-0">
-                        <HeroCarousel />
-                    </main>
-                </div>
+                <SidebarLayout>
+                    <HeroCarousel />
+                </SidebarLayout>
 
                 {/* ALT CONTENT */}
                 <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6 lg:gap-16">

@@ -1,26 +1,23 @@
 "use client";
-
-import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import CategoriesButton from "../header/categoriesButton/categoriesButton";
 import CategoriesMenu from "./CategoriesMenu";
-import PromoSection from "../promo/promoSection";
+import { useCategoryMenu } from "@/context/CategoryMenuContext";
 
 export default function CategoriesSection() {
     const pathname = usePathname();
-    const [open, setOpen] = useState(false);
-
-    useEffect(() => {
-        setOpen(false);
-    }, [pathname]);
+    const { isOpen, toggle } = useCategoryMenu();
 
     return (
         <div className="relative">
             <CategoriesButton
-                isOpen={open}
-                onToggle={() => setOpen(v => !v)}
+                isOpen={isOpen}
+                onToggle={toggle}
             />
-            <CategoriesMenu isOpen={open} />
+            {/* Sadece sol tarafta statik menü barınmadığı sayfalarda açılır menüyü (dropdown) göster */}
+            {pathname !== "/" && pathname !== "/yeni-urunler" && (
+                <CategoriesMenu isOpen={isOpen} />
+            )}
         </div>
     );
 }

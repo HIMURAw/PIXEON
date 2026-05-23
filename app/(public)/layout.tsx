@@ -21,6 +21,7 @@ import Footer from "@/components/footer/Footer";
 import { SupportProvider } from "@/context/SupportContext";
 import { CartProvider } from "@/context/CartContext";
 import { CartAnimationProvider } from "@/context/CartAnimationContext";
+import { CategoryMenuProvider } from "@/context/CategoryMenuContext";
 import { Toaster } from "react-hot-toast";
 import SupportWidget from "@/components/support/SupportWidget";
 
@@ -36,10 +37,12 @@ export default function RootLayout({
       >
         <CartProvider>
           <CartAnimationProvider>
-            <SupportProvider>
-              {children}
-              <SupportWidget />
-            </SupportProvider>
+            <CategoryMenuProvider>
+              <SupportProvider>
+                {children}
+                <SupportWidget />
+              </SupportProvider>
+            </CategoryMenuProvider>
           </CartAnimationProvider>
           <Toaster 
             position="top-right" 
