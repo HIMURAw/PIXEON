@@ -6,8 +6,11 @@ import { eq, desc, asc, and, gte, lte, like, or, count, inArray, not } from "dri
 import { revalidatePath } from "next/cache";
 import fs from "fs/promises";
 import path from "path";
+import { randomUUID } from "crypto";
 
 const UPLOAD_DIR = path.join(process.cwd(), "public/uploads/products");
+const ALLOWED_EXTENSIONS = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
+const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
 
 export async function searchProducts(query: string) {
   try {
@@ -57,10 +60,23 @@ export async function uploadImage(file: File, oldImageUrl?: string | null) {
 
     if (!file || file.size === 0) return null;
 
+    // Validate MIME type
+    if (!ALLOWED_MIME_TYPES.includes(file.type)) {
+      console.error("Invalid MIME type:", file.type);
+      return null;
+    }
+
+    // Validate extension
+    const ext = path.extname(file.name).toLowerCase();
+    if (!ALLOWED_EXTENSIONS.includes(ext)) {
+      console.error("Invalid extension:", ext);
+      return null;
+    }
+
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    const fileName = `${Date.now()}-${file.name.replace(/ /g, "-")}`;
+    const fileName = `${Date.now()}-${randomUUID()}${ext}`;
     const filePath = path.join(UPLOAD_DIR, fileName);
 
     await fs.mkdir(UPLOAD_DIR, { recursive: true });
