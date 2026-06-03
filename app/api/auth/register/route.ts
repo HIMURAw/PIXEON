@@ -6,6 +6,8 @@ import bcrypt from "bcryptjs";
 import fs from "fs/promises";
 import path from "path";
 
+import { verifyCaptcha } from "@/lib/captcha";
+
 export async function POST(request: NextRequest) {
   try {
     // Check if new registrations are allowed
@@ -23,7 +25,16 @@ export async function POST(request: NextRequest) {
       // ignore
     }
 
-    const { name, email, password } = await request.json();
+    const { name, email, password, captchaToken, captchaAnswer } = await request.json();
+
+    // Verify Captcha
+    const isCaptchaValid = await verifyCaptcha(captchaToken, captchaAnswer);
+    if (!isCaptchaValid) {
+      return NextResponse.json(
+        { success: false, message: "Güvenlik kodu hatalı veya süresi dolmuş." },
+        { status: 400 }
+      );
+    }
 
     // 1. Kullanıcı var mı kontrol et
     const existingUsers = await db.select().from(users).where(eq(users.email, email)).limit(1);

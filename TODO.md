@@ -15,10 +15,9 @@
 - [✖️] google auth eklenicek
 - [✖️] İade sistemine bakılıcak
 
-- [✖️] captcha eklenicek
-- [✖️] Rate limit eklenicek
+- [✔️] captcha eklenicek
+- [✔️] Rate limit eklenicek
 - [✖️] Admin login rate limit eklenicek
-- [✖️] gereken işlemlere role check eklenicek
 - [✖️] Zod ile API güvenliği sağlanıcak
 - [✖️] XSS (Cross Site Scripting) kontrol edilicek
 - [✖️] ticket kısmında upload sistemine dosya boyutu kontrolü eklenicek

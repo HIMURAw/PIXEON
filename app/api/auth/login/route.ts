@@ -5,10 +5,21 @@ import { users } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 
+import { verifyCaptcha } from "@/lib/captcha";
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email, password } = body;
+    const { email, password, captchaToken, captchaAnswer } = body;
+
+    // Verify Captcha
+    const isCaptchaValid = await verifyCaptcha(captchaToken, captchaAnswer);
+    if (!isCaptchaValid) {
+      return NextResponse.json(
+        { success: false, message: "Güvenlik kodu hatalı veya süresi dolmuş." },
+        { status: 400 }
+      );
+    }
 
     // 1. Kullanıcıyı bul
     const foundUsers = await db.select().from(users).where(eq(users.email, email)).limit(1);
