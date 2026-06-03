@@ -4,14 +4,35 @@ import { db } from "@/lib/db";
 import { users } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
+import { z } from "zod";
 
 import { verifyCaptcha } from "@/lib/captcha";
 import { rateLimit } from "@/lib/rate-limiter";
 
+const loginSchema = z.object({
+  email: z.string().email("Geçerli bir e-posta adresi giriniz"),
+  password: z.string().min(6, "Şifre en az 6 karakter olmalıdır"),
+  captchaToken: z.string().min(1, "Güvenlik kodu anahtarı eksik"),
+  captchaAnswer: z.string().min(1, "Güvenlik kodunu giriniz"),
+});
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email, password, captchaToken, captchaAnswer } = body;
+
+    // Validate request body
+    const validationResult = loginSchema.safeParse(body);
+    if (!validationResult.success) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: validationResult.error.errors[0]?.message || "Geçersiz giriş bilgileri",
+        },
+        { status: 400 }
+      );
+    }
+
+    const { email, password, captchaToken, captchaAnswer } = validationResult.data;
 
     // Verify Captcha
     const isCaptchaValid = await verifyCaptcha(captchaToken, captchaAnswer);
