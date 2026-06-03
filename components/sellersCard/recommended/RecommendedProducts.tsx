@@ -29,7 +29,10 @@ export default function RecommendedProducts() {
                 const visited = localStorage.getItem("visited_categories");
                 const visitedCategories: string[] = visited ? JSON.parse(visited) : [];
                 
-                const data = await getRecommendedProducts(visitedCategories);
+                const visitedProds = localStorage.getItem("visited_products");
+                const visitedProducts: string[] = visitedProds ? JSON.parse(visitedProds) : [];
+                
+                const data = await getRecommendedProducts(visitedCategories, visitedProducts);
                 const mapped = data.map((p: any) => ({
                     id: p.id,
                     name: p.name,

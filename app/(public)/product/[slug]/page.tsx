@@ -97,7 +97,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
     return (
         <div className="min-h-screen bg-slate-950">
-            <ProductViewTracker categorySlug={category?.slug} />
+            <ProductViewTracker categorySlug={category?.slug} productId={product.id} />
             <TopBar />
             <MainBar />
             <Head />

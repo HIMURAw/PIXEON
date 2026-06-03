@@ -313,13 +313,72 @@ export async function getFilteredProducts(filters: {
   }
 }
 
-export async function getRecommendedProducts(categorySlugs: string[]) {
+export async function getRecommendedProducts(categorySlugs: string[], visitedProductIds: string[] = []) {
   try {
     let data: any[] = [];
     const activeSlugs = categorySlugs.filter(Boolean);
+    const activeProductIds = visitedProductIds.filter(Boolean);
 
-    if (activeSlugs.length > 0) {
-      data = await db.select({
+    // 1. If we have recently visited products, find their category IDs and query similar products
+    if (activeProductIds.length > 0) {
+      // First, fetch the category IDs of the visited products
+      const visitedProductsData = await db.select({ categoryId: products.categoryId })
+        .from(products)
+        .where(inArray(products.id, activeProductIds));
+      
+      const visitedCategoryIds = visitedProductsData
+        .map(p => p.categoryId)
+        .filter(Boolean) as string[];
+
+      if (visitedCategoryIds.length > 0) {
+        // Query products in these categories, excluding the visited products themselves
+        data = await db.select({
+          id: products.id,
+          name: products.name,
+          slug: products.slug,
+          sku: products.sku,
+          price: products.price,
+          oldPrice: products.oldPrice,
+          stock: products.stock,
+          salesCount: products.salesCount,
+          image: products.image,
+          status: products.status,
+          categoryId: products.categoryId,
+          category: {
+            name: categories.name,
+            slug: categories.slug
+          },
+          createdAt: products.createdAt,
+          updatedAt: products.updatedAt
+        })
+          .from(products)
+          .leftJoin(categories, eq(products.categoryId, categories.id))
+          .where(
+            and(
+              eq(products.status, "ACTIVE"),
+              inArray(products.categoryId, visitedCategoryIds),
+              not(inArray(products.id, activeProductIds)) // Exclude already viewed products
+            )
+          )
+          .orderBy(desc(products.salesCount))
+          .limit(8);
+      }
+    }
+
+    // 2. If we still need more products, fallback to querying by category slugs (from category history)
+    if (data.length < 8 && activeSlugs.length > 0) {
+      const remainingLimit = 8 - data.length;
+      const excludedIds = [...activeProductIds, ...data.map(p => p.id)];
+      const conditions = [
+        eq(products.status, "ACTIVE"),
+        inArray(categories.slug, activeSlugs)
+      ];
+      
+      if (excludedIds.length > 0) {
+        conditions.push(not(inArray(products.id, excludedIds)));
+      }
+
+      const catFallbackData = await db.select({
         id: products.id,
         name: products.name,
         slug: products.slug,
@@ -340,19 +399,17 @@ export async function getRecommendedProducts(categorySlugs: string[]) {
       })
         .from(products)
         .leftJoin(categories, eq(products.categoryId, categories.id))
-        .where(
-          and(
-            eq(products.status, "ACTIVE"),
-            inArray(categories.slug, activeSlugs)
-          )
-        )
+        .where(and(...conditions))
         .orderBy(desc(products.salesCount))
-        .limit(8);
+        .limit(remainingLimit);
+
+      data = [...data, ...catFallbackData];
     }
 
+    // 3. General popular products as a final fallback
     if (data.length < 8) {
       const remainingLimit = 8 - data.length;
-      const excludedIds = data.map(p => p.id);
+      const excludedIds = [...activeProductIds, ...data.map(p => p.id)];
       const fallbackConditions = [eq(products.status, "ACTIVE")];
 
       if (excludedIds.length > 0) {

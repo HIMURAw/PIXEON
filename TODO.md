@@ -3,7 +3,7 @@
 - [✔️] Mobil uyumluluk eklenicek
 - [✔️] Spread out the website layout
 - [✔️] Anasayfaya ürün filtreleme özelliği eklenicek
-- [✖️] En Çok Satanlar kısmı alt tarafa kayıcak bunun yerinde önerilen ürünler kısmı olucak burada kullanıcı hangi ürünlere gidiyse o kategörideki ürünler çıkıcak
+- [✔️] En Çok Satanlar kısmı alt tarafa kayıcak bunun yerinde önerilen ürünler kısmı olucak burada kullanıcı hangi ürünlere gidiyse o kategörideki ürünler çıkıcak
 
 - [✖️] kategoriler kısmına bir kez daha bakılıcak
 - [✖️] abonelik sistemine birdaha bakılıcak
