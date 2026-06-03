@@ -259,47 +259,60 @@ export default function SupportWidget() {
 
     // ── Image Upload ────────────────────────────────────────────────────────
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file || !sessionId || !user) return;
+    const file = e.target.files?.[0];
+    if (!file || !sessionId || !user) return;
 
-        const formData = new FormData();
-        formData.append("file", file);
+    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+    if (file.size > MAX_FILE_SIZE) {
+        alert("Dosya boyutu 5MB'dan büyük olamaz.");
+        e.target.value = "";
+        return;
+    }
 
-        try {
-            const uploadRes = await fetch("/api/support/upload", {
+    const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+    if (!ALLOWED_TYPES.includes(file.type)) {
+        alert("Yalnızca JPEG, PNG, GIF ve WebP formatları desteklenmektedir.");
+        e.target.value = "";
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+        const uploadRes = await fetch("/api/support/upload", {
+            method: "POST",
+            body: formData,
+        });
+        const uploadData = await uploadRes.json();
+
+        if (uploadData.url) {
+            const res = await fetch("/api/support/chat", {
                 method: "POST",
-                body: formData,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    sessionId,
+                    message: "Görsel gönderdi.",
+                    imageUrl: uploadData.url,
+                    senderName: user.name
+                }),
             });
-            const uploadData = await uploadRes.json();
 
-            if (uploadData.url) {
-                // Send as a message
-                const res = await fetch("/api/support/chat", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        sessionId,
-                        message: "Görsel gönderdi.",
-                        imageUrl: uploadData.url,
-                        senderName: user.name
-                    }),
-                });
-
-                if (res.ok) {
-                    const data = await res.json();
-                    setLiveMessages(prev => [...prev, {
-                        id: data.message.id,
-                        role: "user",
-                        text: data.message.message,
-                        imageUrl: data.message.imageUrl,
-                        time: now()
-                    }]);
-                }
+            if (res.ok) {
+                const data = await res.json();
+                setLiveMessages(prev => [...prev, {
+                    id: data.message.id,
+                    role: "user",
+                    text: data.message.message,
+                    imageUrl: data.message.imageUrl,
+                    time: now()
+                }]);
             }
-        } catch (err) {
-            console.error("Image upload failed", err);
         }
-    };
+    } catch (err) {
+        console.error("Image upload failed", err);
+    }
+};
 
     // ── AI Send ──────────────────────────────────────────────────────────────
     const handleAiSend = async (text?: string) => {
