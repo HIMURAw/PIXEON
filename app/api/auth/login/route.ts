@@ -6,6 +6,7 @@ import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 
 import { verifyCaptcha } from "@/lib/captcha";
+import { rateLimit } from "@/lib/rate-limiter";
 
 export async function POST(request: NextRequest) {
   try {
@@ -30,6 +31,24 @@ export async function POST(request: NextRequest) {
         { success: false, message: "Geçersiz e-posta veya şifre" },
         { status: 401 }
       );
+    }
+
+    // 1.5. Admin için rate limit kontrolü
+    if (user.role === "ADMIN") {
+      const limitResult = await rateLimit(request, "admin_login", {
+        limit: 5, // 15 dakika içinde en fazla 5 deneme
+        windowMs: 15 * 60 * 1000,
+      });
+
+      if (!limitResult.success) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: `Çok fazla giriş denemesi yaptınız. Lütfen ${limitResult.resetSeconds} saniye sonra tekrar deneyin.`,
+          },
+          { status: 429 }
+        );
+      }
     }
 
     // 2. Şifreyi kontrol et

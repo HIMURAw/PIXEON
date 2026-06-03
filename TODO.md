@@ -17,7 +17,7 @@
 
 - [✔️] captcha eklenicek
 - [✔️] Rate limit eklenicek
-- [✖️] Admin login rate limit eklenicek
+- [✔️] Admin login rate limit eklenicek
 - [✖️] Zod ile API güvenliği sağlanıcak
 - [✖️] XSS (Cross Site Scripting) kontrol edilicek
 - [✖️] ticket kısmında upload sistemine dosya boyutu kontrolü eklenicek
