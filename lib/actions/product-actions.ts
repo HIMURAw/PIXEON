@@ -111,7 +111,7 @@ export async function getBestSellers() {
       .from(products)
       .where(eq(products.status, "ACTIVE"))
       .orderBy(desc(products.salesCount))
-      .limit(8);
+      .limit(16);
 
     return JSON.parse(JSON.stringify(data));
   } catch (error) {

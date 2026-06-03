@@ -1,10 +1,9 @@
 # TODO: Spread out the website layout       ✔️✖️
 
-- [✖️] Mobil uyumluluk eklenicek
-- [✖️] Spread out the website layout
-- [✖️] Anasayfaya ürün filtreleme özelliği eklenicek
+- [✔️] Mobil uyumluluk eklenicek
+- [✔️] Spread out the website layout
+- [✔️] Anasayfaya ürün filtreleme özelliği eklenicek
 - [✖️] En Çok Satanlar kısmı alt tarafa kayıcak bunun yerinde önerilen ürünler kısmı olucak burada kullanıcı hangi ürünlere gidiyse o kategörideki ürünler çıkıcak
-- [✖️] Kullanıcı deneyimi test edilicek
 
 - [✖️] kategoriler kısmına bir kez daha bakılıcak
 - [✖️] abonelik sistemine birdaha bakılıcak
@@ -59,3 +58,7 @@
 - [✖️] Global error handling yapılacak
 - [✖️] Maintenance mode sistemi yapılacak
 - [✖️] Feature flag sistemi araştırılacak
+
+
+
+- [✖️] Kullanıcı deneyimi test edilicek

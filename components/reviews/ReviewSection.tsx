@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { MessageSquare, Star, Quote, Heart, Package, PenTool, ShieldCheck, X, Plus } from "lucide-react";
@@ -19,8 +19,16 @@ export default function ReviewSection({
 }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth < 768);
+        checkMobile();
+        window.addEventListener("resize", checkMobile);
+        return () => window.removeEventListener("resize", checkMobile);
+    }, []);
     
-    const reviewsPerPage = 3;
+    const reviewsPerPage = isMobile ? 4 : 8;
     const totalPages = Math.ceil(initialReviews.length / reviewsPerPage);
     const startIndex = (currentPage - 1) * reviewsPerPage;
     const displayedReviews = initialReviews.slice(startIndex, startIndex + reviewsPerPage);
