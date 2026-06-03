@@ -18,8 +18,8 @@
 - [✔️] captcha eklenicek
 - [✔️] Rate limit eklenicek
 - [✔️] Admin login rate limit eklenicek
-- [✖️] Zod ile API güvenliği sağlanıcak
-- [✖️] XSS (Cross Site Scripting) kontrol edilicek
+- [✔️] Zod ile API güvenliği sağlanıcak
+- [✔️] XSS (Cross Site Scripting) kontrol edilicek
 - [✖️] ticket kısmında upload sistemine dosya boyutu kontrolü eklenicek
 - [✖️] Upload klasörünü execute edilemez yapılıcak
 - [✖️] admin panele giriş için 2FA eklenicek

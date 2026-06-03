@@ -32,6 +32,25 @@ interface Message {
 }
 
 // ─── Tiny Markdown Renderer (bold + links only) ───────────────────────────────
+const getSafeHref = (url: string): string => {
+    try {
+        const trimmed = url.trim();
+        const lower = trimmed.toLowerCase();
+        if (
+            lower.startsWith("/") ||
+            lower.startsWith("http://") ||
+            lower.startsWith("https://") ||
+            lower.startsWith("mailto:") ||
+            lower.startsWith("tel:")
+        ) {
+            return trimmed;
+        }
+        return "#";
+    } catch {
+        return "#";
+    }
+};
+
 function RenderText({ text }: { text: string }) {
     const lines = text.split("\n");
     return (
@@ -55,10 +74,11 @@ function RenderText({ text }: { text: string }) {
                             </strong>
                         );
                     } else {
+                        const safeHref = getSafeHref(match[4]);
                         parts.push(
                             <Link
                                 key={`l-${li}-${match.index}`}
-                                href={match[4]}
+                                href={safeHref}
                                 className="text-blue-400 underline underline-offset-2 hover:text-blue-300 transition-colors inline-flex items-center gap-1"
                             >
                                 {match[3]}
