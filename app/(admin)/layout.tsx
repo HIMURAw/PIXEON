@@ -32,7 +32,8 @@ import {
     ShieldCheck,
     User,
     Info,
-    ChevronDown
+    ChevronDown,
+    History
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NotificationProvider } from "@/context/NotificationContext";
@@ -93,6 +94,7 @@ const menuGroups = [
         items: [
             { label: "Genel Ayarlar", icon: Settings, href: "/admin/settings" },
             { label: "Admin Kullanıcıları", icon: ShieldCheck, href: "/admin/settings/admins" },
+            { label: "Güvenlik Günlüğü", icon: History, href: "/admin/settings/logs" },
         ]
     }
 ];

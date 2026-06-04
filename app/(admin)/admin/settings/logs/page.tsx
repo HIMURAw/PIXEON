@@ -4,10 +4,7 @@ import React, { useState, useEffect } from "react";
 import { 
     History, 
     Search, 
-    Filter, 
-    Calendar, 
     User, 
-    Shield, 
     Activity, 
     Clock, 
     ArrowLeft,
@@ -17,14 +14,20 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { getAdminLogs } from "@/lib/actions/admin-actions";
 
+interface AdminLog {
+    id: string;
+    adminId: string;
+    adminName: string;
+    action: string;
+    details: string;
+    ipAddress?: string | null;
+    createdAt: string | Date;
+}
+
 export default function SecurityLogs() {
-    const [logs, setLogs] = useState<any[]>([]);
+    const [logs, setLogs] = useState<AdminLog[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
-
-    useEffect(() => {
-        fetchLogs();
-    }, []);
 
     const fetchLogs = async () => {
         setIsLoading(true);
@@ -32,6 +35,21 @@ export default function SecurityLogs() {
         setLogs(data);
         setIsLoading(false);
     };
+
+    useEffect(() => {
+        let active = true;
+        async function init() {
+            const data = await getAdminLogs();
+            if (active) {
+                setLogs(data);
+                setIsLoading(false);
+            }
+        }
+        init();
+        return () => {
+            active = false;
+        };
+    }, []);
 
     const filteredLogs = logs.filter(log => 
         log.adminName.toLowerCase().includes(searchTerm.toLowerCase()) ||
