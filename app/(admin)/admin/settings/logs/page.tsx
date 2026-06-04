@@ -36,7 +36,8 @@ export default function SecurityLogs() {
     const filteredLogs = logs.filter(log => 
         log.adminName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         log.action.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        log.details.toLowerCase().includes(searchTerm.toLowerCase())
+        log.details.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (log.ipAddress && log.ipAddress.toLowerCase().includes(searchTerm.toLowerCase()))
     );
 
     return (
@@ -92,6 +93,7 @@ export default function SecurityLogs() {
                             <tr className="border-b border-white/5">
                                 <th className="px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">ZAMAN</th>
                                 <th className="px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">YÖNETİCİ</th>
+                                <th className="px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">IP ADRESİ</th>
                                 <th className="px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">EYLEM</th>
                                 <th className="px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">DETAYLAR</th>
                             </tr>
@@ -99,7 +101,7 @@ export default function SecurityLogs() {
                         <tbody className="divide-y divide-white/5">
                             {isLoading ? (
                                 <tr>
-                                    <td colSpan={4} className="px-8 py-20 text-center">
+                                    <td colSpan={5} className="px-8 py-20 text-center">
                                         <div className="flex flex-col items-center gap-4 text-slate-500">
                                             <Loader2 className="animate-spin text-blue-500" size={32} />
                                             <p className="text-xs font-bold uppercase tracking-widest">Günlükler Yükleniyor...</p>
@@ -125,6 +127,9 @@ export default function SecurityLogs() {
                                                 <span className="text-sm font-black text-white">{log.adminName}</span>
                                             </div>
                                         </td>
+                                        <td className="px-8 py-6 text-xs text-slate-400 font-mono">
+                                            {log.ipAddress || "-"}
+                                        </td>
                                         <td className="px-8 py-6">
                                             <span className={cn(
                                                 "text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full",
@@ -144,7 +149,7 @@ export default function SecurityLogs() {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={4} className="px-8 py-20 text-center text-slate-600 italic text-sm">
+                                    <td colSpan={5} className="px-8 py-20 text-center text-slate-600 italic text-sm">
                                         Eşleşen kayıt bulunamadı.
                                     </td>
                                 </tr>

@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { encrypt, SESSION_COOKIE_NAME } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { users } from "@/lib/db/schema";
+import { users, adminLogs } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
+import { randomUUID } from "crypto";
 
 import { verifyCaptcha } from "@/lib/captcha";
-import { rateLimit } from "@/lib/rate-limiter";
+import { rateLimit, getClientIp } from "@/lib/rate-limiter";
 
 const loginSchema = z.object({
   email: z.string().email("Geçerli bir e-posta adresi giriniz"),
@@ -90,6 +91,24 @@ export async function POST(request: NextRequest) {
       name: user.name,
       role: user.role,
     };
+    
+    // Log successful admin login
+    if (user.role === "ADMIN") {
+      const ip = getClientIp(request);
+      try {
+        await db.insert(adminLogs).values({
+          id: randomUUID(),
+          adminId: user.id,
+          adminName: user.name || "Bilinmeyen",
+          action: "Giriş Yapıldı",
+          details: "Yönetici başarılı bir şekilde sisteme giriş yaptı.",
+          ipAddress: ip,
+          createdAt: new Date(),
+        });
+      } catch (err) {
+        console.error("Error creating login admin log:", err);
+      }
+    }
     
     const session = await encrypt({ user: sessionUser, expires });
 

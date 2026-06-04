@@ -7,6 +7,7 @@ import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
 import { randomUUID } from "crypto";
 import { getSession } from "@/lib/auth";
+import { headers } from "next/headers";
 import fs from "fs/promises";
 import path from "path";
 
@@ -15,12 +16,27 @@ export async function createLog(action: string, details: string) {
     const session = await getSession();
     if (!session) return;
 
+    let ipAddress = "127.0.0.1";
+    try {
+      const headerList = await headers();
+      const xForwardedFor = headerList.get("x-forwarded-for");
+      if (xForwardedFor) {
+        ipAddress = xForwardedFor.split(",")[0].trim();
+      } else {
+        const xRealIp = headerList.get("x-real-ip");
+        if (xRealIp) ipAddress = xRealIp;
+      }
+    } catch (e) {
+      console.warn("Could not retrieve headers in createLog:", e);
+    }
+
     await db.insert(adminLogs).values({
       id: randomUUID(),
       adminId: session.user.id,
       adminName: session.user.name || "Bilinmeyen",
       action: action,
       details: details,
+      ipAddress: ipAddress,
       createdAt: new Date(),
     });
   } catch (error) {

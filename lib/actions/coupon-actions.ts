@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { coupons } from "@/lib/db/schema";
 import { eq, desc } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { createLog } from "./admin-actions";
 
 export async function getCoupons() {
   try {
@@ -30,6 +31,9 @@ export async function createCoupon(data: {
       ...data,
       usageCount: 0,
     });
+    
+    await createLog("Kupon Eklendi", `Yeni indirim kuponu eklendi: ${data.code} (${data.discountType === "PERCENTAGE" ? `%${data.discountValue}` : `₺${data.discountValue}`})`);
+
     revalidatePath("/admin/coupons");
     return { success: true, id };
   } catch (error) {
@@ -48,6 +52,9 @@ export async function updateCoupon(id: string, data: Partial<{
 }>) {
   try {
     await db.update(coupons).set(data).where(eq(coupons.id, id));
+    
+    await createLog("Kupon Güncellendi", `İndirim kuponu güncellendi: ${data.code || id}`);
+    
     revalidatePath("/admin/coupons");
     return { success: true };
   } catch (error) {
@@ -58,7 +65,13 @@ export async function updateCoupon(id: string, data: Partial<{
 
 export async function deleteCoupon(id: string) {
   try {
+    const coupon = await db.select().from(coupons).where(eq(coupons.id, id)).limit(1);
+    const couponCode = coupon[0]?.code || id;
+
     await db.delete(coupons).where(eq(coupons.id, id));
+    
+    await createLog("Kupon Silindi", `İndirim kuponu silindi: ${couponCode}`);
+
     revalidatePath("/admin/coupons");
     return { success: true };
   } catch (error) {

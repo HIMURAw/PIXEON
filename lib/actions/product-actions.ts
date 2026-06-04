@@ -7,6 +7,7 @@ import { revalidatePath } from "next/cache";
 import fs from "fs/promises";
 import path from "path";
 import { randomUUID } from "crypto";
+import { createLog } from "./admin-actions";
 
 const UPLOAD_DIR = path.join(process.cwd(), "public/uploads/products");
 const ALLOWED_EXTENSIONS = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
@@ -187,6 +188,8 @@ export async function createProduct(formData: FormData) {
 
     await db.insert(products).values(data);
 
+    await createLog("Ürün Eklendi", `Yeni ürün eklendi: ${data.name} (SKU: ${data.sku}, Fiyat: ₺${data.price})`);
+
     revalidatePath("/admin/products");
     revalidatePath("/");
     return { success: true, id };
@@ -222,6 +225,8 @@ export async function updateProduct(id: string, formData: FormData) {
       .set(data)
       .where(eq(products.id, id));
 
+    await createLog("Ürün Güncellendi", `Ürün güncellendi: ${data.name} (SKU: ${data.sku}, Fiyat: ₺${data.price})`);
+
     revalidatePath("/admin/products");
     revalidatePath("/");
     return { success: true };
@@ -244,7 +249,12 @@ export async function deleteProduct(id: string) {
       }
     }
 
+    const productName = existing?.name || id;
+
     await db.delete(products).where(eq(products.id, id));
+    
+    await createLog("Ürün Silindi", `Ürün silindi: ${productName} (ID: ${id})`);
+
     revalidatePath("/admin/products");
     revalidatePath("/");
     return { success: true };
