@@ -83,6 +83,7 @@ export default function RequestMonitor() {
     const uniqueIps = new Set(logs.map(l => l.ip)).size;
     const postRequests = logs.filter(l => l.method === "POST").length;
     const getRequests = logs.filter(l => l.method === "GET").length;
+    const blockedRequests = logs.filter(l => l.method === "BLOCKED").length;
 
     return (
         <div className="space-y-8 animate-in fade-in duration-700">
@@ -153,7 +154,7 @@ export default function RequestMonitor() {
             </div>
 
             {/* Quick Analytics Card */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
                 <div className="bg-[#020617] border border-white/10 rounded-3xl p-6 flex items-center gap-4 relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 blur-[50px] rounded-full pointer-events-none"></div>
                     <div className="w-12 h-12 bg-blue-600/10 rounded-2xl flex items-center justify-center text-blue-400">
@@ -197,6 +198,17 @@ export default function RequestMonitor() {
                         <p className="text-xl font-black text-white">{postRequests}</p>
                     </div>
                 </div>
+
+                <div className="bg-[#020617] border border-white/10 rounded-3xl p-6 flex items-center gap-4 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-rose-500/5 blur-[50px] rounded-full pointer-events-none"></div>
+                    <div className="w-12 h-12 bg-rose-600/10 rounded-2xl flex items-center justify-center text-rose-400">
+                        <ShieldAlert size={24} className={blockedRequests > 0 ? "animate-bounce" : ""} />
+                    </div>
+                    <div>
+                        <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest">ENGELENEN (WAF)</p>
+                        <p className="text-xl font-black text-white">{blockedRequests}</p>
+                    </div>
+                </div>
             </div>
 
             {/* Logs Table Card */}
@@ -233,6 +245,7 @@ export default function RequestMonitor() {
                                                 log.method === "GET" ? "bg-blue-500/10 text-blue-400 border-blue-500/20" :
                                                 log.method === "POST" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" :
                                                 log.method === "DELETE" ? "bg-red-500/10 text-red-400 border-red-500/20" :
+                                                log.method === "BLOCKED" ? "bg-rose-500/10 text-rose-400 border-rose-500/20 animate-pulse font-black" :
                                                 "bg-amber-500/10 text-amber-400 border-amber-500/20"
                                             )}>
                                                 {log.method}
