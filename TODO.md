@@ -30,8 +30,8 @@
 - [✖️] KVKK, mesafeli satış sözleşmesi, gizlilik politikası, çerez politikası bunlar eklenicek
 
 - [✔️] Admin panele ayrıntılı log sistemi eklenicek
-- [✖️] Admin panele canlı request monitor eklenicek
-- [✖️] Logging / Monitoring sistemi eklenicek Sentry, Grafana bunlardan birisi kullanılacak
+- [✔️] Admin panele canlı request monitor eklenicek
+- [✔️] Logging / Monitoring sistemi eklenicek Sentry, Grafana bunlardan birisi kullanılacak
 - [✖️] Cloudflare kullanılacak
 - [✖️] WAFBot, protection, CDN cache bu teknolojilere bakılıcak
 - [✖️] Redis ile cache kontrolü yapılıcak
@@ -61,3 +61,4 @@
 
 
 - [✖️] Kullanıcı deneyimi test edilicek
+- [✖️] Sentry ayarlanıcak

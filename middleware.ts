@@ -12,7 +12,7 @@ export async function middleware(request: NextRequest) {
     body: JSON.stringify({
       method: request.method,
       url: path + request.nextUrl.search,
-      ip: request.headers.get("x-forwarded-for")?.split(",")[0] || request.ip || "127.0.0.1",
+      ip: request.headers.get("x-forwarded-for")?.split(",")[0] || (request as NextRequest & { ip?: string }).ip || "127.0.0.1",
       userAgent: request.headers.get("user-agent") || "Bilinmeyen",
     }),
   }).catch(() => {});
