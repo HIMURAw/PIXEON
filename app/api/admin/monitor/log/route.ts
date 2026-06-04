@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
             try {
                 const content = await fs.promises.readFile(LOG_FILE, "utf-8");
                 logs = JSON.parse(content);
-            } catch (e) {
+            } catch {
                 // ignore invalid JSON
             }
         }

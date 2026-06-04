@@ -11,7 +11,7 @@ export async function GET() {
             try {
                 const content = await fs.promises.readFile(LOG_FILE, "utf-8");
                 logs = JSON.parse(content);
-            } catch (e) {
+            } catch {
                 // ignore
             }
         }

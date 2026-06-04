@@ -95,7 +95,7 @@ export default function RequestMonitor() {
                             className="p-2 hover:bg-white/5 rounded-lg text-slate-500 hover:text-white transition-all flex items-center gap-2 text-xs font-bold uppercase tracking-widest"
                         >
                             <ArrowLeft size={16} />
-                            Dashboard'a Dön
+                            Dashboard&apos;a Dön
                         </Link>
                     </div>
                     <h1 className="text-3xl font-extrabold text-white tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400 flex items-center gap-3">

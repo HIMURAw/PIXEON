@@ -22,14 +22,20 @@ export async function middleware(request: NextRequest) {
   const isProtectedUserRoute = path.startsWith("/hesabim");
   const isAuthRoute = path.startsWith("/login") || path.startsWith("/register");
 
+  interface SessionData {
+    user: {
+      role?: string;
+    };
+  }
+
   // 2. Session kontrolü yap
   const cookie = request.cookies.get(SESSION_COOKIE_NAME)?.value;
-  let session: any = null;
+  let session: SessionData | null = null;
 
   if (cookie) {
     try {
       session = await decrypt(cookie);
-    } catch (e) {
+    } catch {
       // Geçersiz token
     }
   }
