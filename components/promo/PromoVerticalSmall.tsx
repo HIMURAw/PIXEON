@@ -4,8 +4,16 @@ import React, { useEffect, useState } from "react";
 import { getActiveBannersByPosition } from "@/lib/actions/banner-actions";
 import Link from "next/link";
 
+interface Banner {
+    id: string | number;
+    image: string;
+    link?: string | null;
+    title?: string | null;
+    subtitle?: string | null;
+}
+
 export default function PromoVerticalSmall() {
-    const [banner, setBanner] = useState<any>(null);
+    const [banner, setBanner] = useState<Banner | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -37,7 +45,7 @@ export default function PromoVerticalSmall() {
                             Aylık Oyunlar ve Çok Oyunculu Mod
                         </p>
                         <span className="text-xs lg:text-xl font-bold text-white mt-1">
-                            270 ₺'den başlayan fiyatlarla
+                            270 ₺&apos;den başlayan fiyatlarla
                         </span>
                     </div>
                     <div className="w-1/3 lg:w-full h-full relative flex items-center justify-center p-2">
@@ -45,6 +53,7 @@ export default function PromoVerticalSmall() {
                             src="/products/psplus-card.png"
                             alt="PS Plus"
                             className="max-h-full max-w-full object-contain"
+                            loading="lazy"
                         />
                         <button className="cursor-pointer absolute bottom-2 lg:bottom-3 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-[10px] lg:text-xs px-3 py-1 lg:px-4 lg:py-1.5 rounded-full hover:bg-blue-700 transition font-bold whitespace-nowrap shadow-md">
                             Üye Ol
@@ -78,6 +87,7 @@ export default function PromoVerticalSmall() {
                         src={banner.image}
                         alt={banner.title || ""}
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        loading="lazy"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent" />
                 </div>

@@ -33,12 +33,11 @@
 - [✔️] Admin panele canlı request monitor eklenicek
 - [✔️] Logging / Monitoring sistemi eklenicek Sentry, Grafana bunlardan birisi kullanılacak
 - [✖️] Cloudflare kullanılacak
-- [✖️] WAFBot, protection, CDN cache bu teknolojilere bakılıcak
-- [✖️] Redis ile cache kontrolü yapılıcak
+- [✔️] WAFBot, protection, CDN cache bu teknolojilere bakılıcak
 
 - [✖️] SEO optimizasyonuna bakılıcak
 - [✖️] image optimization yapılıcak
-- [✖️] lazy loading araştırılıcak ve eklenicek
+- [✔️] lazy loading araştırılıcak ve eklenicek
 - [✖️] 3D objelerin performansı arttırılacak
 - [✖️] Search sistemi Algolia, Elasticsearch, Meilisearch bunlardan birisi ile değiştirilicek
 

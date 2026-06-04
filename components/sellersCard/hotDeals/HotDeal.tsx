@@ -16,7 +16,7 @@ export default function HotDeal() {
                     <span className="absolute -top-2 -left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded-full font-bold">
                         %10 FIRSAT
                     </span>
-                    <img src="/products/ps5-digital.png" className="w-28 h-28 object-contain" />
+                    <img src="/products/ps5-digital.png" alt="PlayStation 5" className="w-28 h-28 object-contain" loading="lazy" />
                 </div>
 
                 <div className="flex-1 space-y-2">

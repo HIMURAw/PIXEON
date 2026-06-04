@@ -49,6 +49,7 @@ export default function BestSellerCard({ product }: BestSellerCardProps) {
                     src={product.image}
                     alt={product.name}
                     className="max-h-full object-contain group-hover:scale-110 transition-transform duration-500"
+                    loading="lazy"
                 />
             </Link>
 

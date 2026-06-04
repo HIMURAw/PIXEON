@@ -1,14 +1,35 @@
 "use client";
 import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import ModelViewer, { preloadModels } from "./ModelViewer";
+import dynamic from "next/dynamic";
+
+const ModelViewer = dynamic(() => import("./ModelViewer"), {
+    ssr: false,
+    loading: () => (
+        <div className="w-full h-full flex flex-col items-center justify-center text-slate-500 font-bold text-xs gap-3">
+            <div className="w-8 h-8 border-2 border-sky-500/20 border-t-sky-500 rounded-full animate-spin"></div>
+            <span>3D Model Yükleniyor...</span>
+        </div>
+    )
+});
 
 // Database driven hero slides
 import { getActiveHeroSlides } from "@/lib/actions/hero-actions";
 
 
+interface HeroSlide {
+    id: string | number;
+    badgeColor?: string;
+    badge?: string;
+    title: string;
+    subtitle?: string;
+    price: string;
+    buttonText: string;
+    modelPath: string;
+}
+
 export default function HeroCarousel() {
-    const [dynamicSlides, setDynamicSlides] = useState<any[]>([]);
+    const [dynamicSlides, setDynamicSlides] = useState<HeroSlide[]>([]);
     const [currentSlide, setCurrentSlide] = useState(0);
     const [isAutoPlaying, setIsAutoPlaying] = useState(true);
     const [loading, setLoading] = useState(true);
@@ -30,8 +51,11 @@ export default function HeroCarousel() {
 
     // Tüm modelleri önden yüklüyoruz
     useEffect(() => {
+        if (activeSlides.length === 0) return;
         const modelPaths = activeSlides.map(s => s.modelPath);
-        preloadModels(modelPaths);
+        import("./ModelViewer").then((mod) => {
+            mod.preloadModels(modelPaths);
+        });
     }, [activeSlides]);
 
     useEffect(() => {
@@ -107,7 +131,7 @@ export default function HeroCarousel() {
                                 </p>
 
                                 <div className="flex items-center justify-center md:justify-start gap-1.5">
-                                    <span className="text-[10px] text-gray-300">'dan itibaren</span>
+                                    <span className="text-[10px] text-gray-300">&apos;dan itibaren</span>
                                     <span className="text-2xl sm:text-3xl font-bold text-red-400">
                                         {slide.price}
                                     </span>

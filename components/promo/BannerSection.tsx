@@ -10,8 +10,16 @@ interface BannerSectionProps {
     className?: string;
 }
 
+interface Banner {
+    id: string | number;
+    image: string;
+    link?: string | null;
+    title?: string | null;
+    subtitle?: string | null;
+}
+
 export default function BannerSection({ position, className }: BannerSectionProps) {
-    const [banners, setBanners] = useState<any[]>([]);
+    const [banners, setBanners] = useState<Banner[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -45,6 +53,7 @@ export default function BannerSection({ position, className }: BannerSectionProp
                         src={banner.image} 
                         alt={banner.title || ""} 
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        loading="lazy"
                     />
                     
                     {(banner.title || banner.subtitle) && (
