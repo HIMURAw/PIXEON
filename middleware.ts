@@ -4,6 +4,19 @@ import { decrypt, SESSION_COOKIE_NAME } from "@/lib/auth";
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
+  // Log incoming requests asynchronously to the live request monitor
+  const logUrl = new URL("/api/admin/monitor/log", request.url);
+  fetch(logUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      method: request.method,
+      url: path + request.nextUrl.search,
+      ip: request.headers.get("x-forwarded-for")?.split(",")[0] || request.ip || "127.0.0.1",
+      userAgent: request.headers.get("user-agent") || "Bilinmeyen",
+    }),
+  }).catch(() => {});
+
   // 1. Rotaları belirle
   const isAdminRoute = path.startsWith("/admin");
   const isProtectedUserRoute = path.startsWith("/hesabim");
@@ -50,5 +63,7 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|.*\\.png$).*)"],
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|api/admin/monitor|.*\\.[\\w]+$).*)",
+  ],
 };

@@ -16,7 +16,7 @@ import {
     FileSpreadsheet,
     TicketPlus,
     Menu,
-    Gamepad2,
+    Activity,
     Disc,
     Headset,
     CreditCard,
@@ -55,11 +55,18 @@ const menuGroups = [
         title: "KATALOG YÖNETİMİ",
         items: [
             { label: "Tüm Ürünler", icon: Package, href: "/admin/products" },
-            { label: "Konsollar", icon: Gamepad2, href: "/admin/products?category=konsollar" },
-            { label: "Oyunlar", icon: Disc, href: "/admin/products?category=oyunlar" },
-            { label: "Aksesuarlar", icon: Headset, href: "/admin/products?category=aksesuarlar" },
-            { label: "Dijital Kodlar", icon: CreditCard, href: "/admin/products?category=dijital-kodlar" },
-            { label: "Kategoriler", icon: Layers, href: "/admin/categories" },
+            { 
+                label: "Kategoriler", 
+                icon: Layers, 
+                href: "/admin/categories",
+                subItems: [
+                    { label: "Tüm Kategoriler", href: "/admin/categories" },
+                    { label: "Konsollar", href: "/admin/products?category=konsollar" },
+                    { label: "Oyunlar", href: "/admin/products?category=oyunlar" },
+                    { label: "Aksesuarlar", href: "/admin/products?category=aksesuarlar" },
+                    { label: "Dijital Kodlar", href: "/admin/products?category=dijital-kodlar" },
+                ]
+            },
         ]
     },
     {
@@ -95,6 +102,7 @@ const menuGroups = [
             { label: "Genel Ayarlar", icon: Settings, href: "/admin/settings" },
             { label: "Admin Kullanıcıları", icon: ShieldCheck, href: "/admin/settings/admins" },
             { label: "Güvenlik Günlüğü", icon: History, href: "/admin/settings/logs" },
+            { label: "İstek Monitörü", icon: Activity, href: "/admin/settings/monitor" },
         ]
     }
 ];
@@ -105,6 +113,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [user, setUser] = useState<any>(null);
     const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
+    const [openSubMenus, setOpenSubMenus] = useState<Record<string, boolean>>({});
+
+    const toggleSubMenu = (label: string) => {
+        setOpenSubMenus(prev => ({
+            ...prev,
+            [label]: !prev[label]
+        }));
+    };
 
     useEffect(() => {
         if (window.innerWidth >= 768) {
@@ -229,21 +245,65 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                                             "space-y-1 transition-all duration-300 ease-in-out overflow-hidden",
                                             isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0 pointer-events-none"
                                         )}>
-                                            {group.items.map((item) => (
-                                                <Link
-                                                    key={item.label}
-                                                    href={item.href}
-                                                    className="flex items-center gap-3 px-3 py-1.5 md:py-2 rounded-lg text-slate-400 hover:bg-white/5 hover:text-white transition-all group relative"
-                                                >
-                                                    <item.icon size={18} className="group-hover:text-blue-400 transition-colors" />
-                                                    {isSidebarOpen && <span className="font-medium text-xs">{item.label}</span>}
-                                                    {!isSidebarOpen && (
-                                                        <div className="absolute left-full ml-2 px-2 py-1 bg-slate-900 border border-white/10 rounded text-[10px] whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50">
-                                                            {item.label}
+                                            {group.items.map((item) => {
+                                                const hasSubItems = 'subItems' in item && !!item.subItems;
+                                                const isSubOpen = !!openSubMenus[item.label];
+
+                                                if (hasSubItems && isSidebarOpen) {
+                                                    return (
+                                                        <div key={item.label} className="space-y-1">
+                                                            <button
+                                                                onClick={() => toggleSubMenu(item.label)}
+                                                                className="w-full flex items-center justify-between px-3 py-1.5 md:py-2 rounded-lg text-slate-400 hover:bg-white/5 hover:text-white transition-all group/btn focus:outline-none"
+                                                            >
+                                                                <div className="flex items-center gap-3">
+                                                                    <item.icon size={18} className="group-hover/btn:text-blue-400 transition-colors" />
+                                                                    <span className="font-medium text-xs text-left">{item.label}</span>
+                                                                </div>
+                                                                <ChevronDown
+                                                                    size={12}
+                                                                    className={cn(
+                                                                        "transition-transform duration-200 text-slate-500",
+                                                                        isSubOpen ? "rotate-0" : "-rotate-90"
+                                                                    )}
+                                                                />
+                                                            </button>
+                                                            {isSubOpen && (
+                                                                <div className="pl-4 space-y-1 border-l border-white/5 ml-5 mt-1 transition-all duration-300">
+                                                                    {(item.subItems as any[]).map((sub) => (
+                                                                        <Link
+                                                                            key={sub.label}
+                                                                            href={sub.href}
+                                                                            className={cn(
+                                                                                "block px-3 py-1.5 text-[11px] font-medium transition-colors rounded-md",
+                                                                                pathname === sub.href ? "text-blue-400 bg-blue-500/5" : "text-slate-500 hover:text-slate-200 hover:bg-white/5"
+                                                                            )}
+                                                                        >
+                                                                            {sub.label}
+                                                                        </Link>
+                                                                    ))}
+                                                                </div>
+                                                            )}
                                                         </div>
-                                                    )}
-                                                </Link>
-                                            ))}
+                                                    );
+                                                }
+
+                                                return (
+                                                    <Link
+                                                        key={item.label}
+                                                        href={item.href}
+                                                        className="flex items-center gap-3 px-3 py-1.5 md:py-2 rounded-lg text-slate-400 hover:bg-white/5 hover:text-white transition-all group relative"
+                                                    >
+                                                        <item.icon size={18} className="group-hover:text-blue-400 transition-colors" />
+                                                        {isSidebarOpen && <span className="font-medium text-xs">{item.label}</span>}
+                                                        {!isSidebarOpen && (
+                                                            <div className="absolute left-full ml-2 px-2 py-1 bg-slate-900 border border-white/10 rounded text-[10px] whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-50">
+                                                                {item.label}
+                                                            </div>
+                                                        )}
+                                                    </Link>
+                                                );
+                                            })}
                                         </div>
                                     </div>
                                 );

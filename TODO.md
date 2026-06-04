@@ -29,8 +29,8 @@
 - [✖️] iade politikası eklenicek
 - [✖️] KVKK, mesafeli satış sözleşmesi, gizlilik politikası, çerez politikası bunlar eklenicek
 
-- [✖️] Admin panele ayrıntılı log sistemi eklenicek
-- [✖️] ADmin panele canlı request monitor eklenicek
+- [✔️] Admin panele ayrıntılı log sistemi eklenicek
+- [✖️] Admin panele canlı request monitor eklenicek
 - [✖️] Logging / Monitoring sistemi eklenicek Sentry, Grafana bunlardan birisi kullanılacak
 - [✖️] Cloudflare kullanılacak
 - [✖️] WAFBot, protection, CDN cache bu teknolojilere bakılıcak
