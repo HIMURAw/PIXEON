@@ -8,6 +8,7 @@ import fs from "fs/promises";
 import path from "path";
 import { randomUUID } from "crypto";
 import { createLog } from "./admin-actions";
+import { meiliClient, MEILI_PRODUCTS_INDEX } from "@/lib/meilisearch";
 
 const UPLOAD_DIR = path.join(process.cwd(), "public/uploads/products");
 const ALLOWED_EXTENSIONS = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
@@ -188,6 +189,24 @@ export async function createProduct(formData: FormData) {
 
     await db.insert(products).values(data);
 
+    try {
+      const cat = await db.query.categories.findFirst({ where: eq(categories.id, data.categoryId) });
+      await meiliClient.index(MEILI_PRODUCTS_INDEX).addDocuments([{
+        id: id,
+        name: data.name,
+        slug: data.slug,
+        sku: data.sku,
+        description: "",
+        price: data.price,
+        oldPrice: data.oldPrice,
+        image: data.image || "",
+        status: "ACTIVE",
+        categoryName: cat?.name || "Genel"
+      }]);
+    } catch (e) {
+      console.warn("Meilisearch sync failed on create:", e);
+    }
+
     await createLog("Ürün Eklendi", `Yeni ürün eklendi: ${data.name} (SKU: ${data.sku}, Fiyat: ₺${data.price})`);
 
     revalidatePath("/admin/products");
@@ -225,6 +244,24 @@ export async function updateProduct(id: string, formData: FormData) {
       .set(data)
       .where(eq(products.id, id));
 
+    try {
+      const cat = await db.query.categories.findFirst({ where: eq(categories.id, data.categoryId) });
+      await meiliClient.index(MEILI_PRODUCTS_INDEX).addDocuments([{
+        id: id,
+        name: data.name,
+        slug: data.slug,
+        sku: data.sku,
+        description: "",
+        price: data.price,
+        oldPrice: data.oldPrice,
+        image: data.image || "",
+        status: "ACTIVE",
+        categoryName: cat?.name || "Genel"
+      }]);
+    } catch (e) {
+      console.warn("Meilisearch sync failed on update:", e);
+    }
+
     await createLog("Ürün Güncellendi", `Ürün güncellendi: ${data.name} (SKU: ${data.sku}, Fiyat: ₺${data.price})`);
 
     revalidatePath("/admin/products");
@@ -252,6 +289,12 @@ export async function deleteProduct(id: string) {
     const productName = existing?.name || id;
 
     await db.delete(products).where(eq(products.id, id));
+    
+    try {
+      await meiliClient.index(MEILI_PRODUCTS_INDEX).deleteDocument(id);
+    } catch (e) {
+      console.warn("Meilisearch sync failed on delete:", e);
+    }
     
     await createLog("Ürün Silindi", `Ürün silindi: ${productName} (ID: ${id})`);
 
@@ -339,9 +382,29 @@ export async function getFilteredProducts(filters: {
   }
 }
 
+interface RecommendedProduct {
+  id: string;
+  name: string;
+  slug: string;
+  sku: string;
+  price: number;
+  oldPrice: number | null;
+  stock: number;
+  salesCount: number;
+  image: string | null;
+  status: "ACTIVE" | "OUT_OF_STOCK" | "DRAFT";
+  categoryId: string | null;
+  category: {
+    name: string;
+    slug: string;
+  } | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export async function getRecommendedProducts(categorySlugs: string[], visitedProductIds: string[] = []) {
   try {
-    let data: any[] = [];
+    let data: RecommendedProduct[] = [];
     const activeSlugs = categorySlugs.filter(Boolean);
     const activeProductIds = visitedProductIds.filter(Boolean);
 
