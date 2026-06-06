@@ -104,7 +104,7 @@ export default function Head() {
     const handleSelect = (slug: string) => {
         setIsOpen(false);
         setQuery("");
-        router.push(`/urun/${slug}`);
+        router.push(`/product/${slug}`);
     };
 
     const formatPrice = (price: number) =>
