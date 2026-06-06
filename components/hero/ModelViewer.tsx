@@ -1,8 +1,8 @@
 "use client";
 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { useGLTF, Environment, AdaptiveDpr } from "@react-three/drei";
-import { Suspense, useRef, memo } from "react";
+import { useGLTF, Environment, AdaptiveDpr, PerformanceMonitor } from "@react-three/drei";
+import { Suspense, useRef, memo, useState, useEffect } from "react";
 import * as THREE from "three";
 
 // ---------------------------------------------------------------------------
@@ -46,6 +46,7 @@ const ModelScene = ({ path }: { path: string }) => {
         const dist = (maxDim / 2 / Math.tan(fov / 2)) * multiplier;
 
         camera.position.set(0, 0, dist);
+        // eslint-disable-next-line react-hooks/immutability
         camera.near = Math.max(0.001, dist / 500);
         camera.far = dist * 500;
         camera.updateProjectionMatrix();
@@ -61,8 +62,10 @@ const ModelScene = ({ path }: { path: string }) => {
 };
 
 // ---------------------------------------------------------------------------
-// Modelleri önceden yükle
+// Modelleri önceden yükle & Draco decoder yolunu tanımla
 // ---------------------------------------------------------------------------
+useGLTF.setDecoderPath("https://www.gstatic.com/draco/versioned/decoders/1.5.7/");
+
 export function preloadModels(paths: string[]) {
   paths.forEach((path) => useGLTF.preload(path));
 }
@@ -72,11 +75,39 @@ export function preloadModels(paths: string[]) {
 // Bu sayede önceki modelin kamera ve state'i bir sonrakine karışmaz.
 // ---------------------------------------------------------------------------
 const ModelViewer = memo(({ path }: { path: string }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(true);
+  const [dpr, setDpr] = useState(1.5);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !("IntersectionObserver" in window)) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0.05 } // Trigger when at least 5% is visible
+    );
+
+    const currentContainer = containerRef.current;
+    if (currentContainer) {
+      observer.observe(currentContainer);
+    }
+
+    return () => {
+      if (currentContainer) {
+        observer.unobserve(currentContainer);
+      }
+      observer.disconnect();
+    };
+  }, []);
+
   return (
-    <div className="w-full h-full relative">
+    <div ref={containerRef} className="w-full h-full relative">
       <Canvas
         key={path}
-        dpr={[1, 1.5]}
+        dpr={dpr}
+        frameloop={isVisible ? "always" : "never"}
         gl={{
           antialias: true,
           alpha: true,
@@ -86,6 +117,7 @@ const ModelViewer = memo(({ path }: { path: string }) => {
         camera={{ fov: 50, near: 0.1, far: 10000, position: [0, 0, 10] }}
       >
         <AdaptiveDpr pixelated />
+        <PerformanceMonitor onDecline={() => setDpr(1.0)} onIncline={() => setDpr(1.5)} />
         <ambientLight intensity={0.7} />
         <directionalLight position={[5, 5, 5]} intensity={1.5} />
         <directionalLight position={[-5, -3, -5]} intensity={0.4} />

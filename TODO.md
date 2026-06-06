@@ -38,7 +38,7 @@
 - [✖️] SEO optimizasyonuna bakılıcak
 - [✖️] image optimization yapılıcak
 - [✔️] lazy loading araştırılıcak ve eklenicek
-- [✖️] 3D objelerin performansı arttırılacak
+- [✔️] 3D objelerin performansı arttırılacak
 - [✖️] Search sistemi Algolia, Elasticsearch, Meilisearch bunlardan birisi ile değiştirilicek
 
 - [✖️] destek kısmındaki yapay zeka geliştirilicek
