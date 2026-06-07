@@ -23,6 +23,7 @@ import Footer from "@/components/footer/Footer";
 import ReviewSection from "@/components/reviews/ReviewSection";
 import WishlistButton from "@/components/products/WishlistButton";
 import ProductAddToCartButton from "@/components/products/ProductAddToCartButton";
+import ProductShareButton from "@/components/products/ProductShareButton";
 import ProductViewTracker from "@/components/products/ProductViewTracker";
 import { getSession } from "@/lib/auth";
 import { cn } from "@/lib/utils";
@@ -225,6 +226,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                                         userId={currentUser?.id ?? null}
                                         initialIsFavorited={isFavorited}
                                     />
+                                    <ProductShareButton productName={product.name} />
                                 </div>
 
                                 <div className="space-y-4 pt-6 border-t border-white/5">

@@ -539,3 +539,31 @@ export async function getRecommendedProducts(categorySlugs: string[], visitedPro
     return [];
   }
 }
+
+export async function getProductsByIds(ids: string[]) {
+  try {
+    if (!ids || ids.length === 0) return [];
+    
+    const data = await db.select({
+      id: products.id,
+      name: products.name,
+      slug: products.slug,
+      sku: products.sku,
+      price: products.price,
+      oldPrice: products.oldPrice,
+      stock: products.stock,
+      image: products.image,
+      status: products.status,
+      category: categories.name
+    })
+      .from(products)
+      .leftJoin(categories, eq(products.categoryId, categories.id))
+      .where(inArray(products.id, ids));
+
+    return JSON.parse(JSON.stringify(data));
+  } catch (error) {
+    console.error("Error in getProductsByIds:", error);
+    return [];
+  }
+}
+

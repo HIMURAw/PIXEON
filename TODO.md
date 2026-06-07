@@ -40,8 +40,8 @@
 - [✔️] lazy loading araştırılıcak ve eklenicek
 - [✔️] 3D objelerin performansı arttırılacak
 - [✔️] Search sistemi Algolia, Elasticsearch, Meilisearch bunlardan birisi ile değiştirilicek,
-- [✖️] sepete ve ürünlere paylaşma özelliği eklenicek
-- [✖️] kategorilere göre farklı sayfa tasarımları yapılıcak
+- [✔️] sepete ve ürünlere paylaşma özelliği eklenicek
+- [✖️"] kategorilere göre farklı sayfa tasarımları yapılıcak
 
 - [✖️] destek kısmındaki yapay zeka geliştirilicek
 
