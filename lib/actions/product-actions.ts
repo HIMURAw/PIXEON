@@ -340,7 +340,18 @@ export async function getFilteredProducts(filters: {
       conditions.push(gte(products.stock, 1));
     }
 
-    let query = db.select({
+    let orderBySpec;
+    if (filters.sortBy === "price-asc") {
+      orderBySpec = asc(products.price);
+    } else if (filters.sortBy === "price-desc") {
+      orderBySpec = desc(products.price);
+    } else if (filters.sortBy === "sales-desc") {
+      orderBySpec = desc(products.salesCount);
+    } else {
+      orderBySpec = desc(products.createdAt);
+    }
+
+    const data = await db.select({
       id: products.id,
       name: products.name,
       slug: products.slug,
@@ -361,20 +372,9 @@ export async function getFilteredProducts(filters: {
     })
       .from(products)
       .leftJoin(categories, eq(products.categoryId, categories.id))
-      .where(and(...conditions));
+      .where(and(...conditions))
+      .orderBy(orderBySpec);
 
-    if (filters.sortBy === "price-asc") {
-      query = query.orderBy(asc(products.price));
-    } else if (filters.sortBy === "price-desc") {
-      query = query.orderBy(desc(products.price));
-    } else if (filters.sortBy === "sales-desc") {
-      query = query.orderBy(desc(products.salesCount));
-    } else {
-      // default: newest
-      query = query.orderBy(desc(products.createdAt));
-    }
-
-    const data = await query;
     return JSON.parse(JSON.stringify(data));
   } catch (error) {
     console.error("Error fetching filtered products:", error);

@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ["svg-captcha"]
 };
 
-export default withSentryConfig(nextConfig, {
+export default (withSentryConfig as any)(nextConfig, {
   // For all available options, see:
   // https://github.com/getsentry/sentry-javascript/blob/master/packages/nextjs/src/config/types.ts
 

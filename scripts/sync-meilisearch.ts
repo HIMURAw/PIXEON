@@ -49,7 +49,7 @@ async function sync() {
     console.log("Meilisearch sync triggered! Task details:", response);
     console.log("Waiting for index synchronization task to complete...");
     
-    await meiliClient.waitForTask(response.taskUid);
+    await (meiliClient as any).waitForTask(response.taskUid);
     console.log("Meilisearch synchronization completed successfully!");
     process.exit(0);
   } catch (error) {

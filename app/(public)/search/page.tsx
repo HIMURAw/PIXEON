@@ -68,7 +68,7 @@ function SearchContent() {
             sku: "",
             description: "",
             price: p.price,
-            oldPrice: p.oldPrice,
+            oldPrice: p.oldPrice || undefined,
             stock: 1,
             categoryId: null,
             image: p.image || "/placeholder.png",

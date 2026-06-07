@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          message: validationResult.error.errors[0]?.message || "Geçersiz giriş bilgileri",
+          message: validationResult.error.issues[0]?.message || "Geçersiz giriş bilgileri",
         },
         { status: 400 }
       );

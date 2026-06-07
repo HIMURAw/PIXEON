@@ -19,13 +19,13 @@ import { getActiveHeroSlides } from "@/lib/actions/hero-actions";
 
 interface HeroSlide {
     id: string | number;
-    badgeColor?: string;
-    badge?: string;
+    badgeColor?: string | null;
+    badge?: string | null;
     title: string;
-    subtitle?: string;
-    price: string;
-    buttonText: string;
-    modelPath: string;
+    subtitle?: string | null;
+    price: string | null;
+    buttonText: string | null;
+    modelPath: string | null;
 }
 
 export default function HeroCarousel() {
@@ -52,7 +52,7 @@ export default function HeroCarousel() {
     // Tüm modelleri önden yüklüyoruz
     useEffect(() => {
         if (activeSlides.length === 0) return;
-        const modelPaths = activeSlides.map(s => s.modelPath);
+        const modelPaths = activeSlides.map(s => s.modelPath).filter((p): p is string => typeof p === "string");
         import("./ModelViewer").then((mod) => {
             mod.preloadModels(modelPaths);
         });
@@ -117,7 +117,7 @@ export default function HeroCarousel() {
                                     <span className="text-[9px] font-bold text-gray-300 bg-gray-700 px-2 py-0.5 rounded-full mr-1">
                                         ÖZEL TEKLİF
                                     </span>
-                                    <span className={`text-[9px] font-bold text-white ${slide.badgeColor} px-2 py-0.5 rounded-full`}>
+                                    <span className={`text-[9px] font-bold text-white ${slide.badgeColor || ""} px-2 py-0.5 rounded-full`}>
                                         {slide.badge}
                                     </span>
                                 </div>
@@ -148,7 +148,7 @@ export default function HeroCarousel() {
 
                 {/* Sağ Taraf: Sabit Tek 3D Görüntüleyici */}
                 <div className="w-full md:w-1/2 h-[360px] md:h-full shrink-0 relative z-10 bg-gradient-to-t md:bg-gradient-to-l from-slate-900/20 to-transparent">
-                    <ModelViewer path={activeSlides[currentSlide]?.modelPath} />
+                    <ModelViewer path={activeSlides[currentSlide]?.modelPath || ""} />
                 </div>
             </div>
 
