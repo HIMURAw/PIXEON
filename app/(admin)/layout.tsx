@@ -17,9 +17,6 @@ import {
     TicketPlus,
     Menu,
     Activity,
-    Disc,
-    Headset,
-    CreditCard,
     Layers,
     Wallet,
     Truck,
@@ -123,9 +120,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     };
 
     useEffect(() => {
-        if (window.innerWidth >= 768) {
-            setIsSidebarOpen(true);
+        const handleResize  = () =>  {
+            if (window.innerWidth >= 768) {
+                setIsSidebarOpen(true);
+            }
         }
+        handleResize();
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
     }, []);
 
     useEffect(() => {
