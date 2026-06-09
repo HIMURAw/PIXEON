@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import {
     Plus,
     Search,
@@ -27,7 +27,7 @@ import ProductViewModal from "@/components/admin/ProductViewModal";
 import { AdminNotificationContainer, NotificationType } from "@/components/admin/AdminNotification";
 import AdminConfirmModal from "@/components/admin/AdminConfirmModal";
 
-export default function AdminProducts() {
+function AdminProductsContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const categoryFilter = searchParams.get("category");
@@ -644,5 +644,18 @@ export default function AdminProducts() {
         </div>
     );
 }
+
+export default function AdminProducts() {
+    return (
+        <Suspense fallback={
+            <div className="flex items-center justify-center min-h-[400px]">
+                <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+        }>
+            <AdminProductsContent />
+        </Suspense>
+    );
+}
+
 
 
