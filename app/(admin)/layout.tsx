@@ -108,7 +108,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
     const pathname = usePathname();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const [user, setUser] = useState<any>(null);
+    const [user, setUser] = useState<unknown>(null);
     const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
     const [openSubMenus, setOpenSubMenus] = useState<Record<string, boolean>>({});
 
