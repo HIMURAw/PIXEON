@@ -32,13 +32,32 @@ const DEFAULT_LINKS = [
     { title: "İLETİŞİM", url: "/iletisim" }
 ];
 
+interface NavLink {
+    title: string;
+    url: string;
+    id?: string;
+    target?: string;
+}
+
+interface SearchResult {
+    id: string;
+    name: string;
+    slug: string;
+    price: number;
+    oldPrice?: number | null;
+    image?: string | null;
+    category?: {
+        name: string;
+    } | null;
+}
+
 export default function Head() {
     const router = useRouter();
     const { totalItems } = useCart();
     const { isJiggling } = useCartAnimation();
-    const [navLinks, setNavLinks] = useState(DEFAULT_LINKS);
+    const [navLinks, setNavLinks] = useState<NavLink[]>(DEFAULT_LINKS);
     const [query, setQuery] = useState("");
-    const [results, setResults] = useState<any[]>([]);
+    const [results, setResults] = useState<SearchResult[]>([]);
     const [loading, setLoading] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
     const wrapperRef = useRef<HTMLDivElement>(null);
@@ -104,7 +123,7 @@ export default function Head() {
     const handleSelect = (slug: string) => {
         setIsOpen(false);
         setQuery("");
-        router.push(`/urun/${slug}`);
+        router.push(`/product/${slug}`);
     };
 
     const formatPrice = (price: number) =>
@@ -237,7 +256,7 @@ export default function Head() {
                                         </>
                                     ) : (
                                         <div className="px-4 py-6 text-center">
-                                            <p className="text-xs text-slate-600 font-bold">"{query}" için sonuç bulunamadı.</p>
+                                            <p className="text-xs text-slate-600 font-bold">&ldquo;{query}&rdquo; için sonuç bulunamadı.</p>
                                         </div>
                                     )}
                                 </div>
@@ -338,7 +357,7 @@ export default function Head() {
                                         ) : (
                                             <div className="px-4 py-8 text-center">
                                                 <Search size={24} className="text-slate-700 mx-auto mb-2" />
-                                                <p className="text-sm text-slate-600 font-bold">"{query}" için sonuç bulunamadı.</p>
+                                                <p className="text-sm text-slate-600 font-bold">&ldquo;{query}&rdquo; için sonuç bulunamadı.</p>
                                                 <p className="text-[10px] text-slate-700 mt-1">Farklı bir kelime deneyin.</p>
                                             </div>
                                         )}
@@ -386,7 +405,7 @@ export default function Head() {
                 <nav className="hidden md:flex items-center gap-6 py-3 text-sm font-extrabold text-slate-200">
                     <CategoriesSection />
                     <div className="flex-1 flex justify-end gap-2">
-                        {navLinks.map((item: any) => (
+                        {navLinks.map((item: NavLink) => (
                             <Link
                                 key={item.id || item.title}
                                 href={item.url}

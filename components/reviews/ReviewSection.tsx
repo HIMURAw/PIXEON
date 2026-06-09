@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { MessageSquare, Star, Quote, Heart, Package, PenTool, ShieldCheck, X, Plus } from "lucide-react";
+import { Star, X, PenTool, ArrowLeft, ArrowRight, Plus } from "lucide-react";
 import ReviewForm from "./ReviewForm";
 import ReviewLikeButton from "./ReviewLikeButton";
 import { cn } from "@/lib/utils";
@@ -19,8 +19,16 @@ export default function ReviewSection({
 }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth < 768);
+        checkMobile();
+        window.addEventListener("resize", checkMobile);
+        return () => window.removeEventListener("resize", checkMobile);
+    }, []);
     
-    const reviewsPerPage = 3;
+    const reviewsPerPage = isMobile ? 4 : 8;
     const totalPages = Math.ceil(initialReviews.length / reviewsPerPage);
     const startIndex = (currentPage - 1) * reviewsPerPage;
     const displayedReviews = initialReviews.slice(startIndex, startIndex + reviewsPerPage);
@@ -127,7 +135,7 @@ export default function ReviewSection({
                             disabled={currentPage === 1}
                             className="p-3 bg-slate-900 border border-white/5 rounded-xl text-slate-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                         >
-                            <X size={16} className="rotate-45" />
+                            <ArrowLeft size={16} className="rotate-45" />
                         </button>
 
                         <div className="flex items-center gap-2">
@@ -152,7 +160,7 @@ export default function ReviewSection({
                             disabled={currentPage === totalPages}
                             className="p-3 bg-slate-900 border border-white/5 rounded-xl text-slate-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
                         >
-                            <X size={16} className="-rotate-[135deg]" />
+                            <ArrowLeft size={16} className="-rotate-[135deg]" />
                         </button>
                     </div>
                 )}

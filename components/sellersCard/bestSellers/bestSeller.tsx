@@ -20,6 +20,7 @@ export default function BestSellers() {
     const [dbProducts, setDbProducts] = useState<Product[]>([]);
     const [isVisible, setIsVisible] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
+    const [isMobile, setIsMobile] = useState(false);
     const sectionRef = useRef<HTMLElement>(null);
 
     useEffect(() => {
@@ -59,7 +60,14 @@ export default function BestSellers() {
         return () => observer.disconnect();
     }, []);
 
-    const productsPerPage = 4;
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth < 768);
+        checkMobile();
+        window.addEventListener("resize", checkMobile);
+        return () => window.removeEventListener("resize", checkMobile);
+    }, []);
+
+    const productsPerPage = isMobile ? 4 : 8;
     const totalPages = Math.ceil(dbProducts.length / productsPerPage);
     const startIndex = (currentPage - 1) * productsPerPage;
     const displayedProducts = dbProducts.slice(startIndex, startIndex + productsPerPage);

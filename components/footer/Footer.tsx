@@ -183,6 +183,7 @@ export default function Footer() {
                                 src="/assets/payment-methods.png"
                                 alt="Ödeme Yöntemleri"
                                 className="h-6 object-contain"
+                                loading="lazy"
                             />
                         </div>
                     </div>

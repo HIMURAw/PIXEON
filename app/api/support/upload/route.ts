@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
-import { getSession } from "@/lib/auth";
+import { randomUUID } from "crypto";
+
+const ALLOWED_EXTENSIONS = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
+const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
 
 export async function POST(req: NextRequest) {
     try {
@@ -12,6 +15,17 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Dosya bulunamadı" }, { status: 400 });
         }
 
+        // Validate MIME type
+        if (!ALLOWED_MIME_TYPES.includes(file.type)) {
+            return NextResponse.json({ error: "Geçersiz dosya tipi. Sadece resim dosyaları yüklenebilir." }, { status: 400 });
+        }
+
+        // Validate extension
+        const ext = path.extname(file.name).toLowerCase();
+        if (!ALLOWED_EXTENSIONS.includes(ext)) {
+            return NextResponse.json({ error: "Geçersiz dosya uzantısı. Sadece resim dosyaları yüklenebilir." }, { status: 400 });
+        }
+
         const bytes = await file.arrayBuffer();
         const buffer = Buffer.from(bytes);
 
@@ -19,10 +33,12 @@ export async function POST(req: NextRequest) {
         const uploadDir = path.join(process.cwd(), "public", "uploads", "support");
         try {
             await mkdir(uploadDir, { recursive: true });
-        } catch (e) {}
+        } catch {
+            // ignore
+        }
 
-        // Unique filename
-        const filename = `${Date.now()}-${file.name.replace(/\s+/g, "-")}`;
+        // Generate a completely safe, random filename (UUID)
+        const filename = `${randomUUID()}${ext}`;
         const filePath = path.join(uploadDir, filename);
 
         await writeFile(filePath, buffer);

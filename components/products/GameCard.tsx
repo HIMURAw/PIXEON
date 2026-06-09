@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { ShoppingCart } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useCartAnimation } from "@/context/CartAnimationContext";
 
@@ -56,7 +55,7 @@ export default function GameCard({ g }: { g: Game }) {
                 <span className="text-xs bg-slate-800 text-slate-400 px-2 py-0.5 rounded border border-white/5">{g.category}</span>
             </div>
             <div className="h-36 flex items-center justify-center mb-4">
-                <img src={g.image} alt={g.name} className="max-h-full object-contain" />
+                <img src={g.image} alt={g.name} className="max-h-full object-contain" loading="lazy" />
             </div>
             <span className="text-[10px] text-blue-400 font-semibold uppercase tracking-wider">{g.genre}</span>
             <h3 className="text-sm text-white leading-snug mb-1 mt-0.5">{g.name}</h3>

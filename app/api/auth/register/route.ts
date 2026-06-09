@@ -5,6 +5,17 @@ import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import fs from "fs/promises";
 import path from "path";
+import { z } from "zod";
+
+import { verifyCaptcha } from "@/lib/captcha";
+
+const registerSchema = z.object({
+  name: z.string().min(2, "İsim en az 2 karakter olmalıdır"),
+  email: z.string().email("Geçerli bir e-posta adresi giriniz"),
+  password: z.string().min(6, "Şifre en az 6 karakter olmalıdır"),
+  captchaToken: z.string().min(1, "Güvenlik kodu anahtarı eksik"),
+  captchaAnswer: z.string().min(1, "Güvenlik kodunu giriniz"),
+});
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,11 +30,34 @@ export async function POST(request: NextRequest) {
           { status: 403 }
         );
       }
-    } catch (e) {
+    } catch {
       // ignore
     }
 
-    const { name, email, password } = await request.json();
+    const body = await request.json();
+
+    // Validate request body
+    const validationResult = registerSchema.safeParse(body);
+    if (!validationResult.success) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: validationResult.error.issues[0]?.message || "Geçersiz kayıt bilgileri",
+        },
+        { status: 400 }
+      );
+    }
+
+    const { name, email, password, captchaToken, captchaAnswer } = validationResult.data;
+
+    // Verify Captcha
+    const isCaptchaValid = await verifyCaptcha(captchaToken, captchaAnswer);
+    if (!isCaptchaValid) {
+      return NextResponse.json(
+        { success: false, message: "Güvenlik kodu hatalı veya süresi dolmuş." },
+        { status: 400 }
+      );
+    }
 
     // 1. Kullanıcı var mı kontrol et
     const existingUsers = await db.select().from(users).where(eq(users.email, email)).limit(1);

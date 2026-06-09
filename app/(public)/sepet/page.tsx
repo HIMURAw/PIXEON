@@ -24,6 +24,9 @@ import { cn } from "@/lib/utils";
 import { useCart } from "@/context/CartContext";
 import { getDatabaseProductCount } from "@/lib/actions/product-actions";
 import toast from "react-hot-toast";
+import CartShareButton from "@/components/cart/CartShareButton";
+import CartImportModal from "@/components/cart/CartImportModal";
+import { Suspense } from "react";
 
 export default function CartPage() {
     const { 
@@ -113,6 +116,7 @@ export default function CartPage() {
                             </p>
                         </div>
                     </div>
+                    <CartShareButton cartItems={cartItems} />
                 </div>
 
                 {cartItems.length > 0 ? (
@@ -300,6 +304,9 @@ export default function CartPage() {
                 )}
             </main>
 
+            <Suspense fallback={null}>
+                <CartImportModal />
+            </Suspense>
             <Footer />
         </div>
     );

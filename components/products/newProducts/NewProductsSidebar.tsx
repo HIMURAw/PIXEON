@@ -4,8 +4,16 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { getActiveBannersByPosition } from "@/lib/actions/banner-actions";
 
+interface Banner {
+    id: string | number;
+    image: string;
+    link?: string | null;
+    title?: string | null;
+    subtitle?: string | null;
+}
+
 export default function NewProductsSidebar() {
-    const [banner, setBanner] = useState<any>(null);
+    const [banner, setBanner] = useState<Banner | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -28,6 +36,7 @@ export default function NewProductsSidebar() {
                         src={banner.image}
                         alt={banner.title || ""}
                         className="w-full h-[260px] object-cover group-hover:scale-105 transition-transform duration-500"
+                        loading="lazy"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
                     <div className="absolute bottom-0 left-0 right-0 p-4">
@@ -49,6 +58,7 @@ export default function NewProductsSidebar() {
                         src="/products/ps5-pro-sidebar.png"
                         alt="Günün Fırsatı"
                         className="w-full h-[260px] object-cover group-hover:scale-105 transition-transform duration-500"
+                        loading="lazy"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
                     <div className="absolute bottom-0 left-0 right-0 p-4">

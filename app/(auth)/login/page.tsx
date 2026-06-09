@@ -12,6 +12,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 const loginSchema = z.object({
   email: z.string().email("Geçerli bir e-posta adresi giriniz"),
   password: z.string().min(6, "Şifre en az 6 karakter olmalıdır"),
+  captchaAnswer: z.string().min(1, "Güvenlik kodunu giriniz"),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -28,20 +29,44 @@ const SearchParamHandler = ({ setSuccess }: { setSuccess: (val: string | null) =
   return null;
 };
 
-export default function LoginPage() {
+function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  const [captchaSvg, setCaptchaSvg] = useState<string>("");
+  const [captchaToken, setCaptchaToken] = useState<string>("");
+
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors, isDirty },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
   });
+
+  const refreshCaptcha = async () => {
+    try {
+      const res = await fetch("/api/auth/captcha");
+      const data = await res.json();
+      if (data.success) {
+        setCaptchaSvg(data.captchaSvg);
+        setCaptchaToken(data.captchaToken);
+        setValue("captchaAnswer", "");
+      }
+    } catch (err) {
+      console.error("Failed to load captcha", err);
+    }
+  };
+
+  useEffect(() => {
+    refreshCaptcha();
+  }, []);
 
   const onSubmit = async (data: LoginFormValues) => {
     setIsLoading(true);
@@ -51,13 +76,15 @@ export default function LoginPage() {
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          ...data,
+          captchaToken,
+        }),
       });
 
       const result = await response.json();
 
       if (response.ok && result.success) {
-        // Rolüne göre yönlendir
         if (result.user.role === "ADMIN") {
           router.push("/admin/dashboard");
         } else {
@@ -67,9 +94,11 @@ export default function LoginPage() {
         router.refresh();
       } else {
         setError(result.message || "Giriş başarısız oldu");
+        refreshCaptcha();
       }
     } catch (err) {
       setError("Bir bağlantı hatası oluştu");
+      refreshCaptcha();
     } finally {
       setIsLoading(false);
     }
@@ -94,9 +123,7 @@ export default function LoginPage() {
         {/* Subtle inner glow */}
         <div className="absolute inset-0 bg-gradient-to-br from-sky-500/5 to-transparent pointer-events-none" />
 
-        <Suspense fallback={null}>
-          <SearchParamHandler setSuccess={setSuccess} />
-        </Suspense>
+        <SearchParamHandler setSuccess={setSuccess} />
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 relative z-10">
           {success && (
@@ -147,6 +174,53 @@ export default function LoginPage() {
             </div>
             {errors.password && <p className="text-red-400 text-[10px] font-medium ml-1">{errors.password.message}</p>}
           </div>
+
+          {/* Captcha Section */}
+          {captchaSvg && (
+            <div className="space-y-2">
+              <label className="text-xs text-slate-400 font-medium px-1">Güvenlik Doğrulaması</label>
+              <div className="flex gap-3 items-center">
+                {/* SVG Container */}
+                <div 
+                  className="flex-1 bg-slate-950/50 rounded-2xl border border-white/5 overflow-hidden flex items-center justify-center h-[54px] select-none cursor-pointer hover:border-white/10 transition-colors"
+                  onClick={refreshCaptcha}
+                  title="Yenilemek için tıklayın"
+                  dangerouslySetInnerHTML={{ __html: captchaSvg }}
+                />
+                
+                {/* Reload Button */}
+                <button
+                  type="button"
+                  onClick={refreshCaptcha}
+                  className="p-3.5 bg-slate-950/50 hover:bg-slate-950 border border-white/5 hover:border-sky-500/20 rounded-2xl text-slate-400 hover:text-white transition-all flex items-center justify-center shrink-0 h-[54px] w-[54px] cursor-pointer"
+                  title="Güvenlik kodunu yenile"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                    <path d="M3 3v5h5"/>
+                    <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/>
+                    <path d="M16 16h5v5"/>
+                  </svg>
+                </button>
+              </div>
+
+              {/* Captcha Input */}
+              <div className="relative group/input">
+                <input
+                  {...register("captchaAnswer")}
+                  type="text"
+                  placeholder="Görseldeki Kodu Giriniz"
+                  autoComplete="off"
+                  className="w-full bg-slate-950/50 border border-white/5 focus:border-sky-500/50 focus:ring-[6px] focus:ring-sky-500/5 rounded-2xl py-4 px-4 text-sm text-white placeholder-slate-600 outline-none transition-all uppercase"
+                />
+              </div>
+              {errors.captchaAnswer && (
+                <p className="text-red-400 text-[10px] font-medium ml-1">
+                  {errors.captchaAnswer.message}
+                </p>
+              )}
+            </div>
+          )}
 
           <div className="flex items-center justify-between px-1">
             <label className="flex items-center gap-2 cursor-pointer group">
@@ -211,5 +285,18 @@ export default function LoginPage() {
         </Link>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="w-full min-h-screen bg-slate-950 flex flex-col items-center justify-center py-12 text-slate-400">
+        <Loader2 className="animate-spin text-sky-500 mb-2" size={24} />
+        <span className="text-sm font-medium">Yükleniyor...</span>
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   );
 }

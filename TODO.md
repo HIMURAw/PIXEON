@@ -1,10 +1,9 @@
 # TODO: Spread out the website layout       ✔️✖️
 
-- [✖️] Mobil uyumluluk eklenicek
-- [✖️] Spread out the website layout
-- [✖️] Anasayfaya ürün filtreleme özelliği eklenicek
-- [✖️] En Çok Satanlar kısmı alt tarafa kayıcak bunun yerinde önerilen ürünler kısmı olucak burada kullanıcı hangi ürünlere gidiyse o kategörideki ürünler çıkıcak
-- [✖️] Kullanıcı deneyimi test edilicek
+- [✔️] Mobil uyumluluk eklenicek
+- [✔️] Spread out the website layout
+- [✔️] Anasayfaya ürün filtreleme özelliği eklenicek
+- [✔️] En Çok Satanlar kısmı alt tarafa kayıcak bunun yerinde önerilen ürünler kısmı olucak burada kullanıcı hangi ürünlere gidiyse o kategörideki ürünler çıkıcak
 
 - [✖️] kategoriler kısmına bir kez daha bakılıcak
 - [✖️] abonelik sistemine birdaha bakılıcak
@@ -16,14 +15,13 @@
 - [✖️] google auth eklenicek
 - [✖️] İade sistemine bakılıcak
 
-- [✖️] captcha eklenicek
-- [✖️] Rate limit eklenicek
-- [✖️] Admin login rate limit eklenicek
-- [✖️] gereken işlemlere role check eklenicek
-- [✖️] Zod ile API güvenliği sağlanıcak
-- [✖️] XSS (Cross Site Scripting) kontrol edilicek
-- [✖️] ticket kısmında upload sistemine dosya boyutu kontrolü eklenicek
-- [✖️] Upload klasörünü execute edilemez yapılıcak
+- [✔️] captcha eklenicek
+- [✔️] Rate limit eklenicek
+- [✔️] Admin login rate limit eklenicek
+- [✔️] Zod ile API güvenliği sağlanıcak
+- [✔️] XSS (Cross Site Scripting) kontrol edilicek
+- [✔️] ticket kısmında upload sistemine dosya boyutu kontrolü eklenicek
+- [✔️] Upload klasörünü execute edilemez yapılıcak
 - [✖️] admin panele giriş için 2FA eklenicek
 - [✖️] sitenin tamamının güvenliğine bakılıcak
 
@@ -31,18 +29,18 @@
 - [✖️] iade politikası eklenicek
 - [✖️] KVKK, mesafeli satış sözleşmesi, gizlilik politikası, çerez politikası bunlar eklenicek
 
-- [✖️] Admin panele ayrıntılı log sistemi eklenicek
-- [✖️] ADmin panele canlı request monitor eklenicek
-- [✖️] Logging / Monitoring sistemi eklenicek Sentry, Grafana bunlardan birisi kullanılacak
+- [✔️] Admin panele ayrıntılı log sistemi eklenicek
+- [✔️] Admin panele canlı request monitor eklenicek
+- [✔️] Logging / Monitoring sistemi eklenicek Sentry, Grafana bunlardan birisi kullanılacak
 - [✖️] Cloudflare kullanılacak
-- [✖️] WAFBot, protection, CDN cache bu teknolojilere bakılıcak
-- [✖️] Redis ile cache kontrolü yapılıcak
+- [✔️] WAFBot, protection, CDN cache bu teknolojilere bakılıcak
 
 - [✖️] SEO optimizasyonuna bakılıcak
 - [✖️] image optimization yapılıcak
-- [✖️] lazy loading araştırılıcak ve eklenicek
-- [✖️] 3D objelerin performansı arttırılacak
-- [✖️] Search sistemi Algolia, Elasticsearch, Meilisearch bunlardan birisi ile değiştirilicek
+- [✔️] lazy loading araştırılıcak ve eklenicek
+- [✔️] 3D objelerin performansı arttırılacak
+- [✔️] Search sistemi Algolia, Elasticsearch, Meilisearch bunlardan birisi ile değiştirilicek,
+- [✔️] sepete ve ürünlere paylaşma özelliği eklenicek
 
 - [✖️] destek kısmındaki yapay zeka geliştirilicek
 
@@ -59,3 +57,8 @@
 - [✖️] Global error handling yapılacak
 - [✖️] Maintenance mode sistemi yapılacak
 - [✖️] Feature flag sistemi araştırılacak
+
+
+
+- [✖️] Kullanıcı deneyimi test edilicek
+- [✖️] Sentry ayarlanıcak

@@ -8,6 +8,9 @@ import fs from "fs/promises";
 import path from "path";
 import { randomUUID } from "crypto";
 
+const ALLOWED_EXTENSIONS = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
+const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+
 export async function uploadProfilePicture(userId: string, formData: FormData) {
   try {
     const file = formData.get("file") as File;
@@ -15,9 +18,19 @@ export async function uploadProfilePicture(userId: string, formData: FormData) {
       return { success: false, error: "Dosya bulunamadı." };
     }
 
+    // Validate MIME type
+    if (!ALLOWED_MIME_TYPES.includes(file.type)) {
+      return { success: false, error: "Geçersiz dosya tipi. Sadece resim dosyaları yüklenebilir." };
+    }
+
+    // Validate extension
+    const ext = path.extname(file.name).toLowerCase();
+    if (!ALLOWED_EXTENSIONS.includes(ext)) {
+      return { success: false, error: "Geçersiz dosya uzantısı. Sadece resim dosyaları yüklenebilir." };
+    }
+
     const buffer = Buffer.from(await file.arrayBuffer());
-    const fileExtension = file.name.split(".").pop();
-    const fileName = `${userId}-${Date.now()}.${fileExtension}`;
+    const fileName = `${userId}-${Date.now()}${ext}`;
     const uploadDir = path.join(process.cwd(), "public", "profile");
     
     // Ensure directory exists

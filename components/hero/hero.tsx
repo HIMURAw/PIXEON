@@ -1,14 +1,35 @@
 "use client";
 import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import ModelViewer, { preloadModels } from "./ModelViewer";
+import dynamic from "next/dynamic";
+
+const ModelViewer = dynamic(() => import("./ModelViewer"), {
+    ssr: false,
+    loading: () => (
+        <div className="w-full h-full flex flex-col items-center justify-center text-slate-500 font-bold text-xs gap-3">
+            <div className="w-8 h-8 border-2 border-sky-500/20 border-t-sky-500 rounded-full animate-spin"></div>
+            <span>3D Model Yükleniyor...</span>
+        </div>
+    )
+});
 
 // Database driven hero slides
 import { getActiveHeroSlides } from "@/lib/actions/hero-actions";
 
 
+interface HeroSlide {
+    id: string | number;
+    badgeColor?: string | null;
+    badge?: string | null;
+    title: string;
+    subtitle?: string | null;
+    price: string | null;
+    buttonText: string | null;
+    modelPath: string | null;
+}
+
 export default function HeroCarousel() {
-    const [dynamicSlides, setDynamicSlides] = useState<any[]>([]);
+    const [dynamicSlides, setDynamicSlides] = useState<HeroSlide[]>([]);
     const [currentSlide, setCurrentSlide] = useState(0);
     const [isAutoPlaying, setIsAutoPlaying] = useState(true);
     const [loading, setLoading] = useState(true);
@@ -30,8 +51,11 @@ export default function HeroCarousel() {
 
     // Tüm modelleri önden yüklüyoruz
     useEffect(() => {
-        const modelPaths = activeSlides.map(s => s.modelPath);
-        preloadModels(modelPaths);
+        if (activeSlides.length === 0) return;
+        const modelPaths = activeSlides.map(s => s.modelPath).filter((p): p is string => typeof p === "string");
+        import("./ModelViewer").then((mod) => {
+            mod.preloadModels(modelPaths);
+        });
     }, [activeSlides]);
 
     useEffect(() => {
@@ -93,7 +117,7 @@ export default function HeroCarousel() {
                                     <span className="text-[9px] font-bold text-gray-300 bg-gray-700 px-2 py-0.5 rounded-full mr-1">
                                         ÖZEL TEKLİF
                                     </span>
-                                    <span className={`text-[9px] font-bold text-white ${slide.badgeColor} px-2 py-0.5 rounded-full`}>
+                                    <span className={`text-[9px] font-bold text-white ${slide.badgeColor || ""} px-2 py-0.5 rounded-full`}>
                                         {slide.badge}
                                     </span>
                                 </div>
@@ -107,7 +131,7 @@ export default function HeroCarousel() {
                                 </p>
 
                                 <div className="flex items-center justify-center md:justify-start gap-1.5">
-                                    <span className="text-[10px] text-gray-300">'dan itibaren</span>
+                                    <span className="text-[10px] text-gray-300">&apos;dan itibaren</span>
                                     <span className="text-2xl sm:text-3xl font-bold text-red-400">
                                         {slide.price}
                                     </span>
@@ -124,7 +148,7 @@ export default function HeroCarousel() {
 
                 {/* Sağ Taraf: Sabit Tek 3D Görüntüleyici */}
                 <div className="w-full md:w-1/2 h-[360px] md:h-full shrink-0 relative z-10 bg-gradient-to-t md:bg-gradient-to-l from-slate-900/20 to-transparent">
-                    <ModelViewer path={activeSlides[currentSlide]?.modelPath} />
+                    <ModelViewer path={activeSlides[currentSlide]?.modelPath || ""} />
                 </div>
             </div>
 

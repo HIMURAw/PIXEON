@@ -4,8 +4,16 @@ import React, { useEffect, useState } from "react";
 import { getActiveBannersByPosition } from "@/lib/actions/banner-actions";
 import Link from "next/link";
 
+interface Banner {
+    id: string | number;
+    image: string;
+    link?: string | null;
+    title?: string | null;
+    subtitle?: string | null;
+}
+
 export default function PromoVertical() {
-    const [banner, setBanner] = useState<any>(null);
+    const [banner, setBanner] = useState<Banner | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -46,6 +54,7 @@ export default function PromoVertical() {
                             src="/products/dualsense.png"
                             alt="DualSense"
                             className="max-h-full max-w-full object-contain"
+                            loading="lazy"
                         />
                     </div>
                 </div>
@@ -62,6 +71,7 @@ export default function PromoVertical() {
                 src={banner.image}
                 alt={banner.title || ""}
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                loading="lazy"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
             <div className="relative z-10 p-5 lg:p-6 flex flex-col h-full justify-end">
