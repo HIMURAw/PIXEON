@@ -166,7 +166,24 @@ export default function Footer() {
                 </div>
             </div>
 
-            {/* 4. Bottom Strip */}
+            {/* 4. Legal Links Strip */}
+            <div className="border-t border-white/5 py-6">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+                    {[
+                        { name: "KVKK Aydınlatma Metni", href: "/p/kvkk-aydinlatma-metni" },
+                        { name: "Gizlilik Politikası", href: "/p/gizlilik-politikasi" },
+                        { name: "Çerez Politikası", href: "/p/cerez-politikasi" },
+                        { name: "Mesafeli Satış Sözleşmesi", href: "/p/mesafeli-satis-sozlesmesi" },
+                        { name: "İade Politikası", href: "/p/iade-politikasi" },
+                    ].map((link) => (
+                        <Link key={link.href} href={link.href} className="text-xs text-slate-500 hover:text-sky-400 transition-colors">
+                            {link.name}
+                        </Link>
+                    ))}
+                </div>
+            </div>
+
+            {/* 5. Bottom Strip */}
             <div className="bg-[#020617] border-t border-white/5 py-8">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
                     <p className="text-sm text-slate-500 text-center md:text-left">
