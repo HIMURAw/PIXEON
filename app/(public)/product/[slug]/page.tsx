@@ -2,6 +2,8 @@ import { db } from "@/lib/db";
 import { products, reviews, users, categories, wishlist } from "@/lib/db/schema";
 import { eq, and, desc } from "drizzle-orm";
 import { notFound } from "next/navigation";
+import { cache } from "react";
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -28,11 +30,8 @@ import ProductViewTracker from "@/components/products/ProductViewTracker";
 import { getSession } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
-export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
-    const session = await getSession();
-    const { slug } = await params;
-
-    // 1. Fetch Product Data using standard leftJoin for better compatibility
+// Cached per-request so generateMetadata and the page component share one query.
+const getProductBySlug = cache(async (slug: string) => {
     const results = await db.select({
         product: products,
         category: categories
@@ -42,9 +41,40 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         .where(eq(products.slug, slug))
         .limit(1);
 
-    if (results.length === 0) notFound();
+    return results[0] ?? null;
+});
 
-    const { product, category } = results[0];
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+    const { slug } = await params;
+    const result = await getProductBySlug(slug);
+
+    if (!result) {
+        return { title: "Ürün Bulunamadı" };
+    }
+
+    const { product, category } = result;
+    const title = product.name;
+    const description = product.description
+        ? product.description.slice(0, 155)
+        : `${product.name} - ${category?.name ?? "PIXEON"} kategorisinde en uygun fiyatlarla PIXEON'da.`;
+    const images = product.image ? [{ url: product.image }] : undefined;
+
+    return {
+        title,
+        description,
+        openGraph: { title, description, images, type: "website" },
+        twitter: { card: "summary_large_image", title, description, images: product.image ? [product.image] : undefined },
+    };
+}
+
+export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
+    const session = await getSession();
+    const { slug } = await params;
+
+    const result = await getProductBySlug(slug);
+    if (!result) notFound();
+
+    const { product, category } = result;
 
     // 2. Fetch Product Reviews
     const productReviews = await db.query.liveChatMessages.findMany({
@@ -96,8 +126,37 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         ? (reviewsData.reduce((acc, curr) => acc + curr.rating, 0) / reviewsData.length).toFixed(1)
         : "5.0";
 
+    const productJsonLd = {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        name: product.name,
+        description: product.description || undefined,
+        image: product.image ? [product.image] : undefined,
+        sku: product.sku,
+        category: category?.name,
+        offers: {
+            "@type": "Offer",
+            priceCurrency: "TRY",
+            price: product.price,
+            availability: product.status === "ACTIVE" && product.stock > 0
+                ? "https://schema.org/InStock"
+                : "https://schema.org/OutOfStock",
+        },
+        ...(reviewsData.length > 0 && {
+            aggregateRating: {
+                "@type": "AggregateRating",
+                ratingValue: avgRating,
+                reviewCount: reviewsData.length,
+            },
+        }),
+    };
+
     return (
         <div className="min-h-screen bg-slate-950">
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+            />
             <ProductViewTracker categorySlug={category?.slug} productId={product.id} />
             <TopBar />
             <MainBar />

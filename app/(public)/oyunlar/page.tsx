@@ -7,7 +7,7 @@ import SidebarLayout from "@/components/categories/SidebarLayout";
 import NewProductsSidebar from "@/components/products/newProducts/NewProductsSidebar";
 
 export const metadata: Metadata = {
-    title: "Oyunlar | PIXEON - Yetkili PlayStation Satış Merkezi",
+    title: "Oyunlar - Yetkili PlayStation Satış Merkezi",
     description: "PS5 ve PS4 oyunlarını en uygun fiyatlarla PIXEON'da satın al.",
 };
 

@@ -9,7 +9,7 @@ import { Calendar, Clock, ChevronRight } from "lucide-react";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-    title: "Blog & Haberler | PIXEON PlayStation Mağazası",
+    title: "Blog & Haberler",
     description: "Oyun dünyasından en son haberler, PlayStation rehberleri ve incelemeler PIXEON Blog'da.",
 };
 

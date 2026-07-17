@@ -14,10 +14,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     const res = await getBlogPostBySlug(slug);
     const post = res.post;
 
-    if (!post) return { title: "Blog Yazısı Bulunamadı | PIXEON" };
+    if (!post) return { title: "Blog Yazısı Bulunamadı" };
 
     return {
-        title: `${post.title} | PIXEON Blog`,
+        title: `${post.title} | Blog`,
         description: post.excerpt || `${post.title} hakkında detaylı bilgiler ve oyun dünyasından haberler.`,
         openGraph: {
             title: post.title,
