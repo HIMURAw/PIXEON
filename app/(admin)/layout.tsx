@@ -99,6 +99,7 @@ const menuGroups: MenuGroup[] = [
         items: [
             { label: "Siparişler", icon: ShoppingCart, href: "/admin/orders" },
             { label: "Ödemeler", icon: Wallet, href: "/admin/payments" },
+            { label: "Cüzdan Yönetimi", icon: Wallet, href: "/admin/wallet" },
             { label: "Kuponlar", icon: TicketPlus, href: "/admin/coupons" },
             { label: "Kargo Ayarları", icon: Truck, href: "/admin/shipping" },
         ]

@@ -20,7 +20,10 @@ import {
     Star,
     Bell,
     ShieldCheck,
-    Truck
+    Truck,
+    Wallet as WalletIcon,
+    ArrowDownCircle,
+    ArrowUpCircle
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -33,6 +36,7 @@ import type { NotificationType } from "@/components/ui/Feedback";
 import { getWishlist, toggleWishlist } from "@/lib/actions/wishlist-actions";
 import toast from "react-hot-toast";
 import { getUserOrders } from "@/lib/actions/order-actions";
+import { getWalletBalance, getWalletTransactions } from "@/lib/actions/wallet-actions";
 
 const getStatusInfo = (status: string) => {
     switch (status) {
@@ -75,7 +79,7 @@ const getStatusInfo = (status: string) => {
     }
 };
 
-type TabType = "dashboard" | "orders" | "addresses" | "profile" | "favorites";
+type TabType = "dashboard" | "orders" | "addresses" | "profile" | "favorites" | "wallet";
 
 export default function AccountPage() {
     const [activeTab, setActiveTab] = useState<TabType>("dashboard");
@@ -157,6 +161,7 @@ export default function AccountPage() {
         { id: "orders", label: "Siparişlerim", icon: ShoppingBag },
         { id: "addresses", label: "Adreslerim", icon: MapPin },
         { id: "favorites", label: "Favorilerim", icon: Heart },
+        { id: "wallet", label: "Cüzdanım", icon: WalletIcon },
         { id: "profile", label: "Profil Ayarları", icon: Settings },
     ];
 
@@ -276,6 +281,7 @@ export default function AccountPage() {
                             {activeTab === "addresses" && <AddressesView user={user} showNotification={showNotification} formatPhone={formatPhoneNumber} />}
                             {activeTab === "profile" && <ProfileView user={user} setUser={setUser} showNotification={showNotification} formatPhone={formatPhoneNumber} />}
                             {activeTab === "favorites" && <FavoritesView userId={user?.id} />}
+                            {activeTab === "wallet" && <WalletView userId={user?.id} />}
                         </div>
                     </main>
                 </div>
@@ -906,6 +912,75 @@ function FavoritesView({ userId }: { userId: string }) {
                     ))}
                 </div>
             )}
+        </div>
+    );
+}
+
+function WalletView({ userId }: { userId: string }) {
+    const [balance, setBalance] = useState<number | null>(null);
+    const [transactions, setTransactions] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        if (!userId) return;
+        Promise.all([getWalletBalance(userId), getWalletTransactions(userId)]).then(([bal, txs]) => {
+            setBalance(bal);
+            setTransactions(txs);
+            setLoading(false);
+        });
+    }, [userId]);
+
+    if (loading) return <div className="flex justify-center py-20 text-blue-400 font-black">YÜKLENİYOR...</div>;
+
+    return (
+        <div className="space-y-12 animate-in fade-in duration-700 relative z-10">
+            <div>
+                <h2 className="text-3xl font-black text-white tracking-tight mb-3">Cüzdanım</h2>
+                <p className="text-slate-500 font-medium leading-relaxed">Bakiyeni görüntüle ve ödeme hareketlerini takip et.</p>
+            </div>
+
+            <div className="p-8 bg-gradient-to-br from-blue-600/15 to-transparent border border-blue-500/20 rounded-[40px] flex items-center justify-between">
+                <div>
+                    <p className="text-xs font-black text-blue-300 uppercase tracking-widest mb-2">Kullanılabilir Bakiye</p>
+                    <p className="text-4xl font-black text-white tracking-tight">₺{(balance ?? 0).toLocaleString("tr-TR")}</p>
+                </div>
+                <div className="w-16 h-16 bg-blue-600/20 rounded-3xl flex items-center justify-center text-blue-300">
+                    <WalletIcon size={32} />
+                </div>
+            </div>
+
+            <div>
+                <h3 className="text-lg font-black text-white mb-6">İşlem Geçmişi</h3>
+                {transactions.length === 0 ? (
+                    <div className="py-16 text-center bg-white/[0.02] border-2 border-dashed border-white/5 rounded-[40px]">
+                        <p className="text-slate-500 font-medium">Henüz bir cüzdan hareketi yok.</p>
+                    </div>
+                ) : (
+                    <div className="divide-y divide-white/5">
+                        {transactions.map((tx) => (
+                            <div key={tx.id} className="py-4 flex items-center justify-between">
+                                <div className="flex items-center gap-4">
+                                    <div className={cn(
+                                        "w-10 h-10 rounded-2xl flex items-center justify-center shrink-0",
+                                        tx.amount >= 0 ? "bg-emerald-500/10 text-emerald-400" : "bg-red-500/10 text-red-400"
+                                    )}>
+                                        {tx.amount >= 0 ? <ArrowDownCircle size={18} /> : <ArrowUpCircle size={18} />}
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-bold text-white">{tx.description || tx.type}</p>
+                                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-0.5">
+                                            {new Date(tx.createdAt).toLocaleDateString("tr-TR", { day: "2-digit", month: "long", year: "numeric" })}
+                                        </p>
+                                    </div>
+                                </div>
+                                <span className={cn("text-sm font-black", tx.amount >= 0 ? "text-emerald-400" : "text-red-400")}>
+                                    {tx.amount >= 0 ? "+" : ""}₺{tx.amount.toLocaleString("tr-TR")}
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
         </div>
     );
 }

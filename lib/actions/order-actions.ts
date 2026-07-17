@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { orders, orderItems, transactions, products, cartItems, userAddresses, coupons, users, siteSettings } from "@/lib/db/schema";
+import { orders, orderItems, transactions, products, cartItems, userAddresses, coupons, users, siteSettings, walletTransactions } from "@/lib/db/schema";
 import { eq, sql, inArray, and, gte } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { randomUUID } from "crypto";
@@ -9,7 +9,7 @@ import { randomUUID } from "crypto";
 interface CreateOrderData {
   userId: string;
   addressId: string;
-  paymentMethod: "Credit Card" | "Bank Transfer";
+  paymentMethod: "Credit Card" | "Bank Transfer" | "Wallet";
   couponCode?: string;
 }
 
@@ -106,15 +106,30 @@ export async function createOrder(data: CreateOrderData) {
         }
       }
 
+      // b. Wallet payments debit immediately (real internal balance movement),
+      // unlike Credit Card which is currently a UI mock (see checkout page notice)
+      // that never actually charges anything.
+      if (paymentMethod === "Wallet") {
+        const [walletUpdate] = await tx
+          .update(users)
+          .set({ walletBalance: sql`${users.walletBalance} - ${totalAmount}` })
+          .where(and(eq(users.id, userId), gte(users.walletBalance, totalAmount)));
+
+        if ((walletUpdate as any).affectedRows === 0) {
+          throw new Error("Cüzdan bakiyeniz bu siparişi karşılamaya yetmiyor.");
+        }
+      }
+
       const orderId = randomUUID();
       const transactionId = randomUUID();
 
-      const isCreditCard = paymentMethod === "Credit Card";
-      const orderStatus = isCreditCard ? "PREPARING" as const : "PENDING" as const;
-      const paymentStatus = isCreditCard ? "PAID" as const : "PENDING" as const;
-      const transactionStatus = isCreditCard ? "COMPLETED" as const : "PENDING" as const;
+      const isImmediatelyPaid = paymentMethod === "Credit Card" || paymentMethod === "Wallet";
+      const orderStatus = isImmediatelyPaid ? "PREPARING" as const : "PENDING" as const;
+      const paymentStatus = isImmediatelyPaid ? "PAID" as const : "PENDING" as const;
+      const transactionStatus = isImmediatelyPaid ? "COMPLETED" as const : "PENDING" as const;
+      const paymentMethodLabel = paymentMethod === "Credit Card" ? "Kredi Kartı (PayTR)" : paymentMethod === "Wallet" ? "Cüzdan" : "Havale/EFT";
 
-      // b. Insert Order
+      // c. Insert Order
       await tx.insert(orders).values({
         id: orderId,
         userId,
@@ -122,13 +137,13 @@ export async function createOrder(data: CreateOrderData) {
         totalAmount,
         status: orderStatus,
         paymentStatus,
-        paymentMethod: paymentMethod === "Credit Card" ? "Kredi Kartı (PayTR)" : "Havale/EFT",
+        paymentMethod: paymentMethodLabel,
         shippingAddress: shippingAddressText,
         createdAt: new Date(),
         updatedAt: new Date()
       });
 
-      // c. Insert Order Items
+      // d. Insert Order Items
       for (const item of userCart) {
         await tx.insert(orderItems).values({
           id: randomUUID(),
@@ -139,18 +154,30 @@ export async function createOrder(data: CreateOrderData) {
         });
       }
 
-      // d. Insert Transaction
+      // e. Insert Transaction
       await tx.insert(transactions).values({
         id: transactionId,
         userId,
         orderId,
         amount: totalAmount,
-        method: paymentMethod === "Credit Card" ? "Kredi Kartı" : "Havale/EFT",
+        method: paymentMethodLabel,
         status: transactionStatus,
         createdAt: new Date()
       });
 
-      // e. Clear Cart
+      if (paymentMethod === "Wallet") {
+        await tx.insert(walletTransactions).values({
+          id: randomUUID(),
+          userId,
+          amount: -totalAmount,
+          type: "ORDER_PAYMENT",
+          description: `${orderNumber} numaralı sipariş ödemesi`,
+          orderId,
+          createdAt: new Date(),
+        });
+      }
+
+      // f. Clear Cart
       await tx.delete(cartItems).where(eq(cartItems.userId, userId));
 
       return { orderNumber };

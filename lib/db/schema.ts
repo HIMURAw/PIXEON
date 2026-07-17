@@ -11,6 +11,7 @@ export const users = mysqlTable("users", {
   adminRole: varchar("admin_role", { length: 255 }),
   twoFactorSecret: varchar("two_factor_secret", { length: 255 }),
   twoFactorEnabled: boolean("two_factor_enabled").default(false).notNull(),
+  walletBalance: double("wallet_balance").default(0).notNull(),
   phone: varchar("phone", { length: 20 }),
   address: text("address"),
   image: varchar("image", { length: 255 }),
@@ -216,6 +217,16 @@ export const cartItems = mysqlTable("cart_items", {
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
 });
 
+export const walletTransactions = mysqlTable("wallet_transactions", {
+  id: varchar("id", { length: 255 }).primaryKey(),
+  userId: varchar("user_id", { length: 255 }).notNull().references(() => users.id),
+  amount: double("amount").notNull(), // positive = credit, negative = debit
+  type: mysqlEnum("type", ["TOPUP", "ORDER_PAYMENT", "REFUND", "ADMIN_ADJUSTMENT"]).notNull(),
+  description: text("description"),
+  orderId: varchar("order_id", { length: 255 }).references(() => orders.id),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // 9. Dynamic Content Management
 export const heroSlides = mysqlTable("hero_slides", {
   id: varchar("id", { length: 255 }).primaryKey(),
@@ -328,6 +339,18 @@ export const usersRelations = relations(users, ({ many }) => ({
   wishlist: many(wishlist),
   cartItems: many(cartItems),
   blogPosts: many(blogPosts),
+  walletTransactions: many(walletTransactions),
+}));
+
+export const walletTransactionsRelations = relations(walletTransactions, ({ one }) => ({
+  user: one(users, {
+    fields: [walletTransactions.userId],
+    references: [users.id],
+  }),
+  order: one(orders, {
+    fields: [walletTransactions.orderId],
+    references: [orders.id],
+  }),
 }));
 
 export const categoriesRelations = relations(categories, ({ many, one }) => ({

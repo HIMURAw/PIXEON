@@ -1,8 +1,9 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { orders, orderItems, transactions, products, users } from "@/lib/db/schema";
+import { orders, orderItems, transactions, products, users, walletTransactions } from "@/lib/db/schema";
 import { eq, desc, sql } from "drizzle-orm";
+import { randomUUID } from "crypto";
 import { revalidatePath } from "next/cache";
 import { createLog } from "./admin-actions";
 
@@ -70,6 +71,8 @@ export async function updateOrderStatus(
     // otherwise cancelled/failed orders permanently shrink inventory.
     const isNewlyCancelled = status === "CANCELLED" && order?.status !== "CANCELLED";
 
+    const isWalletOrder = order?.paymentMethod === "Cüzdan" && order?.paymentStatus === "PAID";
+
     if (isNewlyCancelled) {
       await db.transaction(async (tx) => {
         const items = await tx.select().from(orderItems).where(eq(orderItems.orderId, orderId));
@@ -81,13 +84,30 @@ export async function updateOrderStatus(
             })
             .where(eq(products.id, item.productId));
         }
+
+        // Wallet-paid orders debited real balance at checkout — refund it back.
+        if (isWalletOrder && order) {
+          await tx.update(users)
+            .set({ walletBalance: sql`${users.walletBalance} + ${order.totalAmount}` })
+            .where(eq(users.id, order.userId));
+          await tx.insert(walletTransactions).values({
+            id: randomUUID(),
+            userId: order.userId,
+            amount: order.totalAmount,
+            type: "REFUND",
+            description: `${orderNum} numaralı iptal edilen siparişin cüzdan iadesi`,
+            orderId: order.id,
+            createdAt: new Date(),
+          });
+        }
+
         await tx.update(orders).set(updateData).where(eq(orders.id, orderId));
       });
     } else {
       await db.update(orders).set(updateData).where(eq(orders.id, orderId));
     }
 
-    await createLog("Sipariş Durumu Güncellendi", `${orderNum} numaralı siparişin durumu "${status}" olarak güncellendi.${isNewlyCancelled ? " İptal edilen ürünlerin stoğu iade edildi." : ""}`);
+    await createLog("Sipariş Durumu Güncellendi", `${orderNum} numaralı siparişin durumu "${status}" olarak güncellendi.${isNewlyCancelled ? " İptal edilen ürünlerin stoğu iade edildi." : ""}${isWalletOrder ? " Cüzdan bakiyesi iade edildi." : ""}`);
 
     revalidatePath("/admin/orders");
     revalidatePath("/admin/products");

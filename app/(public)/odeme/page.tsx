@@ -3,16 +3,18 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { 
-  CreditCard as CardIcon, 
-  MapPin, 
-  Plus, 
-  Loader2, 
-  ShieldCheck, 
-  ChevronLeft, 
-  ArrowRight, 
+import {
+  CreditCard as CardIcon,
+  MapPin,
+  Plus,
+  Loader2,
+  ShieldCheck,
+  ChevronLeft,
+  ArrowRight,
   ShoppingBag,
-  Info
+  Info,
+  Wallet as WalletIcon,
+  Landmark
 } from "lucide-react";
 import TopBar from "@/components/header/TopBar";
 import MainBar from "@/components/header/MainBar";
@@ -21,6 +23,7 @@ import Footer from "@/components/footer/Footer";
 import { useCart } from "@/context/CartContext";
 import { getUserAddresses, addAddress, setDefaultAddress } from "@/lib/actions/user-actions";
 import { createOrder } from "@/lib/actions/order-actions";
+import { getWalletBalance } from "@/lib/actions/wallet-actions";
 import toast from "react-hot-toast";
 
 interface Address {
@@ -58,8 +61,9 @@ export default function CheckoutPage() {
   const [addingAddress, setAddingAddress] = useState(false);
 
   // Checkout & Payment States
-  const paymentMethod = "Credit Card";
+  const [paymentMethod, setPaymentMethod] = useState<"Credit Card" | "Bank Transfer" | "Wallet">("Credit Card");
   const [submittingOrder, setSubmittingOrder] = useState(false);
+  const [walletBalance, setWalletBalance] = useState<number | null>(null);
 
   // Credit Card Interactive Form States
   const [cardDetails, setCardDetails] = useState({
@@ -78,6 +82,7 @@ export default function CheckoutPage() {
         const data = await res.json();
         if (data.success && data.user) {
           setUser(data.user);
+          getWalletBalance(data.user.id).then(setWalletBalance);
           // Load user addresses
           const userAddrs = await getUserAddresses(data.user.id);
           setAddresses(userAddrs);
@@ -197,6 +202,11 @@ export default function CheckoutPage() {
         toast.error("Lütfen 3 haneli CVV kodunu girin.");
         return;
       }
+    }
+
+    if (paymentMethod === "Wallet" && (walletBalance ?? 0) < total) {
+      toast.error("Cüzdan bakiyeniz bu siparişi karşılamaya yetmiyor.");
+      return;
     }
 
     setSubmittingOrder(true);
@@ -502,9 +512,33 @@ export default function CheckoutPage() {
             <div className="bg-[#0b1220] border border-white/10 rounded-2xl p-6 space-y-6">
               <h3 className="text-base font-bold text-white flex items-center gap-2 border-b border-white/5 pb-4">
                 <CardIcon size={18} className="text-blue-400" />
-                Ödeme Bilgileri (Kredi / Banka Kartı)
+                Ödeme Yöntemi
               </h3>
 
+              {/* Payment Method Selector */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {([
+                  { id: "Credit Card" as const, label: "Kredi / Banka Kartı", icon: CardIcon },
+                  { id: "Bank Transfer" as const, label: "Havale / EFT", icon: Landmark },
+                  { id: "Wallet" as const, label: "Cüzdan", icon: WalletIcon },
+                ]).map((m) => (
+                  <button
+                    key={m.id}
+                    type="button"
+                    onClick={() => setPaymentMethod(m.id)}
+                    className={`flex items-center gap-3 p-4 rounded-xl border text-left transition-all ${
+                      paymentMethod === m.id
+                        ? "bg-blue-600/10 border-blue-500 shadow-[0_0_15px_rgba(37,99,235,0.1)]"
+                        : "bg-[#020617] border-white/5 hover:border-white/15"
+                    }`}
+                  >
+                    <m.icon size={18} className={paymentMethod === m.id ? "text-blue-400" : "text-slate-500"} />
+                    <span className="text-xs font-bold text-white">{m.label}</span>
+                  </button>
+                ))}
+              </div>
+
+              {paymentMethod === "Credit Card" && (
               <div className="space-y-8">
                 {/* Dynamic Credit Card Visualizer */}
                 <div className="flex justify-center perspective-1000">
@@ -646,6 +680,40 @@ export default function CheckoutPage() {
                   </div>
                 </div>
               </div>
+              )}
+
+              {paymentMethod === "Bank Transfer" && (
+                <div className="p-5 bg-[#020617] border border-white/10 rounded-xl space-y-3">
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    Siparişiniz <strong className="text-white">beklemede</strong> olarak oluşturulur. Tutarı aşağıdaki hesaba
+                    aktardıktan sonra, ekibimiz ödemenizi onaylayınca siparişiniz hazırlanmaya başlar.
+                  </p>
+                  <div className="text-[11px] text-slate-400 font-mono bg-black/20 rounded-lg p-3 space-y-1">
+                    <p>Banka: [BANKA ADI]</p>
+                    <p>Hesap Sahibi: [ŞİRKET UNVANI]</p>
+                    <p>IBAN: [IBAN NUMARASI]</p>
+                  </div>
+                </div>
+              )}
+
+              {paymentMethod === "Wallet" && (
+                <div className="p-5 bg-[#020617] border border-white/10 rounded-xl space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-slate-400">Cüzdan Bakiyeniz</span>
+                    <span className="text-lg font-black text-white">
+                      {walletBalance === null ? <Loader2 size={16} className="animate-spin" /> : `₺${walletBalance.toLocaleString("tr-TR")}`}
+                    </span>
+                  </div>
+                  {walletBalance !== null && walletBalance < total && (
+                    <p className="text-xs text-red-400">
+                      Bakiyeniz bu siparişi karşılamaya yetmiyor. Eksik: ₺{(total - walletBalance).toLocaleString("tr-TR")}
+                    </p>
+                  )}
+                  <p className="text-[11px] text-slate-500">
+                    Sipariş tutarı onaylandığında cüzdanınızdan anında düşülür.
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* 3. ORDER ITEMS REVIEW */}
@@ -711,7 +779,7 @@ export default function CheckoutPage() {
               {/* Complete Payment Button */}
               <button 
                 onClick={handleCompleteOrder}
-                disabled={submittingOrder}
+                disabled={submittingOrder || (paymentMethod === "Wallet" && (walletBalance ?? 0) < total)}
                 className="w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-bold py-4 rounded-full flex items-center justify-center gap-2 transition active:scale-98 group cursor-pointer text-sm uppercase tracking-wider shadow-lg shadow-blue-500/20"
               >
                 {submittingOrder ? (
