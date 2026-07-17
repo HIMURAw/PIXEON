@@ -34,6 +34,7 @@ node_modules
 *.sql
 *.sqlite
 *.sqlite3
+/backups/
 
 # local scratch scripts and debug logs (never commit real data/queries)
 /scratch/

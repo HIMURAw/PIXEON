@@ -9,7 +9,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "meili:sync": "tsx scripts/sync-meilisearch.ts"
+    "meili:sync": "tsx scripts/sync-meilisearch.ts",
+    "db:backup": "tsx scripts/backup-db.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
