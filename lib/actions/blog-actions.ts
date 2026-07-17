@@ -5,6 +5,7 @@ import { blogPosts } from "@/lib/db/schema";
 import { eq, desc } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { getSession } from "@/lib/auth";
+import { createLog } from "./admin-actions";
 
 export async function getBlogPosts() {
     try {
@@ -46,8 +47,10 @@ export async function saveBlogPost(data: any) {
 
         if (data.id) {
             await db.update(blogPosts).set(postData).where(eq(blogPosts.id, id));
+            await createLog("Blog Yazısı Güncellendi", `Blog yazısı güncellendi: ${postData.title}`);
         } else {
             await db.insert(blogPosts).values({ id, ...postData });
+            await createLog("Blog Yazısı Eklendi", `Yeni blog yazısı eklendi: ${postData.title}`);
         }
 
         revalidatePath("/admin/content/blog");
@@ -62,6 +65,7 @@ export async function saveBlogPost(data: any) {
 export async function deleteBlogPost(id: string) {
     try {
         await db.delete(blogPosts).where(eq(blogPosts.id, id));
+        await createLog("Blog Yazısı Silindi", `Blog yazısı silindi (ID: ${id})`);
         revalidatePath("/admin/content/blog");
         return { success: true };
     } catch (error: any) {

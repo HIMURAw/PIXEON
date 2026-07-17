@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { banners } from "@/lib/db/schema";
 import { eq, desc } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { createLog } from "./admin-actions";
 
 export async function getBanners() {
     try {
@@ -45,8 +46,10 @@ export async function saveBanner(data: any) {
 
         if (data.id) {
             await db.update(banners).set(bannerData).where(eq(banners.id, id));
+            await createLog("Banner Güncellendi", `Banner güncellendi: ${bannerData.title || id}`);
         } else {
             await db.insert(banners).values({ id, ...bannerData });
+            await createLog("Banner Eklendi", `Yeni banner eklendi: ${bannerData.title || id}`);
         }
 
         revalidatePath("/");
@@ -60,6 +63,7 @@ export async function saveBanner(data: any) {
 export async function deleteBanner(id: string) {
     try {
         await db.delete(banners).where(eq(banners.id, id));
+        await createLog("Banner Silindi", `Banner silindi (ID: ${id})`);
         revalidatePath("/");
         revalidatePath("/admin/content/banners");
         return { success: true };

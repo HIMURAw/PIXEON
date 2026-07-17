@@ -6,6 +6,7 @@ import { eq, asc } from "drizzle-orm";
 import { randomUUID } from "crypto";
 import { getSession } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
+import { createLog } from "./admin-actions";
 
 export async function getHeroSlides() {
   try {
@@ -44,11 +45,13 @@ export async function saveHeroSlide(data: any) {
         await db.update(heroSlides)
             .set({ ...rest, updatedAt: new Date() })
             .where(eq(heroSlides.id, slideId));
+        await createLog("Hero Slide Güncellendi", `Slider güncellendi: ${rest.title || slideId}`);
     } else {
         await db.insert(heroSlides).values({
             id: slideId,
             ...rest,
         });
+        await createLog("Hero Slide Eklendi", `Yeni slider eklendi: ${rest.title || slideId}`);
     }
 
     revalidatePath("/");
@@ -66,6 +69,7 @@ export async function deleteHeroSlide(id: string) {
 
     try {
         await db.delete(heroSlides).where(eq(heroSlides.id, id));
+        await createLog("Hero Slide Silindi", `Slider silindi (ID: ${id})`);
         revalidatePath("/");
         return { success: true };
     } catch (error: any) {

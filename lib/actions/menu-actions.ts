@@ -6,6 +6,7 @@ import { eq, asc } from "drizzle-orm";
 import { getSession } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { randomUUID } from "crypto";
+import { createLog } from "./admin-actions";
 
 
 export async function getMenus() {
@@ -132,6 +133,8 @@ export async function saveMenu(data: any) {
       await db.insert(navMenuItems).values(itemsToInsert);
     }
 
+    await createLog(id ? "Menü Güncellendi" : "Menü Eklendi", `Menü ${id ? "güncellendi" : "eklendi"}: ${name}`);
+
     revalidatePath("/");
     return { success: true, menuId };
   } catch (error: any) {
@@ -148,6 +151,7 @@ export async function deleteMenu(id: string) {
   try {
     await db.delete(navMenuItems).where(eq(navMenuItems.menuId, id));
     await db.delete(navMenus).where(eq(navMenus.id, id));
+    await createLog("Menü Silindi", `Menü silindi (ID: ${id})`);
     revalidatePath("/");
     return { success: true };
   } catch (error: any) {

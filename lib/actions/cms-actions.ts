@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { cmsPages } from "@/lib/db/schema";
 import { eq, desc } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { createLog } from "./admin-actions";
 
 export async function getPages() {
     try {
@@ -39,8 +40,10 @@ export async function savePage(data: any) {
 
         if (data.id) {
             await db.update(cmsPages).set(pageData).where(eq(cmsPages.id, id));
+            await createLog("CMS Sayfası Güncellendi", `Sayfa güncellendi: ${pageData.title} (/p/${pageData.slug})`);
         } else {
             await db.insert(cmsPages).values({ id, ...pageData });
+            await createLog("CMS Sayfası Eklendi", `Yeni sayfa eklendi: ${pageData.title} (/p/${pageData.slug})`);
         }
 
         revalidatePath("/admin/content/pages");
@@ -54,6 +57,7 @@ export async function savePage(data: any) {
 export async function deletePage(id: string) {
     try {
         await db.delete(cmsPages).where(eq(cmsPages.id, id));
+        await createLog("CMS Sayfası Silindi", `Sayfa silindi (ID: ${id})`);
         revalidatePath("/admin/content/pages");
         return { success: true };
     } catch (error: any) {

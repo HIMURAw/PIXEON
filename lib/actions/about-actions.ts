@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { settings } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { createLog } from "./admin-actions";
 
 const ABOUT_US_KEY = "about_us_content";
 
@@ -61,6 +62,8 @@ export async function saveAboutUsContent(data: any) {
         } else {
             await db.insert(settings).values({ key: ABOUT_US_KEY, value: jsonValue });
         }
+
+        await createLog("Hakkımızda Sayfası Güncellendi", "\"Hakkımızda\" içeriği düzenlendi.");
 
         revalidatePath("/hakkimizda");
         revalidatePath("/admin/content/about");
