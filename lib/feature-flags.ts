@@ -3,21 +3,9 @@
 import { db } from "@/lib/db";
 import { settings } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
+import { FEATURE_FLAGS, type FeatureFlagKey } from "@/lib/feature-flags-registry";
 
 const FLAG_KEY_PREFIX = "flag:";
-
-// Central registry so the admin UI has something to list/toggle without
-// hand-editing raw keys. Add an entry here, then gate the relevant code with
-// getFeatureFlag(key).
-export const FEATURE_FLAGS = [
-  {
-    key: "ai_chat_assistant",
-    label: "AI Destek Asistanı",
-    description: "Destek widget'ındaki otomatik yanıtlayan AI sohbet sekmesi.",
-  },
-] as const;
-
-export type FeatureFlagKey = (typeof FEATURE_FLAGS)[number]["key"];
 
 export async function getFeatureFlag(key: FeatureFlagKey, defaultValue = true): Promise<boolean> {
   try {

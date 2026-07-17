@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { encrypt, SESSION_COOKIE_NAME } from "@/lib/auth";
+import { createTwoFactorPendingToken } from "@/lib/auth";
+import { issueSession } from "@/lib/session";
 import { db } from "@/lib/db";
-import { users, adminLogs } from "@/lib/db/schema";
+import { users } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
-import { randomUUID } from "crypto";
 
 import { verifyCaptcha } from "@/lib/captcha";
 import { rateLimit, getClientIp } from "@/lib/rate-limiter";
@@ -83,45 +83,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 3. Oturum oluştur
-    const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
-    const sessionUser = {
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      role: user.role,
-    };
-    
-    // Log successful admin login
-    if (user.role === "ADMIN") {
-      const ip = getClientIp(request);
-      try {
-        await db.insert(adminLogs).values({
-          id: randomUUID(),
-          adminId: user.id,
-          adminName: user.name || "Bilinmeyen",
-          action: "Giriş Yapıldı",
-          details: "Yönetici başarılı bir şekilde sisteme giriş yaptı.",
-          ipAddress: ip,
-          createdAt: new Date(),
-        });
-      } catch (err) {
-        console.error("Error creating login admin log:", err);
-      }
+    // 3. İki faktörlü doğrulama etkinse, session açmadan doğrulama adımına yönlendir
+    if (user.twoFactorEnabled) {
+      const tempToken = await createTwoFactorPendingToken(user.id);
+      return NextResponse.json({ success: true, requiresTwoFactor: true, tempToken });
     }
-    
-    const session = await encrypt({ user: sessionUser, expires });
 
-    const response = NextResponse.json({ success: true, user: sessionUser });
-    response.cookies.set(SESSION_COOKIE_NAME, session, {
-      expires,
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-    });
-
-    return response;
+    // 4. Oturum oluştur
+    const ip = getClientIp(request);
+    return await issueSession(user, ip);
   } catch (error) {
     console.error("Login Error:", error);
     return NextResponse.json(

@@ -20,7 +20,9 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getSettings, updateSettings } from "@/lib/actions/settings-actions";
-import { FEATURE_FLAGS, getAllFeatureFlags, setFeatureFlag, type FeatureFlagKey } from "@/lib/feature-flags";
+import { getAllFeatureFlags, setFeatureFlag } from "@/lib/feature-flags";
+import { FEATURE_FLAGS, type FeatureFlagKey } from "@/lib/feature-flags-registry";
+import TwoFactorSettings from "@/components/admin/TwoFactorSettings";
 import { toast } from "react-hot-toast";
 
 export default function AdminSettings() {
@@ -30,10 +32,14 @@ export default function AdminSettings() {
     const [formData, setFormData] = useState<any>({});
     const [flags, setFlags] = useState<Record<string, boolean>>({});
     const [flagsLoading, setFlagsLoading] = useState(true);
+    const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
     useEffect(() => {
         fetchSettings();
         fetchFlags();
+        fetch("/api/auth/me").then(res => res.ok ? res.json() : null).then(data => {
+            if (data?.user?.id) setCurrentUserId(data.user.id);
+        });
     }, []);
 
     const fetchSettings = async () => {
@@ -372,10 +378,13 @@ export default function AdminSettings() {
                         )}
 
                         {activeTab === "guvenlik" && (
-                            <div className="p-8 text-center bg-slate-950/50 rounded-3xl border border-white/5 border-dashed">
-                                <Lock className="mx-auto text-slate-700 mb-4" size={48} />
-                                <p className="text-sm text-slate-500 font-bold uppercase tracking-widest">Güvenlik ve API ayarları çok yakında!</p>
-                            </div>
+                            currentUserId ? (
+                                <TwoFactorSettings userId={currentUserId} />
+                            ) : (
+                                <div className="flex justify-center py-8">
+                                    <Loader2 className="animate-spin text-blue-500" size={28} />
+                                </div>
+                            )
                         )}
 
                         {activeTab === "ozellikler" && (

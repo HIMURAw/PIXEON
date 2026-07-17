@@ -9,6 +9,8 @@ export const users = mysqlTable("users", {
   password: varchar("password", { length: 255 }).notNull(),
   role: mysqlEnum("role", ["USER", "ADMIN"]).default("USER").notNull(),
   adminRole: varchar("admin_role", { length: 255 }),
+  twoFactorSecret: varchar("two_factor_secret", { length: 255 }),
+  twoFactorEnabled: boolean("two_factor_enabled").default(false).notNull(),
   phone: varchar("phone", { length: 20 }),
   address: text("address"),
   image: varchar("image", { length: 255 }),

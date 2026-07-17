@@ -4,7 +4,7 @@ import React, { useState, useEffect, Suspense } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Mail, Lock, Loader2, ArrowRight, ShieldCheck, Eye, EyeOff, CheckCircle2 } from "lucide-react";
+import { Mail, Lock, Loader2, ArrowRight, ShieldCheck, Eye, EyeOff, CheckCircle2, KeyRound } from "lucide-react";
 import Link from "next/link";
 import { FcGoogle } from "react-icons/fc";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -38,6 +38,12 @@ function LoginForm() {
   const [captchaSvg, setCaptchaSvg] = useState<string>("");
   const [captchaToken, setCaptchaToken] = useState<string>("");
 
+  // Two-factor step: set once the password step succeeds for a 2FA-enabled account
+  const [twoFactorTempToken, setTwoFactorTempToken] = useState<string | null>(null);
+  const [twoFactorCode, setTwoFactorCode] = useState("");
+  const [isVerifying2FA, setIsVerifying2FA] = useState(false);
+  const [twoFactorError, setTwoFactorError] = useState<string | null>(null);
+
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -68,6 +74,16 @@ function LoginForm() {
     refreshCaptcha();
   }, []);
 
+  const goToDestination = (user: { role: string }) => {
+    if (user.role === "ADMIN") {
+      router.push("/admin/dashboard");
+    } else {
+      const callbackUrl = searchParams.get("callbackUrl") || "/";
+      router.push(callbackUrl);
+    }
+    router.refresh();
+  };
+
   const onSubmit = async (data: LoginFormValues) => {
     setIsLoading(true);
     setError(null);
@@ -84,14 +100,10 @@ function LoginForm() {
 
       const result = await response.json();
 
-      if (response.ok && result.success) {
-        if (result.user.role === "ADMIN") {
-          router.push("/admin/dashboard");
-        } else {
-          const callbackUrl = searchParams.get("callbackUrl") || "/";
-          router.push(callbackUrl);
-        }
-        router.refresh();
+      if (response.ok && result.success && result.requiresTwoFactor) {
+        setTwoFactorTempToken(result.tempToken);
+      } else if (response.ok && result.success) {
+        goToDestination(result.user);
       } else {
         setError(result.message || "Giriş başarısız oldu");
         refreshCaptcha();
@@ -101,6 +113,32 @@ function LoginForm() {
       refreshCaptcha();
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const onVerifyTwoFactor = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!twoFactorTempToken) return;
+    setIsVerifying2FA(true);
+    setTwoFactorError(null);
+
+    try {
+      const response = await fetch("/api/auth/verify-2fa", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tempToken: twoFactorTempToken, code: twoFactorCode }),
+      });
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        goToDestination(result.user);
+      } else {
+        setTwoFactorError(result.message || "Doğrulama başarısız oldu");
+      }
+    } catch (err) {
+      setTwoFactorError("Bir bağlantı hatası oluştu");
+    } finally {
+      setIsVerifying2FA(false);
     }
   };
 
@@ -119,6 +157,61 @@ function LoginForm() {
         </p>
       </div>
 
+      {twoFactorTempToken ? (
+        <div className="bg-slate-900/60 backdrop-blur-2xl border border-white/5 rounded-[2rem] p-8 shadow-2xl relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-sky-500/5 to-transparent pointer-events-none" />
+          <form onSubmit={onVerifyTwoFactor} className="space-y-5 relative z-10">
+            <div className="flex flex-col items-center text-center gap-3 mb-2">
+              <div className="w-14 h-14 bg-sky-500/10 border border-sky-500/20 rounded-2xl flex items-center justify-center">
+                <KeyRound className="text-sky-400 w-7 h-7" />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-white">İki Faktörlü Doğrulama</h2>
+                <p className="text-slate-400 text-xs mt-1 max-w-[280px]">
+                  Kimlik doğrulama uygulamanızdaki 6 haneli kodu girin.
+                </p>
+              </div>
+            </div>
+
+            {twoFactorError && (
+              <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-xs py-3 px-4 rounded-xl flex items-center gap-3 animate-in">
+                <span className="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]" />
+                {twoFactorError}
+              </div>
+            )}
+
+            <input
+              value={twoFactorCode}
+              onChange={(e) => setTwoFactorCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+              type="text"
+              inputMode="numeric"
+              autoFocus
+              placeholder="000000"
+              className="w-full bg-slate-950/50 border border-white/5 focus:border-sky-500/50 focus:ring-[6px] focus:ring-sky-500/5 rounded-2xl py-4 px-4 text-center text-2xl tracking-[0.5em] text-white placeholder-slate-700 outline-none transition-all"
+            />
+
+            <button
+              type="submit"
+              disabled={isVerifying2FA || twoFactorCode.length !== 6}
+              className="w-full relative group/btn overflow-hidden rounded-2xl p-px disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98]"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-sky-600 via-blue-600 to-sky-600 group-hover/btn:bg-sky-500" />
+              <div className="relative bg-sky-600 group-hover/btn:bg-transparent py-4 flex items-center justify-center gap-2 font-black text-sm text-white transition-all uppercase tracking-widest">
+                {isVerifying2FA ? <Loader2 className="animate-spin" size={18} /> : "Doğrula"}
+              </div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => { setTwoFactorTempToken(null); setTwoFactorCode(""); setTwoFactorError(null); }}
+              className="w-full text-center text-xs text-slate-500 hover:text-slate-300 font-medium transition-colors"
+            >
+              Farklı bir hesapla giriş yap
+            </button>
+          </form>
+        </div>
+      ) : (
+      <>
       <div className="bg-slate-900/60 backdrop-blur-2xl border border-white/5 rounded-[2rem] p-8 shadow-2xl relative overflow-hidden group/card">
         {/* Subtle inner glow */}
         <div className="absolute inset-0 bg-gradient-to-br from-sky-500/5 to-transparent pointer-events-none" />
@@ -276,6 +369,8 @@ function LoginForm() {
           Kayıt Ol
         </Link>
       </p>
+      </>
+      )}
 
       {/* Back to Home Link */}
       <div className="flex justify-center pt-4">
