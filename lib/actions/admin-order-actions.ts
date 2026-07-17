@@ -6,6 +6,7 @@ import { eq, desc, sql } from "drizzle-orm";
 import { randomUUID } from "crypto";
 import { revalidatePath } from "next/cache";
 import { createLog } from "./admin-actions";
+import { sendSms } from "@/lib/netgsm";
 
 export async function getAdminOrders() {
   try {
@@ -108,6 +109,19 @@ export async function updateOrderStatus(
     }
 
     await createLog("Sipariş Durumu Güncellendi", `${orderNum} numaralı siparişin durumu "${status}" olarak güncellendi.${isNewlyCancelled ? " İptal edilen ürünlerin stoğu iade edildi." : ""}${isWalletOrder ? " Cüzdan bakiyesi iade edildi." : ""}`);
+
+    // Best-effort SMS to the customer when their order ships — never blocks the status update.
+    if (status === "SHIPPED" && order) {
+      db.select({ phone: users.phone }).from(users).where(eq(users.id, order.userId)).limit(1)
+        .then(([u]) => {
+          if (!u?.phone) return;
+          const trackingInfo = trackingNumber ? ` Takip no: ${trackingNumber}` : "";
+          sendSms(u.phone, `PIXEON: ${orderNum} numaralı siparişiniz kargoya verildi.${trackingInfo}`).catch((err) =>
+            console.error("Shipment SMS failed:", err)
+          );
+        })
+        .catch((err) => console.error("Shipment SMS lookup failed:", err));
+    }
 
     revalidatePath("/admin/orders");
     revalidatePath("/admin/products");
