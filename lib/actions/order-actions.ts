@@ -1,8 +1,8 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { orders, orderItems, transactions, products, cartItems, userAddresses, coupons, users } from "@/lib/db/schema";
-import { eq, sql, inArray } from "drizzle-orm";
+import { orders, orderItems, transactions, products, cartItems, userAddresses, coupons, users, siteSettings } from "@/lib/db/schema";
+import { eq, sql, inArray, and, gte } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { randomUUID } from "crypto";
 
@@ -45,9 +45,12 @@ export async function createOrder(data: CreateOrderData) {
 
     const shippingAddressText = `${address.title}: ${address.name || ""} - ${address.phone || ""}\n${address.addressDetail}\n${address.district} / ${address.city}`;
 
-    // 3. Calculate total
+    // 3. Calculate total (shipping fee/threshold come from admin-configured site settings)
     const subtotal = userCart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const shippingFee = subtotal > 5000 ? 0 : 99;
+    const [settings] = await db.select().from(siteSettings).where(eq(siteSettings.id, "global")).limit(1);
+    const shippingFeeSetting = settings?.shippingFee ?? 99;
+    const freeShippingLimit = settings?.freeShippingLimit ?? 5000;
+    const shippingFee = freeShippingLimit > 0 && subtotal >= freeShippingLimit ? 0 : shippingFeeSetting;
     let totalAmount = subtotal + shippingFee;
 
     // 4. Generate order number
@@ -87,28 +90,22 @@ export async function createOrder(data: CreateOrderData) {
           .where(eq(coupons.id, coupon.id));
       }
 
-      // a. Check and update product stocks
+      // a. Atomically decrement stock, guarded by the current stock in the same statement
+      // so two concurrent checkouts can't both succeed against the same last unit
+      // (the in-memory `item.stock` read before the transaction started is not trustworthy).
       for (const item of userCart) {
-        if (item.stock < item.quantity) {
-          throw new Error(`Yetersiz stok: ${item.name} ürününde sadece ${item.stock} adet kaldı.`);
-        }
-        await tx.update(products)
-          .set({ 
-            stock: item.stock - item.quantity,
+        const [result] = await tx.update(products)
+          .set({
+            stock: sql`${products.stock} - ${item.quantity}`,
             salesCount: sql`${products.salesCount} + ${item.quantity}`
           })
-          .where(eq(products.id, item.productId));
+          .where(and(eq(products.id, item.productId), gte(products.stock, item.quantity)));
+
+        if (result.affectedRows === 0) {
+          throw new Error(`Yetersiz stok: ${item.name} ürünü için yeterli stok kalmadı.`);
+        }
       }
 
-      // To handle salesCount increment properly across Drizzle, let's query the salesCount or use simple update:
-      // Wait, let's update salesCount using normal select-update or raw SQL to avoid type issues. Let's do raw SQL.
-      // Drizzle has sql helper:
-      // `set({ stock: item.stock - item.quantity, salesCount: sql`${products.salesCount} + ${item.quantity}` })`
-      // Wait, let's use a simpler approach: we already have product object, so we can just set:
-      // But wait! Multiple checkouts could happen. Standard SQL increment is best:
-      // `import { sql } from "drizzle-orm"` but since we don't import sql, let's write it with sql template:
-      // Wait, let's just use `sql` from drizzle-orm. Let's import it.
-      
       const orderId = randomUUID();
       const transactionId = randomUUID();
 

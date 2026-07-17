@@ -45,11 +45,25 @@ export async function addToCartDb(userId: string, productId: string, quantity: n
       return { success: false, error: "Ürün bulunamadı." };
     }
 
+    if (product.status !== "ACTIVE") {
+      return { success: false, error: "Bu ürün şu anda satışa kapalı." };
+    }
+
     // Check if item already exists in the cart
     const existing = await db.select()
       .from(cartItems)
       .where(and(eq(cartItems.userId, userId), eq(cartItems.productId, productId)))
       .limit(1);
+
+    const requestedQuantity = existing.length > 0 ? existing[0].quantity + quantity : quantity;
+    if (requestedQuantity > product.stock) {
+      return {
+        success: false,
+        error: product.stock > 0
+          ? `Stokta sadece ${product.stock} adet var.`
+          : "Bu ürün stokta yok.",
+      };
+    }
 
     if (existing.length > 0) {
       const newQuantity = existing[0].quantity + quantity;
@@ -80,6 +94,14 @@ export async function updateCartQuantityDb(userId: string, productId: string, qu
   try {
     if (quantity <= 0) {
       return await removeFromCartDb(userId, productId);
+    }
+
+    const product = await db.query.products.findFirst({ where: eq(products.id, productId) });
+    if (!product) {
+      return { success: false, error: "Ürün bulunamadı." };
+    }
+    if (quantity > product.stock) {
+      return { success: false, error: `Stokta sadece ${product.stock} adet var.` };
     }
 
     await db.update(cartItems)
