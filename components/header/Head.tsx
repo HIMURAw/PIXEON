@@ -164,7 +164,7 @@ export default function Head() {
                             }}
                             animate={isJiggling ? "jiggle" : "idle"}
                         >
-                            <Link href="/sepet" className="relative p-1 block text-slate-200 hover:text-sky-400 transition-colors">
+                            <Link href="/sepet" aria-label="Sepetim" className="relative p-1 block text-slate-200 hover:text-sky-400 transition-colors">
                                 <ShoppingCart size={20} />
                                 {totalItems > 0 && (
                                     <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-[9px] font-black w-4 h-4 flex items-center justify-center rounded-full border border-[#0c1022] animate-in zoom-in duration-300">

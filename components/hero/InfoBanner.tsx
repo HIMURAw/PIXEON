@@ -12,6 +12,7 @@ export default function InfoBanner() {
 
             <img
                 src="/products/ps-plus-logo-nobg.png"
+                alt="PlayStation Plus"
                 className="h-20 object-contain"
             />
         </div>

@@ -23,7 +23,7 @@ export default function UserMenu({ mobile }: { mobile?: boolean }) {
 
     if (mobile) {
         return (
-            <Link href="/hesabim" className="hover:text-sky-400 transition-colors">
+            <Link href="/hesabim" aria-label="Hesabım" className="hover:text-sky-400 transition-colors">
                 {user?.image ? (
                     <div className="w-8 h-8 rounded-full overflow-hidden border border-slate-700 relative">
                         <Image src={user.image} alt={user.name || "User"} fill className="object-cover" />

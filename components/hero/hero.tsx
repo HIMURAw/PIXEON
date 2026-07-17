@@ -154,6 +154,7 @@ export default function HeroCarousel() {
 
             <button
                 onClick={prevSlide}
+                aria-label="Önceki slayt"
                 className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/10 hover:bg-white/30 backdrop-blur-md rounded-full flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity shadow-lg z-20"
             >
                 <ChevronLeft className="w-6 h-6 text-white" />
@@ -161,6 +162,7 @@ export default function HeroCarousel() {
 
             <button
                 onClick={nextSlide}
+                aria-label="Sonraki slayt"
                 className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/10 hover:bg-white/30 backdrop-blur-md rounded-full flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity shadow-lg z-20"
             >
                 <ChevronRight className="w-6 h-6 text-white" />
@@ -171,6 +173,7 @@ export default function HeroCarousel() {
                     <button
                         key={index}
                         onClick={() => goToSlide(index)}
+                        aria-label={`${index + 1}. slayta git`}
                         className={`transition-all duration-300 rounded-full h-1.5 ${index === currentSlide
                             ? "w-8 bg-sky-400"
                             : "w-2 bg-gray-600 hover:bg-sky-400"

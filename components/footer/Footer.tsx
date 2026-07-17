@@ -85,8 +85,12 @@ export default function Footer() {
                             PIXEON, en yeni PlayStation konsollarını, en popüler oyunları ve profesyonel ekipmanları en uygun fiyatlarla sunan yetkili satış merkezinizdir.
                         </p>
                         <div className="flex gap-4">
-                            {[Facebook, Instagram, Twitter].map((Icon, i) => (
-                                <a key={i} href="#" className="w-10 h-10 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center hover:bg-sky-500 hover:text-white transition">
+                            {[
+                                { Icon: Facebook, label: "Facebook" },
+                                { Icon: Instagram, label: "Instagram" },
+                                { Icon: Twitter, label: "Twitter" },
+                            ].map(({ Icon, label }) => (
+                                <a key={label} href="#" aria-label={label} className="w-10 h-10 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center hover:bg-sky-500 hover:text-white transition">
                                     <Icon size={18} />
                                 </a>
                             ))}
