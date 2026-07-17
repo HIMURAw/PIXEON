@@ -17,14 +17,23 @@ const loginSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
-const SearchParamHandler = ({ setSuccess }: { setSuccess: (val: string | null) => void }) => {
+const GOOGLE_ERROR_MESSAGES: Record<string, string> = {
+  google_not_configured: "Google ile giriş şu anda kullanılamıyor.",
+  google_auth_failed: "Google ile giriş başarısız oldu. Lütfen tekrar deneyin.",
+};
+
+const SearchParamHandler = ({ setSuccess, setError }: { setSuccess: (val: string | null) => void; setError: (val: string | null) => void }) => {
   const searchParams = useSearchParams();
 
   useEffect(() => {
     if (searchParams.get("registered")) {
       setSuccess("Hesabınız başarıyla oluşturuldu! Şimdi giriş yapabilirsiniz.");
     }
-  }, [searchParams, setSuccess]);
+    const errorCode = searchParams.get("error");
+    if (errorCode && GOOGLE_ERROR_MESSAGES[errorCode]) {
+      setError(GOOGLE_ERROR_MESSAGES[errorCode]);
+    }
+  }, [searchParams, setSuccess, setError]);
 
   return null;
 };
@@ -216,7 +225,7 @@ function LoginForm() {
         {/* Subtle inner glow */}
         <div className="absolute inset-0 bg-gradient-to-br from-sky-500/5 to-transparent pointer-events-none" />
 
-        <SearchParamHandler setSuccess={setSuccess} />
+        <SearchParamHandler setSuccess={setSuccess} setError={setError} />
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 relative z-10">
           {success && (
@@ -356,10 +365,13 @@ function LoginForm() {
             <div className="flex-1 h-px bg-white/5" />
           </div>
 
-          <button className="w-full bg-slate-950/50 hover:bg-slate-950 border border-white/5 hover:border-sky-500/20 text-slate-300 font-bold py-3.5 rounded-2xl flex items-center justify-center gap-3 transition-all group shadow-sm">
+          <a
+            href="/api/auth/google"
+            className="w-full bg-slate-950/50 hover:bg-slate-950 border border-white/5 hover:border-sky-500/20 text-slate-300 font-bold py-3.5 rounded-2xl flex items-center justify-center gap-3 transition-all group shadow-sm"
+          >
             <FcGoogle size={20} className="group-hover:scale-110 transition-transform" />
             <span className="text-sm">Google Hesabı</span>
-          </button>
+          </a>
         </div>
       </div>
 

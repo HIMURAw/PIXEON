@@ -13,7 +13,10 @@ interface SessionSourceUser {
   role: string;
 }
 
-export async function issueSession(user: SessionSourceUser, ip: string) {
+// Shared by issueSession (JSON response, used by password + 2FA login) and
+// the Google OAuth callback (redirect response) so both log the admin login
+// and sign the session cookie the same way without duplicating that logic.
+async function buildSession(user: SessionSourceUser, ip: string) {
   const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
   const sessionUser = { id: user.id, email: user.email, name: user.name, role: user.role };
 
@@ -34,8 +37,10 @@ export async function issueSession(user: SessionSourceUser, ip: string) {
   }
 
   const session = await encrypt({ user: sessionUser, expires });
+  return { sessionUser, session, expires };
+}
 
-  const response = NextResponse.json({ success: true, user: sessionUser });
+function setSessionCookie(response: NextResponse, session: string, expires: Date) {
   response.cookies.set(SESSION_COOKIE_NAME, session, {
     expires,
     httpOnly: true,
@@ -44,4 +49,18 @@ export async function issueSession(user: SessionSourceUser, ip: string) {
     path: "/",
   });
   return response;
+}
+
+export async function issueSession(user: SessionSourceUser, ip: string) {
+  const { sessionUser, session, expires } = await buildSession(user, ip);
+  const response = NextResponse.json({ success: true, user: sessionUser });
+  return setSessionCookie(response, session, expires);
+}
+
+// For flows that need to redirect (e.g. OAuth callbacks) instead of
+// returning JSON.
+export async function issueSessionRedirect(user: SessionSourceUser, ip: string, redirectUrl: string | URL) {
+  const { session, expires } = await buildSession(user, ip);
+  const response = NextResponse.redirect(redirectUrl);
+  return setSessionCookie(response, session, expires);
 }
