@@ -27,6 +27,7 @@ import SupportWidget from "@/components/support/SupportWidget";
 import { getSettings } from "@/lib/actions/settings-actions";
 import { getSession } from "@/lib/auth";
 import MaintenanceScreen from "@/components/MaintenanceScreen";
+import { getFeatureFlag } from "@/lib/feature-flags";
 
 export default async function RootLayout({
   children,
@@ -37,6 +38,7 @@ export default async function RootLayout({
   const session = await getSession().catch(() => null);
   const isAdmin = session?.user?.role === "ADMIN";
   const inMaintenance = !!settings?.maintenanceMode && !isAdmin;
+  const aiChatEnabled = await getFeatureFlag("ai_chat_assistant", true);
 
   return (
     <html lang="en">
@@ -51,7 +53,7 @@ export default async function RootLayout({
               <CategoryMenuProvider>
                 <SupportProvider>
                   {children}
-                  <SupportWidget />
+                  <SupportWidget aiChatEnabled={aiChatEnabled} />
                 </SupportProvider>
               </CategoryMenuProvider>
             </CartAnimationProvider>

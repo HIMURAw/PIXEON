@@ -132,9 +132,10 @@ function now() {
 }
 
 // ─── Main Component ────────────────────────────────────────────────────────────
-export default function SupportWidget() {
+export default function SupportWidget({ aiChatEnabled = true }: { aiChatEnabled?: boolean }) {
     const { isOpen, toggleSupport, closeSupport } = useSupport();
-    const [tab, setTab] = useState<Tab>("ai");
+    const [tab, setTab] = useState<Tab>(aiChatEnabled ? "ai" : "live");
+    const availableTabs: Tab[] = aiChatEnabled ? ["ai", "live"] : ["live"];
 
     // User Auth state
     const [user, setUser] = useState<any>(null);
@@ -416,8 +417,9 @@ export default function SupportWidget() {
                     </div>
 
                     {/* Tab Bar */}
+                    {availableTabs.length > 1 && (
                     <div className="flex shrink-0 bg-slate-950/80 border-b border-white/5">
-                        {(["ai", "live"] as Tab[]).map((t) => (
+                        {availableTabs.map((t) => (
                             <button
                                 key={t}
                                 onClick={() => setTab(t)}
@@ -427,6 +429,7 @@ export default function SupportWidget() {
                             </button>
                         ))}
                     </div>
+                    )}
 
                     {/* Content Area */}
                     <div className="flex-1 overflow-hidden flex flex-col relative">

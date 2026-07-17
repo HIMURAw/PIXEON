@@ -15,10 +15,12 @@ import {
     Plus,
     Trash2,
     Loader2,
-    Wrench
+    Wrench,
+    Flag
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getSettings, updateSettings } from "@/lib/actions/settings-actions";
+import { FEATURE_FLAGS, getAllFeatureFlags, setFeatureFlag, type FeatureFlagKey } from "@/lib/feature-flags";
 import { toast } from "react-hot-toast";
 
 export default function AdminSettings() {
@@ -26,9 +28,12 @@ export default function AdminSettings() {
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
     const [formData, setFormData] = useState<any>({});
+    const [flags, setFlags] = useState<Record<string, boolean>>({});
+    const [flagsLoading, setFlagsLoading] = useState(true);
 
     useEffect(() => {
         fetchSettings();
+        fetchFlags();
     }, []);
 
     const fetchSettings = async () => {
@@ -36,6 +41,25 @@ export default function AdminSettings() {
         const data = await getSettings();
         setFormData(data);
         setIsLoading(false);
+    };
+
+    const fetchFlags = async () => {
+        setFlagsLoading(true);
+        const data = await getAllFeatureFlags();
+        setFlags(data);
+        setFlagsLoading(false);
+    };
+
+    const handleFlagToggle = async (key: FeatureFlagKey) => {
+        const next = !flags[key];
+        setFlags((prev) => ({ ...prev, [key]: next }));
+        const res = await setFeatureFlag(key, next);
+        if (res.success) {
+            toast.success(next ? "Özellik etkinleştirildi." : "Özellik devre dışı bırakıldı.");
+        } else {
+            setFlags((prev) => ({ ...prev, [key]: !next }));
+            toast.error(res.error || "Bayrak güncellenemedi.");
+        }
     };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -93,6 +117,7 @@ export default function AdminSettings() {
         { id: "kargo", label: "Kargo & Teslimat", icon: Truck },
         { id: "bildirim", label: "Bildirimler", icon: Bell },
         { id: "guvenlik", label: "Güvenlik & API", icon: Lock },
+        { id: "ozellikler", label: "Özellik Bayrakları", icon: Flag },
     ];
 
     if (isLoading) {
@@ -350,6 +375,42 @@ export default function AdminSettings() {
                             <div className="p-8 text-center bg-slate-950/50 rounded-3xl border border-white/5 border-dashed">
                                 <Lock className="mx-auto text-slate-700 mb-4" size={48} />
                                 <p className="text-sm text-slate-500 font-bold uppercase tracking-widest">Güvenlik ve API ayarları çok yakında!</p>
+                            </div>
+                        )}
+
+                        {activeTab === "ozellikler" && (
+                            <div className="space-y-6">
+                                {flagsLoading ? (
+                                    <div className="flex justify-center py-12">
+                                        <Loader2 className="animate-spin text-blue-500" size={32} />
+                                    </div>
+                                ) : (
+                                    FEATURE_FLAGS.map((flag) => (
+                                        <div key={flag.key} className="flex items-center justify-between p-6 bg-slate-950 border border-white/5 rounded-3xl group hover:border-blue-500/20 transition-all">
+                                            <div className="flex items-center gap-4">
+                                                <div className={cn(
+                                                    "w-12 h-12 rounded-2xl flex items-center justify-center border",
+                                                    flags[flag.key] ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" : "bg-slate-900 border-white/5 text-slate-600"
+                                                )}>
+                                                    <Flag size={22} />
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm font-black text-white">{flag.label}</p>
+                                                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-tight mt-0.5">{flag.description}</p>
+                                                </div>
+                                            </div>
+                                            <button
+                                                onClick={() => handleFlagToggle(flag.key)}
+                                                className={cn(
+                                                    "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                                                    flags[flag.key] ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" : "bg-white/5 text-slate-500 border border-white/5"
+                                                )}
+                                            >
+                                                {flags[flag.key] ? "Aktif" : "Devre Dışı"}
+                                            </button>
+                                        </div>
+                                    ))
+                                )}
                             </div>
                         )}
                     </div>
