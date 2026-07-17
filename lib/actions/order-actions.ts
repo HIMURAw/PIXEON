@@ -5,6 +5,7 @@ import { orders, orderItems, transactions, products, cartItems, userAddresses, c
 import { eq, sql, inArray, and, gte } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { randomUUID } from "crypto";
+import { sendOrderConfirmationEmail } from "@/lib/email";
 
 interface CreateOrderData {
   userId: string;
@@ -186,6 +187,18 @@ export async function createOrder(data: CreateOrderData) {
     revalidatePath("/sepet");
     revalidatePath("/admin/orders");
     revalidatePath("/admin/reports");
+
+    // Best-effort order confirmation email — never blocks or fails the order itself.
+    db.select({ email: users.email }).from(users).where(eq(users.id, userId)).limit(1)
+      .then(([u]) => {
+        if (!u?.email) return;
+        sendOrderConfirmationEmail(u.email, {
+          orderNumber: result.orderNumber,
+          totalAmount,
+          items: userCart.map((item) => ({ name: item.name, quantity: item.quantity, price: item.price })),
+        }).catch((err) => console.error("Order confirmation email failed:", err));
+      })
+      .catch((err) => console.error("Order confirmation email lookup failed:", err));
 
     return { success: true, orderNumber: result.orderNumber };
 

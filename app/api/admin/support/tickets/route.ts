@@ -3,6 +3,7 @@ import { supportTickets, supportMessages, users } from "@/lib/db/schema";
 import { eq, desc, asc } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
+import { sendSupportTicketUpdateEmail } from "@/lib/email";
 import fs from "fs/promises";
 import path from "path";
 
@@ -70,6 +71,20 @@ export async function POST(req: NextRequest) {
         await db.update(supportTickets)
             .set({ status: "IN_PROGRESS", updatedAt: new Date() })
             .where(eq(supportTickets.id, ticketId));
+
+        // Best-effort notification email to the ticket owner — never blocks the response.
+        db.select({ email: users.email, subject: supportTickets.subject })
+            .from(supportTickets)
+            .innerJoin(users, eq(supportTickets.userId, users.id))
+            .where(eq(supportTickets.id, ticketId))
+            .limit(1)
+            .then(([row]) => {
+                if (!row?.email) return;
+                sendSupportTicketUpdateEmail(row.email, { subject: row.subject, message }).catch((err) =>
+                    console.error("Support ticket email failed:", err)
+                );
+            })
+            .catch((err) => console.error("Support ticket email lookup failed:", err));
 
         return NextResponse.json({ success: true });
     } catch (error) {
