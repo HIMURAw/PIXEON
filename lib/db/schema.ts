@@ -37,6 +37,8 @@ export const siteSettings = mysqlTable("site_settings", {
   cryptoEnabled: boolean("crypto_enabled").default(false).notNull(),
   shippingFee: double("shipping_fee").default(0).notNull(),
   freeShippingLimit: double("free_shipping_limit").default(0).notNull(),
+  maintenanceMode: boolean("maintenance_mode").default(false).notNull(),
+  maintenanceMessage: text("maintenance_message"),
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow(),
 });
 

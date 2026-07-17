@@ -24,38 +24,50 @@ import { CartAnimationProvider } from "@/context/CartAnimationContext";
 import { CategoryMenuProvider } from "@/context/CategoryMenuContext";
 import { Toaster } from "react-hot-toast";
 import SupportWidget from "@/components/support/SupportWidget";
+import { getSettings } from "@/lib/actions/settings-actions";
+import { getSession } from "@/lib/auth";
+import MaintenanceScreen from "@/components/MaintenanceScreen";
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const settings = await getSettings();
+  const session = await getSession().catch(() => null);
+  const isAdmin = session?.user?.role === "ADMIN";
+  const inMaintenance = !!settings?.maintenanceMode && !isAdmin;
+
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <CartProvider>
-          <CartAnimationProvider>
-            <CategoryMenuProvider>
-              <SupportProvider>
-                {children}
-                <SupportWidget />
-              </SupportProvider>
-            </CategoryMenuProvider>
-          </CartAnimationProvider>
-          <Toaster 
-            position="top-right" 
-            toastOptions={{
-              style: {
-                background: "#0c1022",
-                color: "#fff",
-                border: "1px solid rgba(255, 255, 255, 0.1)",
-                borderRadius: "1rem",
-              }
-            }} 
-          />
-        </CartProvider>
+        {inMaintenance ? (
+          <MaintenanceScreen message={settings?.maintenanceMessage} />
+        ) : (
+          <CartProvider>
+            <CartAnimationProvider>
+              <CategoryMenuProvider>
+                <SupportProvider>
+                  {children}
+                  <SupportWidget />
+                </SupportProvider>
+              </CategoryMenuProvider>
+            </CartAnimationProvider>
+            <Toaster
+              position="top-right"
+              toastOptions={{
+                style: {
+                  background: "#0c1022",
+                  color: "#fff",
+                  border: "1px solid rgba(255, 255, 255, 0.1)",
+                  borderRadius: "1rem",
+                }
+              }}
+            />
+          </CartProvider>
+        )}
       </body>
     </html>
   );

@@ -14,7 +14,8 @@ import {
     Image as ImageIcon,
     Plus,
     Trash2,
-    Loader2
+    Loader2,
+    Wrench
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getSettings, updateSettings } from "@/lib/actions/settings-actions";
@@ -210,12 +211,46 @@ export default function AdminSettings() {
                                 </div>
                                 <div className="space-y-4 md:col-span-2">
                                     <label className="block text-xs font-black text-slate-500 uppercase tracking-widest">Meta Açıklaması</label>
-                                    <textarea 
+                                    <textarea
                                         rows={4}
                                         name="siteDescription"
                                         value={formData.siteDescription || ""}
                                         onChange={handleInputChange}
                                         className="w-full bg-slate-950 border border-white/10 rounded-2xl px-5 py-3.5 text-white outline-none focus:border-blue-500 transition-all font-bold resize-none"
+                                    ></textarea>
+                                </div>
+
+                                <div className="space-y-4 md:col-span-2 p-6 bg-slate-950 border border-white/5 rounded-3xl">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-4">
+                                            <div className={cn(
+                                                "w-12 h-12 rounded-2xl flex items-center justify-center border",
+                                                formData.maintenanceMode ? "bg-amber-500/10 border-amber-500/20 text-amber-400" : "bg-slate-900 border-white/5 text-slate-600"
+                                            )}>
+                                                <Wrench size={24} />
+                                            </div>
+                                            <div>
+                                                <p className="text-sm font-black text-white">Bakım Modu</p>
+                                                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-tight mt-0.5">Aktifken ziyaretçiler bakım ekranı görür, adminler siteyi normal kullanmaya devam eder</p>
+                                            </div>
+                                        </div>
+                                        <button
+                                            onClick={() => handleToggle("maintenanceMode", formData.maintenanceMode)}
+                                            className={cn(
+                                                "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0",
+                                                formData.maintenanceMode ? "bg-amber-500/10 text-amber-400 border border-amber-500/20" : "bg-white/5 text-slate-500 border border-white/5"
+                                            )}
+                                        >
+                                            {formData.maintenanceMode ? "Aktif" : "Devre Dışı"}
+                                        </button>
+                                    </div>
+                                    <textarea
+                                        rows={2}
+                                        name="maintenanceMessage"
+                                        placeholder="Ziyaretçilere gösterilecek bakım mesajı (opsiyonel)"
+                                        value={formData.maintenanceMessage || ""}
+                                        onChange={handleInputChange}
+                                        className="w-full bg-slate-900 border border-white/10 rounded-2xl px-5 py-3.5 text-white outline-none focus:border-blue-500 transition-all font-medium resize-none placeholder:text-slate-600"
                                     ></textarea>
                                 </div>
                             </div>
