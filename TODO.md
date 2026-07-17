@@ -22,12 +22,12 @@
 - [✔️] XSS (Cross Site Scripting) kontrol edilicek
 - [✔️] ticket kısmında upload sistemine dosya boyutu kontrolü eklenicek
 - [✔️] Upload klasörünü execute edilemez yapılıcak
-- [✖️] admin panele giriş için 2FA eklenicek
+- [✔️] admin panele giriş için 2FA eklenicek
 - [✖️] sitenin tamamının güvenliğine bakılıcak
 
-- [✖️] KVK gizliliği araştırılıcak ona göre düzenlemeler yapılıcak
-- [✖️] iade politikası eklenicek
-- [✖️] KVKK, mesafeli satış sözleşmesi, gizlilik politikası, çerez politikası bunlar eklenicek
+- [✖️] KVK gizliliği araştırılıcak ona göre düzenlemeler yapılıcak (şablon sayfalar eklendi, gerçek içerik hukuki incelemeden geçmeli — bkz. scripts/seed-legal-pages.ts)
+- [✔️] iade politikası eklenicek
+- [✔️] KVKK, mesafeli satış sözleşmesi, gizlilik politikası, çerez politikası bunlar eklenicek
 
 - [✔️] Admin panele ayrıntılı log sistemi eklenicek
 - [✔️] Admin panele canlı request monitor eklenicek
@@ -49,14 +49,14 @@
 - [✖️] DB otomatik backup sistemi yapılacak
 - [✖️] Queue sistemi araştırılacak (BullMQ vs)
 - [✖️] Email queue sistemi yapılacak
-- [✖️] Stok yönetim sistemi test edilecek
-- [✖️] Ödeme başarısız senaryoları test edilecek
+- [✔️] Stok yönetim sistemi test edilecek (eşzamanlı sipariş race condition ve sepet stok kontrolü düzeltildi)
+- [✖️] Ödeme başarısız senaryoları test edilecek (gerçek ödeme gateway'i (PayTR vb.) entegre değil; sipariş iptalinde stok iadesi eklendi ama gateway hata senaryoları test edilemedi)
 - [✖️] Lighthouse performans testi yapılacak
 - [✖️] Mobile gesture UX iyileştirilecek
-- [✖️] Error boundary sistemi eklenecek
-- [✖️] Global error handling yapılacak
-- [✖️] Maintenance mode sistemi yapılacak
-- [✖️] Feature flag sistemi araştırılacak
+- [✔️] Error boundary sistemi eklenecek
+- [✔️] Global error handling yapılacak
+- [✔️] Maintenance mode sistemi yapılacak
+- [✔️] Feature flag sistemi araştırılacak
 
 
 
