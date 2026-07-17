@@ -1,9 +1,31 @@
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { randomBytes } from "crypto";
 
-const secretKey = process.env.JWT_SECRET || "TUGER-secret-key-change-me-in-production";
+function resolveSecretKey(): string {
+  if (process.env.JWT_SECRET) return process.env.JWT_SECRET;
+
+  if (process.env.NODE_ENV === "production") {
+    throw new Error(
+      "JWT_SECRET environment variable is required in production. Set it before starting the app."
+    );
+  }
+
+  // Dev-only fallback: random per-process secret, never usable across restarts or deployments.
+  console.warn(
+    "[auth] JWT_SECRET is not set — using an ephemeral dev-only secret. Sessions will be invalidated on restart. Set JWT_SECRET in .env for persistent sessions."
+  );
+  return randomBytes(32).toString("hex");
+}
+
+const secretKey = resolveSecretKey();
 const key = new TextEncoder().encode(secretKey);
+
+// Reused by lib/captcha.ts so both share one secret-resolution policy.
+export function getAuthKey() {
+  return key;
+}
 
 export const SESSION_COOKIE_NAME = "TUGER_session";
 

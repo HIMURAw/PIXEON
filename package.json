@@ -1,7 +1,9 @@
 {
-  "name": "frontend",
+  "name": "pixeon",
   "version": "0.1.0",
   "private": true,
+  "description": "PIXEON — a Next.js gaming e-commerce platform with a full admin back-office.",
+  "license": "Apache-2.0",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

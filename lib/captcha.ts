@@ -1,8 +1,8 @@
 import { create } from "svg-captcha";
 import { SignJWT, jwtVerify } from "jose";
+import { getAuthKey } from "./auth";
 
-const secretKey = process.env.JWT_SECRET || "TUGER-captcha-secret-key-change-me-in-production";
-const key = new TextEncoder().encode(secretKey);
+const key = getAuthKey();
 
 export async function generateCaptcha() {
   const captcha = create({

@@ -18,6 +18,7 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # vercel
 .vercel
@@ -28,3 +29,17 @@ next-env.d.ts
 node_modules
 
 /lib/generated/prisma
+
+# database dumps / local-only backups
+*.sql
+*.sqlite
+*.sqlite3
+
+# local scratch scripts and debug logs (never commit real data/queries)
+/scratch/
+
+# local design-tool cache
+/.kombai/
+
+# uploaded user content (existing demo files stay tracked; new uploads are runtime data, not source)
+/public/uploads/*
