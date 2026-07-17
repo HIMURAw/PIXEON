@@ -2,7 +2,7 @@
 
 import { db } from "@/lib/db";
 import { orders, orderItems, transactions, products, users } from "@/lib/db/schema";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { createLog } from "./admin-actions";
 
@@ -57,7 +57,8 @@ export async function updateOrderStatus(
 ) {
   try {
     const orderData = await db.select().from(orders).where(eq(orders.id, orderId)).limit(1);
-    const orderNum = orderData[0]?.orderNumber || orderId;
+    const order = orderData[0];
+    const orderNum = order?.orderNumber || orderId;
 
     const updateData: any = { status, updatedAt: new Date() };
     if (status === "SHIPPED") {
@@ -65,11 +66,31 @@ export async function updateOrderStatus(
       updateData.trackingNumber = trackingNumber || null;
     }
 
-    await db.update(orders).set(updateData).where(eq(orders.id, orderId));
-    
-    await createLog("Sipariş Durumu Güncellendi", `${orderNum} numaralı siparişin durumu "${status}" olarak güncellendi.`);
-    
+    // Cancelling an order that reserved stock at checkout must give that stock back,
+    // otherwise cancelled/failed orders permanently shrink inventory.
+    const isNewlyCancelled = status === "CANCELLED" && order?.status !== "CANCELLED";
+
+    if (isNewlyCancelled) {
+      await db.transaction(async (tx) => {
+        const items = await tx.select().from(orderItems).where(eq(orderItems.orderId, orderId));
+        for (const item of items) {
+          await tx.update(products)
+            .set({
+              stock: sql`${products.stock} + ${item.quantity}`,
+              salesCount: sql`GREATEST(${products.salesCount} - ${item.quantity}, 0)`,
+            })
+            .where(eq(products.id, item.productId));
+        }
+        await tx.update(orders).set(updateData).where(eq(orders.id, orderId));
+      });
+    } else {
+      await db.update(orders).set(updateData).where(eq(orders.id, orderId));
+    }
+
+    await createLog("Sipariş Durumu Güncellendi", `${orderNum} numaralı siparişin durumu "${status}" olarak güncellendi.${isNewlyCancelled ? " İptal edilen ürünlerin stoğu iade edildi." : ""}`);
+
     revalidatePath("/admin/orders");
+    revalidatePath("/admin/products");
     return { success: true };
   } catch (error: any) {
     console.error("Error updating order status:", error);
